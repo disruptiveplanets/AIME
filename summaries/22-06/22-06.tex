@@ -92,7 +92,7 @@ Next, we calculate the moment of inertia in the co-rotating frame of the asteroi
     \label{eqn:moi-local}
 \end{aligned}
 \end{equation}
-where $I_{ij}$ are the components of the inertia tensor $I_\mathcal{L}$ in the local frame, and
+where $I_{ab}$ are the components of the inertia tensor $I_\mathcal{L}$ in the local frame, and
 \begin{equation}
     I_\mathcal{G} = R I_\mathcal{L} R^{-1}
     \label{eqn:moi-global}
@@ -118,14 +118,14 @@ where
 \end{equation}
 was chosen such that $\nabla \times \bm T = \bm t$. By the divergence theorem,
 \begin{equation}
-    I_{ij} = \sum_{i=1}^N \rho_i\oint_{\partial V_i} d^2 \bm r \cdot \bm I_{ij}(\bm r)
+    I_{ab} = \sum_{i=1}^N \rho_i\oint_{\partial V_i} d^2 \bm r \cdot \bm I_{ab}(\bm r)
     \label{eqn:surface-moi}
 \end{equation}
 for 
 \begin{equation}
 \begin{aligned}
-    \bm I_{ii}(\bm r)& = \hat{\bm j} \frac{r_j^3}{3} + \hat{\bm k} \frac{r_k^3}{3} \\
-    \bm I_{ij}(\bm r)& = \hat{\bm k} r_i r_j r_k \hspace{1.5 cm} i \neq j
+    \bm I_{aa}(\bm r)& = \hat{\bm b} \frac{r_b^3}{3} + \hat{\bm c} \frac{r_c^3}{3} \\
+    \bm I_{ab}(\bm r)& = -\hat{\bm c} r_a r_b r_c \hspace{1.5 cm} a \neq b
     \label{eqn:moi-generator}.
 \end{aligned}
 \end{equation}
@@ -185,6 +185,7 @@ There are $\sum_{s=1}^m 6(ns/m)^2$ chunks all together, each with their one para
 
 
 \subsection{Calculating moment of inertia and torque}
+\label{sec:equations}
 Once the shape of the asteroid has been fixed for parameters $C_{lm}$ and the densities $\rho_i$ have been assigned to each chunk, the center of mass must next be calculated via equation \ref{eqn:com-surf}. Each volume $V_i$ is a hexahedron, with the exception of those touching the origin which are pentahedra. So we break the faces into 10 or 12 triangles and compute both surface integral on each. The first surface integral is
 \begin{equation}
     \oint_{\partial V_i} d^2 \bm r \frac{r^2}{2} =
@@ -197,7 +198,7 @@ while the second, which also determines the mass of the asteroid, is
     \frac{1}{3}\sum_{j=1}^{10, 12} \parens{\bm \ell_{ij1}\times\bm \ell_{ij2}}\cdot \int_0^1 d\alpha \int_0^{1-\alpha} d\beta \bm r.
     \label{eqn:com-triangle-2}
 \end{equation}
-Here, $\bm \ell_{ij1}$ and $\bm \ell_{ij2}$ are two edges of the $j$th triangular face of $V_i$, ordered such that $\bm \ell_{ij1} \times \bm \ell_{ij2}$ points out of $V_i$. These vectors can be computed once the fit parameters are known, and then simply rotated by $R$ as the asteroid rotates.
+Here, $\bm \ell_{ij1}$ and $\bm \ell_{ij2}$ are two edges of the $j$th triangular face of $V_i$, ordered such that $\bm \ell_{ij1} \times \bm \ell_{ij2}$ points out of $V_i$. The vector $v_i$ points to the intersection of $\bm \ell_{ij1}$ and $\bm \ell_{ij2}$. These vectors can be computed once the fit parameters are known, and then simply rotated by $R$ as the asteroid rotates.
 
 The above two integrals have analytical solutions to be found in the appendix.
 
@@ -254,10 +255,63 @@ We parameterize each chunk with spherical coordinates: ($\alpha$, $\theta$, $\ph
 \end{equation}
 where $\Omega_i$ is the solid angle occupied by chunk $i$.
 
-\section{Update}
-Instead of doing what I've outlined above, I'd like to use the spherical harmonic technique to segment the asteroid and define its shape. Then break it into polyhedrons, and use the polyhedral integral outlined above.
 
 
+\appendix
+\section{Analytical equations for torque, center of mass, and moment of inertia}
+In section \ref{sec:equations}, we outlined integrals for calculating the torque on the asteroid, the moment of inertia, and the center of mass. We stated that the integrals were analytical, but did not give the analytical values. They are given here.
+
+The mass of the asteroid is given by equation \ref{eqn:analytical-mass}. It can be used to calculate the center of mass of the asteroid with equation \ref{eqn:analytical-com}. Once the center of mass is subtracted so that the origin is the new center, the moment of inertia components in the local frame can be computed with equations \ref{eqn:analytical-moi-same} and  \ref{eqn:analytical-moi-diff}. Then the torque can be computed with equation \ref{eqn:analytical-torque} with the model positions rotated by $R$ to account for asteroid rotation.
+
+\begin{table*} 
+    \begin{equation}
+        M = \frac{1}{6}\sum_{i=1}^N\rho_i \sum_{j=1}^{10, 12} \parens{\bm\ell_{ij1} \times \bm\ell_{ij2}} \cdot (\bm \ell_{ij1} + \bm \ell_{ij2} + 2\bm v)
+        \label{eqn:analytical-mass}
+    \end{equation}
+    \begin{equation}
+        C_\mathcal{L} = \frac{1}{12M}\sum_{i=1}^N\rho_i \sum_{j=1}^{10, 12} \parens{\bm\ell_{ij1} \times \bm\ell_{ij2}} \{2(\bm \ell_{ij1} - \bm \ell_{ij2})^2 + \bm \ell_{ij1}\cdot  \bm \ell_{ij2} + 6(\bm \ell_{ij1}+ \bm v)\cdot (\bm \ell_{ij2} + \bm v)\}
+        \label{eqn:analytical-com}
+    \end{equation}
+    \caption*{\textit{Top}: mass of the asteroid model, and \textit{bottom}: center of mass of the asteroid model. }
+\end{table*}
+
+\begin{table*} 
+    \begin{equation}
+        \begin{aligned}
+            I_{aa} = \frac{1}{60}\sum_{i=1}^N \rho_i \sum_{j=1}^{10, 12} \parens{\ell_{ij1}\times \ell_{ij2}}\cdot \{&\hat{\bm b}[\ell_{1b}^3 + \ell_{1b}^2 \ell_{2b} + \ell_{1b} \ell_{2b}^2 + \ell_{2b}^3 + 
+            5 v_b (\ell_{1b}^2 + \ell_{1b} l2b + \ell_{2b}^2) + 
+            10 v_b^2 (\ell_{1b} + \ell_{2b}) + 10 v_b^3]\\
+             + & \hat {\bm c}[\ell_{1c}^3 + \ell_{1c}^2 \ell_{2c} + \ell_{1c} \ell_{2c}^2 + \ell_{2c}^3 + 5 v_c (\ell_{1c}^2 + \ell_{1c} \ell_{2c} + \ell_{2c}^2) + 10 v_c^2(\ell_{1c} + \ell_{2c}) + 10 v_c^3]\}
+        \end{aligned}
+    \label{eqn:analytical-moi-same}
+    \end{equation}
+    \begin{equation}
+        \begin{aligned}
+            I_{ab} = -\frac{1}{120}\sum_{i=1}^N \rho_i \sum_{j=1}^{10, 12} \parens{\ell_{ij1}\times \ell_{ij2}}\cdot \hat{\bm c}\{
+                &\ell_{1c} [6 \ell_{1a} \ell_{1b} + 2 \ell_{2a} \ell_{2b} + 2 \ell_{1b} (\ell_{2a} + 5 v_a) + 2 \ell_{1a} (\ell_{2b} + 5 v_b) +  5 \ell_{2a} v_b + 5 \ell_{2b} v_a + 20 v_a v_b] \\
+                + &\ell_{2c}[2 \ell_{1a} \ell_{1b} + 6 \ell_{2a} \ell_{2b}
+                + 2 \ell_{2b}(\ell_{1a}  + 5 v_a) + 2 \ell_{2a}(\ell_{1b} + 5 v_b)
+                + 5 \ell_{1a} v_b + 5 \ell_{1b}v_a + 20 v_a v_b] \\
+                + &5v_c[ \ell_{1a} (2\ell_{1b} + \ell_{2b}) + \ell_{2a}(2\ell_{2b} + \ell_{1b}) + 4 v_a(\ell_{2b} + \ell_{1b}) + 4v_b(\ell_{1a} + \ell_{2a})  + 12 v_a v_b]\}
+        \end{aligned}
+    \label{eqn:analytical-moi-diff}
+    \end{equation}
+    \caption*{Diagonal (\textit{top}) and off-diagonal (\textit{bottom}) components of the moment of inertia tensor on an asteroid model. The $b$th component of $\bm \ell_{ij1}$ has been written as $\ell_{1b}$ for brevity, and likewise for other components.}
+\end{table*}
+
+\begin{table*} 
+    \begin{equation}
+        \begin{aligned}
+        \tau = \frac{\mu}{40D^3}\sum_{i=1}^N\rho_i \sum_{j=1}^{10, 12} \parens{\bm\ell_{ij1} \times \bm\ell_{ij2}} \times \hat {\bm z} \{
+        &\ell_{1z} [(\ell_{2x} + 5v_x)(\ell_{2x} + 2\ell_{1x}) + (\ell_{2y} + 5 v_y)(\ell_{2y}+2\ell_{1y}) + 3 (\ell_{1x}^2 + \ell_{1y}^2) + 10(v_x^2 + v_y^2)]\\
+        + &\ell_{2z} [ (\ell_{1x}+5v_x)(\ell_{1x}+2\ell_{2x}) + (\ell_{1y}+5v_y)(\ell_{1y}+2\ell_{2y}) + 3 (\ell_{2x}^2 + \ell_{2y}^2) + 10(v_x^2 + v_y^2)]\\
+        + &5v_z [(\ell_{1x}^2 + \ell_{1y}^2 + \ell_{2x}^2 + \ell_{2y}^2 + \ell_{1x} \ell_{2x} + \ell_{1y} \ell_{2y}) \\
+        & + 2v_x(2\ell_{1x} + 2\ell_{2x} + 3 v_x) + 2v_y(2\ell_{1y} + 2\ell_{2y} + 3 v_y)]\}
+        \end{aligned}
+    \label{eqn:analytical-torque}
+    \end{equation}
+    \caption*{Torque on an asteroid model. The $z$th component of $\bm \ell_{ij1}$ has been written as $\ell_{1z}$ for brevity, and likewise for other components. The $\bm \ell$ vectors used to do this integral should be in the global frame of reference, rotated by $R$.}
+\end{table*}
 
 
 
