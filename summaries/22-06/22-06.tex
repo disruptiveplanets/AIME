@@ -1,0 +1,265 @@
+ %\documentclass[aps,twocolumn,secnumarabic,balancelastpage,amsmath,amssymb,nofootinbib, floatfix]{revtex4}
+\documentclass[aps,twocolumn,secnumarabic,balancelastpage,amsmath,amssymb,nofootinbib,floatfix]{revtex4-1}
+
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\usepackage{graphicx}      % tools for importing graphics
+%\usepackage{lgrind}        % convert program code listings to a form 
+                            % includable in a LaTeX document
+%\usepackage{xcolor}        % produces boxes or entire pages with 
+                            % colored backgrounds
+%\usepackage{longtable}     % helps with long table options
+%\usepackage{epsf}          % old package handles encapsulated postscript issues
+\usepackage{bm}            % special bold-math package. usge: \bm{mathsymbol}
+\usepackage{subcaption}
+%\usepackage{asymptote}     % For typesetting of mathematical illustrations
+%\usepackage{thumbpdf}
+\usepackage[colorlinks=true]{hyperref}  % this package should be added after 
+                                        % all others.
+                                        % usage: \url{http://web.mit.edu/8.13}
+\usepackage{wasysym}
+
+\begin{document}
+\title{June 2022 Summary of Project to Determine Asteroid Shape and Density from Flybys}
+\author{Jack Dinsmore, Julien de Wit}
+\email{jtdinsmo@mit.edu}
+\date{\today}
+\affiliation{MIT Department of Physics}
+
+\newcommand{\parens}[1]{\left( #1 \right)}
+\newcommand{\brackets}[1]{\left[ #1 \right]}
+\newcommand{\comment}[1]{\textcolor{red}{\emph{ #1 }}}
+
+
+
+
+
+
+\begin{abstract}
+    Tidal torque induces changes in the angular velocity of asteroids on close flyby to a planet, and the nature of this change is strongly dependent on asteroid shape and density. We propose two models for the shape of the (convex) asteroid in question: a polyhedral model and an expansion of the surface in terms of the real spherical harmonics. The asteroid is divided into regions of similar volume, which are allowed to vary in density from each other. For many types of simulated asteroid flybys, a light curve is generated and the two asteroid models are fitted \comment{Results and Conclusion}.
+\end{abstract}
+
+\maketitle
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+\subsection{Tidal torque}
+The torque $d\bm{\tau}$ imposed on a section of mass $dm$ inside an asteroid by tidal forces is
+\begin{equation}
+    \frac{d\bm{\tau}}{dm} =\frac{3\mu}{D^3} (\bm{\hat x} yz - \bm{\hat y} xz) = \frac{3\mu}{D^3} \bm{t}(\bm{r})
+    \label{eqn:diff-torque}
+\end{equation}
+where $D$ is the distance between the asteroid and $x$, $y$, and $z$ are of course all new utensils. Here, we have chosen $+\$hat z$ to e
+
+\section{Model}
+\subsection{Asteroid model requirements}
+\label{sec:requirements}
+Any asteroid model with floating paramters designed to describe an asteroid with nonuniform density on flyby with a planet must be well-equipped to perform the following operations
+
+\begin{enumerate}
+    \item Rotate the asteroid along its axis of spin
+    \item Extract the tidal torque on the asteroid at an instant
+    \item Extract the moment of inertia tensor as a function of the parameters of the model
+    \item Extract the center of mass of the asteroid as a function of the parameters of the model
+\end{enumerate}
+Fortunately, the first task requires no extra work; Euler's equations dictate the manner of rotation of a three dimensional body:
+\begin{equation}
+    I\dot{\bm{\omega}} + \bm \omega \times (I \bm \omega) = \bm \tau
+    \label{eqn:euler}
+\end{equation}
+where $\bm \tau$ is the external torque on the asteroid: tidal torque in this case.
+
+The second task requires us to integrate equation \ref{eqn:diff-torque} over the volume of the asteroid model as follows:
+\begin{equation}
+    \bm{\tau} =  \frac{3\mu}{D^3}\int_{V} d^3 r \bm{t}(\bm{r}) \rho(\bm r) 
+    \label{eqn:total-torque}
+\end{equation}
+with the definition of $\bm{t}$ given in equation \ref{eqn:diff-torque}. Here, $V$ represents the volume of the asteroid, which will rotate and move over time.
+
+Next, we calculate the moment of inertia in the co-rotating frame of the asteroid, which we call the ``local frame'' $\mathcal{L}$. The values we calculate will remain constant throughout the course of the asteroid's trajectory. We can convert vectors in the local frame to the global frame by the rotation matrix $R$. The moment of inertia tensor is then defined entirely by the following integrals
+\begin{equation}
+\begin{aligned}
+    I_{xx} &= \int_{V_\mathcal{L}} d^3 r  \rho(\bm r) (y^2 + z^2) \\
+    I_{yy} &= \int_{V_\mathcal{L}} d^3 r  \rho(\bm r) (x^2 + z^2) \\
+    I_{zz} &= \int_{V_\mathcal{L}} d^3 r  \rho(\bm r) (x^2 + y^2) \\
+    I_{xy}=I_{yx} &= -\int_{V_\mathcal{L}} d^3r \rho(\bm r) xy \\
+    I_{yz}=I_{yx} &= -\int_{V_\mathcal{L}} d^3r \rho(\bm r) yz\\
+    I_{xz}=I_{zx} &= -\int_{V_\mathcal{L}} d^3r \rho(\bm r) xz
+    \label{eqn:moi-local}
+\end{aligned}
+\end{equation}
+where $I_{ij}$ are the components of the inertia tensor $I_\mathcal{L}$ in the local frame, and
+\begin{equation}
+    I_\mathcal{G} = R I_\mathcal{L} R^{-1}
+    \label{eqn:moi-global}
+\end{equation}
+is the inertia tensor in the global frame.
+
+The final task is to extract the center of mass of the asteroid in the local frame, which is defined as 
+\begin{equation}
+    \bm C_\mathcal{L} = \brackets{\int_{V_\mathcal{L}} d^3 r \rho(\bm r)\bm r}\brackets{\int_{V_\mathcal{L}} d^3 r \rho(\bm r)}^{-1}.
+    \label{eqn:com}
+\end{equation}
+
+For this paper, we will model the density distribution of the asteroid by partitioning the asteroid into $N$ chunks $V_i$ of uniform density $\rho_i$. We then compute the integrals in equations \ref{eqn:total-torque} and \ref{eqn:moi-local} by summing over the same integrals computed on each $V_i$. Performing the volume integrals directly is difficult, so we making use of the identity $\int_{V_i} d^3 r \nabla \times \bm A = \oint_{\partial V_i} d^2 \bm r \times \bm A$
+and achieve
+\begin{equation}
+    \bm \tau = \frac{3\mu}{D^3} \sum_{i=1}^N \rho_i\oint_{\partial V_i} (d^2 \bm r) \times \bm T(\bm r)
+    \label{eqn:surface-torque}
+\end{equation}
+where 
+\begin{equation}
+    \bm T(\bm r) = \frac{r_z}{2}\parens{r_x^2 + r_y^2}\hat{\bm z}
+    \label{eqn:torque-generator}
+\end{equation}
+was chosen such that $\nabla \times \bm T = \bm t$. By the divergence theorem,
+\begin{equation}
+    I_{ij} = \sum_{i=1}^N \rho_i\oint_{\partial V_i} d^2 \bm r \cdot \bm I_{ij}(\bm r)
+    \label{eqn:surface-moi}
+\end{equation}
+for 
+\begin{equation}
+\begin{aligned}
+    \bm I_{ii}(\bm r)& = \hat{\bm j} \frac{r_j^3}{3} + \hat{\bm k} \frac{r_k^3}{3} \\
+    \bm I_{ij}(\bm r)& = \hat{\bm k} r_i r_j r_k \hspace{1.5 cm} i \neq j
+    \label{eqn:moi-generator}.
+\end{aligned}
+\end{equation}
+Similarly, we calculate the center of mass:
+\begin{equation}
+    \bm C_\mathcal{L} = \brackets{\sum_{i=1}^N \rho_i \oint_{\partial V_i}d^2 \bm r \frac{r^2}{2}}\brackets{\sum_{i=1}^N \rho_i \oint_{\partial V_i}d^2 \bm r \cdot \frac{\bm r}{3}}^{-1}
+    \label{eqn:com-surf}
+\end{equation}
+where we implicitly used the identity $\int_V \nabla \psi d^3 r = \int_{\partial V} d^2 \bm r \psi$.
+
+
+\subsection{Parameterization of asteroid surface}
+We seek a model of asteroid surface that covers many asteroid shapes, is well behaved for all fit parameters, and admits an adjustable number of parameters. In this paper we model the asteroid surface as a sum of the real spherical harmonics:
+\begin{equation}
+    r(\theta, \phi) = \sum_{l=0}^L\sum_{m=-l}^l C_{lm} Y_{lm}(\theta, \phi)
+    \label{eqn:sph-surface}
+\end{equation}
+where $r(\theta, \phi)$ is the distance from the origin to the surface of the pulsar in direction $(\theta, \phi)$, and $C_{lm}$ are the fit parameters. Here we define the real spherical harmonics as 
+\begin{equation}
+    \begin{aligned}
+        Y_{lm} = &(-1)^m\sqrt{\frac{2l + 1}{2\pi}\frac{(l-|m|)!}{(l+|m|)!}}\\
+        &\times P_l^{|m|}(\cos\theta)\begin{cases}
+            \sin(|m|\phi)& m < 0\\
+            1/\sqrt{2}& m = 0\\
+            \cos(|m|\phi)& m > 0\\
+        \end{cases}.
+        \label{eqn:spherical-harmonics}
+    \end{aligned}
+\end{equation}
+The number of parameters may be changed by adjusting $L$. Note that there are $(L+1)^2$ parameters.
+
+
+Once the $C_{lm}$ parameters have been set, the asteroid surface is approximated as a polyhedron. The radial positions of each vertex are determined by equation \ref{eqn:sph-surface}. The angular positions are assigned as followed. A cube is considered, with each side tessellated into an $n\times n$ grid. The grids are projected onto the unit sphere and their angular positions are used for the angular coordinates of the polyhedron vertices.
+
+In general, the $l$th order spherical harmonic encodes fluctuation with wavelength $2\pi / l$ radians. Similarly, each face of the polyhedron has angular width $2\pi / (4n)$. It is therefore sensible to set $n \gg L/4$, so that the high-order spherical harmonics are included in the model. The upper bound on $n$ is determined by computation speed.
+
+The angular positions of the vertices need not be the projection of a cube onto the unit sphere; projections of a tetrahedron, octahedron, or icosahedron are also possible, since the symmetry properties of these platonic solids guarantee that the vertices will be placed evenly around the sphere. The icosahedron provides the most even distribution of points, but its 20 faces produce a large number of vertices which might not be desired depending on the computation speed available.
+
+Since the angular positions of the polyhedron vertices are spread evenly along the surface and do not depend on the parameters $C_{lm}$, they will behave well even for extreme fit parameters $C_{lm}$.
+
+The radial positions of the vertices are not guaranteed to be well behaved, so we outlaw all choices of $C_{lm}$ that result in vertices too close to or too far from the origin. For example, we could require that the range of $r(\theta, \phi)$ over the asteroid be less than or equal to its mean value.
+
+
+
+\subsection{Parameterization of asteroid interior}
+As discussed in section \ref{sec:requirements}, we will model the density distribution of the asteroid interior by breaking the interior into $N$ chunks of uniform density. It will be advantageous for the chunks to be of roughly equal volume, so that the model does not induce any unphysical structure in the interior of the asteroid.
+
+To guarantee this property, we subdivide the asteroid interior by foliating it into $m$ thick shells, with the $s$th shell containing the radii from $\frac{s-1}{n}r(\theta, \phi)$ to $\frac{s}{n}r(\theta, \phi)$. Each shell is further subdivided as the surface was divided, by projecting the tessellated faces of a cube onto the unit sphere. However, we tessellate the faces less for the inner shells, using a grid with $ns / m$ squares in each row for shell $s$. The integers $n$ and $m$ should be chosen such that $n/m$ is itself an integer.
+
+The volume of the $s$th shell is roughly proportional to $s^2$. With the above subdivision method, the $s$th shell is divided into $6(ns / m)^2$ chunks, so that the volume of each chunk is independent of $s$. There will be some variation in volume caused by different radii at different points of the asteroid, the thickness of the shells, and warping of the cube's faces caused by the projection, but for this paper we will accept these variations.
+
+There are $\sum_{s=1}^m 6(ns/m)^2$ chunks all together, each with their one parameter for their density. Adding the parameters of the spherical harmonics, we achieve a total number of parameters:
+\begin{equation}
+    P = (L+1)^2 + \frac{n^2(m+1)(2m+1)}{m}
+    \label{eqn:num-parameters}
+\end{equation}
+
+
+\subsection{Calculating moment of inertia and torque}
+Once the shape of the asteroid has been fixed for parameters $C_{lm}$ and the densities $\rho_i$ have been assigned to each chunk, the center of mass must next be calculated via equation \ref{eqn:com-surf}. Each volume $V_i$ is a hexahedron, with the exception of those touching the origin which are pentahedra. So we break the faces into 10 or 12 triangles and compute both surface integral on each. The first surface integral is
+\begin{equation}
+    \oint_{\partial V_i} d^2 \bm r \frac{r^2}{2} =
+    \frac{1}{2}\sum_{j=1}^{10, 12} \parens{\bm \ell_{ij1}\times\bm \ell_{ij2}}\int_0^1 d\alpha \int_0^{1-\alpha} d\beta r^2
+    \label{eqn:com-triangle-1}
+\end{equation}
+while the second, which also determines the mass of the asteroid, is 
+\begin{equation}
+    \oint_{\partial V_i} d^2 \bm r \frac{\bm r}{3} =
+    \frac{1}{3}\sum_{j=1}^{10, 12} \parens{\bm \ell_{ij1}\times\bm \ell_{ij2}}\cdot \int_0^1 d\alpha \int_0^{1-\alpha} d\beta \bm r.
+    \label{eqn:com-triangle-2}
+\end{equation}
+Here, $\bm \ell_{ij1}$ and $\bm \ell_{ij2}$ are two edges of the $j$th triangular face of $V_i$, ordered such that $\bm \ell_{ij1} \times \bm \ell_{ij2}$ points out of $V_i$. These vectors can be computed once the fit parameters are known, and then simply rotated by $R$ as the asteroid rotates.
+
+The above two integrals have analytical solutions to be found in the appendix.
+
+Once the center of mass $\bm C_{\mathcal L}$ is calculated, the asteroid model should be manually translated by $\bm -C_{\mathcal L}$ so that the origin represents the center of mass. Then we may perform the torque integral (equation \ref{eqn:surface-torque}) and the moment of inertia integrals (equation \ref{eqn:surface-moi}) in a similar method to equations \ref{eqn:com-triangle-1} and \ref{eqn:com-triangle-2}. Again, the solutions are analytical and can be found in the appendix.
+
+
+\subsection{Limitations of the model}
+The depth of this model is easily scalable by changing $L$, $m$, or $n$. Higher $L$ results in a more precise shape, and higher $m$ and $n$ result in better knowledge of the radial and angular density distribution respectively. The model is robust under allowed values of the parameters $C_{lm}$, and the asteroid's torque, moment of inertia, and center of mass are all analytically calculable, which speeds up the rate of fitting.
+
+However, the model contains two major limitations. First, it can only represent ``star shaped'' asteroids---that is, asteroids where there is a point such that a line segment from that point to any point on the surface does not exit the asteroid. By restricting the values of $C_{lm}$, we also rule out some extreme shapes that are star-shaped. Most known asteroid shapes can be represented with this model, so we conclude that this limitation does not pose too serious a threat to accuracy. \comment{Prove this!}
+
+A radial density profile is also built into this asteroid model. Although the chunks of constant density $V_i$ do not shrink in volume towards the center, their sides all point towards the center, which may give a slight bias towards radial density profiles. \comment{I can check whether this exists}.
+
+
+\newpage 
+
+\section{Old spherical harmonic model}
+For the spherical harmonic model, we describe the shape of the model with the first $L$ orders of the real spherical harmonics:
+\begin{equation}
+    r(\theta, \phi) = \sum_{l=0}^L\sum_{m=-l}^l C_{lm} Y_{lm}(\theta, \phi)
+    \label{eqn:sph-surface}
+\end{equation}
+where $C_{lm}$ are parameters, and 
+\begin{equation}
+\begin{aligned}
+    Y_{lm} = &(-1)^m\sqrt{\frac{2l + 1}{2\pi}\frac{(l-|m|)!}{(l+|m|)!}}\\
+    &\times P_l^{|m|}(\cos\theta)\begin{cases}
+        \sin(|m|\phi)& m < 0\\
+        1/\sqrt{2}& m = 0\\
+        \cos(|m|\phi)& m > 0\\
+    \end{cases}.
+    \label{eqn:spherical-harmonics}
+\end{aligned}
+\end{equation}
+Note that there are $(L+1)^2$ parameters.
+
+Like for the polyhedral model, we will need to break this shape into $M$ chunks. We would like for these chunks to be of roughly equal size so that the model is ambivalent as possible about the density distribution of the asteroid. To do so, we will first foliate the asteroid into $n$ thick shells by multiplying $r(\theta, \phi)$ by integer multiples of $1/n$. In the next step, we break up the shells further.
+
+Consider a cube, where each face is subdivided into an $i\times i$ array of smaller squares. The vertices of these squares can be projected onto a sphere, yielding $6i^2$ patches of roughly equal area on the sphere, with vertices given in spherical coordinates by the projection. The $i$th shell can be broken up into $6i^2$ chunks using these projected vertices.
+
+The volume of each of these chunks is roughly proportional to the volume of each shell divided by $6i^2$. The shell volume in turn is proportional to $4\pi i^2$, so that we expect the volume of each chunk to be roughly equal.
+
+% Ensure origin is center of mass for both models
+% Use mathematica to do the integrals
+
+% Talk about rotations.
+
+We parameterize each chunk with spherical coordinates: ($\alpha$, $\theta$, $\phi$), where the radial coordinate is $\alpha r(\theta, \phi)$. The Jacobian turns out to be $\alpha^2 \sin\theta r^3(\theta, \phi)$, which is the same as spherical coordinates. Thus, the torque integral reduces to 
+\begin{equation}
+    \begin{aligned}
+    \int_{V_i} d^3 r \bm t(\bm r) = \frac{2}{5}\sqrt{\frac{\pi}{15}}\frac{(i+1)^5-i^5}{n^5}\\
+    \times\int_{\Omega_i} d\Omega \brackets{\sum_{l=0}^\infty\sum_{m=-l}^l C_{lm} Y_{lm}}^5\brackets{\hat{\bm x} Y_{2, -1} - \hat{\bm y} Y_{2, 1}}
+    \end{aligned}
+\end{equation}
+where $\Omega_i$ is the solid angle occupied by chunk $i$.
+
+\section{Update}
+Instead of doing what I've outlined above, I'd like to use the spherical harmonic technique to segment the asteroid and define its shape. Then break it into polyhedrons, and use the polyhedral integral outlined above.
+
+
+
+
+
+\bibliography{../asteroids-flybys.bib}
+\end{document}
