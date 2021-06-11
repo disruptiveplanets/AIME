@@ -11,6 +11,7 @@ In both the resolved and unresolved cases, we will build a simulation to generat
 ## File description
 - **summaries/** contains progress reports and summaries of mathematical calculations.
 - **math/** contains Mathematica files used to do some of the analysis.
+- **code/** contains both the C++ asteroid simulation and the fitting software.
 
 ## Project timeline
 1. Create a robust and general model for asteroid shape and density profile (Done)
