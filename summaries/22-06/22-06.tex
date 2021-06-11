@@ -53,7 +53,7 @@ The torque $d\bm{\tau}$ imposed on a section of mass $dm$ inside an asteroid by 
     \frac{d\bm{\tau}}{dm} =\frac{3\mu}{D^3} (\bm{\hat x} yz - \bm{\hat y} xz) = \frac{3\mu}{D^3} \bm{t}(\bm{r})
     \label{eqn:diff-torque}
 \end{equation}
-where $D$ is the distance between the asteroid and $x$, $y$, and $z$ are of course all new utensils. Here, we have chosen $+\$hat z$ to e
+where $D$ is the distance between the asteroid, $\mu$ is the gravitational parameter of the planet being orbited. We have oriented our axes such that $\hat {\bm z}$ points towards the planet and $\hat {\bm y}$ points forward in the plane of orbit of the asteroid.
 
 \section{Model}
 \subsection{Asteroid model requirements}
@@ -72,6 +72,12 @@ Fortunately, the first task requires no extra work; Euler's equations dictate th
     \label{eqn:euler}
 \end{equation}
 where $\bm \tau$ is the external torque on the asteroid: tidal torque in this case.
+
+Equation \ref{eqn:diff-torque} is written in the frame where $\hat {\bm z}$ points towards the planet. Assuming the torque $\bm \tau$ in equation \ref{eqn:euler} is also written in this frame, there will be an additional rotation caused by the orbital motion of the asteroid of $\bm \Omega = \bm v \times \hat{\bm z} / D$, where $\bm v$ is the orbital velocity of the asteroid. Note that $\bm \Omega$ is parallel to $\hat x$. From conservation of angular momentum, it follows that $\dot{\bm \Omega} = -2(\bm v \cdot \hat{\bm z})\bm \Omega / D$. The final angular acceleration is then
+\begin{equation}
+    \dot{\bm \omega} = -\dot{\bm \Omega} + I^{-1}\brackets{\bm \tau - (\bm \omega + \bm \Omega) \times I(\bm \omega + \bm \Omega)}
+    \label{eqn:angular-acc}
+\end{equation}
 
 The second task requires us to integrate equation \ref{eqn:diff-torque} over the volume of the asteroid model as follows:
 \begin{equation}
@@ -269,7 +275,7 @@ The mass of the asteroid is given by equation \ref{eqn:analytical-mass}. It can 
         \label{eqn:analytical-mass}
     \end{equation}
     \begin{equation}
-        C_\mathcal{L} = \frac{1}{12M}\sum_{i=1}^N\rho_i \sum_{j=1}^{10, 12} \parens{\bm\ell_{ij1} \times \bm\ell_{ij2}} \{2(\bm \ell_{ij1} - \bm \ell_{ij2})^2 + \bm \ell_{ij1}\cdot  \bm \ell_{ij2} + 6(\bm \ell_{ij1}+ \bm v)\cdot (\bm \ell_{ij2} + \bm v)\}
+        \bm C_\mathcal{L} = \frac{1}{12M}\sum_{i=1}^N\rho_i \sum_{j=1}^{10, 12} \parens{\bm\ell_{ij1} \times \bm\ell_{ij2}} \{2(\bm \ell_{ij1} - \bm \ell_{ij2})^2 + \bm \ell_{ij1}\cdot  \bm \ell_{ij2} + 6(\bm \ell_{ij1}+ \bm v)\cdot (\bm \ell_{ij2} + \bm v)\}
         \label{eqn:analytical-com}
     \end{equation}
     \caption*{\textit{Top}: mass of the asteroid model, and \textit{bottom}: center of mass of the asteroid model. }
@@ -302,7 +308,7 @@ The mass of the asteroid is given by equation \ref{eqn:analytical-mass}. It can 
 \begin{table*} 
     \begin{equation}
         \begin{aligned}
-        \tau = \frac{\mu}{40D^3}\sum_{i=1}^N\rho_i \sum_{j=1}^{10, 12} \parens{\bm\ell_{ij1} \times \bm\ell_{ij2}} \times \hat {\bm z} \{
+        \bm \tau = \frac{\mu}{40D^3}\sum_{i=1}^N\rho_i \sum_{j=1}^{10, 12} \parens{\bm\ell_{ij1} \times \bm\ell_{ij2}} \times \hat {\bm z} \{
         &\ell_{1z} [(\ell_{2x} + 5v_x)(\ell_{2x} + 2\ell_{1x}) + (\ell_{2y} + 5 v_y)(\ell_{2y}+2\ell_{1y}) + 3 (\ell_{1x}^2 + \ell_{1y}^2) + 10(v_x^2 + v_y^2)]\\
         + &\ell_{2z} [ (\ell_{1x}+5v_x)(\ell_{1x}+2\ell_{2x}) + (\ell_{1y}+5v_y)(\ell_{1y}+2\ell_{2y}) + 3 (\ell_{2x}^2 + \ell_{2y}^2) + 10(v_x^2 + v_y^2)]\\
         + &5v_z [(\ell_{1x}^2 + \ell_{1y}^2 + \ell_{2x}^2 + \ell_{2y}^2 + \ell_{1x} \ell_{2x} + \ell_{1y} \ell_{2y}) \\
