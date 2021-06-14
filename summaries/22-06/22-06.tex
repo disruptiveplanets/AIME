@@ -28,6 +28,7 @@
 \date{\today}
 \affiliation{MIT Department of Physics}
 
+\newcommand{\abs}[1]{\left| #1 \right|}
 \newcommand{\parens}[1]{\left( #1 \right)}
 \newcommand{\brackets}[1]{\left[ #1 \right]}
 \newcommand{\comment}[1]{\textcolor{red}{\emph{ #1 }}}
@@ -192,16 +193,16 @@ There are $\sum_{s=1}^m 6(ns/m)^2$ chunks all together, each with their one para
 
 \subsection{Calculating moment of inertia and torque}
 \label{sec:equations}
-Once the shape of the asteroid has been fixed for parameters $C_{lm}$ and the densities $\rho_i$ have been assigned to each chunk, the center of mass must next be calculated via equation \ref{eqn:com-surf}. Each volume $V_i$ is a hexahedron, with the exception of those touching the origin which are pentahedra. So we break the faces into 10 or 12 triangles and compute both surface integral on each. The first surface integral is
+Once the shape of the asteroid has been fixed for parameters $C_{lm}$ and the densities $\rho_i$ have been assigned to each chunk, the center of mass must next be calculated via equation \ref{eqn:com-surf}. Each volume $V_i$ is a hexahedron, with the exception of those touching the origin which are pentahedra. So we break the faces into 6 (pentahedra) or 12 (hexahedra) triangles and compute both surface integral on each. The first surface integral is
 \begin{equation}
     \oint_{\partial V_i} d^2 \bm r \frac{r^2}{2} =
-    \frac{1}{2}\sum_{j=1}^{10, 12} \parens{\bm \ell_{ij1}\times\bm \ell_{ij2}}\int_0^1 d\alpha \int_0^{1-\alpha} d\beta r^2
+    \frac{1}{2}\sum_{j=1}^{6, 12} \parens{\bm \ell_{ij1}\times\bm \ell_{ij2}}\int_0^1 d\alpha \int_0^{1-\alpha} d\beta r^2
     \label{eqn:com-triangle-1}
 \end{equation}
 while the second, which also determines the mass of the asteroid, is 
 \begin{equation}
     \oint_{\partial V_i} d^2 \bm r \frac{\bm r}{3} =
-    \frac{1}{3}\sum_{j=1}^{10, 12} \parens{\bm \ell_{ij1}\times\bm \ell_{ij2}}\cdot \int_0^1 d\alpha \int_0^{1-\alpha} d\beta \bm r.
+    \frac{1}{3}\sum_{j=1}^{6, 12} \parens{\bm \ell_{ij1}\times\bm \ell_{ij2}}\cdot \int_0^1 d\alpha \int_0^{1-\alpha} d\beta \bm r.
     \label{eqn:com-triangle-2}
 \end{equation}
 Here, $\bm \ell_{ij1}$ and $\bm \ell_{ij2}$ are two edges of the $j$th triangular face of $V_i$, ordered such that $\bm \ell_{ij1} \times \bm \ell_{ij2}$ points out of $V_i$. The vector $v_i$ points to the intersection of $\bm \ell_{ij1}$ and $\bm \ell_{ij2}$. These vectors can be computed once the fit parameters are known, and then simply rotated by $R$ as the asteroid rotates.
@@ -271,11 +272,11 @@ The mass of the asteroid is given by equation \ref{eqn:analytical-mass}. It can 
 
 \begin{table*} 
     \begin{equation}
-        M = \frac{1}{6}\sum_{i=1}^N\rho_i \sum_{j=1}^{10, 12} \parens{\bm\ell_{ij1} \times \bm\ell_{ij2}} \cdot (\bm \ell_{ij1} + \bm \ell_{ij2} + 2\bm v)
+        M = \frac{1}{18}\sum_{i=1}^N\rho_i \sum_{j=1}^{6, 12} \parens{\bm\ell_{ij1} \times \bm\ell_{ij2}} \cdot (\bm \ell_{ij1} + \bm \ell_{ij2} + 3\bm v)
         \label{eqn:analytical-mass}
     \end{equation}
     \begin{equation}
-        \bm C_\mathcal{L} = \frac{1}{12M}\sum_{i=1}^N\rho_i \sum_{j=1}^{10, 12} \parens{\bm\ell_{ij1} \times \bm\ell_{ij2}} \{2(\bm \ell_{ij1} - \bm \ell_{ij2})^2 + \bm \ell_{ij1}\cdot  \bm \ell_{ij2} + 6(\bm \ell_{ij1}+ \bm v)\cdot (\bm \ell_{ij2} + \bm v)\}
+        \bm C_\mathcal{L} = \frac{1}{24M}\sum_{i=1}^N\rho_i \sum_{j=1}^{6, 12} \parens{\bm\ell_{ij1} \times \bm\ell_{ij2}} \parens{\abs{\bm\ell_{ij1}}^2  + \abs{\bm\ell_{ij2}}^2 + 6\abs{\bm v}^2 + \bm\ell_{ij1} \cdot \bm\ell_{ij2} + 4(\bm \ell_{ij1} + \bm \ell_{ij2})\cdot \bm v}
         \label{eqn:analytical-com}
     \end{equation}
     \caption*{\textit{Top}: mass of the asteroid model, and \textit{bottom}: center of mass of the asteroid model. }
@@ -284,8 +285,8 @@ The mass of the asteroid is given by equation \ref{eqn:analytical-mass}. It can 
 \begin{table*} 
     \begin{equation}
         \begin{aligned}
-            I_{aa} = \frac{1}{60}\sum_{i=1}^N \rho_i \sum_{j=1}^{10, 12} \parens{\ell_{ij1}\times \ell_{ij2}}\cdot \{&\hat{\bm b}[\ell_{1b}^3 + \ell_{1b}^2 \ell_{2b} + \ell_{1b} \ell_{2b}^2 + \ell_{2b}^3 + 
-            5 v_b (\ell_{1b}^2 + \ell_{1b} l2b + \ell_{2b}^2) + 
+            I_{aa} = \frac{1}{60}\sum_{i=1}^N \rho_i \sum_{j=1}^{6, 12} \parens{\bm \ell_{ij1}\times \bm \ell_{ij2}}\cdot \{&\hat{\bm b}[\ell_{1b}^3 + \ell_{1b}^2 \ell_{2b} + \ell_{1b} \ell_{2b}^2 + \ell_{2b}^3 + 
+            5 v_b (\ell_{1b}^2 + \ell_{1b} \ell_{2b} + \ell_{2b}^2) + 
             10 v_b^2 (\ell_{1b} + \ell_{2b}) + 10 v_b^3]\\
              + & \hat {\bm c}[\ell_{1c}^3 + \ell_{1c}^2 \ell_{2c} + \ell_{1c} \ell_{2c}^2 + \ell_{2c}^3 + 5 v_c (\ell_{1c}^2 + \ell_{1c} \ell_{2c} + \ell_{2c}^2) + 10 v_c^2(\ell_{1c} + \ell_{2c}) + 10 v_c^3]\}
         \end{aligned}
@@ -293,7 +294,7 @@ The mass of the asteroid is given by equation \ref{eqn:analytical-mass}. It can 
     \end{equation}
     \begin{equation}
         \begin{aligned}
-            I_{ab} = -\frac{1}{120}\sum_{i=1}^N \rho_i \sum_{j=1}^{10, 12} \parens{\ell_{ij1}\times \ell_{ij2}}\cdot \hat{\bm c}\{
+            I_{ab} = -\frac{1}{120}\sum_{i=1}^N \rho_i \sum_{j=1}^{6, 12} \parens{\bm \ell_{ij1}\times \bm \ell_{ij2}}\cdot \hat{\bm c}\{
                 &\ell_{1c} [6 \ell_{1a} \ell_{1b} + 2 \ell_{2a} \ell_{2b} + 2 \ell_{1b} (\ell_{2a} + 5 v_a) + 2 \ell_{1a} (\ell_{2b} + 5 v_b) +  5 \ell_{2a} v_b + 5 \ell_{2b} v_a + 20 v_a v_b] \\
                 + &\ell_{2c}[2 \ell_{1a} \ell_{1b} + 6 \ell_{2a} \ell_{2b}
                 + 2 \ell_{2b}(\ell_{1a}  + 5 v_a) + 2 \ell_{2a}(\ell_{1b} + 5 v_b)
@@ -308,7 +309,7 @@ The mass of the asteroid is given by equation \ref{eqn:analytical-mass}. It can 
 \begin{table*} 
     \begin{equation}
         \begin{aligned}
-        \bm \tau = \frac{\mu}{40D^3}\sum_{i=1}^N\rho_i \sum_{j=1}^{10, 12} \parens{\bm\ell_{ij1} \times \bm\ell_{ij2}} \times \hat {\bm z} \{
+        \bm \tau = \frac{\mu}{40D^3}\sum_{i=1}^N\rho_i \sum_{j=1}^{6, 12} \parens{\bm\ell_{ij1} \times \bm\ell_{ij2}} \times \hat {\bm z} \{
         &\ell_{1z} [(\ell_{2x} + 5v_x)(\ell_{2x} + 2\ell_{1x}) + (\ell_{2y} + 5 v_y)(\ell_{2y}+2\ell_{1y}) + 3 (\ell_{1x}^2 + \ell_{1y}^2) + 10(v_x^2 + v_y^2)]\\
         + &\ell_{2z} [ (\ell_{1x}+5v_x)(\ell_{1x}+2\ell_{2x}) + (\ell_{1y}+5v_y)(\ell_{1y}+2\ell_{2y}) + 3 (\ell_{2x}^2 + \ell_{2y}^2) + 10(v_x^2 + v_y^2)]\\
         + &5v_z [(\ell_{1x}^2 + \ell_{1y}^2 + \ell_{2x}^2 + \ell_{2y}^2 + \ell_{1x} \ell_{2x} + \ell_{1y} \ell_{2y}) \\
@@ -321,5 +322,5 @@ The mass of the asteroid is given by equation \ref{eqn:analytical-mass}. It can 
 
 
 
-\bibliography{../asteroids-flybys.bib}
+\bibliography{../asteroid-flybys.bib}
 \end{document}
