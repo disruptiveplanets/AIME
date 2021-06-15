@@ -21,9 +21,9 @@ Results of the simulated are saved in `params-unresolved.dat`, which assumes tha
 Done
 - The integrals calculated in `math/polyhedron.nb` are accuratly reproduced in the code
 - The mass, center of mass, and moment of inertia of a cube are correct.
+- For large `n` and only Clm00 is nonzero, the mass and moment of inertia reduce to that of a sphere. (Done for `n=20`)
 
 Not done
-- For large `n` and only Clm00 is nonzero, the mass and moment of inertia reduce to that of a sphere.
 - The orbits follow hyperbolae
 - Neglecting torque and with zero initial angular momentum, the object does not change orientation
 - Neglecting torque and with nonzero initial angular momentum, the object spins at a constant rate
