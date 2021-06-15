@@ -17,9 +17,9 @@ Asteroid::Asteroid(std::string filename) {
     /* Note: since this code is intended to be used in a limited set of
      * scnarios, and since I will always have access to this source code
      * to debug any errors. I will not be writing a "safe parser". That is,
-     * when I parse the file `filename`, I will not carefully print out the 
+     * when I parse the file `filename`, I will not carefully print out the
      * error messages that could occur. The program will crash somehow and it
-     * is up to the user to figure out the problem with the formatting of 
+     * is up to the user to figure out the problem with the formatting of
      * `filename`. I'm doing this to save time.
     */
 
@@ -42,7 +42,7 @@ Asteroid::Asteroid(std::string filename) {
     int num_chunks = n * n * (m + 1) * (2 * m + 1) / m;
     chunks.reserve(num_chunks);
     make_chunks();
-    
+
     std::vector<double> clms;
 
     // Clms
@@ -126,7 +126,7 @@ void Asteroid::make_chunks() {
 }
 
 void Asteroid::set_pos(double b) {
-    // Asteroid enters at +x and is traveling towards -x, with offset in +y 
+    // Asteroid enters at +x and is traveling towards -x, with offset in +y
     // direction.
     double dist = b * pow(INTEGRAL_LIMIT_FRAC, -1/3.0);
     position = Vector3({sqrt(dist * dist - b * b), b, 0});
@@ -140,6 +140,9 @@ int Asteroid::simulate(std::ofstream&& resolved, std::ofstream&& unresolved){
 
     int frames = 0;
     for (;;frames++){
+        if (frames % 1000 == 0) {
+            std::cout << position << std::endl;
+        }
         double dt = DELTA_T_MIN * pow(position.mag() / closest_approach, 3);
         update_orientation(dt);
         update_position(dt);
@@ -174,7 +177,7 @@ void Asteroid::recenter() {
     for (Triangle& t : triangles) {
         t.recenter(-com);
     }
-    
+
     #ifdef _DEBUG
     std::cout << "New COM: " << get_com() << " should be zero." << std::endl;
     #endif

@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
     if (argc == 2) {
         filename = std::string(argv[1]);
     }
-    
+
     if (filename.size() < 4 ||
         filename.substr(filename.size() - 4, 4) != ".dat") {
         std::cout << "The input file must be a .dat file." << std::endl;
