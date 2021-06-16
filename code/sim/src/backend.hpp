@@ -10,8 +10,8 @@
 #include "algebra.hpp"
 #include "triangle.hpp"
 
-#define DELTA_T_MIN 1
-#define INTEGRAL_LIMIT_FRAC 1.0e-5 
+#define ONE_SECOND_TORQUE 1e-8
+#define INTEGRAL_LIMIT_FRAC 1.0e-5
     // Torque at closest approach divided by torque at start of sim.
 #define G 6.67408e-11
 #define _DEBUG
@@ -44,9 +44,12 @@ private:
     Matrix3 moi;
     std::vector<Chunk> chunks;
     std::vector<Triangle> triangles;
+    double edge_dist; // Limit of the integration region
     Vector3 position;
     Vector3 velocity;
     Vector3 spin;
     double mu;
+    double mean_density;// Used to generate rough parameters of the asteroid
+    double radius;// Used to generate rough parameters of the asteroid
     double closest_approach;
 };

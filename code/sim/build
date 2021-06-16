@@ -1,5 +1,2 @@
-
-Write build script for this cpp file
-
-git push
+/usr/bin/g++ -g ./src/*.cpp -o "/home/jtdinsmo/Dropbox (MIT)/12.420 project/code/sim/target/sim"
 

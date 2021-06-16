@@ -54,16 +54,20 @@ Asteroid::Asteroid(std::string filename) {
             clms.push_back(std::stod(word));
         }
     }
+    radius = clms[0];
 
     // Density
     triangles.reserve(12 * num_chunks);
         // Over estimate the number of triangles about to be pushed
     std::getline(f, line);
     ss = std::istringstream (line);
+    mean_density = 0;
     for(int i = 0; i <= num_chunks; i++) {
         ss >> word;
+        mean_density += std::stod(word);
         chunks[i].shape(std::stod(word), L, clms, triangles);
     }
+    mean_density /= chunks.size();
 
     // Spin
     std::getline(f, line);
@@ -128,25 +132,32 @@ void Asteroid::make_chunks() {
 void Asteroid::set_pos(double b) {
     // Asteroid enters at +x and is traveling towards -x, with offset in +y
     // direction.
-    double dist = b * pow(INTEGRAL_LIMIT_FRAC, -1/3.0);
-    position = Vector3({sqrt(dist * dist - b * b), b, 0});
+    edge_dist = b * pow(INTEGRAL_LIMIT_FRAC, -1/3.0);
+    position = Vector3({sqrt(edge_dist * edge_dist - b * b), b, 0});
+    position *= 0.9999999;// So that it reads as just inside the allowed region
 
     double a = mu / velocity.mag2(); // Positive
     closest_approach = sqrt(a * a + b * b) - a;
 }
 
-int Asteroid::simulate(std::ofstream&& resolved, std::ofstream&& unresolved){
-    // Motivation: Torque is proportional to 1/position^3. Angular acceleration is now roughly constant every frame.
+int Asteroid::simulate(std::ofstream&& resolved, std::ofstream&& unresolved) {
+    // Motivation: Torque is proportional to 1/position^3. Angular acceleration
+    // is now roughly constant every frame.
+    const double scale_torque = mu / pow(closest_approach, 3) * mean_density *
+        pow(radius, 5);
+    const double min_delta_t = ONE_SECOND_TORQUE / scale_torque;
+        // Toruqe at min delta t
 
     int frames = 0;
-    for (;;frames++){
-        if (frames % 1000 == 0) {
+    for (;position.mag() < edge_dist; frames++){
+        if (frames % 1 == 0) {
             std::cout << position << std::endl;
         }
-        double dt = DELTA_T_MIN * pow(position.mag() / closest_approach, 3);
+        double dt = min_delta_t * pow(position.mag() / closest_approach, 3);
         update_orientation(dt);
         update_position(dt);
     }
+    std::cout << position << std::endl;
     return frames;
 }
 
@@ -202,7 +213,7 @@ Vector3 Asteroid::get_torque() {
 void Asteroid::update_position(double dt) {
     Vector3 accel = -mu / pow(position.mag(), 3) * position;
     velocity += accel * dt;
-    position += accel * dt;
+    position += velocity * dt;
 }
 
 void Asteroid::update_orientation(double dt) {
