@@ -8,7 +8,7 @@
 
 int main(int argc, char* argv[]) {
     std::string filename = "params.dat";
-    if (argc == 2) {
+    if (argc >= 2) {
         filename = std::string(argv[1]);
     }
 
@@ -26,6 +26,20 @@ int main(int argc, char* argv[]) {
     }
 
     Asteroid asteroid(filename);
+    if (argc >= 4) {
+        if (strcmp(argv[2], "draw") == 0) {
+            Vector3 axis = Vector3::z();
+            if (strcmp(argv[3], "x") == 0) {
+                axis = Vector3::x();
+            }
+            if (strcmp(argv[3], "y") == 0) {
+                axis = Vector3::y();
+            }
+            asteroid.draw(bare + ".ast", axis);
+            return 1;
+        }
+        filename = std::string(argv[1]);
+    }
     std::ofstream resolved, unresolved;
     resolved.open(bare + "-resolved.dat");
     unresolved.open(bare + "-unresolved.dat");

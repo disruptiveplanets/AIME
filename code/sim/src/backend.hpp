@@ -25,6 +25,7 @@ public:
     Asteroid(std::string filename);
 
     int simulate(std::ofstream&& resolved, std::ofstream&& unresolved);
+    void draw(std::string filename, Vector3 axis);
 
 private:
     void make_chunks();

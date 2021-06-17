@@ -33,6 +33,12 @@ void Vector3::operator-=(Vector3 v) {
     e[2] -= v[2];
     invalid_mag = true;
 }
+void Vector3::operator/=(double d) {
+    e[0] /= d;
+    e[1] /= d;
+    e[2] /= d;
+    invalid_mag = true;
+}
 double Vector3::dot(Vector3 v1, Vector3 v2)  {
     return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
 }

@@ -14,7 +14,7 @@ public:
         theta = acos(cart[2] / cart.mag());
         phi = atan2(cart[1], cart[0]);
     }
-    
+
     Vector3 to_vector(double r) const {
         return r * Vector3({ sin(theta) * cos(phi),
                              sin(theta) * sin(phi),
@@ -37,6 +37,9 @@ public:
     Vector3 get_torque() const; // Used tor torque
     double get_Isame(int a) const; // Used for MOI
     double get_Idiff(int a, int b) const; // Used for MOI
+    std::array<Vector3, 3> get_corners() const;
+    double get_density() const;
+    bool is_edge() const;
 
 private:
     double get_Isame_component(double l1b, double l2b, double vb) const;
@@ -54,7 +57,7 @@ private:
 class Chunk {
     friend class Triangle;
 public:
-    Chunk(double alpha_above, double alpha_below, 
+    Chunk(double alpha_above, double alpha_below,
         int n_here, int face, int a, int b);
 
     void shape(double density_, uint L, std::vector<double> const& clms,
@@ -62,9 +65,9 @@ public:
 
 protected:
     double density;
+    double ab;// alpha_above
 
 private:
-    double ab;// alpha_above
     ThetaPhi ul, ur, ll, lr;
     double be;// alpha_below
 };

@@ -23,6 +23,7 @@ public:
     void operator*=(double v);
     void operator+=(Vector3 v);
     void operator-=(Vector3 v);
+    void operator/=(double d);
     static double dot(Vector3 v1, Vector3 v2);
     static Vector3 cross(Vector3 v1, Vector3 v2);
     double operator[](int i) const;

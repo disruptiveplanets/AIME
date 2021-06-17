@@ -113,6 +113,82 @@ Asteroid::Asteroid(std::string filename) {
     #endif
 }
 
+void Asteroid::draw(std::string filename, Vector3 axis) {
+    // Write data about how to draw an asteroid to a text file (.ast) to be read
+    // by a python script and displayed with matplotlib.
+
+    // Project everything along axis. Axis must be normalized
+    Vector3 up = Vector3::z();
+    if (Vector3::cross(up, axis).mag() < EPSILON) {
+        up = Vector3::x();
+    }
+    up = up - Vector3::dot(up, axis) * axis;
+    up /= up.mag();
+
+    std::vector<double> depths;
+    std::vector<std::string> lines;
+    depths.reserve(triangles.size());
+    lines.reserve(triangles.size());
+
+    for (Triangle const& triangle : triangles) {
+        if (!triangle.is_edge()){
+            continue;
+        }
+        std::array<Vector3, 3> corners = triangle.get_corners();
+        Vector3 center = (corners[0] + corners[1] + corners[2]) / 3;
+        Vector3 norm = Vector3::cross(corners[1] - corners[0],
+            corners[2] - corners[0]);
+        norm /= norm.mag();
+        if (Vector3::dot(norm, axis) < 0) {
+            continue;
+        }
+        double depth = Vector3::dot(center, axis);
+
+        std::string line = "";
+        for(Vector3 const& c : corners) {
+            Vector3 offset = c - Vector3::dot(c, axis) * axis;
+            if (offset.mag() == 0){
+                line += "0 0 ";
+                continue;
+            }
+            double theta = acos(Vector3::dot(offset, up) / offset.mag());
+            if (Vector3::dot(Vector3::cross(offset, up), axis) < 0) {
+                theta = 2 * PI - theta;
+            }
+            double r = offset.mag();
+            line += std::to_string(r * cos(theta)) + " "
+                    + std::to_string(r * sin(theta)) + " ";
+        }
+        line += std::to_string(triangle.get_density()) + " "
+                + std::to_string(Vector3::dot(norm, axis));
+
+        // Insert the line and depth in order from low depth to high
+        if (lines.size() == 0) {
+            depths.push_back(depth);
+            lines.push_back(line);
+        }
+        int i;
+        for (i = 0; i < depths.size(); i++){
+            if (depths[i] > depth) {
+                depths.insert(depths.begin() + i, depth);
+                lines.insert(lines.begin() + i, line);
+                break;
+            }
+        }
+        if (i == depths.size()){
+            depths.push_back(depth);
+            lines.push_back(line);
+        }
+    }
+
+    std::ofstream output;
+    output.open(filename);
+    for (std::string& line : lines) {
+        output << line << '\n';
+    }
+    output.close();
+}
+
 void Asteroid::make_chunks() {
     for (int f = 0; f < 6; f++) {
         for (int s = 0; s < m; s++){

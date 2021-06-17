@@ -37,8 +37,8 @@ Not done
 Implemented
 - The ability to read asteroid data from a text file and generate an asteroid model
 - Code to automatically calculate the asteroid's mass, center of mass, moment of inertia matrix, and tidal torque
+- A program to plot the shape of the asteroid as projected onto various planes with Painter's algorithm and `matplotlib`
 
 Not yet implemented
 - A simulation of the asteroid's flight through the sphere of influence of a planet
-- A program to plot the shape of the asteroid as projected onto various planes with Painter's algorithm and `matplotlib`
 - An MCMC to regress for asteroid shape.
