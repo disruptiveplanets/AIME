@@ -32,6 +32,8 @@ public:
         v += l;
     }
 
+    void operator*=(Matrix3 m);
+
     Vector3 get_lever_arm() const; // Used for com
     double get_mass() const; // Used for com
     Vector3 get_torque() const; // Used tor torque

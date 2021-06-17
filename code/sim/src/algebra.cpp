@@ -333,3 +333,85 @@ Matrix3 operator*(double d, Matrix3 const& m) {
                     d * m(1, 0), d * m(1, 1), d * m(1, 2),
                     d * m(2, 0), d * m(2, 1), d * m(2, 2)});
 }
+
+
+
+Matrix3 Quaternion::matrix() {
+    if (invalid_mat) {
+        double s = 1/mag2();
+        mat = Matrix3({
+            1 - 2*s*(j_*j_ + k_*k_), 2*s*(i_*j_ - k_*r_), 2*s*(i_*k_ + j_*r_),
+            2*s*(i_*j_ + k_*r_), 1 - 2*s*(i_*i_ + k_*k_), 2*s*(j_*k_ - i_*r_),
+            2*s*(i_*k_ - j_*r_), 2*s*(j_*k_ + i_*r_), 1 - 2*s*(i_*i_ + j_*j_)
+        });
+        invalid_mat = false;
+    }
+    return mat;
+}
+Quaternion Quaternion::inverse() const {
+    return conjugate() / mag2();
+}
+Vector3 Quaternion::vec() const {
+    return Vector3({i_, j_, k_});
+}
+Quaternion Quaternion::operator+(Quaternion const& q) const {
+    return Quaternion(r_+q.r(), i_+q.i(), j_+q.j(), k_+q.k());
+}
+Quaternion Quaternion::operator-(Quaternion const& q) const {
+    return Quaternion(r_-q.r(), i_-q.i(), j_-q.j(), k_-q.k());
+}
+Quaternion Quaternion::operator*(double d) const {
+    return Quaternion(r_*d, i_*d, j_*d, k_*d);
+}
+Quaternion Quaternion::operator/(double d) const {
+    return Quaternion(r_/d, i_/d, j_/d, k_/d);
+}
+void Quaternion::operator+=(Quaternion const& q) {
+    r_ += q.r();
+    i_ += q.i();
+    j_ += q.j();
+    k_ += q.k();
+    invalid_mat = true;
+}
+void Quaternion::operator-=(Quaternion const& q) {
+    r_ -= q.r();
+    i_ -= q.i();
+    j_ -= q.j();
+    k_ -= q.k();
+    invalid_mat = true;
+}
+void Quaternion::operator*=(double d) {
+    r_ *= d;
+    i_ *= d;
+    j_ *= d;
+    k_ *= d;
+    invalid_mat = true;
+}
+void Quaternion::operator/=(double d) {
+    r_ /= d;
+    i_ /= d;
+    j_ /= d;
+    k_ /= d;
+    invalid_mat = true;
+}
+Quaternion Quaternion::operator*(Quaternion q) const {
+    Vector3 mv = vec();
+    Vector3 qv = q.vec();
+    double d = r_ * q.r() - Vector3::dot(mv, qv);
+    Vector3 v = r_ * qv + q.r() * mv + Vector3::cross(mv, qv);
+    return Quaternion(d, v[0], v[1], v[2]);
+}
+double Quaternion::mag() const {
+    return sqrt(r_*r_+i_*i_+j_*j_+k_*k_);
+}
+double Quaternion::mag2() const {
+    return r_*r_+i_*i_+j_*j_+k_*k_;
+}
+
+std::ostream& operator<<(std::ostream& os, const Quaternion& q) {
+    os << q.r() << " + " << q.i() << " i + " << q.j() << " j + " << q.k();
+    return os;
+}
+Quaternion operator*(double d, Quaternion const& q) {
+    return Quaternion(d*q.r(), d*q.i(), d*q.j(), d*q.k());
+}

@@ -20,6 +20,12 @@ Triangle::Triangle(Chunk* parent, Vector3 v1, Vector3 v2, Vector3 v3) :
 std::array<Vector3, 3> Triangle::get_corners() const {
     return {v, v + l1, v + l2};
 }
+void Triangle::operator*=(Matrix3 m) {
+    v = m * v;
+    l1 = m * l1;
+    l2 = m * l2;
+    norm = m * norm;// Assume this is a rotation matrix
+}
 double Triangle::get_density() const{
     return parent->density;
 }

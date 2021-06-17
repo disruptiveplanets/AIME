@@ -81,8 +81,51 @@ private:
     std::array<double, 9> e;
 };
 
+
+class Quaternion {
+public:
+    Quaternion() {};
+    Quaternion(double r, double i, double j, double k) : r_(r), i_(i), j_(j),
+        k_(k), invalid_mat(true) {}
+
+    static Quaternion zero() {return Quaternion(0, 0, 0, 0); }
+    static Quaternion identity() {return Quaternion(1, 0, 0, 0); }
+
+    double r() const { return r_; }
+    double i() const { return i_; }
+    double j() const { return j_; }
+    double k() const { return k_; }
+    Quaternion operator+(Quaternion const& q) const;
+    Quaternion operator-(Quaternion const& q) const;
+    Quaternion operator*(double d) const;
+    Quaternion operator/(double d) const;
+    void operator+=(Quaternion const& q);
+    void operator-=(Quaternion const& q);
+    void operator*=(double d);
+    void operator/=(double d);
+    Quaternion operator*(Quaternion q) const;
+
+    Quaternion inverse() const;
+    Matrix3 matrix();
+    Vector3 vec() const;
+    double mag() const;
+    double mag2() const;
+    Quaternion conjugate() const { return Quaternion(r_, -i_, -j_, -k_); }
+
+private:
+    double r_;
+    double i_;
+    double j_;
+    double k_;
+    Matrix3 mat;
+    bool invalid_mat;
+};
+
+
 std::ostream& operator<<(std::ostream& os, const Matrix3& dt);
 std::ostream& operator<<(std::ostream& os, const Vector3& dt);
+std::ostream& operator<<(std::ostream& os, const Quaternion& dt);
 Vector3 operator*(double d, Vector3 const& v);
 Matrix3 operator*(double d, Matrix3 const& m);
+Quaternion operator*(double d, Quaternion const& q);
 void force_diagonal(std::array<Vector3, 3>& vs);

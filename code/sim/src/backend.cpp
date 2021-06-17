@@ -239,21 +239,24 @@ void Asteroid::calculate_moi() {
     moi = Matrix3({ Ixx, Ixy, Ixz,
                     Ixy, Iyy, Iyz,
                     Ixz, Iyz, Izz,});
-    moi = Matrix3({ 1.1812, 0.13, -0.1542,
-                    0.213, 1.124, 0.6102,
-                    1.23, 0, 1.53,});
-    moi = moi * moi.transpose();
     std::array<double, 3> evals = moi.get_evals();
     std::cout << evals[0] << ' ' << evals[1] << ' ' << evals[2] << std::endl;
     std::array<Vector3, 3> evecs = moi.get_symmetric_evecs(evals);
-    std::cout << moi << std::endl;
     moiInverse = Matrix3::symmetric_invert(evals, evecs);
 
-    std::cout << moi * moiInverse << std::endl;
-    std::cout << moiInverse * moi << std::endl;
-
-    //moi = Matrix3::symmetric_reconstruct(evals, evecs);
+    Matrix3 new_moi = Matrix3::symmetric_reconstruct(evals, evecs);
         // Do if there are issues with moi * moiInverse != identity.
+
+    std::cout << new_moi - moi << std::endl;
+    moi = new_moi;
+    std::cout << moi << std::endl;
+    std::cout << moiInverse << std::endl;
+    std::cout << moi * moiInverse << std::endl;
+
+    orientation = Quaternion::identity();
+    //moi = Matrix3::identity();
+    //moiInverse = Matrix3::identity();
+
 }
 
 void Asteroid::calculate_mass() {
@@ -282,6 +285,7 @@ int Asteroid::simulate(std::ofstream&& resolved, std::ofstream&& unresolved) {
     const double min_delta_t = ONE_SECOND_TORQUE / scale_torque;
         // Toruqe at min delta t
 
+    time = 0;
     int frames = 0;
     for (;position.mag() < edge_dist; frames++){
         double dt = min_delta_t * pow(position.mag() / closest_approach, 3);
@@ -290,7 +294,9 @@ int Asteroid::simulate(std::ofstream&& resolved, std::ofstream&& unresolved) {
         }
         update_orientation(dt);
         update_position(dt);
+        time += dt;
     }
+    std::cout << "Simulation took " << time << " seconds." << std::endl;
 
     return frames;
 }
@@ -312,7 +318,8 @@ Vector3 Asteroid::get_com() {
 
 Vector3 Asteroid::get_torque() {
     Vector3 torque = Vector3::zero();
-    for (Triangle& t : triangles) {
+    for (Triangle t : triangles) {
+        t *= orientation.matrix();
         torque += t.get_torque();
     }
     return (mu / pow(position.mag(), 3)) * torque;
@@ -328,15 +335,23 @@ void Asteroid::update_orientation(double dt) {
     Vector3 Omega = ang_mom / position.mag2();
     Vector3 torque = Vector3::zero(); // get_torque();
 
-    std::cout << get_rot_ang_mom() << std::endl;
+    //std::cout << get_rot_ang_mom() << std::endl;
+    double theta = atan2(position[1], position[2]);
+    std::cout << Matrix3::rotation_x(-theta) * (orientation.matrix() * Vector3({1, 2, 3})) << ' ' << dt << std::endl;
 
     // TO DO: Once I have orientation set up, fix this
-    Matrix3 moiGlobal = moi;
-    Matrix3 moiGlobalInverse = moiInverse;
+    Matrix3 inv_mat = orientation.inverse().matrix();
+    Matrix3 moiGlobal = orientation.matrix() * moi * inv_mat;
+    Matrix3 moiGlobalInverse = orientation.matrix() * moiInverse * inv_mat;
 
     Vector3 omegaDot = moiGlobalInverse * (torque - Vector3::cross(
         Omega + spin, moiGlobal * (Omega + spin)))
         + 2 * Omega * Vector3::dot(position, velocity) / position.mag2()
         - Vector3::cross(Omega, spin);
     spin += dt * omegaDot;
+
+    Quaternion d_quat = 0.5 * Quaternion(0, spin[0], spin[1], spin[2])
+        * orientation;
+    orientation += d_quat * dt;
+    orientation /= orientation.mag();
 }

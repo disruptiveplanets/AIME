@@ -13,8 +13,8 @@
 #define ONE_SECOND_TORQUE 1e-8
 #define INTEGRAL_LIMIT_FRAC 1.0e-5
     // Torque at closest approach divided by torque at start of sim.
-#define MAX_DT 43200.0
-    // Maximum delta t. Twelve hours
+#define MAX_DT 3600.0
+    // Maximum delta t. One hour
 #define G 6.67408e-11
 #define _DEBUG
 
@@ -54,6 +54,8 @@ private:
     Vector3 velocity;
     Vector3 spin;
     double mu;
+    Quaternion orientation;
+    double time;
 
     // Shape features
     double mean_density;// Used to generate rough parameters of the asteroid
