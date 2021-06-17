@@ -23,11 +23,12 @@ Done
 - The mass, center of mass, and moment of inertia of a cube are correct.
 - For large `n` and only Clm00 is nonzero, the mass and moment of inertia reduce to that of a sphere. (Done for `n=20`)
 - The orbits follow hyperbolae
-
-Not done
 - Neglecting torque and with zero initial angular momentum, the object does not change orientation
+- Orbit is not sensitive to changes in integration time step, or the way that the integration time step is lengthened at the edges of the orbit
 - Neglecting torque and with nonzero initial angular momentum, the object spins at a constant rate
 - Neglecting torque, angular momentum is conserved
+
+Not done
 - Neglecting torque, the object does not change orientation
 - Torque is not generated on a spherically symmetric object
 - Results are not sensitive to changes in integration time step, or the way that the integration time step is lengthened at the edges of the orbit

@@ -2,19 +2,19 @@
 
 double real_spherical_harmonic(uint l, int m, double theta, double phi) {
     if (m < 0) {
-        return sqrt(2) * pow(-1, m) * 
+        return sqrt(2) * pow(-1, m) *
         boost::math::spherical_harmonic(l, -m, theta, phi).imag();
     }
     if (m == 0) {
         return boost::math::spherical_harmonic(l, 0, theta, phi).real();
     }
     else {
-        return sqrt(2) * pow(-1, m) * 
+        return sqrt(2) * pow(-1, m) *
         boost::math::spherical_harmonic(l, m, theta, phi).real();
     }
 }
 
-Triangle::Triangle(Chunk* parent, Vector3 v1, Vector3 v2, Vector3 v3) : 
+Triangle::Triangle(Chunk* parent, Vector3 v1, Vector3 v2, Vector3 v3) :
     parent(parent), v(v1), l1(v2-v1), l2(v3-v1),
     norm(Vector3::cross(l1, l2)) {}
 
@@ -31,16 +31,16 @@ double Triangle::get_Isame(int a) const {
     Vector3 b, c;
     switch(a){
     case 0:
-        b = Vector3({0, 1, 0}) * get_Isame_component(l1[1], l2[1], v[1]);
-        c = Vector3({0, 0, 1}) * get_Isame_component(l1[2], l2[2], v[2]);
+        b = Vector3::y() * get_Isame_component(l1[1], l2[1], v[1]);
+        c = Vector3::z() * get_Isame_component(l1[2], l2[2], v[2]);
         break;
     case 1:
-        b = Vector3({1, 0, 0}) * get_Isame_component(l1[0], l2[0], v[0]);
-        c = Vector3({0, 0, 1}) * get_Isame_component(l1[2], l2[2], v[2]);
+        b = Vector3::x() * get_Isame_component(l1[0], l2[0], v[0]);
+        c = Vector3::z() * get_Isame_component(l1[2], l2[2], v[2]);
         break;
     case 2:
-        b = Vector3({0, 1, 0}) * get_Isame_component(l1[1], l2[1], v[1]);
-        c = Vector3({1, 0, 0}) * get_Isame_component(l1[0], l2[0], v[0]);
+        b = Vector3::y() * get_Isame_component(l1[1], l2[1], v[1]);
+        c = Vector3::x() * get_Isame_component(l1[0], l2[0], v[0]);
         break;
     }
     return 1/60.0 * parent->density *
@@ -55,50 +55,50 @@ double Triangle::get_Idiff(int a, int b) const {
     Vector3 vc;
     int c;
     if ((a == 0 && b == 1) || (a == 1 && b == 0)) {
-        vc = Vector3({0, 0, 1});
+        vc = Vector3::z();
         c = 2;
     }
     if ((a == 0 && b == 2) || (a == 2 && b == 0)) {
-        vc = Vector3({0, 1, 0});
+        vc = Vector3::y();
         c = 1;
     }
     if ((a == 2 && b == 1) || (a == 1 && b == 2)) {
-        vc = Vector3({1, 0, 0});
+        vc = Vector3::x();
         c = 0;
     }
     return -1/120.0 * parent->density * Vector3::dot(vc, norm) * (
-            l1[c] * get_Idiff_component(l1[a], l1[b], l2[a], l2[b], v[a], v[b]) + 
-            l2[c] * get_Idiff_component(l2[a], l2[b], l1[a], l1[b], v[a], v[b]) + 
+            l1[c] * get_Idiff_component(l1[a], l1[b], l2[a], l2[b], v[a], v[b]) +
+            l2[c] * get_Idiff_component(l2[a], l2[b], l1[a], l1[b], v[a], v[b]) +
             5 * v[c] * (l1[a] * (2 * l1[b] + l2[b]) + l2[a] * (2 * l2[b] + l1[b])+
-            4 * v[a] * (l2[b] + l1[b]) + 4 * v[b] * (l2[a] + l1[a]) + 
+            4 * v[a] * (l2[b] + l1[b]) + 4 * v[b] * (l2[a] + l1[a]) +
             12 * v[a] * v[b])
         );
 }
 double Triangle::get_Idiff_component(double l1a, double l1b,
     double l2a, double l2b, double va, double vb) const {
-    return 6 * l1a * l1b + 2 * l2a * l2b + 2 * l1b * (l2a + 5 * va) + 
+    return 6 * l1a * l1b + 2 * l2a * l2b + 2 * l1b * (l2a + 5 * va) +
         2 * l1a * (l2b + 5 * vb) + 5 * l2a * vb + 5 * l2b * va + 20 * va * vb;
 }
 Vector3 Triangle::get_torque() const {
     return 1/40.0 * parent->density * (
-        get_torque_component(l1, l2) + get_torque_component(l2, l1) + 
+        get_torque_component(l1, l2) + get_torque_component(l2, l1) +
         5 * v[2] * (
-            l1[0] * l1[0] + l1[1] * l1[1] + l2[0] * l2[0] + l2[1] * l2[1] + 
-            l1[0] * l2[0] + l1[1] * l2[1] + 
-            2 * v[0] * (2 * l1[0] + 2 * l2[0] + 3 * v[0]) + 
+            l1[0] * l1[0] + l1[1] * l1[1] + l2[0] * l2[0] + l2[1] * l2[1] +
+            l1[0] * l2[0] + l1[1] * l2[1] +
+            2 * v[0] * (2 * l1[0] + 2 * l2[0] + 3 * v[0]) +
             2 * v[1] * (2 * l1[1] + 2 * l2[1] + 3 * v[1])
-        )) * Vector3::cross(norm, Vector3({0, 0, 1}));
+        )) * Vector3::cross(norm, Vector3::z());
 }
 double Triangle::get_torque_component(Vector3 const& l1_, Vector3 const& l2_)
 const {
     return l1_[2] * (
         (l2_[0] + 5 * v[0]) * (l2_[0] + 2 * l1_[0]) +
-        (l2_[1] + 5 * v[1]) * (l2_[1] + 2 * l1_[1]) + 
-        3 * (l1_[0] * l1_[0] + l1_[1] * l1_[1]) + 
+        (l2_[1] + 5 * v[1]) * (l2_[1] + 2 * l1_[1]) +
+        3 * (l1_[0] * l1_[0] + l1_[1] * l1_[1]) +
         10 * (v[0] * v[0] + v[1] * v[1]));
 }
 
-Chunk::Chunk(double alpha_above, double alpha_below, 
+Chunk::Chunk(double alpha_above, double alpha_below,
     int n_here, int face, int a, int b) : ab(alpha_above), be(alpha_below) {
     Vector3 v, avec, bvec;
         // Vectors indicating the directions of a and b in cart. coords
@@ -164,7 +164,7 @@ void Chunk::shape(double density_, uint L, std::vector<double> const& clms,
     Vector3 vlr = lr.to_vector(rlr);
 
     if (be <= 0) {
-        Vector3 o = Vector3({0, 0, 0}); // origin]
+        Vector3 o = Vector3::zero(); // origin
 
         tris.push_back(Triangle(this, ab * vur, ab * vul, ab * vlr));
         tris.push_back(Triangle(this, ab * vll, ab * vlr, ab * vul));

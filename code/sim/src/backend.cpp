@@ -87,7 +87,7 @@ Asteroid::Asteroid(std::string filename) {
     std::getline(f, line);
     ss = std::istringstream (line);
     ss >> word;
-    velocity = Vector3({-std::stod(word), 0, 0});
+    velocity = Vector3({0, 0, std::stod(word)});
 
     // Central mass
     std::getline(f, line);
@@ -117,8 +117,8 @@ void Asteroid::make_chunks() {
     for (int f = 0; f < 6; f++) {
         for (int s = 0; s < m; s++){
             const int length = n * (s + 1) / m;
-            const double alpha_above = float(s + 1) / m;
-            const double alpha_below = float(s) / m;
+            const double alpha_above = double(s + 1) / m;
+            const double alpha_below = double(s) / m;
             for (int a = 0; a < length; a++){
                 for (int b = 0; b < length; b++) {
                     chunks.push_back(
@@ -133,32 +133,21 @@ void Asteroid::set_pos(double b) {
     // Asteroid enters at +x and is traveling towards -x, with offset in +y
     // direction.
     edge_dist = b * pow(INTEGRAL_LIMIT_FRAC, -1/3.0);
-    position = Vector3({sqrt(edge_dist * edge_dist - b * b), b, 0});
-    position *= 0.9999999;// So that it reads as just inside the allowed region
+    position = Vector3({0, b, -sqrt(edge_dist * edge_dist - b * b)});
+    position *= 1 - EPSILON;
+        // So that it reads as just inside the allowed region
 
-    double a = mu / velocity.mag2(); // Positive
-    closest_approach = sqrt(a * a + b * b) - a;
-}
 
-int Asteroid::simulate(std::ofstream&& resolved, std::ofstream&& unresolved) {
-    // Motivation: Torque is proportional to 1/position^3. Angular acceleration
-    // is now roughly constant every frame.
-    const double scale_torque = mu / pow(closest_approach, 3) * mean_density *
-        pow(radius, 5);
-    const double min_delta_t = ONE_SECOND_TORQUE / scale_torque;
-        // Toruqe at min delta t
+    energy = 0.5 * velocity.mag2() - mu / position.mag();
+    ang_mom = Vector3::cross(position, velocity);
+    double velocity_periapsis = mu / ang_mom.mag() +
+        sqrt(mu * mu / ang_mom.mag2() + 2 * energy);
+    closest_approach = ang_mom.mag() / velocity_periapsis;
+    excess_vel = sqrt(2 * energy);
+    impact_parameter = ang_mom.mag() / excess_vel;
 
-    int frames = 0;
-    for (;position.mag() < edge_dist; frames++){
-        if (frames % 1 == 0) {
-            std::cout << position << std::endl;
-        }
-        double dt = min_delta_t * pow(position.mag() / closest_approach, 3);
-        update_orientation(dt);
-        update_position(dt);
-    }
-    std::cout << position << std::endl;
-    return frames;
+    Vector3 Omega = ang_mom / position.mag2();
+    spin -= Omega;
 }
 
 void Asteroid::calculate_moi() {
@@ -174,6 +163,21 @@ void Asteroid::calculate_moi() {
     moi = Matrix3({ Ixx, Ixy, Ixz,
                     Ixy, Iyy, Iyz,
                     Ixz, Iyz, Izz,});
+    moi = Matrix3({ 1.1812, 0.13, -0.1542,
+                    0.213, 1.124, 0.6102,
+                    1.23, 0, 1.53,});
+    moi = moi * moi.transpose();
+    std::array<double, 3> evals = moi.get_evals();
+    std::cout << evals[0] << ' ' << evals[1] << ' ' << evals[2] << std::endl;
+    std::array<Vector3, 3> evecs = moi.get_symmetric_evecs(evals);
+    std::cout << moi << std::endl;
+    moiInverse = Matrix3::symmetric_invert(evals, evecs);
+
+    std::cout << moi * moiInverse << std::endl;
+    std::cout << moiInverse * moi << std::endl;
+
+    //moi = Matrix3::symmetric_reconstruct(evals, evecs);
+        // Do if there are issues with moi * moiInverse != identity.
 }
 
 void Asteroid::calculate_mass() {
@@ -194,8 +198,36 @@ void Asteroid::recenter() {
     #endif
 }
 
+int Asteroid::simulate(std::ofstream&& resolved, std::ofstream&& unresolved) {
+    // Motivation: Torque is proportional to 1/position^3. Angular acceleration
+    // is now roughly constant every frame.
+    const double scale_torque = mu / pow(closest_approach, 3) * mean_density *
+        pow(radius, 5);
+    const double min_delta_t = ONE_SECOND_TORQUE / scale_torque;
+        // Toruqe at min delta t
+
+    int frames = 0;
+    for (;position.mag() < edge_dist; frames++){
+        double dt = min_delta_t * pow(position.mag() / closest_approach, 3);
+        if (dt > MAX_DT) {
+            dt = MAX_DT;
+        }
+        update_orientation(dt);
+        update_position(dt);
+    }
+
+    return frames;
+}
+
+Vector3 Asteroid::get_rot_ang_mom() {
+    Vector3 Omega = ang_mom / position.mag2();
+    double theta = atan2(position[1], position[2]);
+    Vector3 omega_inertial = Matrix3::rotation_x(-theta) * spin + Omega;
+    return moi * omega_inertial;
+}
+
 Vector3 Asteroid::get_com() {
-    Vector3 total_arm = Vector3({0, 0, 0});
+    Vector3 total_arm = Vector3::zero();
     for (Triangle& t : triangles) {
         total_arm += t.get_lever_arm();
     }
@@ -203,7 +235,7 @@ Vector3 Asteroid::get_com() {
 }
 
 Vector3 Asteroid::get_torque() {
-    Vector3 torque = Vector3({0, 0, 0});
+    Vector3 torque = Vector3::zero();
     for (Triangle& t : triangles) {
         torque += t.get_torque();
     }
@@ -217,5 +249,18 @@ void Asteroid::update_position(double dt) {
 }
 
 void Asteroid::update_orientation(double dt) {
+    Vector3 Omega = ang_mom / position.mag2();
+    Vector3 torque = Vector3::zero(); // get_torque();
 
+    std::cout << get_rot_ang_mom() << std::endl;
+
+    // TO DO: Once I have orientation set up, fix this
+    Matrix3 moiGlobal = moi;
+    Matrix3 moiGlobalInverse = moiInverse;
+
+    Vector3 omegaDot = moiGlobalInverse * (torque - Vector3::cross(
+        Omega + spin, moiGlobal * (Omega + spin)))
+        + 2 * Omega * Vector3::dot(position, velocity) / position.mag2()
+        - Vector3::cross(Omega, spin);
+    spin += dt * omegaDot;
 }
