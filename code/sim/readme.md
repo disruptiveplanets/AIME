@@ -29,10 +29,10 @@ Done
 - Neglecting torque, angular momentum is conserved
 - Neglecting torque, the object does not change orientation
 - The object rotates the proper number of times per second
+- Nutation is stable
 
 Not done
 - Torque is not generated on a spherically symmetric object
-- Nutation is stable
 - Results are not sensitive to changes in integration time step, or the way that the integration time step is lengthened at the edges of the orbit
 - What is the best dt(r, omega) profile that leads to the most stable
     - orbital path?

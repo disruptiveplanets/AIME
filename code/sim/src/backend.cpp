@@ -248,7 +248,6 @@ void Asteroid::calculate_moi() {
     orientation = Quaternion::identity();
     //moi = Matrix3::identity();
     //moiInverse = Matrix3::identity();
-
 }
 
 void Asteroid::calculate_mass() {
@@ -301,18 +300,18 @@ int Asteroid::simulate(std::ofstream&& resolved, std::ofstream&& unresolved) {
 
     #ifdef _DEBUG
     std::cout << "Simulation took " << time << " seconds." << std::endl;
-    std::cout << "Total angle turned " << angle_tracker << std::endl;
-    std::cout << "Maximum quaternion magnitude (want 1) " << max_quat_mag
+    std::cout << "Maximum dquaternion magnitude (want 0) " << max_quat_mag
         << std::endl;
     #endif
 
     return frames;
 }
 
-Vector3 Asteroid::get_rot_ang_mom() const {
+Vector3 Asteroid::get_rot_ang_mom() {
     Vector3 Omega = ang_mom / position.mag2();
-    Vector3 omega_inertial = global_to_inertial() * spin + Omega;
-    return moi * omega_inertial;
+    Matrix3 inv_mat = orientation.inverse().matrix();
+    Matrix3 moiGlobal = orientation.matrix() * moi * inv_mat;
+    return global_to_inertial() * (moiGlobal * (spin + Omega));
 }
 
 Vector3 Asteroid::get_com() const {
@@ -358,7 +357,7 @@ void Asteroid::update_orientation(double dt) {
     orientation += d_quat * dt;
 
     #ifdef _DEBUG
-    max_quat_mag = max(max_quat_mag, orientation.mag());
+    max_quat_mag = max(max_quat_mag, d_quat.mag());
     #endif
 
     orientation /= orientation.mag();

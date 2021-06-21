@@ -9,7 +9,7 @@ start = False
 
 f = open("ang-mom.txt", 'r')
 for line in f.readlines():
-    if line == '' or line[0] == "S":
+    if line == '' or line[0] == "S" or line[0] == 'M':
         continue
     if line == '\n':
         start = True

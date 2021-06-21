@@ -38,7 +38,7 @@ private:
     Vector3 get_torque();
     void update_position(double dt);
     void update_orientation(double dt);
-    Vector3 get_rot_ang_mom() const;
+    Vector3 get_rot_ang_mom();
     Matrix3 global_to_inertial() const;
     Matrix3 inertial_to_global() const;
 
