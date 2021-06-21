@@ -339,7 +339,8 @@ void Asteroid::update_position(double dt) {
 
 void Asteroid::update_orientation(double dt) {
     Vector3 Omega = ang_mom / position.mag2();
-    Vector3 torque = Vector3::zero(); // get_torque();
+    Vector3 torque = 1e-10 * Vector3::x();//get_torque();
+    std::cout << (spin - Omega).mag() << ' ' << time << std::endl;
 
     Matrix3 inv_mat = orientation.inverse().matrix();
     Matrix3 moiGlobal = orientation.matrix() * moi * inv_mat;
