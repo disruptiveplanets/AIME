@@ -39,8 +39,7 @@ Implemented
 - The ability to read asteroid data from a text file and generate an asteroid model
 - Code to automatically calculate the asteroid's mass, center of mass, moment of inertia matrix, and tidal torque
 - A program to plot the shape of the asteroid as projected onto various planes with Painter's algorithm and `matplotlib`
-- A simulation of the asteroid's flight through the sphere of influence of a planet
+- A simulation of the asteroid's flight through the sphere of influence of a planet. It runs to my satisfaction in **16.5 seconds**
 
 Not yet implemented
-- Threading to make things faster
 - An MCMC to regress for asteroid shape.
