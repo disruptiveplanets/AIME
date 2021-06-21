@@ -32,7 +32,7 @@ public:
         v += l;
     }
 
-    void operator*=(Matrix3 m);
+    void operator*=(Matrix3 const& m);
 
     Vector3 get_lever_arm() const; // Used for com
     double get_mass() const; // Used for com
@@ -53,6 +53,7 @@ private:
     Vector3 l1;
     Vector3 l2;
     Vector3 norm;
+    Vector3 premul;
     Chunk* parent;
 };
 

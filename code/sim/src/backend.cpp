@@ -242,7 +242,7 @@ void Asteroid::calculate_moi() {
     std::array<Vector3, 3> evecs = moi.get_symmetric_evecs(evals);
     moiInverse = Matrix3::symmetric_invert(evals, evecs);
 
-    Matrix3 new_moi = Matrix3::symmetric_reconstruct(evals, evecs);
+    //Matrix3 new_moi = Matrix3::symmetric_reconstruct(evals, evecs);
         // Do if there are issues with moi * moiInverse != identity.
 
     orientation = Quaternion::identity();
@@ -278,7 +278,7 @@ Matrix3 Asteroid::inertial_to_global() const {
     return Matrix3::rotation_x(-theta);
 }
 
-int Asteroid::simulate(std::ofstream&& resolved, std::ofstream&& unresolved) {
+int Asteroid::simulate(double cadence, std::ofstream&& resolved, std::ofstream&& unresolved) {
     // Motivation: Torque is proportional to 1/position^3. Angular acceleration
     // is now roughly constant every frame.
     const double scale_torque = mu / pow(closest_approach, 3) * mean_density *
@@ -288,14 +288,18 @@ int Asteroid::simulate(std::ofstream&& resolved, std::ofstream&& unresolved) {
 
     time = 0;
     int frames = 0;
+    int cadence_index = -1;
+    double dt;
     for (;position.mag() < edge_dist; frames++){
-        double dt = min_delta_t * pow(position.mag() / closest_approach, 3);
-        if (dt > MAX_DT) {
-            dt = MAX_DT;
-        }
+        dt = min_delta_t + DT_SLOPE * (pow(position.mag() / closest_approach, 3) - 1);
         update_orientation(dt);
         update_position(dt);
         time += dt;
+
+        if (int(time / cadence) > cadence_index) {
+            resolved << spin << std::endl;
+            cadence_index = int(time / cadence);
+        }
     }
 
     #ifdef _DEBUG
@@ -339,8 +343,7 @@ void Asteroid::update_position(double dt) {
 
 void Asteroid::update_orientation(double dt) {
     Vector3 Omega = ang_mom / position.mag2();
-    Vector3 torque = 1e-10 * Vector3::x();//get_torque();
-    std::cout << (spin - Omega).mag() << ' ' << time << std::endl;
+    Vector3 torque = get_torque();
 
     Matrix3 inv_mat = orientation.inverse().matrix();
     Matrix3 moiGlobal = orientation.matrix() * moi * inv_mat;

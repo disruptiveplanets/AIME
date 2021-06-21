@@ -6,10 +6,10 @@ Vector3 Vector3::operator*(double d) const {
 Vector3 Vector3::operator/(double d) const {
     return Vector3({e[0] / d, e[1] / d, e[2] / d});
 }
-Vector3 Vector3::operator+(Vector3 v) const {
+Vector3 Vector3::operator+(Vector3 const& v) const {
     return Vector3({e[0] + v[0], e[1] + v[1], e[2] + v[2]});
 }
-Vector3 Vector3::operator-(Vector3 v) const {
+Vector3 Vector3::operator-(Vector3 const& v) const {
     return Vector3({e[0] - v[0], e[1] - v[1], e[2] - v[2]});
 }
 Vector3 Vector3::operator-() const {
@@ -21,13 +21,13 @@ void Vector3::operator*=(double d) {
     e[2] *= d;
     invalid_mag = true;
 }
-void Vector3::operator+=(Vector3 v) {
+void Vector3::operator+=(Vector3 const& v) {
     e[0] += v[0];
     e[1] += v[1];
     e[2] += v[2];
     invalid_mag = true;
 }
-void Vector3::operator-=(Vector3 v) {
+void Vector3::operator-=(Vector3 const& v) {
     e[0] -= v[0];
     e[1] -= v[1];
     e[2] -= v[2];
@@ -39,10 +39,10 @@ void Vector3::operator/=(double d) {
     e[2] /= d;
     invalid_mag = true;
 }
-double Vector3::dot(Vector3 v1, Vector3 v2)  {
+double Vector3::dot(Vector3 const& v1, Vector3 const& v2)  {
     return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
 }
-Vector3 Vector3::cross(Vector3 v1, Vector3 v2) {
+Vector3 Vector3::cross(Vector3 const& v1, Vector3 const& v2) {
     return Vector3({v1[1] * v2[2] - v1[2] * v2[1],
                     v1[2] * v2[0] - v1[0] * v2[2],
                     v1[0] * v2[1] - v1[1] * v2[0]});
@@ -77,12 +77,12 @@ Matrix3 Matrix3::operator/(double d) const {
                     e[3] / d, e[4] / d, e[5] / d,
                     e[6] / d, e[7] / d, e[8] / d});
 }
-Vector3 Matrix3::operator*(Vector3 v) const {
+Vector3 Matrix3::operator*(Vector3 const& v) const {
     return Vector3({e[0] * v[0] + e[1] * v[1] + e[2] * v[2],
                     e[3] * v[0] + e[4] * v[1] + e[5] * v[2],
                     e[6] * v[0] + e[7] * v[1] + e[8] * v[2]});
 }
-Matrix3 Matrix3::operator*(Matrix3 m) const {
+Matrix3 Matrix3::operator*(Matrix3 const& m) const {
     return Matrix3(
         {e[0] * m(0, 0) + e[1] * m(1, 0) + e[2] * m(2, 0),
          e[0] * m(0, 1) + e[1] * m(1, 1) + e[2] * m(2, 1),
@@ -96,25 +96,25 @@ Matrix3 Matrix3::operator*(Matrix3 m) const {
          e[6] * m(0, 1) + e[7] * m(1, 1) + e[8] * m(2, 1),
          e[6] * m(0, 2) + e[7] * m(1, 2) + e[8] * m(2, 2),});
 }
-Matrix3 Matrix3::operator+(Matrix3 m) const {
+Matrix3 Matrix3::operator+(Matrix3 const& m) const {
     return Matrix3(
         {e[0] + m(0, 0), e[1] + m(0, 1), e[2] + m(0, 2),
          e[3] + m(1, 0), e[4] + m(1, 1), e[5] + m(1, 2),
          e[6] + m(2, 0), e[7] + m(2, 1), e[8] + m(2, 2),});
 }
-Matrix3 Matrix3::operator-(Matrix3 m) const {
+Matrix3 Matrix3::operator-(Matrix3 const& m) const {
     return Matrix3(
         {e[0] - m(0, 0), e[1] - m(0, 1), e[2] - m(0, 2),
          e[3] - m(1, 0), e[4] - m(1, 1), e[5] - m(1, 2),
          e[6] - m(2, 0), e[7] - m(2, 1), e[8] - m(2, 2),});
 
 }
-void Matrix3::operator+=(Matrix3 m) {
+void Matrix3::operator+=(Matrix3 const& m) {
     e[0] += m(0, 0); e[1] += m(0, 1); e[2] += m(0, 2);
     e[3] += m(1, 0); e[4] += m(1, 1); e[5] += m(1, 2);
     e[6] += m(2, 0); e[7] += m(2, 1); e[8] += m(2, 2);
 }
-void Matrix3::operator-=(Matrix3 m) {
+void Matrix3::operator-=(Matrix3 const& m) {
     e[0] -= m(0, 0); e[1] -= m(0, 1); e[2] -= m(0, 2);
     e[3] -= m(1, 0); e[4] -= m(1, 1); e[5] -= m(1, 2);
     e[6] -= m(2, 0); e[7] -= m(2, 1); e[8] -= m(2, 2);
@@ -394,7 +394,7 @@ void Quaternion::operator/=(double d) {
     k_ /= d;
     invalid_mat = true;
 }
-Quaternion Quaternion::operator*(Quaternion q) const {
+Quaternion Quaternion::operator*(Quaternion const& q) const {
     Vector3 mv = vec();
     Vector3 qv = q.vec();
     double d = r_ * q.r() - Vector3::dot(mv, qv);

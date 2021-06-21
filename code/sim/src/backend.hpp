@@ -10,13 +10,13 @@
 #include "algebra.hpp"
 #include "triangle.hpp"
 
-#define ONE_SECOND_TORQUE 1e-10
-#define INTEGRAL_LIMIT_FRAC 1.0e-5
+#define DT_SLOPE 5e-5// 5e-6
+#define ONE_SECOND_TORQUE 1e-8// 1e-8
+#define INTEGRAL_LIMIT_FRAC 1.0e-5// 5e-6
     // Torque at closest approach divided by torque at start of sim.
-#define MAX_DT 2.0 // Maximum delta t.
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define G 6.67408e-11
-#define _DEBUG
+//#define _DEBUG
 
 using uint = unsigned int;
 
@@ -24,7 +24,7 @@ class Asteroid {
 public:
     Asteroid(std::string filename);
 
-    int simulate(std::ofstream&& resolved, std::ofstream&& unresolved);
+    int simulate(double cadence, std::ofstream&& resolved, std::ofstream&& unresolved);
     void draw(std::string filename, Vector3 axis) const;
 
 private:
@@ -70,5 +70,7 @@ private:
     double excess_vel;
     double impact_parameter;
 
+    #ifdef _DEBUG
     double max_quat_mag;
+    #endif
 };

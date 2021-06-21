@@ -1,10 +1,13 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <chrono>
 
 #include "backend.hpp"
 #include "algebra.hpp"
 #include "triangle.hpp"
+
+#define CADENCE 3600.0 // Seconds between record
 
 int main(int argc, char* argv[]) {
     std::string filename = "params.dat";
@@ -44,8 +47,17 @@ int main(int argc, char* argv[]) {
     resolved.open(bare + "-resolved.dat");
     unresolved.open(bare + "-unresolved.dat");
 
-    int frames = asteroid.simulate(std::move(resolved), std::move(unresolved));
-    std::cout << "Simulation took " << frames << " frames." << std::endl;
+    auto start = std::chrono::high_resolution_clock::now();
+
+    int frames = asteroid.simulate(CADENCE, std::move(resolved), std::move(unresolved));
+
+    auto stop = std::chrono::high_resolution_clock::now();
+    double time_taken = std::chrono::duration_cast<std::chrono::milliseconds>(
+        stop - start).count() / 1000.0;
+
+    std::cout << "Simulation took " << frames << " frames or "
+        << time_taken << " s." << std::endl;
+
 
     return 1;
 }

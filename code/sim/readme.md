@@ -32,20 +32,15 @@ Done
 - Nutation is stable
 - Torque is not generated on a spherically symmetric object
 - Ang mom increases for steady torque.
-
-Not done
 - Results are not sensitive to changes in integration time step, or the way that the integration time step is lengthened at the edges of the orbit
-- What is the best dt(r, omega) profile that leads to the most stable
-    - orbital path?
-    - rotational angular momentum conservation?
-    - orientation conservation in the case of no initial spin?
 
 ## Features
 Implemented
 - The ability to read asteroid data from a text file and generate an asteroid model
 - Code to automatically calculate the asteroid's mass, center of mass, moment of inertia matrix, and tidal torque
 - A program to plot the shape of the asteroid as projected onto various planes with Painter's algorithm and `matplotlib`
+- A simulation of the asteroid's flight through the sphere of influence of a planet
 
 Not yet implemented
-- A simulation of the asteroid's flight through the sphere of influence of a planet
+- Threading to make things faster
 - An MCMC to regress for asteroid shape.

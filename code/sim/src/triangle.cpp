@@ -15,12 +15,11 @@ double real_spherical_harmonic(uint l, int m, double theta, double phi) {
 }
 
 Triangle::Triangle(Chunk* parent, Vector3 v1, Vector3 v2, Vector3 v3) :
-    parent(parent), v(v1), l1(v2-v1), l2(v3-v1),
-    norm(Vector3::cross(l1, l2)) {}
+    v(v1), l1(v2-v1), l2(v3-v1), norm(Vector3::cross(l1, l2)), parent(parent) {}
 std::array<Vector3, 3> Triangle::get_corners() const {
     return {v, v + l1, v + l2};
 }
-void Triangle::operator*=(Matrix3 m) {
+void Triangle::operator*=(Matrix3 const& m) {
     v = m * v;
     l1 = m * l1;
     l2 = m * l2;

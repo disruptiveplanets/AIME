@@ -17,15 +17,15 @@ public:
 
     Vector3 operator*(double d) const;
     Vector3 operator/(double d) const;
-    Vector3 operator+(Vector3 v) const;
-    Vector3 operator-(Vector3 v) const;
+    Vector3 operator+(Vector3 const& v) const;
+    Vector3 operator-(Vector3 const& v) const;
     Vector3 operator-() const;
-    void operator*=(double v);
-    void operator+=(Vector3 v);
-    void operator-=(Vector3 v);
+    void operator*=(double d);
+    void operator+=(Vector3 const& v);
+    void operator-=(Vector3 const& v);
     void operator/=(double d);
-    static double dot(Vector3 v1, Vector3 v2);
-    static Vector3 cross(Vector3 v1, Vector3 v2);
+    static double dot(Vector3 const& v1, Vector3 const& v2);
+    static Vector3 cross(Vector3 const& v1, Vector3 const& v2);
     double operator[](int i) const;
     double mag();
     double mag2() const;
@@ -48,12 +48,12 @@ public:
 
     Matrix3 operator*(double d) const;
     Matrix3 operator/(double d) const;
-    Vector3 operator*(Vector3 v) const;
-    Matrix3 operator*(Matrix3 m) const;
-    Matrix3 operator+(Matrix3 m) const;
-    Matrix3 operator-(Matrix3 m) const;
-    void operator+=(Matrix3 m);
-    void operator-=(Matrix3 m);
+    Vector3 operator*(Vector3 const& v) const;
+    Matrix3 operator*(Matrix3 const& m) const;
+    Matrix3 operator+(Matrix3 const& m) const;
+    Matrix3 operator-(Matrix3 const& m) const;
+    void operator+=(Matrix3 const& m);
+    void operator-=(Matrix3 const& m);
     double operator()(int i, int j) const;
     Matrix3 transpose() const;
     void in_transpose();
@@ -103,7 +103,7 @@ public:
     void operator-=(Quaternion const& q);
     void operator*=(double d);
     void operator/=(double d);
-    Quaternion operator*(Quaternion q) const;
+    Quaternion operator*(Quaternion const& q) const;
 
     Quaternion inverse() const;
     Matrix3 matrix();

@@ -1,0 +1,3 @@
+clang++ -Wall -std=c++17 ./src/*.cpp -o "/home/jtdinsmo/Dropbox (MIT)/12.420 project/code/sim/target/sim" -Ofast
+
+./target/sim
