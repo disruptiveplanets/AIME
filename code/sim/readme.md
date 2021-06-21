@@ -28,9 +28,9 @@ Done
 - Neglecting torque and with nonzero initial angular momentum, the object spins at a constant rate
 - Neglecting torque, angular momentum is conserved
 - Neglecting torque, the object does not change orientation
+- The object rotates the proper number of times per second
 
 Not done
-- The object rotates the proper number of times per second
 - Torque is not generated on a spherically symmetric object
 - Nutation is stable
 - Results are not sensitive to changes in integration time step, or the way that the integration time step is lengthened at the edges of the orbit

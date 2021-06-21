@@ -10,11 +10,11 @@
 #include "algebra.hpp"
 #include "triangle.hpp"
 
-#define ONE_SECOND_TORQUE 1e-8
+#define ONE_SECOND_TORQUE 1e-10
 #define INTEGRAL_LIMIT_FRAC 1.0e-5
     // Torque at closest approach divided by torque at start of sim.
-#define MAX_DT 3600.0
-    // Maximum delta t. One hour
+#define MAX_DT 2.0 // Maximum delta t.
+#define max(a, b) ((a) > (b) ? (a) : (b))
 #define G 6.67408e-11
 #define _DEBUG
 
@@ -25,20 +25,22 @@ public:
     Asteroid(std::string filename);
 
     int simulate(std::ofstream&& resolved, std::ofstream&& unresolved);
-    void draw(std::string filename, Vector3 axis);
+    void draw(std::string filename, Vector3 axis) const;
 
 private:
     void make_chunks();
     void calculate_moi();
     void calculate_mass();
-    Vector3 get_com();
+    Vector3 get_com() const;
     void recenter();
     void set_pos(double impact_parameter);
 
     Vector3 get_torque();
     void update_position(double dt);
     void update_orientation(double dt);
-    Vector3 get_rot_ang_mom();
+    Vector3 get_rot_ang_mom() const;
+    Matrix3 global_to_inertial() const;
+    Matrix3 inertial_to_global() const;
 
 private:
     uint L; // Max degree of harmonics
@@ -67,4 +69,6 @@ private:
     double closest_approach;
     double excess_vel;
     double impact_parameter;
+
+    double max_quat_mag;
 };

@@ -113,7 +113,7 @@ Asteroid::Asteroid(std::string filename) {
     #endif
 }
 
-void Asteroid::draw(std::string filename, Vector3 axis) {
+void Asteroid::draw(std::string filename, Vector3 axis) const {
     // Write data about how to draw an asteroid to a text file (.ast) to be read
     // by a python script and displayed with matplotlib.
 
@@ -213,7 +213,6 @@ void Asteroid::set_pos(double b) {
     position *= 1 - EPSILON;
         // So that it reads as just inside the allowed region
 
-
     energy = 0.5 * velocity.mag2() - mu / position.mag();
     ang_mom = Vector3::cross(position, velocity);
     double velocity_periapsis = mu / ang_mom.mag() +
@@ -240,18 +239,11 @@ void Asteroid::calculate_moi() {
                     Ixy, Iyy, Iyz,
                     Ixz, Iyz, Izz,});
     std::array<double, 3> evals = moi.get_evals();
-    std::cout << evals[0] << ' ' << evals[1] << ' ' << evals[2] << std::endl;
     std::array<Vector3, 3> evecs = moi.get_symmetric_evecs(evals);
     moiInverse = Matrix3::symmetric_invert(evals, evecs);
 
     Matrix3 new_moi = Matrix3::symmetric_reconstruct(evals, evecs);
         // Do if there are issues with moi * moiInverse != identity.
-
-    std::cout << new_moi - moi << std::endl;
-    moi = new_moi;
-    std::cout << moi << std::endl;
-    std::cout << moiInverse << std::endl;
-    std::cout << moi * moiInverse << std::endl;
 
     orientation = Quaternion::identity();
     //moi = Matrix3::identity();
@@ -277,6 +269,16 @@ void Asteroid::recenter() {
     #endif
 }
 
+Matrix3 Asteroid::global_to_inertial() const {
+    double theta = atan2(position[1], -position[2]);
+    return Matrix3::rotation_x(theta);
+}
+
+Matrix3 Asteroid::inertial_to_global() const {
+    double theta = atan2(position[1], -position[2]);
+    return Matrix3::rotation_x(-theta);
+}
+
 int Asteroid::simulate(std::ofstream&& resolved, std::ofstream&& unresolved) {
     // Motivation: Torque is proportional to 1/position^3. Angular acceleration
     // is now roughly constant every frame.
@@ -296,21 +298,26 @@ int Asteroid::simulate(std::ofstream&& resolved, std::ofstream&& unresolved) {
         update_position(dt);
         time += dt;
     }
+
+    #ifdef _DEBUG
     std::cout << "Simulation took " << time << " seconds." << std::endl;
+    std::cout << "Total angle turned " << angle_tracker << std::endl;
+    std::cout << "Maximum quaternion magnitude (want 1) " << max_quat_mag
+        << std::endl;
+    #endif
 
     return frames;
 }
 
-Vector3 Asteroid::get_rot_ang_mom() {
+Vector3 Asteroid::get_rot_ang_mom() const {
     Vector3 Omega = ang_mom / position.mag2();
-    double theta = atan2(position[1], position[2]);
-    Vector3 omega_inertial = Matrix3::rotation_x(-theta) * spin + Omega;
+    Vector3 omega_inertial = global_to_inertial() * spin + Omega;
     return moi * omega_inertial;
 }
 
-Vector3 Asteroid::get_com() {
+Vector3 Asteroid::get_com() const {
     Vector3 total_arm = Vector3::zero();
-    for (Triangle& t : triangles) {
+    for (Triangle const& t : triangles) {
         total_arm += t.get_lever_arm();
     }
     return 1 / mass * total_arm;
@@ -335,11 +342,6 @@ void Asteroid::update_orientation(double dt) {
     Vector3 Omega = ang_mom / position.mag2();
     Vector3 torque = Vector3::zero(); // get_torque();
 
-    //std::cout << get_rot_ang_mom() << std::endl;
-    double theta = atan2(position[1], position[2]);
-    std::cout << Matrix3::rotation_x(-theta) * (orientation.matrix() * Vector3({1, 2, 3})) << ' ' << dt << std::endl;
-
-    // TO DO: Once I have orientation set up, fix this
     Matrix3 inv_mat = orientation.inverse().matrix();
     Matrix3 moiGlobal = orientation.matrix() * moi * inv_mat;
     Matrix3 moiGlobalInverse = orientation.matrix() * moiInverse * inv_mat;
@@ -348,10 +350,16 @@ void Asteroid::update_orientation(double dt) {
         Omega + spin, moiGlobal * (Omega + spin)))
         + 2 * Omega * Vector3::dot(position, velocity) / position.mag2()
         - Vector3::cross(Omega, spin);
+
     spin += dt * omegaDot;
 
     Quaternion d_quat = 0.5 * Quaternion(0, spin[0], spin[1], spin[2])
         * orientation;
     orientation += d_quat * dt;
+
+    #ifdef _DEBUG
+    max_quat_mag = max(max_quat_mag, orientation.mag());
+    #endif
+
     orientation /= orientation.mag();
 }
