@@ -15,7 +15,20 @@ central mass
 ```
 All units are given in SI units unless otherwise specified. Please see *summaries/21-06* for a description of what each variable means, and the math going into the internal code.
 
-Results of the simulated are saved in `params-unresolved.dat`, which assumes that the the asteroid is unresolved (and only light curve data can be captured) and `params-resolved.dat`, which assumes that the asteroid is resolved (and full rotation data can be captured)
+Results of the simulated are saved in `params-unresolved.dat`, which assumes that the the asteroid is unresolved (and only light curve data can be captured) and `params-resolved.dat`, which assumes that the asteroid is resolved (and full rotation data can be captured) For the resolved case, the results are the spin vector (x, y, z in global coordinates) at periodic intervals. By default, the period (`CADENCE`, defined in main.cpp), is one hour.
+
+## Use
+To generate data, run
+
+`./target/sim <ASTEROID PARAMETERS>`
+
+`ASTEROID PARAMETERS` should be a `.dat` file containing asteroid parameters in the format given above. If no file is provided, `params.dat` will be assumed.
+
+To draw the asteroid, run
+
+`./target/sim <ASTEROID PARAMETERS> draw <DIRECTION>`
+
+`ASTEROID PARAMETERS` fulfils the same role as in the first paragraph, except that it is required here. `DIRECTION` should be either `x`, `y`, or `z`. It represents the axis that the asteroid is projected onto. Non-axial directions would be easy to implement, but are not yet simply because there has not yet been a use for them. If `DIRECTION` is not provided, `z` is assumed.
 
 ## Tests
 Done
