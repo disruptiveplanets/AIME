@@ -53,3 +53,11 @@ Implemented
 - Code to automatically calculate the asteroid's mass, center of mass, moment of inertia matrix, and tidal torque
 - A program to plot the shape of the asteroid as projected onto various planes with Painter's algorithm and `matplotlib`
 - A simulation of the asteroid's flight through the sphere of influence of a planet. It runs to my satisfaction in **16.5 seconds**
+
+## To do:
+- Fix the fact that my build command is wrong
+- Fix up the drawing code: it doesn't free asteroid and I might not have finished porting it.
+- Test to make sure I haven't caused any bugs with the new port
+    - I.e., test that the output is the same.
+- Test the speed: make sure it's comparable
+- Implement emcee! 
