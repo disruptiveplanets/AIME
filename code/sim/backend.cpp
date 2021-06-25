@@ -296,9 +296,11 @@ int Asteroid::simulate(double cadence, std::ofstream&& resolved, std::ofstream&&
         update_position(dt);
         time += dt;
 
+
         if (int(time / cadence) > cadence_index) {
             resolved << spin << std::endl;
             cadence_index = int(time / cadence);
+            std::cout << frames << std::endl;
         }
     }
 

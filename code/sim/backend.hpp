@@ -13,6 +13,7 @@
 #define DT_SLOPE 5e-6// 5e-6
 #define ONE_SECOND_TORQUE 1e-8// 1e-8
 #define INTEGRAL_LIMIT_FRAC 1.0e-5// 5e-6
+#define NUM_THREADS 4
     // Torque at closest approach divided by torque at start of sim.
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define G 6.67408e-11
