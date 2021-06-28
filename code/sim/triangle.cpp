@@ -14,7 +14,7 @@ double real_spherical_harmonic(uint l, int m, double theta, double phi) {
     }
 }
 
-Triangle::Triangle(Chunk* parent, Vector3 v1, Vector3 v2, Vector3 v3) :
+Triangle::Triangle(Chunk& parent, Vector3 v1, Vector3 v2, Vector3 v3) :
     v(v1), l1(v2-v1), l2(v3-v1), norm(Vector3::cross(l1, l2)), parent(parent) {}
 std::array<Vector3, 3> Triangle::get_corners() const {
     return {v, v + l1, v + l2};
@@ -26,17 +26,17 @@ void Triangle::operator*=(Matrix3 const& m) {
     norm = m * norm;// Assume this is a rotation matrix
 }
 double Triangle::get_density() const{
-    return parent->density;
+    return parent.density;
 }
 bool Triangle::is_edge() const {
-    return abs(parent->ab - 1.0) < EPSILON;
+    return abs(parent.ab - 1.0) < EPSILON;
 }
 
 double Triangle::get_mass() const {
-    return 1/18.0 * parent->density * Vector3::dot(norm, l1 + l2 + 3 * v);
+    return 1/18.0 * parent.density * Vector3::dot(norm, l1 + l2 + 3 * v);
 }
 Vector3 Triangle::get_lever_arm() const {
-    return 1/24.0 * parent->density * norm * (
+    return 1/24.0 * parent.density * norm * (
         l1.mag2() + l2.mag2() + 6 * v.mag2() + Vector3::dot(l1, l2) +
         4 * Vector3::dot(l1 + l2, v)
     );
@@ -57,8 +57,14 @@ double Triangle::get_Isame(int a) const {
         c = Vector3::x() * get_Isame_component(l1[0], l2[0], v[0]);
         break;
     }
-    return 1/60.0 * parent->density *
+    return 1/60.0 * parent.density *
         Vector3::dot(norm, b + c);
+}
+bool Triangle::is_nan() const {
+    //Vector3 norm;
+    //Vector3 premul;
+    //Chunk* parent;
+    return isnan(v[0]) || isnan(l1[0]) || isnan(l2[0]);
 }
 double Triangle::get_Isame_component(double l1b, double l2b, double vb) const {
     return l1b * l1b * l1b + l1b * l1b * l2b + l1b * l2b * l2b + l2b * l2b * l2b
@@ -80,7 +86,7 @@ double Triangle::get_Idiff(int a, int b) const {
         vc = Vector3::x();
         c = 0;
     }
-    return -1/120.0 * parent->density * Vector3::dot(vc, norm) * (
+    return -1/120.0 * parent.density * Vector3::dot(vc, norm) * (
             l1[c] * get_Idiff_component(l1[a], l1[b], l2[a], l2[b], v[a], v[b]) +
             l2[c] * get_Idiff_component(l2[a], l2[b], l1[a], l1[b], v[a], v[b]) +
             5 * v[c] * (l1[a] * (2 * l1[b] + l2[b]) + l2[a] * (2 * l2[b] + l1[b])+
@@ -94,7 +100,7 @@ double Triangle::get_Idiff_component(double l1a, double l1b,
         2 * l1a * (l2b + 5 * vb) + 5 * l2a * vb + 5 * l2b * va + 20 * va * vb;
 }
 Vector3 Triangle::get_torque() const {
-    return 1/40.0 * parent->density * (
+    return 1/40.0 * parent.density * (
         get_torque_component(l1, l2) + get_torque_component(l2, l1) +
         5 * v[2] * (
             l1[0] * l1[0] + l1[1] * l1[1] + l2[0] * l2[0] + l2[1] * l2[1] +
@@ -164,6 +170,9 @@ void Chunk::shape(double density_, uint L, std::vector<double> const& clms,
     auto clm = clms.begin();
     for (int l = 0; l <= L; l++) {
         for(int m = -l; m<= l; m++) {
+            if (clm == clms.end()) {
+                std::cout << "Too few clms" << std::endl;
+            }
             rul += *clm * real_spherical_harmonic(l, m, ul.theta, ul.phi);
             rur += *clm * real_spherical_harmonic(l, m, ur.theta, ur.phi);
             rll += *clm * real_spherical_harmonic(l, m, ll.theta, ll.phi);
@@ -180,29 +189,29 @@ void Chunk::shape(double density_, uint L, std::vector<double> const& clms,
     if (be <= 0) {
         Vector3 o = Vector3::zero(); // origin
 
-        tris.push_back(Triangle(this, ab * vur, ab * vul, ab * vlr));
-        tris.push_back(Triangle(this, ab * vll, ab * vlr, ab * vul));
+        tris.push_back(Triangle(*this, ab * vur, ab * vul, ab * vlr));
+        tris.push_back(Triangle(*this, ab * vll, ab * vlr, ab * vul));
 
-        tris.push_back(Triangle(this, ab * vur, ab * vlr, o));
-        tris.push_back(Triangle(this, ab * vlr, ab * vll, o));
-        tris.push_back(Triangle(this, ab * vll, ab * vul, o));
-        tris.push_back(Triangle(this, ab * vul, ab * vur, o));
+        tris.push_back(Triangle(*this, ab * vur, ab * vlr, o));
+        tris.push_back(Triangle(*this, ab * vlr, ab * vll, o));
+        tris.push_back(Triangle(*this, ab * vll, ab * vul, o));
+        tris.push_back(Triangle(*this, ab * vul, ab * vur, o));
     }
     else{
-        tris.push_back(Triangle(this, ab * vur, ab * vul, ab * vlr));
-        tris.push_back(Triangle(this, ab * vll, ab * vlr, ab * vul));
+        tris.push_back(Triangle(*this, ab * vur, ab * vul, ab * vlr));
+        tris.push_back(Triangle(*this, ab * vll, ab * vlr, ab * vul));
 
-        tris.push_back(Triangle(this, ab * vur, ab * vlr, be * vur));
-        tris.push_back(Triangle(this, ab * vlr, ab * vll, be * vlr));
-        tris.push_back(Triangle(this, ab * vll, ab * vul, be * vll));
-        tris.push_back(Triangle(this, ab * vul, ab * vur, be * vul));
+        tris.push_back(Triangle(*this, ab * vur, ab * vlr, be * vur));
+        tris.push_back(Triangle(*this, ab * vlr, ab * vll, be * vlr));
+        tris.push_back(Triangle(*this, ab * vll, ab * vul, be * vll));
+        tris.push_back(Triangle(*this, ab * vul, ab * vur, be * vul));
 
-        tris.push_back(Triangle(this, be * vlr, be * vur, ab * vlr));
-        tris.push_back(Triangle(this, be * vll, be * vlr, ab * vll));
-        tris.push_back(Triangle(this, be * vul, be * vll, ab * vul));
-        tris.push_back(Triangle(this, be * vur, be * vul, ab * vur));
+        tris.push_back(Triangle(*this, be * vlr, be * vur, ab * vlr));
+        tris.push_back(Triangle(*this, be * vll, be * vlr, ab * vll));
+        tris.push_back(Triangle(*this, be * vul, be * vll, ab * vul));
+        tris.push_back(Triangle(*this, be * vur, be * vul, ab * vur));
 
-        tris.push_back(Triangle(this, be * vul, be * vur, be * vll));
-        tris.push_back(Triangle(this, be * vlr, be * vll, be * vur));
+        tris.push_back(Triangle(*this, be * vul, be * vur, be * vll));
+        tris.push_back(Triangle(*this, be * vlr, be * vll, be * vur));
     }
 }

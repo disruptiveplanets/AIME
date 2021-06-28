@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
     std::vector<double> densities;
     std::getline(f, line);
     ss = std::istringstream (line);
-    for(int i = 0; i <= num_chunks; i++) {
+    for(int i = 0; i < num_chunks; i++) {
         ss >> word;
         densities.push_back(std::stod(word));
     }

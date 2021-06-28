@@ -1,4 +1,4 @@
-# Simulation
+# Draw
 
 This code draws an asteroid's shape and density distribution as projected onto a given axis. A description of the asteroid should be put in `params.dat`, which should have the following format:
 ```

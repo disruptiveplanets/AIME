@@ -6,16 +6,34 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <deque>
 
 #include "algebra.hpp"
 #include "triangle.hpp"
 
-#define DT_SLOPE 5e-6// 5e-6
-#define ONE_SECOND_TORQUE 1e-8// 1e-8
+#define MAX_DT 2.0
+#define MIN_DT 1.0e-0
+#define DT_POWER 1// 5M
+
+/*#define MAX_DT 3.0
+#define MIN_DT 1.0e-0
+#define DT_POWER 3*/// 5M
+// Sort this out
+
+
+
+
+
+
+
+
+
+
 #define INTEGRAL_LIMIT_FRAC 1.0e-5// 5e-6
 #define NUM_THREADS 4
     // Torque at closest approach divided by torque at start of sim.
 #define max(a, b) ((a) > (b) ? (a) : (b))
+#define min(a, b) ((a) < (b) ? (a) : (b))
 #define G 6.67408e-11
 //#define _DEBUG
 
@@ -53,7 +71,7 @@ private:
     double mass;
     Matrix3 moi;
     Matrix3 moiInverse;
-    std::vector<Chunk> chunks;
+    std::deque<Chunk> chunks;
     std::vector<Triangle> triangles;
     double edge_dist; // Limit of the integration region
     Vector3 position;
@@ -77,4 +95,15 @@ private:
     #ifdef _DEBUG
     double max_quat_mag;
     #endif
+
+
+    // Variables defined globally for computational efficiency
+    Vector3 accel;
+    Vector3 Omega;
+    Matrix3 inv_mat;
+    Matrix3 moiGlobal;
+    Matrix3 moiGlobalInverse;;
+    Vector3 torque;
+    Vector3 omegaDot;
+    Quaternion d_quat;
 };

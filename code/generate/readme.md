@@ -1,4 +1,4 @@
-# Simulation
+# Generate
 
 This code generates data for a simulated asteroid over its flyby. A description of the asteroid should be put in `params.dat`, which should have the following format:
 ```

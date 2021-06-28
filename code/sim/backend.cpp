@@ -8,13 +8,15 @@ Asteroid::Asteroid(int L, int n, int m, const std::vector<double>& clms,
     radius(clms[0]) {
 
     int num_chunks = n * n * (m + 1) * (2 * m + 1) / m;
-    chunks.reserve(num_chunks);
     make_chunks();
 
     // Density
     triangles.reserve(12 * num_chunks);
     mean_density = 0;
-    for(int i = 0; i <= densities.size(); i++) {
+    for(int i = 0; i < densities.size(); i++) {
+        if (i >= chunks.size()) {
+            std::cout << "Too few chunks." << std::endl;
+        }
         mean_density += densities[i];
         chunks[i].shape(densities[i], L, clms, triangles);
     }
@@ -151,7 +153,12 @@ void Asteroid::set_pos(double b) {
 }
 
 void Asteroid::calculate_moi() {
-    double Ixx = 0, Iyy = 0, Izz = 0, Ixz = 0, Ixy = 0, Iyz = 0;
+    double Ixx = 0;
+    double Iyy = 0;
+    double Izz = 0;
+    double Ixz = 0;
+    double Ixy = 0;
+    double Iyz = 0;
     for (Triangle& t : triangles) {
         Ixx += t.get_Isame(0);
         Iyy += t.get_Isame(1);
@@ -163,11 +170,12 @@ void Asteroid::calculate_moi() {
     moi = Matrix3({ Ixx, Ixy, Ixz,
                     Ixy, Iyy, Iyz,
                     Ixz, Iyz, Izz,});
+
     std::array<double, 3> evals = moi.get_evals();
     std::array<Vector3, 3> evecs = moi.get_symmetric_evecs(evals);
     moiInverse = Matrix3::symmetric_invert(evals, evecs);
 
-    //Matrix3 new_moi = Matrix3::symmetric_reconstruct(evals, evecs);
+    moi = Matrix3::symmetric_reconstruct(evals, evecs);
         // Do if there are issues with moi * moiInverse != identity.
 
     orientation = Quaternion::identity();
@@ -188,9 +196,9 @@ void Asteroid::recenter() {
         t.recenter(-com);
     }
 
-    #ifdef _DEBUG
+    /*#ifdef _DEBUG
     std::cout << "New COM: " << get_com() << " should be zero." << std::endl;
-    #endif
+    #endif*/
 }
 
 Matrix3 Asteroid::global_to_inertial() const {
@@ -204,19 +212,16 @@ Matrix3 Asteroid::inertial_to_global() const {
 }
 
 int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
-    // Motivation: Torque is proportional to 1/position^3. Angular acceleration
-    // is now roughly constant every frame.
-    const double scale_torque = mu / pow(closest_approach, 3) * mean_density *
-        pow(radius, 5);
-    const double min_delta_t = ONE_SECOND_TORQUE / scale_torque;
-        // Toruqe at min delta t
-
     time = 0;
     int frames = 0;
     int cadence_index = -1;
     double dt;
-    for (;position.mag() < edge_dist; frames++){
-        dt = min_delta_t + DT_SLOPE * (pow(position.mag() / closest_approach, 3) - 1);
+    double close_power = pow(closest_approach, DT_POWER);
+    double denom = 1.0 / (pow(edge_dist, DT_POWER) - close_power);
+
+    for (;position.mag() < edge_dist; frames++) {
+        dt = MIN_DT + (MAX_DT - MIN_DT) *
+            (pow(position.mag(), DT_POWER) - close_power) * denom;
         update_orientation(dt);
         update_position(dt);
         time += dt;
@@ -226,6 +231,26 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
             resolved_data.push_back(spin[1]);
             resolved_data.push_back(spin[2]);
             cadence_index = int(time / cadence);
+
+            if (isnan(spin[0])) {
+                std::cout << mass << std::endl;
+                std::cout << moi << std::endl;
+                std::cout << moiInverse << std::endl;
+                std::cout << edge_dist << std::endl;
+                std::cout << position << std::endl;
+                std::cout << velocity << std::endl;
+                std::cout << orientation << std::endl;
+                std::cout << mean_density << std::endl;
+                std::cout << radius << std::endl;
+                std::cout << energy << std::endl;
+                std::cout << ang_mom << std::endl;
+                std::cout << closest_approach << std::endl;
+                std::cout << excess_vel << std::endl;
+                std::cout << impact_parameter << std::endl;
+                return 0;
+            }
+
+            //std::cout << spin[0] <<' '<< spin[1]<<' ' << spin[2] << ' ' << dt << std::endl;
         }
     }
 
@@ -263,27 +288,30 @@ Vector3 Asteroid::get_torque() {
 }
 
 void Asteroid::update_position(double dt) {
-    Vector3 accel = -mu / pow(position.mag(), 3) * position;
+    accel = -mu / pow(position.mag(), 3) * position;
     velocity += accel * dt;
     position += velocity * dt;
 }
 
 void Asteroid::update_orientation(double dt) {
-    Vector3 Omega = ang_mom / position.mag2();
-    Vector3 torque = get_torque();
+    Omega = ang_mom / position.mag2();
 
-    Matrix3 inv_mat = orientation.inverse().matrix();
-    Matrix3 moiGlobal = orientation.matrix() * moi * inv_mat;
-    Matrix3 moiGlobalInverse = orientation.matrix() * moiInverse * inv_mat;
+    inv_mat = orientation.inverse().matrix();
+    moiGlobal = orientation.matrix() * moi * inv_mat;
+    moiGlobalInverse = orientation.matrix() * moiInverse * inv_mat;
 
-    Vector3 omegaDot = moiGlobalInverse * (torque - Vector3::cross(
+    //Vector3 torque = get_torque();
+    torque = 3 * mu / pow(position.mag(), 3) *
+        Vector3({-moiGlobal(1, 2), moiGlobal(0, 2), 0});
+
+    omegaDot = moiGlobalInverse * (torque - Vector3::cross(
         Omega + spin, moiGlobal * (Omega + spin)))
         + 2 * Omega * Vector3::dot(position, velocity) / position.mag2()
         - Vector3::cross(Omega, spin);
 
     spin += dt * omegaDot;
 
-    Quaternion d_quat = 0.5 * Quaternion(0, spin[0], spin[1], spin[2])
+    d_quat = 0.5 * Quaternion(0, spin[0], spin[1], spin[2])
         * orientation;
     orientation += d_quat * dt;
 

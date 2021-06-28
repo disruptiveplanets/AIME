@@ -219,7 +219,7 @@ std::array<double, 3> Matrix3::get_evals() const {
 
     double r = r_c.real();
     double disc = (b - r) * (b - r) - 4 * d / r;
-    if (abs(disc) < EPSILON) { disc = 0; }
+    if (disc < EPSILON) { disc = 0; }
     double r1 = (b - r + sqrt(disc)) / 2;
     double r2 = (b - r - sqrt(disc)) / 2;
     return {r, r1, r2};
@@ -295,6 +295,8 @@ const {
             a = 0;
             b = 1;
             break;
+        default:
+            return {Vector3::x(), Vector3::y(), Vector3::z()};
         }
         D = ((*this)(a, a) - evals[1]) * ((*this)(b, b) - evals[1]) -
             (*this)(b, a) * (*this)(a, b);

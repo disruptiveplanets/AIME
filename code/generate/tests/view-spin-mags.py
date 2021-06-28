@@ -1,45 +1,46 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
-f = open("spin-mags.txt", 'r')
-start = False
-t = 0
-times = []
-spins = []
-dists = []
-for line in f.readlines():
-    if line == '\n':
-        start = True
-        continue
-    if line == '':
-        continue
-    if line[0] == 'S':# Last line
-        continue
-    if start:
-        dt, spin_mag, dist = line.split(' ')
-        t += float(dt)
-        times.append(t)
-        spins.append(float(spin_mag))
-        dists.append(float(dist))
-    
-f.close()
+MARKER = "."
 
-fig, ax1 = plt.subplots()
-
-ax1.set_xlabel("Time (s)")
-ax1.set_ylabel("Spin mag in non-inertial frame (Hz)")
-ax1.plot(times, spins, color='k')
-ax1.scatter(times, spins, marker='.', color='k')
-
+fig, ax1 = plt.subplots(figsize=(12, 4))
 ax2 = ax1.twinx()
 
-ax2.set_ylabel("Position (m)")
-ax2.plot(times, dists, color='C1')
-ax2.scatter(times, dists, color='C1', marker='.')
+i = 0
+for fname in os.listdir():
+    if fname[:9] == "spin-mags":
+        f = open(fname, 'r')
+        xs = []
+        ys = []
+        zs = []
+        os = []
+        for line in f.readlines():
+            if line == '':
+                continue
+            if line[0] == 'S':# Last line
+                continue
+            try:
+                x, y, z, o = line.split(' ')
+                os.append(float(o))
+            except:
+                x, y, z = line.split(' ')
+            xs.append(float(x))
+            ys.append(float(y))
+            zs.append(float(z))
 
-print("Max spin:", np.max(spins))
-print("Min pos:", np.min(dists))
+        f.close()
+
+        ax1.plot(xs, linestyle='solid', color = "C"+str(i), linewidth=1)
+        ax1.plot(ys, linestyle='dashed',color = "C"+str(i), linewidth=1)
+        #ax1.plot(zs, linestyle='dotted', color = "C"+str(i), linewidth=1)
+        ax1.plot([], [], label=fname, color = "C"+str(i), linewidth=1)
+
+        if len(os) > 5:
+            ax2.plot(os, color="C"+str(i), linestyle='dashdot')
+        i+= 1
 
 fig.tight_layout()
+fig.legend(loc="lower left")
 plt.show()
 plt.savefig("img-spin-mags.png")

@@ -26,7 +26,7 @@ public:
 
 class Triangle {
 public:
-    Triangle(Chunk* parent, Vector3 v1, Vector3 v2, Vector3 v3);
+    Triangle(Chunk& parent, Vector3 v1, Vector3 v2, Vector3 v3);
 
     void recenter(Vector3 const& l) {
         v += l;
@@ -42,6 +42,7 @@ public:
     std::array<Vector3, 3> get_corners() const;
     double get_density() const;
     bool is_edge() const;
+    bool is_nan() const;
 
 private:
     double get_Isame_component(double l1b, double l2b, double vb) const;
@@ -54,7 +55,7 @@ private:
     Vector3 l2;
     Vector3 norm;
     Vector3 premul;
-    Chunk* parent;
+    Chunk& parent;
 };
 
 class Chunk {

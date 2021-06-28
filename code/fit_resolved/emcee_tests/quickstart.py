@@ -25,6 +25,12 @@ plt.ylabel("y");
 
 plt.show()
 
+def log_likelihood(theta, x, y, yerr):
+    m, b, log_f = theta
+    model = m * x + b
+    sigma2 = yerr ** 2 + model ** 2 * np.exp(2 * log_f)
+    return -0.5 * np.sum((y - model) ** 2 / sigma2 + np.log(sigma2))
+'''
 A = np.vander(x, 2)
 C = np.diag(yerr * yerr)
 ATA = np.dot(A.T, A / (yerr ** 2)[:, None])
@@ -42,15 +48,8 @@ plt.xlim(0, 10)
 plt.xlabel("x")
 plt.ylabel("y");
 
-plt.show()
-
-def log_likelihood(theta, x, y, yerr):
-    m, b, log_f = theta
-    model = m * x + b
-    sigma2 = yerr ** 2 + model ** 2 * np.exp(2 * log_f)
-    return -0.5 * np.sum((y - model) ** 2 / sigma2 + np.log(sigma2))
-
-
+plt.show()'''
+'''
 from scipy.optimize import minimize
 
 np.random.seed(42)
@@ -72,7 +71,7 @@ plt.legend(fontsize=14)
 plt.xlim(0, 10)
 plt.xlabel("x")
 plt.ylabel("y");
-plt.show()
+plt.show()'''
 
 def log_prior(theta):
     m, b, log_f = theta
@@ -88,7 +87,10 @@ def log_probability(theta, x, y, yerr):
 
 import emcee
 
-pos = soln.x + 1e-4 * np.random.randn(32, 3)
+#begin = soln.x
+begin = (m_true, b_true, f_true)
+
+pos = begin + 1e-4 * np.random.randn(32, 3)
 nwalkers, ndim = pos.shape
 
 sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability, args=(x, y, yerr))
