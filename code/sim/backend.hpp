@@ -23,9 +23,12 @@ using uint = unsigned int;
 
 class Asteroid {
 public:
-    Asteroid(std::string filename);
+    Asteroid(int L, int n, int m, const std::vector<double>& clms,
+        const std::vector<double>& densities, double spinx, double spiny,
+        double spinz, double impact_parameter, double speed,
+        double central_mass);
 
-    int simulate(double cadence, std::ofstream&& resolved, std::ofstream&& unresolved);
+    int simulate(double cadence, std::vector<double>& resolved_data);
     void draw(std::string filename, Vector3 axis) const;
 
 private:

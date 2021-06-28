@@ -1,99 +1,24 @@
 #include "backend.hpp"
 
-Asteroid::Asteroid(std::string filename) {
-    /* Expected format:
-    L n m
-    C00
-    C1-1 C10 C11
-    <...>
-    rho00 rho01 rho02 rho03 rho04 rho05
-    <...>
-    spinx, spiny, spinz
-    impact parameter
-    velocity mps
-    central mass
-    */
-
-    /* Note: since this code is intended to be used in a limited set of
-     * scnarios, and since I will always have access to this source code
-     * to debug any errors. I will not be writing a "safe parser". That is,
-     * when I parse the file `filename`, I will not carefully print out the
-     * error messages that could occur. The program will crash somehow and it
-     * is up to the user to figure out the problem with the formatting of
-     * `filename`. I'm doing this to save time.
-    */
-
-
-    std::ifstream f;
-    f.open(filename);
-    std::string line, word, x, y, z;
-    std::istringstream ss;
-
-    // Parameterization numbers
-    std::getline(f, line);
-    ss = std::istringstream (line);
-    ss >> x;
-    ss >> y;
-    ss >> z;
-    L = std::stoi(x);// Max degree of spherical harmonics
-    n = std::stoi(y);// Segmentation of cube face at outer shell
-    m = std::stoi(z);// Number of shells
+Asteroid::Asteroid(int L, int n, int m, const std::vector<double>& clms,
+    const std::vector<double>& densities, double spinx, double spiny,
+    double spinz, double impact_parameter, double speed, double central_mass) :
+    L(L), n(n), m(m), velocity(Vector3({0, 0, speed})),
+    spin(Vector3({spinx, spiny, spinz})), mu(G * central_mass),
+    radius(clms[0]) {
 
     int num_chunks = n * n * (m + 1) * (2 * m + 1) / m;
     chunks.reserve(num_chunks);
     make_chunks();
 
-    std::vector<double> clms;
-
-    // Clms
-    for(int i = 0; i <= L; i++){
-        std::getline(f, line);
-        ss = std::istringstream (line);
-        for(int m = -i; m <= i; m++) {
-            ss >> word;
-            clms.push_back(std::stod(word));
-        }
-    }
-    radius = clms[0];
-
     // Density
     triangles.reserve(12 * num_chunks);
-        // Over estimate the number of triangles about to be pushed
-    std::getline(f, line);
-    ss = std::istringstream (line);
     mean_density = 0;
-    for(int i = 0; i <= num_chunks; i++) {
-        ss >> word;
-        mean_density += std::stod(word);
-        chunks[i].shape(std::stod(word), L, clms, triangles);
+    for(int i = 0; i <= densities.size(); i++) {
+        mean_density += densities[i];
+        chunks[i].shape(densities[i], L, clms, triangles);
     }
     mean_density /= chunks.size();
-
-    // Spin
-    std::getline(f, line);
-    ss = std::istringstream (line);
-    ss >> x;
-    ss >> y;
-    ss >> z;
-    spin = Vector3({std::stod(x), std::stod(y), std::stod(z)});
-
-    // Impact parameter
-    std::getline(f, line);
-    ss = std::istringstream (line);
-    ss >> word;
-    double impact_parameter = std::stod(word);
-
-    // Velocity (units: times escape velocity)
-    std::getline(f, line);
-    ss = std::istringstream (line);
-    ss >> word;
-    velocity = Vector3({0, 0, std::stod(word)});
-
-    // Central mass
-    std::getline(f, line);
-    ss = std::istringstream (line);
-    ss >> word;
-    mu = G * std::stod(word);
 
     calculate_mass();
     recenter();
@@ -278,7 +203,7 @@ Matrix3 Asteroid::inertial_to_global() const {
     return Matrix3::rotation_x(-theta);
 }
 
-int Asteroid::simulate(double cadence, std::ofstream&& resolved, std::ofstream&& unresolved) {
+int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
     // Motivation: Torque is proportional to 1/position^3. Angular acceleration
     // is now roughly constant every frame.
     const double scale_torque = mu / pow(closest_approach, 3) * mean_density *
@@ -296,11 +221,11 @@ int Asteroid::simulate(double cadence, std::ofstream&& resolved, std::ofstream&&
         update_position(dt);
         time += dt;
 
-
         if (int(time / cadence) > cadence_index) {
-            resolved << spin << std::endl;
+            resolved_data.push_back(spin[0]);
+            resolved_data.push_back(spin[1]);
+            resolved_data.push_back(spin[2]);
             cadence_index = int(time / cadence);
-            std::cout << frames << std::endl;
         }
     }
 

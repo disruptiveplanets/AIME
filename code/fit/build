@@ -1,1 +1,0 @@
-clang++ -Wall -pthread -std=c++17 ../sim/*.cpp main.cpp -o "/home/jtdinsmo/Dropbox (MIT)/12.420 project/code/fit/bin/generate"

@@ -8,6 +8,7 @@
 #include "../sim/triangle.hpp"
 
 #define CADENCE 3600.0 // Seconds between record
+#define ROOT "/home/jtdinsmo/Dropbox (MIT)/12.420 project/"
 
 /* Expected format for params.dat:
 L n m
@@ -40,6 +41,19 @@ int main(int argc, char* argv[]) {
     test.open(filename);
     if (!test.is_open()) {
         std::cout << "The file " << filename << " does not exist." << std::endl;
+    }
+
+    Vector3 axis = Vector3::z();
+    std::string axis_name = "z";
+    if (argc >= 3) {
+        if (strcmp(argv[3], "x") == 0) {
+            axis = Vector3::x();
+            axis_name = "x";
+        }
+        if (strcmp(argv[3], "y") == 0) {
+            axis = Vector3::y();
+            axis_name = "y";
+        }
     }
 
     // Load information
@@ -120,24 +134,12 @@ int main(int argc, char* argv[]) {
     Asteroid asteroid(L, n, m, clms, densities, spinx, spiny, spinz,
         impact_parameter, speed, central_mass);
 
-    // Run asteroid
-    std::vector<double> resolved_data;
-    auto start = std::chrono::high_resolution_clock::now();
-    int frames = asteroid.simulate(CADENCE, resolved_data);
-    auto stop = std::chrono::high_resolution_clock::now();
-    double time_taken = std::chrono::duration_cast<std::chrono::milliseconds>(
-        stop - start).count() / 1000.0;
+    // Draw asteroid
+    std::string ast_name = bare + "_" + axis_name + ".ast";
+    asteroid.draw(ast_name, axis);
 
-    std::cout << "Simulation took " << frames << " frames or "
-        << time_taken << " s." << std::endl;
-
-    std::ofstream resolved_file;
-    resolved_file.open(bare + "-resolved.dat");
-    for (int i = 0; i < resolved_data.size(); i+=3) {
-        resolved_file << resolved_data[i] << ' ';
-        resolved_file << resolved_data[i + 1] << ' ';
-        resolved_file << resolved_data[i + 2] << std::endl;
-    }
-
+    std::string command = ("python3 \"" ROOT "code/draw/draw.py\" \"" ROOT
+        "code/draw/") + ast_name + "\"";
+    system(command.c_str());
     return 1;
 }

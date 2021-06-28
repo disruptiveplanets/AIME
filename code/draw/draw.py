@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import colorsys
+import colorsys, sys
 
-FILENAME = "params.ast"
+FILENAME = sys.argv[1]
+print("Drawing filename " + FILENAME)
 f = open(FILENAME, 'r')
 points = []
 densities = []
