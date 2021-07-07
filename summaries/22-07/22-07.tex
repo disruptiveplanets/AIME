@@ -54,7 +54,7 @@
 
 \section{Definitions}
 Please see \href{https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.56.5257&rep=rep1&type=pdf}{info on spherical harmonics}
-$$P_{lm}=\frac{1}{2l!}(1-t^2)^{m/2} \frac{d^{l+1}}{dl^{l+m}}(t^2-1)^l$$
+$$P_{lm}=\frac{1}{2^ll!}(1-t^2)^{m/2} \frac{d^{l+m}}{dl^{l+m}}(t^2-1)^l$$
 $$Y_{lm}(\theta, \phi) = P_{lm}(\cos\theta)e^{im\phi}$$
 $$\bar Y_{lm}(\theta, \phi) = (-1)^m \sqrt{\frac{2l+1}{4\pi}\frac{(l-m)!}{(l+m)!}} Y_{lm}(\theta, \phi)$$
 $$R_{lm}(\bm r) = (-1)^m \frac{r^l}{(l+m)!}Y_{lm}(\bm r)$$
@@ -70,6 +70,7 @@ $$S_{lm}^*(\bm r - \bm D)=(-1)^l (-1)^m \sum_{l'=|m|}^\infty R_{l'm}^*(\bm r) \f
 Similarly, we have some gradient formulas that result in
 $$\bm r \times \nabla R_{lm}^*=\frac{1}{2}[(\x + i\y)(l-m+1)R^*_{l,m-1}$$
 $$+(-\x+i\y)(l+m+1)R^*_{l,m+1}+2im\z R^*_{lm}]$$
+\comment{This last one is wrong; the way I have it in writing is correct. But for some reason, the mistake cancels, and the final answer is correct anyway.}
 All of these functions obey the symmetry relations $F_{l,-m}=(-1)^mF_{lm}^*$
 \comment{WRONG! Y DOES NOT! FIX THIS!!!}.
 
