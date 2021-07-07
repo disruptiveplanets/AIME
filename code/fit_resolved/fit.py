@@ -6,7 +6,7 @@ from multiprocessing import Pool
 EARTH_RADIUS = 6370000
 EARTH_MASS =5.972e24
 CADENCE = 30 * 60
-REGENERATE_DATA = False
+REGENERATE_DATA = True
 N_WALKERS = 32
 N_STEPS = 5000
 
@@ -19,7 +19,7 @@ m = 1
 n_clms = (L + 1)**2
 n_densities = n * n * (m + 1) * (2 * m + 1) // m
 
-spinx, spiny, spinz = (0.000050189, 0.0000789152, 0.0000527891)
+spin = 0.000050189
 impact_parameter = 50 * EARTH_RADIUS
 speed = 4000
 
@@ -50,8 +50,8 @@ def fit_function(theta):
     clms = theta[:n_clms]
     densities = theta[n_clms:]
     start = time.time()
-    resolved_data = asteroids.simulate(CADENCE, L, n, m, clms, densities, spinx,
-        spiny, spinz, impact_parameter, speed, EARTH_MASS)
+    resolved_data = asteroids.simulate(CADENCE, L, n, m, clms, densities, spin,
+        impact_parameter, speed, EARTH_MASS)
     #print(time.time() - start)
     return resolved_data
 

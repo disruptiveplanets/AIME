@@ -1,10 +1,10 @@
 #include "backend.hpp"
 
 Asteroid::Asteroid(int L, int n, int m, const std::vector<double>& clms,
-    const std::vector<double>& densities, double spinx, double spiny,
-    double spinz, double impact_parameter, double speed, double central_mass) :
+    const std::vector<double>& densities, double spin, double impact_parameter,
+    double speed, double central_mass) :
     L(L), n(n), m(m), velocity(Vector3({0, 0, speed})),
-    spin(Vector3({spinx, spiny, spinz})), mu(G * central_mass),
+    spin(Vector3({spin, 0, 0})), mu(G * central_mass),
     radius(clms[0]) {
 
     int num_chunks = n * n * (m + 1) * (2 * m + 1) / m;
@@ -24,8 +24,8 @@ Asteroid::Asteroid(int L, int n, int m, const std::vector<double>& clms,
 
     calculate_mass();
     recenter();
-    set_pos(impact_parameter);
     calculate_moi();
+    set_pos(impact_parameter);
 
     #ifdef _DEBUG
     std::cout << "PARAMETERS:" << std::endl;
@@ -40,11 +40,12 @@ Asteroid::Asteroid(int L, int n, int m, const std::vector<double>& clms,
     #endif
 }
 
-void Asteroid::draw(std::string filename, Vector3 axis) const {
+void Asteroid::draw(std::string filename, int axis_num) const {
     // Write data about how to draw an asteroid to a text file (.ast) to be read
     // by a python script and displayed with matplotlib.
 
     // Project everything along axis. Axis must be normalized
+    Vector3 axis = moi_evecs[axis_num];
     Vector3 up = Vector3::z();
     if (Vector3::cross(up, axis).mag() < EPSILON) {
         up = Vector3::x();
@@ -171,12 +172,44 @@ void Asteroid::calculate_moi() {
                     Ixy, Iyy, Iyz,
                     Ixz, Iyz, Izz,});
 
-    std::array<double, 3> evals = moi.get_evals();
-    std::array<Vector3, 3> evecs = moi.get_symmetric_evecs(evals);
-    moiInverse = Matrix3::symmetric_invert(evals, evecs);
+    moi_evals = moi.get_evals();
+    moi_evecs = moi.get_symmetric_evecs(moi_evals);
+    moiInverse = Matrix3::symmetric_invert(moi_evals, moi_evecs);
 
-    moi = Matrix3::symmetric_reconstruct(evals, evecs);
+    moi = Matrix3::symmetric_reconstruct(moi_evals, moi_evecs);
         // Do if there are issues with moi * moiInverse != identity.
+
+    // Sort the evals and evecs
+    double temp_val;
+    Vector3 temp_vec;
+
+    if (moi_evals[2] > moi_evals[1]) {
+        temp_val = moi_evals[1];
+        temp_vec = moi_evecs[1];
+        moi_evals[1] = moi_evals[2];
+        moi_evecs[1] = moi_evecs[2];
+        moi_evals[2] = temp_val;
+        moi_evecs[2] = temp_vec;
+    }
+    if (moi_evals[1] > moi_evals[0]) {
+        temp_val = moi_evals[1];
+        temp_vec = moi_evecs[1];
+        moi_evals[1] = moi_evals[0];
+        moi_evecs[1] = moi_evecs[0];
+        moi_evals[0] = temp_val;
+        moi_evecs[0] = temp_vec;
+    }
+    if (moi_evals[2] > moi_evals[1]) {
+        temp_val = moi_evals[1];
+        temp_vec = moi_evecs[1];
+        moi_evals[1] = moi_evals[2];
+        moi_evecs[1] = moi_evecs[2];
+        moi_evals[2] = temp_val;
+        moi_evecs[2] = temp_vec;
+    }
+
+    // Set the spin to the principle axis with the greatest moi
+    spin = moi_evecs[0] / moi_evecs[0].mag() * spin.mag();
 
     orientation = Quaternion::identity();
     //moi = Matrix3::identity();

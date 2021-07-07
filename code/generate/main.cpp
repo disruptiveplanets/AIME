@@ -92,11 +92,7 @@ int main(int argc, char* argv[]) {
     std::getline(f, line);
     ss = std::istringstream (line);
     ss >> x;
-    ss >> y;
-    ss >> z;
-    double spinx = std::stod(x);
-    double spiny = std::stod(y);
-    double spinz = std::stod(z);
+    double spin = std::stod(x);
 
     // Impact parameter
     std::getline(f, line);
@@ -117,7 +113,7 @@ int main(int argc, char* argv[]) {
     double central_mass = std::stod(word);
 
     // Load asteroid
-    Asteroid asteroid(L, n, m, clms, densities, spinx, spiny, spinz,
+    Asteroid asteroid(L, n, m, clms, densities, spin,
         impact_parameter, speed, central_mass);
 
     // Run asteroid

@@ -7,12 +7,11 @@
 
 std::vector<double> simulate(double cadence, int L, int n, int m,
     const std::vector<double> clms,
-    const std::vector<double> densities, double spinx, double spiny,
-    double spinz, double impact_parameter, double speed,
-    double central_mass) {
+    const std::vector<double> densities, double spin, double impact_parameter,
+    double speed, double central_mass) {
 
 
-    Asteroid asteroid(L, n, m, clms, densities, spinx, spiny, spinz,
+    Asteroid asteroid(L, n, m, clms, densities, spin,
         impact_parameter, speed, central_mass);
 
     // Run asteroid

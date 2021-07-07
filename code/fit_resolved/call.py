@@ -7,15 +7,13 @@ n = 1
 m = 1
 clms = [1, 1, 2, 3]
 densities = [1, 2, 3, 4, 5, 6]
-spinx = 0.0001
-spiny = 0.00005
-spinz = 0.00004
-impact_parameter = 63700000
+spin = 0.00012
+impact_parameter = 318500000
 speed = 4000
 central_mass = 5.972e24
 
 start = time.time()
-resolved_data = asteroids.simulate(CADENCE, L, n, m, clms, densities, spinx, spiny, spinz,
+resolved_data = asteroids.simulate(CADENCE, L, n, m, clms, densities, spin,
     impact_parameter, speed, central_mass)
 end = time.time()
 print("Time taken: {} s".format(end - start))

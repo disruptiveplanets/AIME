@@ -8,7 +8,7 @@ C1-1 C10 C11
 <...other Clms...>
 rho00 rho01 rho02 rho03 rho04 rho05
 <...other densities...>
-spinx, spiny, spinz
+spin
 impact parameter
 velocity
 central mass

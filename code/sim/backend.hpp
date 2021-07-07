@@ -42,12 +42,11 @@ using uint = unsigned int;
 class Asteroid {
 public:
     Asteroid(int L, int n, int m, const std::vector<double>& clms,
-        const std::vector<double>& densities, double spinx, double spiny,
-        double spinz, double impact_parameter, double speed,
-        double central_mass);
+        const std::vector<double>& densities, double spin,
+        double impact_parameter, double speed, double central_mass);
 
     int simulate(double cadence, std::vector<double>& resolved_data);
-    void draw(std::string filename, Vector3 axis) const;
+    void draw(std::string filename, int axis) const;
 
 private:
     void make_chunks();
@@ -80,6 +79,8 @@ private:
     double mu;
     Quaternion orientation;
     double time;
+    std::array<double, 3> moi_evals;
+    std::array<Vector3, 3> moi_evecs;
 
     // Shape features
     double mean_density;// Used to generate rough parameters of the asteroid

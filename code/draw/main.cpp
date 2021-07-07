@@ -17,7 +17,7 @@ C1-1 C10 C11
 <...>
 rho00 rho01 rho02 rho03 rho04 rho05
 <...>
-spinx, spiny, spinz
+spin
 impact parameter
 velocity mps
 central mass
@@ -43,16 +43,16 @@ int main(int argc, char* argv[]) {
         std::cout << "The file " << filename << " does not exist." << std::endl;
     }
 
-    Vector3 axis = Vector3::z();
-    std::string axis_name = "z";
+    int axis_num = 1;
     if (argc >= 3) {
-        if (strcmp(argv[3], "x") == 0) {
-            axis = Vector3::x();
-            axis_name = "x";
+        if (strcmp(argv[3], "2") == 0) {
+            axis_num = 2;
         }
-        if (strcmp(argv[3], "y") == 0) {
-            axis = Vector3::y();
-            axis_name = "y";
+        else if (strcmp(argv[3], "3") == 0) {
+            axis_num = 3;
+        }
+        else {
+            std::cout << "Invalid axis name" << std::endl;
         }
     }
 
@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
     std::vector<double> densities;
     std::getline(f, line);
     ss = std::istringstream (line);
-    for(int i = 0; i <= num_chunks; i++) {
+    for(int i = 0; i < num_chunks; i++) {
         ss >> word;
         densities.push_back(std::stod(word));
     }
@@ -106,11 +106,7 @@ int main(int argc, char* argv[]) {
     std::getline(f, line);
     ss = std::istringstream (line);
     ss >> x;
-    ss >> y;
-    ss >> z;
-    double spinx = std::stod(x);
-    double spiny = std::stod(y);
-    double spinz = std::stod(z);
+    double spin = std::stod(x);
 
     // Impact parameter
     std::getline(f, line);
@@ -131,12 +127,12 @@ int main(int argc, char* argv[]) {
     double central_mass = std::stod(word);
 
     // Load asteroid
-    Asteroid asteroid(L, n, m, clms, densities, spinx, spiny, spinz,
+    Asteroid asteroid(L, n, m, clms, densities, spin,
         impact_parameter, speed, central_mass);
 
     // Draw asteroid
-    std::string ast_name = bare + "_" + axis_name + ".ast";
-    asteroid.draw(ast_name, axis);
+    std::string ast_name = bare + "_" + std::to_string(axis_num) + ".ast";
+    asteroid.draw(ast_name, axis_num - 1);
 
     std::string command = ("python3 \"" ROOT "code/draw/draw.py\" \"" ROOT
         "code/draw/") + ast_name + "\"";
