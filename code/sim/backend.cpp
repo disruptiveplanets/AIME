@@ -1,36 +1,23 @@
 #include "backend.hpp"
 
-Asteroid::Asteroid(int L, int n, int m, const std::vector<double>& clms,
-    const std::vector<double>& densities, double spin, double impact_parameter,
-    double speed, double central_mass) :
-    L(L), n(n), m(m), velocity(Vector3({0, 0, speed})),
-    spin(Vector3({spin, 0, 0})), mu(G * central_mass),
-    radius(clms[0]) {
+Asteroid::Asteroid(const std::vector<cdouble> jlms,
+    const std::vector<cdouble> mlms, double spin,
+    double impact_parameter, double speed) :
+    mlms(mlms), jlms(jlms), velocity(Vector3({0, 0, speed})),
+    spin(Vector3({spin, 0, 0})), mu(jlms[0].real() * G) {
 
-    int num_chunks = n * n * (m + 1) * (2 * m + 1) / m;
-    make_chunks();
+    maxml = -3/2.0 + sqrt(1 + 8 * (mlms.size()+3)) / 2;
+    maxjl = -3/2.0 + sqrt(1 + 8 * jlms.size()) / 2;
+    assert((maxml + 2) * (maxml + 1) / 2 == mlms.size()+3);
+    assert((maxjl + 2) * (maxjl + 1) / 2 == jlms.size());
 
-    // Density
-    triangles.reserve(12 * num_chunks);
-    mean_density = 0;
-    for(int i = 0; i < densities.size(); i++) {
-        if (i >= chunks.size()) {
-            std::cout << "Too few chunks." << std::endl;
-        }
-        mean_density += densities[i];
-        chunks[i].shape(densities[i], L, clms, triangles);
-    }
-    mean_density /= chunks.size();
+    nowmlms = mlms;// copy
 
-    calculate_mass();
-    recenter();
     calculate_moi();
     set_pos(impact_parameter);
 
     #ifdef _DEBUG
     std::cout << "PARAMETERS:" << std::endl;
-    std::cout << "L=" << L << ", m="<<m<<", n=" << n << std::endl;
-    std::cout << "Mass: " << mass << std::endl;
     std::cout << "MOI (local): " << moi << std::endl;
     std::cout << "Start position: " << position << std::endl;
     std::cout << "Start velocity: " << velocity << std::endl;
@@ -40,98 +27,34 @@ Asteroid::Asteroid(int L, int n, int m, const std::vector<double>& clms,
     #endif
 }
 
-void Asteroid::draw(std::string filename, int axis_num) const {
-    // Write data about how to draw an asteroid to a text file (.ast) to be read
-    // by a python script and displayed with matplotlib.
-
-    // Project everything along axis. Axis must be normalized
-    Vector3 axis = moi_evecs[axis_num];
-    Vector3 up = Vector3::z();
-    if (Vector3::cross(up, axis).mag() < EPSILON) {
-        up = Vector3::x();
+cdouble Asteroid::mlm(uint l, int m) {
+    if (m < 0) {
+        return std::conj(mlm(l, -m)) * (double)sign(m);
     }
-    up = up - Vector3::dot(up, axis) * axis;
-    up /= up.mag();
-
-    std::vector<double> depths;
-    std::vector<std::string> lines;
-    depths.reserve(triangles.size());
-    lines.reserve(triangles.size());
-
-    for (Triangle const& triangle : triangles) {
-        if (!triangle.is_edge()){
-            continue;
-        }
-        std::array<Vector3, 3> corners = triangle.get_corners();
-        Vector3 center = (corners[0] + corners[1] + corners[2]) / 3;
-        Vector3 norm = Vector3::cross(corners[1] - corners[0],
-            corners[2] - corners[0]);
-        norm /= norm.mag();
-        if (Vector3::dot(norm, axis) < 0) {
-            continue;
-        }
-        double depth = Vector3::dot(center, axis);
-
-        std::string line = "";
-        for(Vector3 const& c : corners) {
-            Vector3 offset = c - Vector3::dot(c, axis) * axis;
-            if (offset.mag() == 0){
-                line += "0 0 ";
-                continue;
-            }
-            double theta = acos(Vector3::dot(offset, up) / offset.mag());
-            if (Vector3::dot(Vector3::cross(offset, up), axis) < 0) {
-                theta = 2 * PI - theta;
-            }
-            double r = offset.mag();
-            line += std::to_string(r * cos(theta)) + " "
-                    + std::to_string(r * sin(theta)) + " ";
-        }
-        line += std::to_string(triangle.get_density()) + " "
-                + std::to_string(Vector3::dot(norm, axis));
-
-        // Insert the line and depth in order from low depth to high
-        if (lines.size() == 0) {
-            depths.push_back(depth);
-            lines.push_back(line);
-        }
-        int i;
-        for (i = 0; i < depths.size(); i++){
-            if (depths[i] > depth) {
-                depths.insert(depths.begin() + i, depth);
-                lines.insert(lines.begin() + i, line);
-                break;
-            }
-        }
-        if (i == depths.size()){
-            depths.push_back(depth);
-            lines.push_back(line);
-        }
-    }
-
-    std::ofstream output;
-    output.open(filename);
-    for (std::string& line : lines) {
-        output << line << '\n';
-    }
-    output.close();
+    return mlms[l * (l + 1) / 2 + l - m - 3]; // l=0 and l=1 are not included
 }
 
-void Asteroid::make_chunks() {
-    for (int f = 0; f < 6; f++) {
-        for (int s = 0; s < m; s++){
-            const int length = n * (s + 1) / m;
-            const double alpha_above = double(s + 1) / m;
-            const double alpha_below = double(s) / m;
-            for (int a = 0; a < length; a++){
-                for (int b = 0; b < length; b++) {
-                    chunks.push_back(
-                        Chunk(alpha_above, alpha_below, length, f, a, b));
-                }
-            }
-        }
+cdouble Asteroid::nowmlm(uint l, int m) {
+    if (m < 0) {
+        return std::conj(nowmlm(l, -m)) * (double)sign(m);
     }
+    return nowmlms[l * (l + 1) / 2 + l -  m - 3]; // l=0 and l=1 are not included
 }
+
+void Asteroid::set_nowmlm(uint l, int m, cdouble val) {
+    if (m < 0) {
+        return set_nowmlm(l, -m, std::conj(val) * (double)sign(m));
+    }
+    nowmlms[l * (l + 1) / 2 + l - m - 3] = val;
+}
+
+cdouble Asteroid::jlm(uint l, int m) {
+    if (m < 0) {
+        return std::conj(jlm(l, -m)) * (double)sign(m);
+    }
+    return jlms[l * (l + 1) / 2 + l - m];
+}
+
 
 void Asteroid::set_pos(double b) {
     // Asteroid enters at +x and is traveling towards -x, with offset in +y
@@ -154,20 +77,14 @@ void Asteroid::set_pos(double b) {
 }
 
 void Asteroid::calculate_moi() {
-    double Ixx = 0;
-    double Iyy = 0;
-    double Izz = 0;
-    double Ixz = 0;
-    double Ixy = 0;
-    double Iyz = 0;
-    for (Triangle& t : triangles) {
-        Ixx += t.get_Isame(0);
-        Iyy += t.get_Isame(1);
-        Izz += t.get_Isame(2);
-        Ixy += t.get_Idiff(0, 1);
-        Ixz += t.get_Idiff(0, 2);
-        Iyz += t.get_Idiff(1, 2);
-    }
+    double Ixx = (-(2.0 * mlm(2, 0) - 1.0) / 3.0
+        + 2.0 * mlm(2, -2) + 2.0 * mlm(2, 2)).real();
+    double Iyy = (-(2.0 * mlm(2, 0) - 1.0) / 3.0
+        - 2.0 * mlm(2, -2) - 2.0 * mlm(2, 2)).real();
+    double Izz = (4.0* mlm(2, 0) / 3.0 + 1/3.0).real();
+    double Ixz = (-mlm(2, 1) + mlm(2, -1)).real();
+    double Iyz = -(mlm(2, 1) + mlm(2, -1)).imag();
+    double Ixy = -2.0 * (mlm(2, 2) + mlm(2, -2)).imag();
     moi = Matrix3({ Ixx, Ixy, Ixz,
                     Ixy, Iyy, Iyz,
                     Ixz, Iyz, Izz,});
@@ -216,24 +133,6 @@ void Asteroid::calculate_moi() {
     //moiInverse = Matrix3::identity();
 }
 
-void Asteroid::calculate_mass() {
-    mass = 0;
-    for (Triangle const& t : triangles) {
-        mass += t.get_mass();
-    }
-}
-
-void Asteroid::recenter() {
-    Vector3 com = get_com();
-    for (Triangle& t : triangles) {
-        t.recenter(-com);
-    }
-
-    /*#ifdef _DEBUG
-    std::cout << "New COM: " << get_com() << " should be zero." << std::endl;
-    #endif*/
-}
-
 Matrix3 Asteroid::global_to_inertial() const {
     double theta = atan2(position[1], -position[2]);
     return Matrix3::rotation_x(theta);
@@ -264,25 +163,6 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
             resolved_data.push_back(spin[1]);
             resolved_data.push_back(spin[2]);
             cadence_index = int(time / cadence);
-
-            if (isnan(spin[0])) {
-                std::cout << mass << std::endl;
-                std::cout << moi << std::endl;
-                std::cout << moiInverse << std::endl;
-                std::cout << edge_dist << std::endl;
-                std::cout << position << std::endl;
-                std::cout << velocity << std::endl;
-                std::cout << orientation << std::endl;
-                std::cout << mean_density << std::endl;
-                std::cout << radius << std::endl;
-                std::cout << energy << std::endl;
-                std::cout << ang_mom << std::endl;
-                std::cout << closest_approach << std::endl;
-                std::cout << excess_vel << std::endl;
-                std::cout << impact_parameter << std::endl;
-                return 0;
-            }
-
             //std::cout << spin[0] <<' '<< spin[1]<<' ' << spin[2] << ' ' << dt << std::endl;
         }
     }
@@ -303,21 +183,53 @@ Vector3 Asteroid::get_rot_ang_mom() {
     return global_to_inertial() * (moiGlobal * (spin + Omega));
 }
 
-Vector3 Asteroid::get_com() const {
-    Vector3 total_arm = Vector3::zero();
-    for (Triangle const& t : triangles) {
-        total_arm += t.get_lever_arm();
+Vector3 Asteroid::get_torque() {
+    double tx = 0;
+    double ty = 0;
+    double tz = 0;
+    cdouble back;
+    cdouble now;
+    double pre;
+    for (int l = 0; l <= maxjl; l++) {
+        for (int m = -l; m <= l; m++) {
+            for (int lp = max(abs(m), 2); lp <= maxml; lp++) {
+                pre = sign(l + m) * fact(l + lp)
+                    / pow(position.mag(), l + lp + 1);
+                back = std::conj(jlm(l, m)) * nowmlm(lp, m-1);
+                now = std::conj(jlm(l, m)) * nowmlm(lp, m);
+                tx += pre * (lp - m + 1) * back.real();
+                ty += pre * (lp - m + 1) * back.imag();
+                tz += pre * 2 * m * now.imag();
+            }
+        }
     }
-    return 1 / mass * total_arm;
+
+    inv_mat = orientation.inverse().matrix();
+    moiGlobal = orientation.matrix() * moi * inv_mat;
+    std::cout << 3 * G * jlm(0, 0).real() / pow(position.mag(), 3)
+        * Vector3({-moiGlobal(2, 1), moiGlobal(2, 0), 0}) << std::endl;
+
+    std::cout << G * Vector3({tx, ty, tz}) << std::endl;
+
+    //return G * Vector3({tx, ty, tz});
+    return 3 * G * jlm(0, 0).real() / pow(position.mag(), 3)
+        * Vector3({-moiGlobal(2, 1), moiGlobal(2, 0), 0});
 }
 
-Vector3 Asteroid::get_torque() {
-    Vector3 torque = Vector3::zero();
-    for (Triangle t : triangles) {
-        t *= orientation.matrix();
-        torque += t.get_torque();
+void Asteroid::update_mlms() {
+    std::array<double, 3> angles = orientation.euler_angles();
+    DMatGen d_generator(angles[0], angles[1], angles[2]);
+
+    for (int l = 2; l <= maxml; l++) {
+        for (int m = -l; m <= l; m++) {
+            cdouble newmlm = 0;
+            for (int mp = -l; mp <= -l; mp++) {
+                newmlm += sqrt(fact(l - mp) * fact(l + mp)) * sign(m + mp)
+                    * d_generator(l, m, mp) * mlm(l, mp);
+            }
+            set_nowmlm(l, m, newmlm / sqrt(fact(l - m) * fact(l + m)));
+        }
     }
-    return (mu / pow(position.mag(), 3)) * torque;
 }
 
 void Asteroid::update_position(double dt) {
@@ -327,15 +239,14 @@ void Asteroid::update_position(double dt) {
 }
 
 void Asteroid::update_orientation(double dt) {
+    update_mlms();
     Omega = ang_mom / position.mag2();
 
     inv_mat = orientation.inverse().matrix();
     moiGlobal = orientation.matrix() * moi * inv_mat;
     moiGlobalInverse = orientation.matrix() * moiInverse * inv_mat;
 
-    //Vector3 torque = get_torque();
-    torque = 3 * mu / pow(position.mag(), 3) *
-        Vector3({-moiGlobal(1, 2), moiGlobal(0, 2), 0});
+    Vector3 torque = get_torque();
 
     omegaDot = moiGlobalInverse * (torque - Vector3::cross(
         Omega + spin, moiGlobal * (Omega + spin)))

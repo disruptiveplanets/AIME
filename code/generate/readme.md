@@ -22,3 +22,10 @@ To generate data, run
 `./target/sim <ASTEROID PARAMETERS>`
 
 `ASTEROID PARAMETERS` should be a `.dat` file containing asteroid parameters in the format given above. If no file is provided, `params.dat` will be assumed.
+
+## Tests
+* Tested that the Euler angles is correct.
+
+## To do:
+* Are all the numbers I assumed are real actually real?
+* Is the D matrix calculation correct?

@@ -7,54 +7,41 @@
 #include <sstream>
 #include <iostream>
 #include <deque>
+#include <assert.h>
+#include <complex>
 
 #include "algebra.hpp"
 #include "triangle.hpp"
+#include "wignerd.hpp"
 
 #define MAX_DT 2.0
 #define MIN_DT 1.0e-0
 #define DT_POWER 1// 5M
 
-/*#define MAX_DT 3.0
-#define MIN_DT 1.0e-0
-#define DT_POWER 3*/// 5M
-// Sort this out
-
-
-
-
-
-
-
-
-
-
 #define INTEGRAL_LIMIT_FRAC 1.0e-5// 5e-6
 #define NUM_THREADS 4
     // Torque at closest approach divided by torque at start of sim.
-#define max(a, b) ((a) > (b) ? (a) : (b))
-#define min(a, b) ((a) < (b) ? (a) : (b))
 #define G 6.67408e-11
-//#define _DEBUG
+#define _DEBUG
 
 using uint = unsigned int;
+using cdouble = std::complex<double>;
 
 class Asteroid {
 public:
-    Asteroid(int L, int n, int m, const std::vector<double>& clms,
-        const std::vector<double>& densities, double spin,
-        double impact_parameter, double speed, double central_mass);
+    Asteroid(const std::vector<cdouble> jlms, const std::vector<cdouble> mlms,
+        double spin, double impact_parameter, double speed);
 
     int simulate(double cadence, std::vector<double>& resolved_data);
-    void draw(std::string filename, int axis) const;
 
 private:
-    void make_chunks();
+    cdouble mlm(uint l, int m);
+    cdouble nowmlm(uint l, int m);
+    void set_nowmlm(uint l, int m, cdouble val);
+    cdouble jlm(uint l, int m);
     void calculate_moi();
-    void calculate_mass();
-    Vector3 get_com() const;
-    void recenter();
     void set_pos(double impact_parameter);
+    void update_mlms();
 
     Vector3 get_torque();
     void update_position(double dt);
@@ -64,14 +51,15 @@ private:
     Matrix3 inertial_to_global() const;
 
 private:
-    uint L; // Max degree of harmonics
-    uint n; // Number of cube subdivisions on outermost shell
-    uint m; // Number of shells
-    double mass;
+    uint maxml;
+    uint maxjl;
+
+    const std::vector<cdouble> mlms;
+    std::vector<cdouble> nowmlms;
+    const std::vector<cdouble> jlms;
+
     Matrix3 moi;
     Matrix3 moiInverse;
-    std::deque<Chunk> chunks;
-    std::vector<Triangle> triangles;
     double edge_dist; // Limit of the integration region
     Vector3 position;
     Vector3 velocity;
@@ -81,10 +69,6 @@ private:
     double time;
     std::array<double, 3> moi_evals;
     std::array<Vector3, 3> moi_evecs;
-
-    // Shape features
-    double mean_density;// Used to generate rough parameters of the asteroid
-    double radius;// Used to generate rough parameters of the asteroid
 
     // Orbital factors
     double energy;

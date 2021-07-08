@@ -104,6 +104,7 @@ public:
     void operator*=(double d);
     void operator/=(double d);
     Quaternion operator*(Quaternion const& q) const;
+    std::array<double, 3> euler_angles() const;
 
     Quaternion inverse() const;
     Matrix3 matrix();

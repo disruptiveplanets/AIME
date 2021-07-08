@@ -56,36 +56,56 @@ int main(int argc, char* argv[]) {
     std::string line, word, x, y, z;
     std::istringstream ss;
 
-    // Parameterization numbers
+    // Max ls
     std::getline(f, line);
     ss = std::istringstream (line);
     ss >> x;
     ss >> y;
-    ss >> z;
-    int L = std::stoi(x);// Max degree of spherical harmonics
-    int n = std::stoi(y);// Segmentation of cube face at outer shell
-    int m = std::stoi(z);// Number of shells
+    int maxjl = std::stoi(x);
+    int maxml = std::stoi(y);
 
-    int num_chunks = n * n * (m + 1) * (2 * m + 1) / m;
-
-    std::vector<double> clms;
-
-    // Clms
-    for(int i = 0; i <= L; i++){
+    // Jlms
+    std::vector<cdouble> jlms;
+    double re = 0;
+    double im = 0;
+    for (int l = 0; l <= maxjl; l++){
+        bool written = true;
         std::getline(f, line);
         ss = std::istringstream (line);
-        for(int m = -i; m <= i; m++) {
-         ss >> word;
-         clms.push_back(std::stod(word));
+        for (int m = -l; m <= l; m++) {
+            ss >> word;
+            if (written) {
+                re = std::stod(word);
+            }
+            else{
+                im = std::stod(word);
+                jlms.push_back({re, im});
+            }
+            written = !written;
         }
+        jlms.push_back({re, 0});
     }
 
-    std::vector<double> densities;
-    std::getline(f, line);
-    ss = std::istringstream (line);
-    for(int i = 0; i < num_chunks; i++) {
-        ss >> word;
-        densities.push_back(std::stod(word));
+    // Mlms
+    std::vector<cdouble> mlms;
+    re = 0;
+    im = 0;
+    for (int l = 2; l <= maxml; l++){
+        bool written = true;
+        std::getline(f, line);
+        ss = std::istringstream (line);
+        for (int m = -l; m <= l; m++) {
+            ss >> word;
+            if (written) {
+                re = std::stod(word);
+            }
+            else {
+                im = std::stod(word);
+                mlms.push_back({re, im});
+            }
+            written = !written;
+        }
+        mlms.push_back({re, 0});
     }
 
     // Spin
@@ -106,15 +126,14 @@ int main(int argc, char* argv[]) {
     ss >> word;
     double speed = std::stod(word);
 
-    // Central mass
-    std::getline(f, line);
-    ss = std::istringstream (line);
-    ss >> word;
-    double central_mass = std::stod(word);
+    for(auto m : mlms) {
+        std::cout << m << std::endl;
+    }
+
 
     // Load asteroid
-    Asteroid asteroid(L, n, m, clms, densities, spin,
-        impact_parameter, speed, central_mass);
+    Asteroid asteroid(jlms, mlms, spin,
+        impact_parameter, speed);
 
     // Run asteroid
     std::vector<double> resolved_data;
