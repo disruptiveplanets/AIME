@@ -24,3 +24,12 @@ Done
 - Torque is not generated on a spherically symmetric object
 - Ang mom increases for steady torque.
 - Results are not sensitive to changes in integration time step, or the way that the integration time step is lengthened at the edges of the orbit
+- The Euler angles are correct.
+- The D matrix calculation is correct
+- Spherical harmonics are rotated correctly
+
+Not done:
+* How does mass come into play in the MOI definition?
+* MOI rotates like a matrix
+* All the numbers I assumed are real are actually real
+* New torque matches old torque

@@ -14,20 +14,20 @@ DMatGen::DMatGen(double alpha, double beta, double gamma)
     sn = sin(beta/2);
 }
 
-cdouble DMatGen::operator()(uint l, int m, int mp) {
-    auto d_pos = small_d_state.find({l, m, mp});
+cdouble DMatGen::operator()(uint l, int mp, int m) {
+    auto d_pos = small_d_state.find({l, mp, m});
     if (d_pos == small_d_state.end()) {
-        small_d_state.insert({{l, m, mp}, wigner_small_d(l, m, mp)});
-        d_pos = small_d_state.find({l, m, mp});
+        small_d_state.insert({{l, mp, m}, wigner_small_d(l, mp, m)});
+        d_pos = small_d_state.find({l, mp, m});
     }
     return std::exp(-(double)mp * alpha) * std::exp(-(double)m * gamma)
-        * wigner_small_d(l, m, mp);
+        * d_pos->second;
 }
 
 double DMatGen::wigner_small_d(uint j, int mp, int m) {
     double pre = sqrt(fact(j+mp) * fact(j-mp) * fact(j+m) * fact(j-m));
     double sum = 0;
-    for(int s = min(j+m, j-mp); s <= max(0, m-mp); s++) {
+    for(int s = max(0, m-mp); s <= min(j+m, j-mp); s++) {
         sum += (sign(mp-m+s) * pow(cs, 2 * j + m - mp - 2 * s)
         * pow(sn, mp - m + 2 * s)) /
         (fact(j + m - s) * fact(s) * fact(mp - m + s) * fact(j - mp - s));

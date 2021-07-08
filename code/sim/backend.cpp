@@ -28,6 +28,7 @@ Asteroid::Asteroid(const std::vector<cdouble> jlms,
 }
 
 cdouble Asteroid::mlm(uint l, int m) {
+    if (abs(m) > l) {return 0;}
     if (m < 0) {
         return std::conj(mlm(l, -m)) * (double)sign(m);
     }
@@ -35,6 +36,7 @@ cdouble Asteroid::mlm(uint l, int m) {
 }
 
 cdouble Asteroid::nowmlm(uint l, int m) {
+    if (abs(m) > l) {return 0;}
     if (m < 0) {
         return std::conj(nowmlm(l, -m)) * (double)sign(m);
     }
@@ -42,6 +44,7 @@ cdouble Asteroid::nowmlm(uint l, int m) {
 }
 
 void Asteroid::set_nowmlm(uint l, int m, cdouble val) {
+    if (abs(m) > l) {return;}
     if (m < 0) {
         return set_nowmlm(l, -m, std::conj(val) * (double)sign(m));
     }
@@ -49,6 +52,7 @@ void Asteroid::set_nowmlm(uint l, int m, cdouble val) {
 }
 
 cdouble Asteroid::jlm(uint l, int m) {
+    if (abs(m) > l) {return 0;}
     if (m < 0) {
         return std::conj(jlm(l, -m)) * (double)sign(m);
     }
@@ -77,14 +81,13 @@ void Asteroid::set_pos(double b) {
 }
 
 void Asteroid::calculate_moi() {
-    double Ixx = (-(2.0 * mlm(2, 0) - 1.0) / 3.0
-        + 2.0 * mlm(2, -2) + 2.0 * mlm(2, 2)).real();
-    double Iyy = (-(2.0 * mlm(2, 0) - 1.0) / 3.0
-        - 2.0 * mlm(2, -2) - 2.0 * mlm(2, 2)).real();
-    double Izz = (4.0* mlm(2, 0) / 3.0 + 1/3.0).real();
-    double Ixz = (-mlm(2, 1) + mlm(2, -1)).real();
-    double Iyz = -(mlm(2, 1) + mlm(2, -1)).imag();
-    double Ixy = -2.0 * (mlm(2, 2) + mlm(2, -2)).imag();
+    double mass = 0;
+    double Ixx = (2/3.0 * mlm(2,0) - 2.0 * mlm(2, -2) - 2.0 * mlm(2, 2)).real() + mass;
+    double Iyy = (2/3.0 * mlm(2,0) + 2.0 * mlm(2, -2) + 2.0 * mlm(2, 2)).real() + mass;
+    double Izz = (- 4 / 3.0 * mlm(2, 0)).real() + mass;
+    double Ixz = (mlm(2, 1) - mlm(2, -1)).real();
+    double Iyz = (mlm(2, 1) + mlm(2, -1)).imag();
+    double Ixy = -2.0 * (mlm(2, 2) - mlm(2, -2)).imag();
     moi = Matrix3({ Ixx, Ixy, Ixz,
                     Ixy, Iyy, Iyz,
                     Ixz, Iyz, Izz,});
@@ -187,7 +190,10 @@ Vector3 Asteroid::get_torque() {
     double tx = 0;
     double ty = 0;
     double tz = 0;
-    cdouble back;
+    double tx2 = 0;
+    double ty2 = 0;
+    double tz2 = 0;
+    cdouble fore;
     cdouble now;
     double pre;
     for (int l = 0; l <= maxjl; l++) {
@@ -195,21 +201,30 @@ Vector3 Asteroid::get_torque() {
             for (int lp = max(abs(m), 2); lp <= maxml; lp++) {
                 pre = sign(l + m) * fact(l + lp)
                     / pow(position.mag(), l + lp + 1);
-                back = std::conj(jlm(l, m)) * nowmlm(lp, m-1);
+                fore = std::conj(jlm(l, m)) * nowmlm(lp, m+1);
                 now = std::conj(jlm(l, m)) * nowmlm(lp, m);
-                tx += pre * (lp - m + 1) * back.real();
-                ty += pre * (lp - m + 1) * back.imag();
-                tz += pre * 2 * m * now.imag();
+                tx += pre * (lp + m + 1) * fore.imag();
+                ty -= pre * (lp + m + 1) * fore.real();
+                tz -= pre * m * now.imag();
             }
         }
     }
 
+
+    pre = 3 * G * jlm(0, 0).real() / pow(position.mag(), 3);
+    tx2 += 2 * pre * nowmlm(2, 1).imag();
+    ty2 -= 2 * pre * nowmlm(2, 1).real();
+
     inv_mat = orientation.inverse().matrix();
     moiGlobal = orientation.matrix() * moi * inv_mat;
+    std::cout << maxjl << " " <<  maxml << std::endl;
     std::cout << 3 * G * jlm(0, 0).real() / pow(position.mag(), 3)
         * Vector3({-moiGlobal(2, 1), moiGlobal(2, 0), 0}) << std::endl;
 
-    std::cout << G * Vector3({tx, ty, tz}) << std::endl;
+
+    std::cout << Vector3({tx2, ty2, tz2}) << std::endl;
+
+    //std::cout << G * Vector3({tx, ty, tz}) << std::endl << std::endl;
 
     //return G * Vector3({tx, ty, tz});
     return 3 * G * jlm(0, 0).real() / pow(position.mag(), 3)
@@ -219,13 +234,13 @@ Vector3 Asteroid::get_torque() {
 void Asteroid::update_mlms() {
     std::array<double, 3> angles = orientation.euler_angles();
     DMatGen d_generator(angles[0], angles[1], angles[2]);
-
+    cdouble newmlm = 0;
     for (int l = 2; l <= maxml; l++) {
         for (int m = -l; m <= l; m++) {
-            cdouble newmlm = 0;
-            for (int mp = -l; mp <= -l; mp++) {
-                newmlm += sqrt(fact(l - mp) * fact(l + mp)) * sign(m + mp)
-                    * d_generator(l, m, mp) * mlm(l, mp);
+            newmlm = 0;
+            for (int mp = -l; mp <= l; mp++) {
+                newmlm += sqrt(fact(l - mp) * fact(l + mp))
+                    * std::conj(d_generator(l, m, mp)) * mlm(l, mp);
             }
             set_nowmlm(l, m, newmlm / sqrt(fact(l - m) * fact(l + m)));
         }

@@ -14,8 +14,26 @@ In both the resolved and unresolved cases, we will build a simulation to generat
 - **code/** contains both the C++ asteroid simulation and the fitting software.
 
 ## Project timeline
+### Done
 1. Create a robust and general model for asteroid shape and density profile (Done)
-2. Write code to simulate an asteroid flyby for certain parameters
+2. Write code to simulate an asteroid flyby for certain parameters (Done)
+
+## Not done:
+Immediate:
+1. Jlms are rotated as well
+2. Be able to do fits
+3. Get my Supercloud account
+4. Check whether different high orders of Mlms give different behavior.
+5. Run a fit
+
+Later:
+1. Run fits with pure J2, J4, etc. coefficients.
+2. Establish a relationship between shape and expansion coefficients
+
+Much later:
+1. Show that moons can be added to perturb the Jlms.
+2. Ask about two asteroids?
+
 
 ### Resolved case
 
