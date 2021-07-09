@@ -420,12 +420,7 @@ Quaternion operator*(double d, Quaternion const& q) {
 
 std::array<double, 3> Quaternion::euler_angles() const {
     // z-y-z
-    double s = 1/mag2();
-    double alpha = -atan2(j_*k_ - i_*r_, i_*k_ + j_*r_);
-    double beta = acos(1 - 2*s*(i_*i_ + j_*j_));
-    double gamma = atan2(j_*k_ + i_*r_, -i_*k_ + j_*r_);
-    if (isnan(beta)) {
-        beta = (1 - 2*s*(i_*i_ + j_*j_) )> 0 ? 0 : PI;
-    }
-    return {alpha, beta, gamma};
+    return {atan2(j_*k_ - i_*r_, i_*k_ + j_*r_),
+        acos(1 - 2*(i_*i_ + j_*j_)/mag2()),
+        atan2(j_*k_ + i_*r_, -(i_*k_ - j_*r_))};
 }

@@ -81,10 +81,9 @@ void Asteroid::set_pos(double b) {
 }
 
 void Asteroid::calculate_moi() {
-    double mass = 0;
-    double Ixx = (2/3.0 * mlm(2,0) - 2.0 * mlm(2, -2) - 2.0 * mlm(2, 2)).real() + mass;
-    double Iyy = (2/3.0 * mlm(2,0) + 2.0 * mlm(2, -2) + 2.0 * mlm(2, 2)).real() + mass;
-    double Izz = (- 4 / 3.0 * mlm(2, 0)).real() + mass;
+    double Ixx = (2/3.0 * mlm(2,0) - 2.0 * mlm(2, -2) - 2.0 * mlm(2, 2)).real();
+    double Iyy = (2/3.0 * mlm(2,0) + 2.0 * mlm(2, -2) + 2.0 * mlm(2, 2)).real();
+    double Izz = (- 4 / 3.0 * mlm(2, 0)).real();
     double Ixz = (mlm(2, 1) - mlm(2, -1)).real();
     double Iyz = (mlm(2, 1) + mlm(2, -1)).imag();
     double Ixy = -2.0 * (mlm(2, 2) - mlm(2, -2)).imag();
@@ -190,10 +189,7 @@ Vector3 Asteroid::get_torque() {
     double tx = 0;
     double ty = 0;
     double tz = 0;
-    double tx2 = 0;
-    double ty2 = 0;
-    double tz2 = 0;
-    cdouble fore;
+    cdouble back;
     cdouble now;
     double pre;
     for (int l = 0; l <= maxjl; l++) {
@@ -201,34 +197,16 @@ Vector3 Asteroid::get_torque() {
             for (int lp = max(abs(m), 2); lp <= maxml; lp++) {
                 pre = sign(l + m) * fact(l + lp)
                     / pow(position.mag(), l + lp + 1);
-                fore = std::conj(jlm(l, m)) * nowmlm(lp, m+1);
+                back = std::conj(jlm(l, m)) * nowmlm(lp, m - 1);
                 now = std::conj(jlm(l, m)) * nowmlm(lp, m);
-                tx += pre * (lp + m + 1) * fore.imag();
-                ty -= pre * (lp + m + 1) * fore.real();
-                tz -= pre * m * now.imag();
+                tx -= pre * (lp - m + 1) * back.imag();
+                ty -= pre * (lp - m + 1) * back.real();
+                tz += pre * m * now.imag();
             }
         }
     }
 
-
-    pre = 3 * G * jlm(0, 0).real() / pow(position.mag(), 3);
-    tx2 += 2 * pre * nowmlm(2, 1).imag();
-    ty2 -= 2 * pre * nowmlm(2, 1).real();
-
-    inv_mat = orientation.inverse().matrix();
-    moiGlobal = orientation.matrix() * moi * inv_mat;
-    std::cout << maxjl << " " <<  maxml << std::endl;
-    std::cout << 3 * G * jlm(0, 0).real() / pow(position.mag(), 3)
-        * Vector3({-moiGlobal(2, 1), moiGlobal(2, 0), 0}) << std::endl;
-
-
-    std::cout << Vector3({tx2, ty2, tz2}) << std::endl;
-
-    //std::cout << G * Vector3({tx, ty, tz}) << std::endl << std::endl;
-
-    //return G * Vector3({tx, ty, tz});
-    return 3 * G * jlm(0, 0).real() / pow(position.mag(), 3)
-        * Vector3({-moiGlobal(2, 1), moiGlobal(2, 0), 0});
+    return G * Vector3({tx, ty, tz});
 }
 
 void Asteroid::update_mlms() {
@@ -257,7 +235,7 @@ void Asteroid::update_orientation(double dt) {
     update_mlms();
     Omega = ang_mom / position.mag2();
 
-    inv_mat = orientation.inverse().matrix();
+    inv_mat = orientation.matrix().transpose();
     moiGlobal = orientation.matrix() * moi * inv_mat;
     moiGlobalInverse = orientation.matrix() * moiInverse * inv_mat;
 

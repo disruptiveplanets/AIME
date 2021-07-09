@@ -27,9 +27,11 @@ Done
 - The Euler angles are correct.
 - The D matrix calculation is correct
 - Spherical harmonics are rotated correctly
+- Answered how mass comes into role in MOI (never used)
+- MOI rotates like a matrix
+- New torque matches old torque
 
 Not done:
-* How does mass come into play in the MOI definition?
-* MOI rotates like a matrix
-* All the numbers I assumed are real are actually real
-* New torque matches old torque
+- All the numbers I assumed are real are actually real
+- New torque is in right direction
+- Check math
