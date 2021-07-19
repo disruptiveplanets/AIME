@@ -4,7 +4,10 @@ This code simulates the asteroid over its flyby. It cannot be compiled by itself
 
 In this and all other code, units are given in SI units unless otherwise specified. Please see *summaries/21-06* for a description of what each variable means, and the math going into the internal code.
 
-Results of the simulation are written to the `resolved_data` and `unresolved_data` vectors passed to `Asteroid::simulate`. They assume that the the asteroid is unresolved respectively; for the resolved case, the entire spin data is recorded, and for the unresolved case, light curve data is recorded. Data is recorded at time intervals set by the `cadence` argument.
+Results of the simulation are written to the `resolved_data` and `unresolved_data` vec
+Not done:
+- Check math
+tors passed to `Asteroid::simulate`. They assume that the the asteroid is unresolved respectively; for the resolved case, the entire spin data is recorded, and for the unresolved case, light curve data is recorded. Data is recorded at time intervals set by the `cadence` argument.
 
 This naming is slightly misleading; a resolved data has both spin data _and_ light curve data available, so that both the resolved and unresolved data vectors can be used in that case, not just the resolved one.
 
@@ -30,8 +33,4 @@ Done
 - Answered how mass comes into role in MOI (never used)
 - MOI rotates like a matrix
 - New torque matches old torque
-
-Not done:
 - All the numbers I assumed are real are actually real
-- New torque is in right direction
-- Check math

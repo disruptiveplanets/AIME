@@ -168,8 +168,8 @@ void Chunk::shape(double density_, uint L, std::vector<double> const& clms,
     double rul = 0, rur = 0, rll = 0, rlr = 0;
 
     auto clm = clms.begin();
-    for (int l = 0; l <= L; l++) {
-        for(int m = -l; m<= l; m++) {
+    for (uint l = 0; l <= L; l++) {
+        for(int m = -l; m <= (int)l; m++) {
             if (clm == clms.end()) {
                 std::cout << "Too few clms" << std::endl;
             }

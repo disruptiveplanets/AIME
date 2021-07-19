@@ -3,15 +3,14 @@
 Asteroid::Asteroid(const std::vector<cdouble> jlms,
     const std::vector<cdouble> mlms, double spin,
     double impact_parameter, double speed) :
-    mlms(mlms), jlms(jlms), velocity(Vector3({0, 0, speed})),
+    jlms(jlms), mlms(mlms), nowjlms(jlms), nowmlms(mlms),
+    velocity(Vector3({0, 0, speed})),
     spin(Vector3({spin, 0, 0})), mu(jlms[0].real() * G) {
 
     maxml = -3/2.0 + sqrt(1 + 8 * (mlms.size()+3)) / 2;
     maxjl = -3/2.0 + sqrt(1 + 8 * jlms.size()) / 2;
     assert((maxml + 2) * (maxml + 1) / 2 == mlms.size()+3);
     assert((maxjl + 2) * (maxjl + 1) / 2 == jlms.size());
-
-    nowmlms = mlms;// copy
 
     calculate_moi();
     set_pos(impact_parameter);
@@ -27,7 +26,7 @@ Asteroid::Asteroid(const std::vector<cdouble> jlms,
     #endif
 }
 
-cdouble Asteroid::mlm(uint l, int m) {
+cdouble Asteroid::mlm(uint l, int m) const {
     if (abs(m) > l) {return 0;}
     if (m < 0) {
         return std::conj(mlm(l, -m)) * (double)sign(m);
@@ -35,12 +34,28 @@ cdouble Asteroid::mlm(uint l, int m) {
     return mlms[l * (l + 1) / 2 + l - m - 3]; // l=0 and l=1 are not included
 }
 
-cdouble Asteroid::nowmlm(uint l, int m) {
+cdouble Asteroid::jlm(uint l, int m) const {
+    if (abs(m) > l) {return 0;}
+    if (m < 0) {
+        return std::conj(jlm(l, -m)) * (double)sign(m);
+    }
+    return jlms[l * (l + 1) / 2 + l - m];
+}
+
+cdouble Asteroid::nowmlm(uint l, int m) const {
     if (abs(m) > l) {return 0;}
     if (m < 0) {
         return std::conj(nowmlm(l, -m)) * (double)sign(m);
     }
     return nowmlms[l * (l + 1) / 2 + l -  m - 3]; // l=0 and l=1 are not included
+}
+
+cdouble Asteroid::nowjlm(uint l, int m) const {
+    if (abs(m) > l) {return 0;}
+    if (m < 0) {
+        return std::conj(nowjlm(l, -m)) * (double)sign(m);
+    }
+    return nowjlms[l * (l + 1) / 2 + l - m];
 }
 
 void Asteroid::set_nowmlm(uint l, int m, cdouble val) {
@@ -51,12 +66,12 @@ void Asteroid::set_nowmlm(uint l, int m, cdouble val) {
     nowmlms[l * (l + 1) / 2 + l - m - 3] = val;
 }
 
-cdouble Asteroid::jlm(uint l, int m) {
-    if (abs(m) > l) {return 0;}
+void Asteroid::set_nowjlm(uint l, int m, cdouble val) {
+    if (abs(m) > l) {return;}
     if (m < 0) {
-        return std::conj(jlm(l, -m)) * (double)sign(m);
+        return set_nowjlm(l, -m, std::conj(val) * (double)sign(m));
     }
-    return jlms[l * (l + 1) / 2 + l - m];
+    nowjlms[l * (l + 1) / 2 + l - m] = val;
 }
 
 
@@ -192,35 +207,51 @@ Vector3 Asteroid::get_torque() {
     cdouble back;
     cdouble now;
     double pre;
-    for (int l = 0; l <= maxjl; l++) {
-        for (int m = -l; m <= l; m++) {
-            for (int lp = max(abs(m), 2); lp <= maxml; lp++) {
+    for (uint l = 0; l <= maxjl; l++) {
+        for (int m = -l; m <= (int)l; m++) {
+            for (uint lp = max(abs(m), 2); lp <= maxml; lp++) {
                 pre = sign(l + m) * fact(l + lp)
                     / pow(position.mag(), l + lp + 1);
-                back = std::conj(jlm(l, m)) * nowmlm(lp, m - 1);
-                now = std::conj(jlm(l, m)) * nowmlm(lp, m);
-                tx -= pre * (lp - m + 1) * back.imag();
-                ty -= pre * (lp - m + 1) * back.real();
+                back = std::conj(nowjlm(l, m)) * nowmlm(lp, m - 1);
+                now = std::conj(nowjlm(l, m)) * nowmlm(lp, m);
+                tx += pre * (lp - m + 1) * back.imag();
+                ty += pre * (lp - m + 1) * back.real();
                 tz += pre * m * now.imag();
             }
         }
     }
 
-    return G * Vector3({tx, ty, tz});
+    return -G * Vector3({tx, ty, tz});
 }
 
 void Asteroid::update_mlms() {
     std::array<double, 3> angles = orientation.euler_angles();
     DMatGen d_generator(angles[0], angles[1], angles[2]);
     cdouble newmlm = 0;
-    for (int l = 2; l <= maxml; l++) {
-        for (int m = -l; m <= l; m++) {
+    for (uint l = 2; l <= maxml; l++) {
+        for (int m = -l; m <= (int)l; m++) {
             newmlm = 0;
-            for (int mp = -l; mp <= l; mp++) {
+            for (int mp = -l; mp <= (int)l; mp++) {
                 newmlm += sqrt(fact(l - mp) * fact(l + mp))
                     * std::conj(d_generator(l, m, mp)) * mlm(l, mp);
             }
             set_nowmlm(l, m, newmlm / sqrt(fact(l - m) * fact(l + m)));
+        }
+    }
+}
+
+void Asteroid::update_jlms() {
+    DMatGen d_generator(PI / 2, fmod(atan2(position[1], -position[2]), 2 * PI),
+        -PI / 2);
+    cdouble newjlm = 0;
+    for (uint l = 1; l <= maxjl; l++) {
+        for (int m = -l; m <= (int)l; m++) {
+            newjlm = 0;
+            for (int mp = -l; mp <= (int)l; mp++) {
+                newjlm += sqrt(fact(l - mp) * fact(l + mp))
+                    * std::conj(d_generator(l, m, mp)) * jlm(l, mp);
+            }
+            set_nowjlm(l, m, newjlm / sqrt(fact(l - m) * fact(l + m)));
         }
     }
 }
@@ -232,6 +263,7 @@ void Asteroid::update_position(double dt) {
 }
 
 void Asteroid::update_orientation(double dt) {
+    update_jlms();
     update_mlms();
     Omega = ang_mom / position.mag2();
 

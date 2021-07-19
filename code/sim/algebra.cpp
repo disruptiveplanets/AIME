@@ -269,7 +269,7 @@ const {
     case 1:
         evec1 = Vector3({Da/D, 1, Db/D});
         break;
-    case 2:
+    default:
         evec1 = Vector3({Da/D, Db/D, 1});
         break;
     }
@@ -313,7 +313,7 @@ const {
         evec2 = Vector3({Da/D, 1, 0});
         evec2 -= Vector3::dot(evec2, evec1) / evec1[2] * Vector3::z();
         break;
-    case 2:
+    default:
         evec2 = Vector3({Da/D, 0, 1});
         evec2 -= Vector3::dot(evec2, evec1) / evec1[1] * Vector3::y();
         break;

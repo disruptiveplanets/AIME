@@ -1,1 +1,1 @@
-clang++ -Wall -std=c++17 ../sim/*.cpp main.cpp -o "/home/jtdinsmo/Dropbox (MIT)/12.420 project/code/generate/bin/generate" -O3
+g++ -Wall -std=c++17 ../sim/*.cpp main.cpp -o "bin/generate" -O3

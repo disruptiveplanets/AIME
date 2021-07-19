@@ -148,7 +148,7 @@ int main(int argc, char* argv[]) {
 
     std::ofstream resolved_file;
     resolved_file.open(bare + "-resolved.dat");
-    for (int i = 0; i < resolved_data.size(); i+=3) {
+    for (uint i = 0; i < resolved_data.size(); i+=3) {
         resolved_file << resolved_data[i] << ' ';
         resolved_file << resolved_data[i + 1] << ' ';
         resolved_file << resolved_data[i + 2] << std::endl;

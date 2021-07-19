@@ -27,7 +27,7 @@ cdouble DMatGen::operator()(uint l, int mp, int m) {
 double DMatGen::wigner_small_d(uint j, int mp, int m) {
     double pre = sqrt(fact(j+mp) * fact(j-mp) * fact(j+m) * fact(j-m));
     double sum = 0;
-    for(int s = max(0, m-mp); s <= min(j+m, j-mp); s++) {
+    for(uint s = max(0, m-mp); s <= min(j+m, j-mp); s++) {
         sum += (sign(mp-m+s) * pow(cs, 2 * j + m - mp - 2 * s)
         * pow(sn, mp - m + 2 * s)) /
         (fact(j + m - s) * fact(s) * fact(mp - m + s) * fact(j - mp - s));

@@ -35,13 +35,16 @@ public:
     int simulate(double cadence, std::vector<double>& resolved_data);
 
 private:
-    cdouble mlm(uint l, int m);
-    cdouble nowmlm(uint l, int m);
+    cdouble mlm(uint l, int m) const;
+    cdouble jlm(uint l, int m) const;
+    cdouble nowmlm(uint l, int m) const;
+    cdouble nowjlm(uint l, int m) const;
     void set_nowmlm(uint l, int m, cdouble val);
-    cdouble jlm(uint l, int m);
+    void set_nowjlm(uint l, int m, cdouble val);
     void calculate_moi();
     void set_pos(double impact_parameter);
     void update_mlms();
+    void update_jlms();
 
     Vector3 get_torque();
     void update_position(double dt);
@@ -54,9 +57,10 @@ private:
     uint maxml;
     uint maxjl;
 
-    const std::vector<cdouble> mlms;
-    std::vector<cdouble> nowmlms;
     const std::vector<cdouble> jlms;
+    const std::vector<cdouble> mlms;
+    std::vector<cdouble> nowjlms;
+    std::vector<cdouble> nowmlms;
 
     Matrix3 moi;
     Matrix3 moiInverse;

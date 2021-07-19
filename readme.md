@@ -15,14 +15,14 @@ In both the resolved and unresolved cases, we will build a simulation to generat
 
 ## Project timeline
 ### Done
-1. Create a robust and general model for asteroid shape and density profile (Done)
-2. Write code to simulate an asteroid flyby for certain parameters (Done)
+1. Created a robust and general model for asteroid shape and density profile (Done)
+2. Wrote code to simulate an asteroid flyby for certain parameters (Done)
+3. Wrote code that can calculate torque to all orders of distance
+4. Confirmed that different Mlms with l>2 can have an effect on output (albeit barely)
 
 ## Not done:
 Immediate:
-1. Jlms are rotated as well
 2. Be able to do fits
-3. Check whether different high orders of Mlms give different behavior.
 4. Run a fit
 
 Later:
