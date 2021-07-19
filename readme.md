@@ -22,9 +22,8 @@ In both the resolved and unresolved cases, we will build a simulation to generat
 Immediate:
 1. Jlms are rotated as well
 2. Be able to do fits
-3. Get my Supercloud account
-4. Check whether different high orders of Mlms give different behavior.
-5. Run a fit
+3. Check whether different high orders of Mlms give different behavior.
+4. Run a fit
 
 Later:
 1. Run fits with pure J2, J4, etc. coefficients.
