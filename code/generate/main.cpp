@@ -138,7 +138,9 @@ int main(int argc, char* argv[]) {
     // Run asteroid
     std::vector<double> resolved_data;
     auto start = std::chrono::high_resolution_clock::now();
+
     int frames = asteroid.simulate(CADENCE, resolved_data);
+
     auto stop = std::chrono::high_resolution_clock::now();
     double time_taken = std::chrono::duration_cast<std::chrono::milliseconds>(
         stop - start).count() / 1000.0;

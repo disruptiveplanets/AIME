@@ -105,6 +105,9 @@ public:
     void operator/=(double d);
     Quaternion operator*(Quaternion const& q) const;
     std::array<double, 3> euler_angles() const;
+    bool is_nan() const {
+        return isnan(r_) || isnan(i_) || isnan(j_) || isnan(k_);
+    }
 
     Quaternion inverse() const;
     Matrix3 matrix();

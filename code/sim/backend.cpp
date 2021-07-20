@@ -31,6 +31,7 @@ cdouble Asteroid::mlm(uint l, int m) const {
     if (m < 0) {
         return std::conj(mlm(l, -m)) * (double)sign(m);
     }
+    //if (l * (l + 1) / 2 + l - m - 3 > mlms.size()) {std::cout << "MLM" << std::endl;}
     return mlms[l * (l + 1) / 2 + l - m - 3]; // l=0 and l=1 are not included
 }
 
@@ -39,6 +40,7 @@ cdouble Asteroid::jlm(uint l, int m) const {
     if (m < 0) {
         return std::conj(jlm(l, -m)) * (double)sign(m);
     }
+    //if (l * (l + 1) / 2 + l - m > jlms.size()) {std::cout << "JLM" << std::endl;}
     return jlms[l * (l + 1) / 2 + l - m];
 }
 
@@ -47,6 +49,7 @@ cdouble Asteroid::nowmlm(uint l, int m) const {
     if (m < 0) {
         return std::conj(nowmlm(l, -m)) * (double)sign(m);
     }
+    //if (l * (l + 1) / 2 + l - m - 3 > nowmlms.size()) {std::cout << "NOWMLM" << std::endl;}
     return nowmlms[l * (l + 1) / 2 + l -  m - 3]; // l=0 and l=1 are not included
 }
 
@@ -55,6 +58,7 @@ cdouble Asteroid::nowjlm(uint l, int m) const {
     if (m < 0) {
         return std::conj(nowjlm(l, -m)) * (double)sign(m);
     }
+    //if (l * (l + 1) / 2 + l - m > nowjlms.size()) {std::cout << "NOWJLM" << std::endl;}
     return nowjlms[l * (l + 1) / 2 + l - m];
 }
 
@@ -63,6 +67,7 @@ void Asteroid::set_nowmlm(uint l, int m, cdouble val) {
     if (m < 0) {
         return set_nowmlm(l, -m, std::conj(val) * (double)sign(m));
     }
+    //if (l * (l + 1) / 2 + l - m - 3 > nowmlms.size()) {std::cout << "SETMLM" << std::endl;}
     nowmlms[l * (l + 1) / 2 + l - m - 3] = val;
 }
 
@@ -71,6 +76,7 @@ void Asteroid::set_nowjlm(uint l, int m, cdouble val) {
     if (m < 0) {
         return set_nowjlm(l, -m, std::conj(val) * (double)sign(m));
     }
+    //if (l * (l + 1) / 2 + l - m > nowjlms.size()) {std::cout << "SETJLM" << std::endl;}
     nowjlms[l * (l + 1) / 2 + l - m] = val;
 }
 
@@ -265,6 +271,7 @@ void Asteroid::update_position(double dt) {
 void Asteroid::update_orientation(double dt) {
     update_jlms();
     update_mlms();
+
     Omega = ang_mom / position.mag2();
 
     inv_mat = orientation.matrix().transpose();

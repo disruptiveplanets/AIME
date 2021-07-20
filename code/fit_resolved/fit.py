@@ -1,57 +1,49 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import emcee, asteroids, time
+import emcee, asteroids, time, sys
 from multiprocessing import Pool
 
 EARTH_RADIUS = 6370000
 EARTH_MASS =5.972e24
-CADENCE = 30 * 60
-REGENERATE_DATA = True
+CADENCE = 3600.0
+REGENERATE_DATA = False
 N_WALKERS = 32
 N_STEPS = 5000
 
 MULTIPROCESSING = True
 
+reload = False
+if len(sys.argv) == 2:
+    if sys.argv[1] == "reload":
+        reload = True
+        REGENERATE_DATA = False
+
 np.random.seed(123)
-L = 1
-n = 1
-m = 1
-n_clms = (L + 1)**2
-n_densities = n * n * (m + 1) * (2 * m + 1) // m
 
 spin = 0.000050189
-impact_parameter = 50 * EARTH_RADIUS
+impact_parameter = 5 * EARTH_RADIUS
 speed = 4000
-
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
 
 theta_true = (
-    5.7893, # C0
-    0.89312, -0.412, -0.908901, # C1
-    0.89124, 1.01298, 1.29021, 0.978512, 0.8912, 1.1250, # densities
+    1.0, 2.0, 3.0, 4.0, 5.0,#m2
+    0.142, 1.512, -0.513, 0.0, 3.512, 2.261, -1.523, #m3
 )
 theta_start = (
-    5.0,
-    0.0, 0.0, 0.0,
-    1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+    1.0, 1.0, 1.0, 1.0, 1.0,#m2
+    0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, #m3
 )
-theta_range = (
-    [4.0, 8.0],
-    [-1.0, 1.0], [-1.0, 1.0], [-1.0, 1.0],
-    [0.5, 1.5], [0.5, 1.5], [0.5, 1.5], [0.5, 1.5], [0.5, 1.5], [0.5, 1.5]
-)
+L = int(np.sqrt(len(theta_true)+4))
+theta_range = ((-5, 5),) * len(theta_start)
 theta_labels = []
-for l in range(L+1):
+for l in range(2, L):
     for m in range(-l, l+1):
-        theta_labels.append("C" + str(l) + str(m))
-for i in range(n_densities):
-    theta_labels.append("d" + str(i))
+        theta_labels.append("M" + str(l) + ',' + str(m))
 
 def fit_function(theta):
-    clms = theta[:n_clms]
-    densities = theta[n_clms:]
-    start = time.time()
-    resolved_data = asteroids.simulate(CADENCE, L, n, m, clms, densities, spin,
-        impact_parameter, speed, EARTH_MASS)
+    #start = time.time()
+    resolved_data = asteroids.simulate(CADENCE, jlms, theta, spin,
+        impact_parameter, speed)
     #print(time.time() - start)
     return resolved_data
 
@@ -113,59 +105,27 @@ nwalkers, ndim = pos.shape
 
 save_filename = "asteroids.h5"
 backend = emcee.backends.HDFBackend(save_filename)
-backend.reset(nwalkers, ndim)
+if not reload:
+    backend.reset(nwalkers, ndim)
+else:
+    print("Initial size: {}".format(backend.iteration))
 
 if MULTIPROCESSING:
     with Pool() as pool:
         sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability,
             args=(x, y, yerr), backend=backend, pool=pool)
-        sampler.run_mcmc(pos, N_STEPS, progress=True)
+
+        if not reload:
+            sampler.run_mcmc(pos, N_STEPS, progress=True)
+        else:
+            sampler.run_mcmc(None, N_STEPS, progress=True)
 else:
     sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability,
         args=(x, y, yerr), backend=backend)
-    sampler.run_mcmc(pos, N_STEPS, progress=True)
+    if not reload:
+        sampler.run_mcmc(pos, N_STEPS, progress=True)
+    else:
+        sampler.run_mcmc(None, N_STEPS, progress=True)
 
-fig, axes = plt.subplots(len(theta_true), figsize=(10, 7), sharex=True)
-samples = sampler.get_chain()
-for i in range(ndim):
-    ax = axes[i]
-    ax.plot(samples[:, :, i], "k", alpha=0.3)
-    ax.set_xlim(0, len(samples))
-    ax.set_ylabel(labels[i])
-    #ax.yaxis.set_label_coords(-0.1, 0.5)
-
-axes[-1].set_xlabel("step number");
-
-plt.show()
-
-tau = sampler.get_autocorr_time()
-print(tau)
-
-flat_samples = sampler.get_chain(discard=100, thin=15, flat=True)
-print(flat_samples.shape)
-
-
-import corner
-
-fig = corner.corner(
-    flat_samples, labels=labels, truths=theta_true
-);
-plt.show()
-
-
-inds = np.random.randint(len(flat_samples), size=100)
-for ind in inds:
-    sample = flat_samples[ind]
-    plt.plot(x0, fit_function(x0, sample), "C1", alpha=0.1)
-plt.errorbar(x, y, yerr=yerr, fmt=".k", capsize=0)
-plt.plot(x0, fit_function(x0, theta_true), "k", label="truth")
-plt.legend(fontsize=14)
-plt.xlim(0, 10)
-plt.xlabel("x")
-plt.ylabel("y");
-plt.show()
-
-for i in range(ndim):
-    mcmc = np.percentile(flat_samples[:, i], [16, 50, 84])
-    q = np.diff(mcmc)
-    print("{}: {} + {} - {} in SI units".format(labels[i], mcmc[1], q[0], q[1]))
+if reload:
+    print("New size: {}".format(backend.iteration))

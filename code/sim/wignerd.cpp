@@ -10,8 +10,8 @@ uint fact(uint i) {
 
 DMatGen::DMatGen(double alpha, double beta, double gamma)
     : alpha(0, alpha), gamma(0, gamma) {
-    cs = cos(beta/2);
     sn = sin(beta/2);
+    cs = cos(beta/2);
 }
 
 cdouble DMatGen::operator()(uint l, int mp, int m) {

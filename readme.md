@@ -19,10 +19,10 @@ In both the resolved and unresolved cases, we will build a simulation to generat
 2. Wrote code to simulate an asteroid flyby for certain parameters (Done)
 3. Wrote code that can calculate torque to all orders of distance
 4. Confirmed that different Mlms with l>2 can have an effect on output (albeit barely)
+5. Be able to do fits
 
 ## Not done:
 Immediate:
-2. Be able to do fits
 4. Run a fit
 
 Later:

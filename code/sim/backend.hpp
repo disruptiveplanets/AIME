@@ -22,7 +22,7 @@
 #define NUM_THREADS 4
     // Torque at closest approach divided by torque at start of sim.
 #define G 6.67408e-11
-#define _DEBUG
+//#define _DEBUG
 
 using uint = unsigned int;
 using cdouble = std::complex<double>;
