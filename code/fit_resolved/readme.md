@@ -11,10 +11,16 @@ On the first day of implementing the MCMC, I realized that torque can be written
 ## Use
 Simply run `python fit.py`. The true parameterization to be used is written into the python file.
 
+## Done
+* First run done on Supercloud
+* Capability to add to old runs
+* Ability to display data
+
 ## To do
-* Try for simple asteroid: L, n, m = (1, 1, 1)
-* Run on supercomputer
-* Try for bigger model
+* Allow distributed computing with `mpiexec`
+    - Then re-run the first run because it's too short
+    - Then do the all-orders model
+* Do all-orders model
 
 ## Timing data
 I'm recording (L, n, m), as well as the time on my laptop and the supercomputer time, so that I can track how long this really takes.
