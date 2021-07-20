@@ -278,12 +278,34 @@ Therefore, we may write
 Note that $\bm \tau_d$ is actually the $m=0$ case of this sum, \comment{Nope} Thus,
 \begin{equation*}
 \begin{aligned}
-\bm \tau = &G\sum_{l=0}^\infty \sum_{m=-l}^l \frac{(-1)^l(-1)^{m}}{D^{l+1}}\sum_{l'=|m|}^\infty \frac{(l+l')!}{D^{l'}}\Bigg\{\\
-&\x(l'+m+1)\Im\Big[\J^*_{lm} \M_{l',m+1}\Big]\\
-&-\y(l'+m+1)\Re\Big[\J^*_{lm} \M_{l',m+1}\Big]\\
-&-m\z\Im\Big[\J_{l,m}^* \M_{l',m}\Big]\Bigg\}.
+\bm \tau = &-G\sum_{l=0}^\infty \sum_{m=-l}^l \frac{(-1)^l(-1)^{m}}{D^{l+1}}\sum_{l'=|m|}^\infty \frac{(l+l')!}{D^{l'}}\Bigg\{\\
+&\x(l'-m+1)\Im\Big[\J^*_{lm} \M_{l',m-1}\Big]\\
+&+\y(l'-m+1)\Re\Big[\J^*_{lm} \M_{l',m-1}\Big]\\
+&+2m\z\Im\Big[\J_{l,m}^* \M_{l',m}\Big]\Bigg\}.
 \end{aligned}
 \end{equation*}
+
+It can be enlightening to combine the Mlm terms:
+\begin{equation*}
+\begin{aligned}
+\bm \tau = &-G\sum_{l=0}^\infty \sum_{m=-l}^l \frac{(-1)^l(-1)^{m}}{D^{l+1}}\sum_{l'=|m|}^\infty \frac{(l+l')!}{D^{l'}}\Bigg\{\\
+&\x(l'-m+1)\Im\Big[\J^*_{lm} \M_{l',m-1}\Big]\\
+&+\y(l'-m+1)\Re\Big[\J^*_{lm} \M_{l',m-1}\Big]\Bigg\}\\
+&-G\sum_{l=0}^\infty \sum_{m=1-l}^{l+1} \frac{(-1)^l(-1)^{m}}{D^{l+1}}\sum_{l'=|m-1|}^\infty \frac{(l+l')!}{D^{l'}}\Bigg\{\\
+&-2(m-1)\z\Im\Big[\J_{l,m-1}^* \M_{l',m-1}\Big]\Bigg\}
+\end{aligned}
+\end{equation*}
+We can change the upper limit of the second sum to $l+1$ because for $m>l$, we may define $\J_{lm} = 0$. Likewise for the lower limit of the fifth sum.
+\begin{equation*}
+\begin{aligned}
+\bm \tau = &-G\sum_{l=0}^\infty \sum_{m=-l}^{l+1} \frac{(-1)^l(-1)^{m}}{D^{l+1}}\sum_{l'=|m|}^\infty \frac{(l+l')!}{D^{l'}}\Bigg\{\\
+&\x(l'-m+1)\Im\Big[\J^*_{lm} \M_{l',m-1}\Big]\\
+&+\y(l'-m+1)\Re\Big[\J^*_{lm} \M_{l',m-1}\Big]\Bigg\}\\
+&-G\sum_{l=0}^\infty \sum_{m=-l}^{l+1} \frac{(-1)^l(-1)^{m}}{D^{l+1}}\sum_{l'=|m-1|}^\infty \frac{(l+l')!}{D^{l'}}\Bigg\{\\
+&-2(m-1)\z\Im\Big[\J_{l,m-1}^* \M_{l',m-1}\Big]\Bigg\}
+\end{aligned}
+\end{equation*}
+It's not very nice, is it?
 
 \section{Rotation}
 The constants $\M_{lm}$ rotate over the course of the asteroid's orbit due to the asteroid's own rotation. Let the constants $\M_{lm}$ be calculated at some time $t_0$ in the orbit, and define the rotation $\R(t)$ such for any vector $\bm r$ pointing to some point in the asteroid at time $t_0$, $\R(t) \bm r$ points to the same point at time $t$. Let $\M'_{lm}$ be the constants calculated at time $t$. Then
