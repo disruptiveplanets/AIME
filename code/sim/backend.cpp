@@ -235,7 +235,7 @@ void Asteroid::update_mlms() {
     DMatGen d_generator(angles[0], angles[1], angles[2]);
     cdouble newmlm = 0;
     for (uint l = 2; l <= maxml; l++) {
-        for (int m = -l; m <= (int)l; m++) {
+        for (int m = 0; m <= (int)l; m++) {// Only need to update half
             newmlm = 0;
             for (int mp = -l; mp <= (int)l; mp++) {
                 newmlm += sqrt(fact(l - mp) * fact(l + mp))
@@ -251,7 +251,7 @@ void Asteroid::update_jlms() {
         -PI / 2);
     cdouble newjlm = 0;
     for (uint l = 1; l <= maxjl; l++) {
-        for (int m = -l; m <= (int)l; m++) {
+        for (int m = 0; m <= (int)l; m++) {// Only need to update half
             newjlm = 0;
             for (int mp = -l; mp <= (int)l; mp++) {
                 newjlm += sqrt(fact(l - mp) * fact(l + mp))
