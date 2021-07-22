@@ -158,6 +158,24 @@ Now we can move straight on to substitution equation \ref{eqn:grad}:
 &+(i\x-\y)(l'+m'+1)R^*_{l',m'+1}(\bm r)+2im'\z R^*_{l'm'}(\bm r)].
 \end{aligned}
 \end{equation*}
+By defining the new varialble
+\begin{equation}
+\K_{lm} = \int d^3 r \rho(\bm r) R_{lm} (\bm r),
+\label{eqn:klm-def}
+\end{equation}
+we can simplify this to
+\begin{equation*}
+\begin{aligned}
+\bm \tau = &-\frac{1}{2}\sum_{lm}(-1)^l\J_{lm}\sum_{l'm'}S_{l+l',m+m'}(\bm D) \\
+&\bigg[(i\x + \y)(l'-m'+1)\K^*_{l',m'-1}\\
+&+(i\x-\y)(l'+m'+1)\K^*_{l',m'+1}+2im'\z \K^*_{l'm'}\bigg].
+\label{eqn:complex-torque}
+\end{aligned}
+\end{equation*}
+
+
+
+\section{Proof of real-ness}
 This equation had better be real. To prove it, let us combine the $\pm m'$ terms, leaving out the $m'=0$ term and using the subscript o (off-diagonal) to indicate its absence:
 \begin{equation*}
 \begin{aligned}
@@ -646,10 +664,121 @@ When the limits are extended to $m_-,m'_- \cup m\geq 0, m' \geq 0$, the off diag
 &+m'\z\Im\bigg(\chi_{l0l'm'}^{+0}+\chi_{l0l'm'}^{-0}\bigg)\Bigg\}
 \end{aligned}
 \end{equation*}
-So it doesn't really work out. I'll have to do this later.
+\comment{So it doesn't really work out. I'll have to do this later.}
 
 
 \clearpage
+
+
+\section{Moment of inertia}
+The moment of inertia matrix of an object is written as
+$$I_{xx}=\int d^3 r \rho(\bm r) (y^2 + z^2), \indent \dots$$
+$$I_{xy}=-\int d^3 r \rho(\bm r) xy, \indent \dots.$$
+Note that
+$$x^2=r^2\brackets{-\frac{1}{3}(Y_{20}-1)+2Y_{2,-2}+\frac{1}{12}Y_{22}}$$
+$$y^2=r^2\brackets{-\frac{1}{3}(Y_{20}-1)-2Y_{2,-2}-\frac{1}{12}Y_{22}}$$
+$$z^2=r^2\brackets{\frac{2}{3}Y_{20}+\frac{1}{3}}$$
+$$xz=r^2\brackets{\frac{Y_{21}}{6}-Y_{2,-1}}$$
+$$yz=r^2\brackets{\frac{Y_{21}}{6i}+\frac{Y_{2,-1}}{i}}$$
+$$xy=r^2\brackets{\frac{Y_{22}}{12i}-2\frac{Y_{2,-2}}{i}}.$$
+Then we can write the above in terms of $R_{2m}$:
+$$I_{xx}=\int d^3r \rho(\bm r)-\frac{1}{3}(2R_{20}-1)+2R_{2,-2}+2R_{22}$$
+$$I_{yy}=\int d^3r \rho(\bm r)-\frac{1}{3}(2R_{20}-1)-2R_{2,-2}-2R_{22}$$
+$$I_{zz}=\int d^3r \rho(\bm r)\frac{4}{3}R_{20}+\frac{1}{3}$$
+$$I_{xz}=-\int d^3r \rho(\bm r)R_{21}-R_{2,-1}$$
+$$I_{yz}=-\int d^3r \rho(\bm r)\frac{R_{21}+R_{2,-1}}{i}$$
+$$I_{xy}=-\int d^3r \rho(\bm r)2\frac{R_{22}-R_{2,-2}}{i}$$
+and therefore
+$$I_{xx}=\frac{2}{3}\K_{20}-2\K_{2,-2}-2\K_{22}+\frac{2}{5}\K_{00}$$
+$$I_{yy}=\frac{2}{3}\K_{20}+2\K_{2,-2}+2\K_{22}+\frac{2}{5}\K_{00}$$
+$$I_{zz}=-\frac{4}{3}\K_{20} + \frac{2}{5}\K_{00}$$
+$$I_{xz}=\K_{21}-\K_{2,-1}$$
+$$I_{yz}=\frac{\K_{21}+\K_{2,-1}}{i}$$
+$$I_{xy}=-2\frac{\K_{22}-\K_{2,-2}}{i}.$$
+
+Thus, the moment of inertia is determined entirely by $\K_{lm}$ and therefore by $C_{lms}$. The reader will notice that the moment of inertia depends counter-intuitively on the asteroid mass $\K_{00}$. However, we may write the moment of inertia as $I_\perp+\mathbb{I}\frac{2}{5}\K_{00}$, where $\mathbb{I}$ is the identity matrix, and $I_\perp$ depends only on $K_{2m}$. Then equation $$\dot{\bm \omega} = I^{-1}\parens{\bm \tau - \bm \omega \times \parens{I_\perp+\mathbb{I}\frac{2}{5}\K_{00}} \bm \omega}$$
+$$\dot{\bm \omega} = I^{-1}\parens{\bm \tau - \bm \omega \times I_\perp\bm \omega}$$
+because the identity matrix does not change the direction of a vector multiplied by it. However, due to the first term, the mass of the asteroid must indeed be known to integrate the equation of motion.
+
+
+
+\section{Computing torque}
+Since the proof that our torque in equation \ref{eqn:complex-torque} is real is generally difficult and does not seem very enlightening, we will move on for now.
+
+Note that the $S$ present in equation \ref{eqn:complex-torque} forces $l$ and $l'$ to be low in the dominant terms. However, $l'=0$ contributes nothing to torque, nor does $l'=1$ due to the fact that $\K_{1m}=0$, which is caused by $\K_{lm}$ being centered on the center of mass of the asteroid. Therefore, $l'=2$ is the minimum value, and the dominant torque term is proportional to $D^{-3}$.
+
+Note that $\K_{lm}$ are constants, since we are using coordinates fixed to the body. Our derivation requires that we use the same coordinates for $\J_{lm}$, which are therefore not constant. We can find their values at any point in the orbit using the \href{https://en.wikipedia.org/wiki/Wigner_D-matrix#Relation_to_spherical_harmonics_and_Legendre_polynomials}{Wigner-$D$ matrices}, which rotate spherical harmonics according to
+$$Y_{lm}(\bm r') = \sum_{m'=-l}^l\sqrt{\frac{(l+m)!}{(l-m)!}\frac{(l-m')!}{(l+m')!}}\parens{D^l_{mm'}(\R}^*Y_{lm'}(\bm r),$$
+where $\R$ indicates a rotation, and $\bm r' = \R \bm r$. Generally, $\R$ is represented by Euler angles.
+
+Let $\R$ rotate from the body-fixed axes to some inertial coordinate system. Then we must rotate both the $S$ in equation \ref{eqn:complex-torque} and the $\J_{lm}$, the latter of which rotate by
+\begin{equation*}
+\begin{aligned}
+\J^\text{rot}_{lm} =&\sum_{m'=-l}^l\sqrt{\frac{(l-m')!}{(l-m)!}\frac{(l+m')!}{(l+m)!}}\parens{D^l_{mm'}(t)}^*\J_{lm'}.
+\end{aligned}
+\end{equation*}
+We also have
+$$S_{lm}(\bm r') = \sum_{m'=-l}^l \sqrt{\frac{(l+m)!}{(l-m')!} \frac{(l-m)!}{(l+m')!}} \parens{D^l_{mm'}(\R}^*S_{lm'}(\bm r)$$
+Thus, equation \ref{eqn:complex-torque} becomes
+\begin{equation*}
+\begin{aligned}
+\bm \tau = &-\frac{1}{2}\sum_{lm}(-1)^l\sum_{l'm'}\\
+&\brackets{\sum_{m''=-l}^l\sqrt{\frac{(l-m'')!}{(l-m)!}\frac{(l+m'')!}{(l+m)!}}\parens{D^l_{mm''}(\R)}^*\J_{lm''}^0}\\
+&\bigg[\sum_{m''=-l-l'}^{l+l'} \sqrt{\frac{(l+l'+m+m')!}{(l+l'-m'')!}\frac{(l+l'-m-m')!}{(l+l'+m'')!}}\\
+&\parens{D^{l+l'}_{m+m',m''}(\R)}^*S_{l+l',m''}(\bm D^0)\bigg]\\
+&\bigg[(i\x + \y)(l'-m'+1)\K^*_{l',m'-1}\\
+&+(i\x-\y)(l'+m'+1)\K^*_{l',m'+1}+2im'\z \K^*_{l'm'}\bigg].
+\end{aligned}
+\end{equation*}
+where $\J_{lm}^0$ and $\bm D^0$ are the values of $\J_{lm}$ and $\bm D$ with respect to the inertial reference frame. There is some subtlety with $\bm D^0$; the length changes over the course of the orbit, so $\bm D^0$ must have length equal to the length of $\bm D$ at the moment of calculation, but its direction is constant.
+
+ We have some freedom in our choice of inertial coordinate system, so let us choose $\z$ to point towards the planet; $\bm D^0 \propto \z$. Then
+$$S_{l+l',m+m'}(\bm D^0) = (-1)^{m} \frac{(l-m)!}{D^{1+l}} P_{lm}(1)e^{im\phi}.$$
+The requirement that $\phi \in \mathbb{R}$ all give the same answer means $m=0$ is necessary, and since $P_{l0}(1)=1$,
+$$S_{l+l',m+m'}(\bm D^0) = \frac{l!}{D^{1+l}}\delta_{m0}.$$
+Thus,
+\begin{equation*}
+\begin{aligned}
+\bm \tau = &-\frac{1}{2}\sum_{lm}(-1)^l\sum_{l'm'}\\
+&\brackets{\sum_{m''=-l}^l\sqrt{\frac{(l-m'')!}{(l-m)!}\frac{(l+m'')!}{(l+m)!}}\parens{D^l_{mm''}(\R)}^*\J_{lm''}^0}\\
+&\bigg[\sqrt{\frac{(l+l'+m+m')!}{(l+l')!}\frac{(l+l'-m-m')!}{(l+l')!}}\\
+&\parens{D^{l+l'}_{m+m',0}(\R)}^*\frac{(l+l')!}{D^{1+l+l'}}\bigg]\\
+&\bigg[(i\x + \y)(l'-m'+1)\K^*_{l',m'-1}\\
+&+(i\x-\y)(l'+m'+1)\K^*_{l',m'+1}+2im'\z \K^*_{l'm'}\bigg].\\
+= &-\frac{1}{2}\sum_{lm}(-1)^l\sum_{l'm'}\frac{\sqrt{(l+l'+m+m')!(l+l'-m-m')!}}{D^{1+l+l'}}\\
+&\brackets{\sum_{m''=-l}^l\sqrt{\frac{(l-m'')!}{(l-m)!}\frac{(l+m'')!}{(l+m)!}}\parens{D^l_{mm''}(\R)}^*\J_{lm''}^0}\\
+&\parens{D^{l+l'}_{m+m',0}(\R)}^*\bigg[(i\x + \y)(l'-m'+1)\K^*_{l',m'-1}\\
+&+(i\x-\y)(l'+m'+1)\K^*_{l',m'+1}+2im'\z \K^*_{l'm'}\bigg].
+\end{aligned}
+\end{equation*}
+We have a little more freedom in our inertial coordinate system; we have not specified which direction $\bm D^0$ points to. We may do this by demanding that $\bm D^0=\hat z$ at the beginning of the simulation; in other words, the body-fixed and inertial coordinates coincide there. We have then determined $\R(t)$, which has initial condition $\R(t)=\mathbb{I}]$ and evolves according to $\dot \R = \omega$ in some sense.
+
+However, we have still not fully specified the problem, because the body-fixed coordinate system has not been identified. We will allow the end user to specify this coordinate system evaluating $\J_{lm}$ with respect to these axes. Therefore, the choice of $\J_{lm}$ determines the body-fixed coordinate system which controls $\K_{lm}$, and the angular and linear equations of motion (eqs.~\ref{eqn:linear-eom} and \ref{eqn:euler}) combined with initial conditions $\bm D(0)=D\z$ and $\bm v$ set to its observed value, and angular initial conditions of $\R(0)=\mathbb{I}$ and $\omega$ set to a known value or an estimate.
+
+
+\section{Evolution of Euler Angles}
+The Wigner-$D$ matrices are commonly expressed in terms of the Euler angles, so we will use these to track the evolution of the body. Let us use $z-y-z$ Euler angles, or $\bm E = (\alpha, \beta, \gamma)$, with
+\begin{equation}
+\R = R_z(\alpha) R_y(\beta) R_z(\gamma)
+\label{eqn:euler-angle-rotation}
+\end{equation}
+where $R_z$ and $R_y$ represent right-handed rotations around the $\z$ and $\y$ axes respectively. These angles control the orientation of the asteroid, so we need an equation of motion to describe them.
+
+By definition of angular velocity, we know $\frac{d}{dt}(\R \bm v) = \bm \omega \times \bm v,$ where $\bm v$ is any constant vector, and therefore $\dot \R \bm v = \bm \omega \times \bm v,$. Let $\omega_{\times}$ be the skew-symmetric matrix for $\omega$, such that $\omega_{\times} \bm v = \bm\omega \times \bm v$. Then $\dot \R \bm v = \omega_\times \bm v$. Since this is true for all $\bm v$, we see that $\dot \R = \omega_\times$, or
+$$\frac{d}{dt}\parens{R_z(\alpha)R_y(\beta)R_z(\gamma)} = \parens{\begin{matrix}
+0 & -\omega_z & \omega_y \\
+\omega_z & 0 & -\omega_x \\
+-\omega_y & \omega_x & 0
+ \end{matrix}}.$$
+ This is
+ $$\dot \alpha \dot R_z(\alpha)R_y(\beta)R_z(\gamma) + \dot \beta R_z(\alpha)\dot R_y(\beta)R_z(\gamma) + \dot \gamma R_z(\alpha)R_y(\beta)\dot R_z(\gamma) = \parens{\begin{matrix}
+ 0 & -\omega_z & \omega_y \\
+ \omega_z & 0 & -\omega_x \\
+ -\omega_y & \omega_x & 0
+  \end{matrix}}.$$
+
+
+
 
 \bibliography{../asteroid-flybys.bib}
 \end{document}
