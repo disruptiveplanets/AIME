@@ -1,5 +1,7 @@
 #include "wignerd.hpp"
 
+#include <boost/math/special_functions/spherical_harmonic.hpp>
+
 // z-y-z Euler angle convention
 
 // https://en.wikipedia.org/wiki/Wigner_D-matrix
@@ -43,8 +45,8 @@ cdouble DMatGen::operator()(uint l, int mp, int m) {
 double DMatGen::wigner_small_d(uint j, int mp, int m) {
     double pre = sqrt(fact(j+mp) * fact(j-mp) * fact(j+m) * fact(j-m));
     double sum = 0;
-    for(uint s = max(0, m-mp); s <= min(j+m, j-mp); s++) {
-        sum += (parity(mp-m+s) * pow(cs, 2 * j + m - mp - 2 * s)
+    for(uint s = max_me(0, m-mp); s <= min_me(j+m, j-mp); s++) {
+        sum += ((double)parity(mp-m+s) * pow(cs, 2 * j + m - mp - 2 * s)
         * pow(sn, mp - m + 2 * s)) /
         (fact(j + m - s) * fact(s) * fact(mp - m + s) * fact(j - mp - s));
     }
@@ -52,7 +54,7 @@ double DMatGen::wigner_small_d(uint j, int mp, int m) {
 }
 
 cdouble slm_c(uint l, int m, double r, double costheta, double phi) {
-    return parity(m) * fact(l - m) / pow(r, l+1) * ylm_c(l, m, costheta, phi);
+    return (double)parity(m) * fact(l - m) / pow(r, l+1) * ylm_c(l, m, costheta, phi);
 }
 
 cdouble ylm_c(uint l, int m, double costheta, double phi) {

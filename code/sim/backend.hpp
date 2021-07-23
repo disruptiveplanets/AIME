@@ -86,9 +86,7 @@ private:
 
     std::array<double, 3> angles;
     Vector3 rot_pos;
-    cdouble x_torque;
-    cdouble y_torque;
-    cdouble z_torque;
+    //cdouble x_torque, y_torque, z_torque;
     double rot_pos_r;
     double rot_pos_ct;
     double rot_pos_p;

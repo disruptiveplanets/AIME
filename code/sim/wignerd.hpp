@@ -6,8 +6,8 @@
 #include <tuple>
 #include <iostream>
 
-#define max(a, b) ((a) < (b) ? (b) : (a))
-#define min(a, b) ((a) > (b) ? (b) : (a))
+#define max_me(a, b) ((a) < (b) ? (b) : (a))
+#define min_me(a, b) ((a) > (b) ? (b) : (a))
 #define parity(a) ((a) % 2 == 0 ? (1) : (-1))
 
 using uint = unsigned int;

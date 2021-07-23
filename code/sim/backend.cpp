@@ -126,15 +126,15 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
 }
 
 Vector3 Asteroid::get_torque() {
-    angles = orientation.euler_angles();
+    auto angles = orientation.euler_angles();
     DMatGen dgen = DMatGen(angles[0], angles[1], angles[2]);
-    rot_pos = orientation.matrix() * -position;
-    rot_pos_r = rot_pos.mag();
-    rot_pos_ct = rot_pos[2] / rot_pos.mag();
-    rot_pos_p = atan2(rot_pos[1], rot_pos[0]);
-    x_torque = 0;
-    y_torque = 0;
-    z_torque = 0;
+    Vector3 rot_pos = orientation.matrix() * -position;
+    double rot_pos_r = position.mag();
+    double rot_pos_ct = rot_pos[2] / rot_pos.mag();
+    double rot_pos_p = atan2(rot_pos[1], rot_pos[0]);
+    cdouble x_torque = 0;
+    cdouble y_torque = 0;
+    cdouble z_torque = 0;
     for (uint l = 0; l <= maxjl; l++) {
         for (int m = -l; m <= (int)l; m++) {
             nowjlm = 0;
@@ -162,9 +162,9 @@ Vector3 Asteroid::get_torque() {
         }
     }
     //std::cout << x_torque << ' ' << y_torque << ' ' << z_torque << std::endl;
-    return Vector3({-std::move(x_torque.imag()),
-        std::move(y_torque.real()),
-        std::move(-z_torque.imag())})
+    return Vector3({-x_torque.imag(),
+        y_torque.real(),
+        -z_torque.imag()})
         * -0.5 * G;
 }
 
@@ -183,13 +183,27 @@ void Asteroid::update_orientation(double dt) {
         (torque[2] + (moi[0] - moi[1]) * spin[0] * spin[1]) / moi[2],
     });
 
+    if (isnan(omegaDot[0])) {
+        std::cout << spin << std::endl;
+        std::cout << torque << std::endl;
+        std::cout << orientation << std::endl;
+        std::cin >> time;
+    }
+
     spin += dt * omegaDot;
 
     d_quat = 0.5 * Quaternion(0, spin[0], spin[1], spin[2]) * orientation;
     orientation += d_quat * dt;
 
+    if (orientation.mag() == 0) {
+        std::cout << spin << std::endl;
+        std::cout << torque << std::endl;
+        std::cout << orientation << std::endl;
+        std::cin >> time;
+    }
+
     #ifdef _DEBUG
-    max_quat_mag = max(max_quat_mag, d_quat.mag());
+    max_quat_mag = max_me(max_quat_mag, d_quat.mag());
     #endif
 
     orientation /= orientation.mag();
