@@ -5,22 +5,8 @@
 
 #include "../sim/backend.hpp"
 #include "../sim/algebra.hpp"
-#include "../sim/triangle.hpp"
 
 #define CADENCE 3600.0 // Seconds between record
-
-/* Expected format for params.dat:
-L n m
-C00
-C1-1 C10 C11
-<...>
-rho00 rho01 rho02 rho03 rho04 rho05
-<...>
-spinx, spiny, spinz
-impact parameter
-velocity mps
-central mass
-*/
 
 int main(int argc, char* argv[]) {
     // Open files
@@ -61,58 +47,46 @@ int main(int argc, char* argv[]) {
     ss = std::istringstream (line);
     ss >> x;
     ss >> y;
-    int maxjl = std::stoi(x);
-    int maxml = std::stoi(y);
+    uint maxjl = std::stoi(x);
+    uint maxkl = std::stoi(y);
 
     // Jlms
-    std::vector<cdouble> jlms;
-    double re = 0;
-    double im = 0;
-    for (int l = 0; l <= maxjl; l++){
-        bool written = true;
+    std::vector<cdouble> halfjlms;// 22, 21, 20, 33, 32, 31, 30
+    for (uint l = 0; l <= maxjl; l++){
         std::getline(f, line);
         ss = std::istringstream (line);
-        for (int m = -l; m <= l; m++) {
-            ss >> word;
-            if (written) {
-                re = std::stod(word);
-            }
-            else{
-                im = std::stod(word);
-                jlms.push_back({re, im});
-            }
-            written = !written;
+        for (int m = -l; m < (int)l; m+=2) {
+            ss >> x >> y;
+            halfjlms.push_back({std::stod(x), std::stod(y)});
         }
-        jlms.push_back({re, 0});
+        ss >> x;
+        halfjlms.push_back({std::stod(x), 0});
     }
 
     // Mlms
-    std::vector<cdouble> mlms;
-    re = 0;
-    im = 0;
-    for (int l = 2; l <= maxml; l++){
-        bool written = true;
+    std::vector<cdouble> halfklms;
+    for (uint l = 0; l <= maxkl; l++){
         std::getline(f, line);
         ss = std::istringstream (line);
-        for (int m = -l; m <= l; m++) {
-            ss >> word;
-            if (written) {
-                re = std::stod(word);
-            }
-            else {
-                im = std::stod(word);
-                mlms.push_back({re, im});
-            }
-            written = !written;
+        for (int m = -l; m < (int)l; m+=2) {
+            ss >> x >> y;
+            halfklms.push_back({std::stod(x), std::stod(y)});
         }
-        mlms.push_back({re, 0});
+        ss >> x;
+        halfklms.push_back({std::stod(x), 0});
     }
 
     // Spin
     std::getline(f, line);
     ss = std::istringstream (line);
-    ss >> x;
-    double spin = std::stod(x);
+    ss >> x >> y >> z;
+    Vector3 spin = Vector3({std::stod(x), std::stod(y), std::stod(z)});
+
+    // Initial roll
+    std::getline(f, line);
+    ss = std::istringstream (line);
+    ss >> word;
+    double initial_roll = std::stod(word);
 
     // Impact parameter
     std::getline(f, line);
@@ -126,13 +100,33 @@ int main(int argc, char* argv[]) {
     ss >> word;
     double speed = std::stod(word);
 
-    for(auto m : mlms) {
-        std::cout << m << std::endl;
+    std::vector<cdouble> jlms, klms;
+    for (uint l = 0; l <= maxjl; l++) {
+        for (int m = -l; m <= (int)l; m++) {
+            if (m < 0) {
+                jlms.push_back(std::conj(halfjlms[l * (l + 1) / 2 + l - abs(m)])
+                    * (double)parity(m));
+            }
+            else {
+                jlms.push_back(halfjlms[l * (l + 1) / 2 + l - abs(m)]);
+            }
+        }
+    }
+    for (uint l = 0; l <= maxkl; l++) {
+        for (int m = -l; m <= (int)l; m++) {
+            if (m < 0) {
+                klms.push_back(std::conj(halfklms[l * (l + 1) / 2 + l - abs(m)])
+                    * (double)parity(m));
+            }
+            else {
+                klms.push_back(halfklms[l * (l + 1) / 2 + l - abs(m)]);
+            }
+        }
     }
 
 
     // Load asteroid
-    Asteroid asteroid(jlms, mlms, spin,
+    Asteroid asteroid(jlms, klms, spin, initial_roll,
         impact_parameter, speed);
 
     // Run asteroid

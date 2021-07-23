@@ -4,11 +4,15 @@ This code generates data for a simulated asteroid over its flyby. A description 
 ```
 Jlmax, Mlmax
 J00
-J11Re J11Im J00Re
+J11Re J11Im J10Re
 <...other Jlms...>
-M22Re M22Im M21Re M21Im M20Im
+M00
+0 0 0
+M22Re 0 0 0 M20Re
+M33Re M33Im M32Re M32Im M31Re M31Im M30Re
 <...other Mlms...>
-spin_mag
+spinx spiny spinz
+initial roll
 impact parameter
 velocity
 ```

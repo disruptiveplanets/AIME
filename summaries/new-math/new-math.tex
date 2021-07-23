@@ -711,49 +711,40 @@ Note that $\K_{lm}$ are constants, since we are using coordinates fixed to the b
 $$Y_{lm}(\bm r') = \sum_{m'=-l}^l\sqrt{\frac{(l+m)!}{(l-m)!}\frac{(l-m')!}{(l+m')!}}\parens{D^l_{mm'}(\R}^*Y_{lm'}(\bm r),$$
 where $\R$ indicates a rotation, and $\bm r' = \R \bm r$. Generally, $\R$ is represented by Euler angles.
 
-Let $\R$ rotate from the body-fixed axes to some inertial coordinate system. Then we must rotate both the $S$ in equation \ref{eqn:complex-torque} and the $\J_{lm}$, the latter of which rotate by
+Let $\R$ rotate from the body-fixed axes to some inertial coordinate system. We choose this coordinate system so that the orbit of the asteroid lies in the $xz$-plane, but the exact orientation of the axes is left to the reader. The constants $\J_{lm}$ are then fixed in this frame at $\J_{lm}^0$. Then we must rotate both the $\J_{lm}$ in equation \ref{eqn:complex-torque} according to
 \begin{equation*}
 \begin{aligned}
 \J^\text{rot}_{lm} =&\sum_{m'=-l}^l\sqrt{\frac{(l-m')!}{(l-m)!}\frac{(l+m')!}{(l+m)!}}\parens{D^l_{mm'}(t)}^*\J_{lm'}.
 \end{aligned}
 \end{equation*}
-We also have
-$$S_{lm}(\bm r') = \sum_{m'=-l}^l \sqrt{\frac{(l+m)!}{(l-m')!} \frac{(l-m)!}{(l+m')!}} \parens{D^l_{mm'}(\R}^*S_{lm'}(\bm r)$$
 Thus, equation \ref{eqn:complex-torque} becomes
 \begin{equation*}
 \begin{aligned}
-\bm \tau = &-\frac{1}{2}\sum_{lm}(-1)^l\sum_{l'm'}\\
+\bm \tau = &-\frac{1}{2}\sum_{lm}(-1)^l\sum_{l'm'}S_{l+l',m+m'}(\bm D)\\
 &\brackets{\sum_{m''=-l}^l\sqrt{\frac{(l-m'')!}{(l-m)!}\frac{(l+m'')!}{(l+m)!}}\parens{D^l_{mm''}(\R)}^*\J_{lm''}^0}\\
-&\bigg[\sum_{m''=-l-l'}^{l+l'} \sqrt{\frac{(l+l'+m+m')!}{(l+l'-m'')!}\frac{(l+l'-m-m')!}{(l+l'+m'')!}}\\
-&\parens{D^{l+l'}_{m+m',m''}(\R)}^*S_{l+l',m''}(\bm D^0)\bigg]\\
 &\bigg[(i\x + \y)(l'-m'+1)\K^*_{l',m'-1}\\
 &+(i\x-\y)(l'+m'+1)\K^*_{l',m'+1}+2im'\z \K^*_{l'm'}\bigg].
+\label{eqn:torque-final}
 \end{aligned}
 \end{equation*}
-where $\J_{lm}^0$ and $\bm D^0$ are the values of $\J_{lm}$ and $\bm D$ with respect to the inertial reference frame. There is some subtlety with $\bm D^0$; the length changes over the course of the orbit, so $\bm D^0$ must have length equal to the length of $\bm D$ at the moment of calculation, but its direction is constant.
+The only value left unfixed is the body-fixed coordinate system. We fix it to the principal axes of the asteroid, so that $\z$ aligns with the axis with maximal inertia. Then $\bm\omega = \omega \z$ initially in the body-fixed system. Now everything is determined; the choice of $\J_{lm}$ determines position and velocity $\bm D$ and $\bm v$ which evolve via the linear equation of motion, equation \ref{eqn:linear-eom}. The body's initial orientation--unknown when the spin axis has not been resolved and known up to a roll parameter when the spin axis is resolved---fixes the initial orientation, represented by $\R$. The orientation and angular velocity $\omega$ then evolve according to equation \ref{eqn:euler}, which references the torque displayed in equation \ref{eqn:torque-final}.
 
- We have some freedom in our choice of inertial coordinate system, so let us choose $\z$ to point towards the planet; $\bm D^0 \propto \z$. Then
-$$S_{l+l',m+m'}(\bm D^0) = (-1)^{m} \frac{(l-m)!}{D^{1+l}} P_{lm}(1)e^{im\phi}.$$
-The requirement that $\phi \in \mathbb{R}$ all give the same answer means $m=0$ is necessary, and since $P_{l0}(1)=1$,
-$$S_{l+l',m+m'}(\bm D^0) = \frac{l!}{D^{1+l}}\delta_{m0}.$$
-Thus,
-\begin{equation*}
+In practice, we represent the orientation as a quaternion $\bm q$ and evolve it according to the quaternion equation of motion
+$$\dot {\bm q} = \frac{1}{2}\bm \omega \bm q$$
+and we extract Euler angles from it to get $\R$, and a matrix from it to convert $\bm D$. from the inertial axes to the body-fixed system.
+
+A benefit to requiring that the body-fixed system be aligned with principal axes is that, in this regime, equation \ref{eqn:euler} simplifies to
+\begin{equation}
 \begin{aligned}
-\bm \tau = &-\frac{1}{2}\sum_{lm}(-1)^l\sum_{l'm'}\\
-&\brackets{\sum_{m''=-l}^l\sqrt{\frac{(l-m'')!}{(l-m)!}\frac{(l+m'')!}{(l+m)!}}\parens{D^l_{mm''}(\R)}^*\J_{lm''}^0}\\
-&\bigg[\sqrt{\frac{(l+l'+m+m')!}{(l+l')!}\frac{(l+l'-m-m')!}{(l+l')!}}\\
-&\parens{D^{l+l'}_{m+m',0}(\R)}^*\frac{(l+l')!}{D^{1+l+l'}}\bigg]\\
-&\bigg[(i\x + \y)(l'-m'+1)\K^*_{l',m'-1}\\
-&+(i\x-\y)(l'+m'+1)\K^*_{l',m'+1}+2im'\z \K^*_{l'm'}\bigg].\\
-= &-\frac{1}{2}\sum_{lm}(-1)^l\sum_{l'm'}\frac{\sqrt{(l+l'+m+m')!(l+l'-m-m')!}}{D^{1+l+l'}}\\
-&\brackets{\sum_{m''=-l}^l\sqrt{\frac{(l-m'')!}{(l-m)!}\frac{(l+m'')!}{(l+m)!}}\parens{D^l_{mm''}(\R)}^*\J_{lm''}^0}\\
-&\parens{D^{l+l'}_{m+m',0}(\R)}^*\bigg[(i\x + \y)(l'-m'+1)\K^*_{l',m'-1}\\
-&+(i\x-\y)(l'+m'+1)\K^*_{l',m'+1}+2im'\z \K^*_{l'm'}\bigg].
+\dot \omega_x = I_x^{-1}\parens{\tau_x + (I_y - I_z)\omega_y \omega_z}\\
+\dot \omega_y = I_y^{-1}\parens{\tau_y + (I_z - I_x)\omega_z \omega_x}\\
+\dot \omega_z = I_z^{-1}\parens{\tau_z + (I_x - I_y)\omega_x \omega_y}\\
 \end{aligned}
-\end{equation*}
-We have a little more freedom in our inertial coordinate system; we have not specified which direction $\bm D^0$ points to. We may do this by demanding that $\bm D^0=\hat z$ at the beginning of the simulation; in other words, the body-fixed and inertial coordinates coincide there. We have then determined $\R(t)$, which has initial condition $\R(t)=\mathbb{I}]$ and evolves according to $\dot \R = \omega$ in some sense.
+\end{equation}
+and the inertial matrix is diagonal, meaning that
+$$\K_{21} = \K_{2,-1}=\Im K_{22} = \Im K_{2,-2}= 0.$$
+The only free parameters with $l\leq 2$ are $\K_{00}$, $\K_{20}$, and $\Re \K_{22}$, which is three total.
 
-However, we have still not fully specified the problem, because the body-fixed coordinate system has not been identified. We will allow the end user to specify this coordinate system evaluating $\J_{lm}$ with respect to these axes. Therefore, the choice of $\J_{lm}$ determines the body-fixed coordinate system which controls $\K_{lm}$, and the angular and linear equations of motion (eqs.~\ref{eqn:linear-eom} and \ref{eqn:euler}) combined with initial conditions $\bm D(0)=D\z$ and $\bm v$ set to its observed value, and angular initial conditions of $\R(0)=\mathbb{I}$ and $\omega$ set to a known value or an estimate.
 
 
 \section{Evolution of Euler Angles}
@@ -776,6 +767,7 @@ $$\frac{d}{dt}\parens{R_z(\alpha)R_y(\beta)R_z(\gamma)} = \parens{\begin{matrix}
  \omega_z & 0 & -\omega_x \\
  -\omega_y & \omega_x & 0
   \end{matrix}}.$$
+  This looks hard, so instead, I suggest using the old Quaternion strategy.
 
 
 

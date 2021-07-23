@@ -11,7 +11,6 @@
 #include <complex>
 
 #include "algebra.hpp"
-#include "triangle.hpp"
 #include "wignerd.hpp"
 
 #define MAX_DT 2.0
@@ -22,54 +21,42 @@
 #define NUM_THREADS 4
     // Torque at closest approach divided by torque at start of sim.
 #define G 6.67408e-11
-//#define _DEBUG
+#define _DEBUG
 
 using uint = unsigned int;
 using cdouble = std::complex<double>;
 
 class Asteroid {
 public:
-    Asteroid(const std::vector<cdouble> jlms, const std::vector<cdouble> mlms,
-        double spin, double impact_parameter, double speed);
+    Asteroid(const std::vector<cdouble> jlms, const std::vector<cdouble> klms,
+        Vector3 spin, double initial_roll,
+        double impact_parameter, double speed);
 
     int simulate(double cadence, std::vector<double>& resolved_data);
 
 private:
-    cdouble mlm(uint l, int m) const;
     cdouble jlm(uint l, int m) const;
-    cdouble nowmlm(uint l, int m) const;
-    cdouble nowjlm(uint l, int m) const;
-    void set_nowmlm(uint l, int m, cdouble val);
-    void set_nowjlm(uint l, int m, cdouble val);
-    void calculate_moi();
+    cdouble klm(uint l, int m) const;
+    void calculate_moi(double initial_roll);
     void set_pos(double impact_parameter);
-    void update_mlms();
-    void update_jlms();
-
     Vector3 get_torque();
     void update_position(double dt);
     void update_orientation(double dt);
-    Vector3 get_rot_ang_mom();
-    Matrix3 global_to_inertial() const;
-    Matrix3 inertial_to_global() const;
 
 private:
-    uint maxml;
     uint maxjl;
+    uint maxkl;
 
     const std::vector<cdouble> jlms;
-    const std::vector<cdouble> mlms;
-    std::vector<cdouble> nowjlms;
-    std::vector<cdouble> nowmlms;
+    const std::vector<cdouble> klms;
 
-    Matrix3 moi;
-    Matrix3 moiInverse;
+    Vector3 moi;
     double edge_dist; // Limit of the integration region
     Vector3 position;
     Vector3 velocity;
     Vector3 spin;
     double mu;
-    Quaternion orientation;
+    Quaternion orientation;// Global to local
     double time;
     std::array<double, 3> moi_evals;
     std::array<Vector3, 3> moi_evecs;
@@ -89,10 +76,22 @@ private:
     // Variables defined globally for computational efficiency
     Vector3 accel;
     Vector3 Omega;
-    Matrix3 inv_mat;
-    Matrix3 moiGlobal;
-    Matrix3 moiGlobalInverse;;
     Vector3 torque;
     Vector3 omegaDot;
     Quaternion d_quat;
+
+
+
+
+
+    std::array<double, 3> angles;
+    Vector3 rot_pos;
+    cdouble x_torque;
+    cdouble y_torque;
+    cdouble z_torque;
+    double rot_pos_r;
+    double rot_pos_ct;
+    double rot_pos_p;
+    cdouble nowjlm;
+    cdouble prelpmp;
 };

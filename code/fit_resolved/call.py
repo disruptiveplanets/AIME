@@ -3,7 +3,7 @@ import asteroids, time
 CADENCE = 3600.0
 
 jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
-mlms = [
+klms = [
     1, 2, 3, 4, 5,#m2
     0, 0, 0, 0, 0, 0, 0 #m3
     ]

@@ -4,9 +4,14 @@
 #include <math.h>
 #include <iostream>
 #include <complex>
+#include <boost/math/special_functions/spherical_harmonic.hpp>
+
+#include "wignerd.hpp"
 
 #define PI 3.141592653589793438462643383
 #define EPSILON 1e-10
+
+using cdouble = std::complex<double>;
 
 class Vector3;
 

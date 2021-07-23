@@ -8,12 +8,14 @@
 
 #define max(a, b) ((a) < (b) ? (b) : (a))
 #define min(a, b) ((a) > (b) ? (b) : (a))
-#define sign(a) ((a) % 2 == 0 ? (1) : (-1))
+#define parity(a) ((a) % 2 == 0 ? (1) : (-1))
 
 using uint = unsigned int;
 using cdouble = std::complex<double>;
 
 uint fact(uint i);
+uint choose(uint a, uint b);
+double gen_choose(double a, uint b);
 
 class DMatGen {
 public:
@@ -30,3 +32,6 @@ private:
     cdouble alpha;
     cdouble gamma;
 };
+
+cdouble slm_c(uint l, int m, double r, double costheta, double phi);
+cdouble ylm_c(uint l, int m, double costheta, double phi);
