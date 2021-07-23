@@ -1,15 +1,10 @@
 #include "backend.hpp"
 
-Asteroid::Asteroid(const std::vector<cdouble> jlms,
-    const std::vector<cdouble> klms, Vector3 spin, double initial_roll,
+Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms,
+    Vector3 spin, double initial_roll,
     double impact_parameter, double speed) :
     jlms(jlms), klms(klms), velocity(Vector3({0, 0, speed})),
     spin(spin), mu(jlms[0].real() * G) {
-
-    maxkl = sqrt(klms.size()) - 1;
-    maxjl = sqrt(jlms.size()) - 1;
-    assert((maxkl + 1) * (maxkl + 1) == klms.size());
-    assert((maxjl + 1) * (maxjl + 1) == jlms.size());
 
     calculate_moi(initial_roll);
     set_pos(impact_parameter);
@@ -126,16 +121,16 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
 }
 
 Vector3 Asteroid::get_torque() {
-    auto angles = orientation.euler_angles();
+    angles = orientation.euler_angles();
     DMatGen dgen = DMatGen(angles[0], angles[1], angles[2]);
-    Vector3 rot_pos = orientation.matrix() * -position;
-    double rot_pos_r = position.mag();
-    double rot_pos_ct = rot_pos[2] / rot_pos.mag();
-    double rot_pos_p = atan2(rot_pos[1], rot_pos[0]);
-    cdouble x_torque = 0;
-    cdouble y_torque = 0;
-    cdouble z_torque = 0;
-    for (uint l = 0; l <= maxjl; l++) {
+    rot_pos = orientation.matrix() * -position;
+    rot_pos_r = position.mag();
+    rot_pos_ct = rot_pos[2] / rot_pos.mag();
+    rot_pos_p = atan2(rot_pos[1], rot_pos[0]);
+    x_torque = 0;
+    y_torque = 0;
+    z_torque = 0;
+    for (uint l = 0; l <= ASTEROIDS_MAX_J; l++) {
         for (int m = -l; m <= (int)l; m++) {
             nowjlm = 0;
             for (int mpp = -l; mpp <= (int)l; mpp++) {
@@ -143,7 +138,7 @@ Vector3 Asteroid::get_torque() {
                     * std::conj(dgen(l,m,mpp)) * jlm(l,mpp);
             }
             nowjlm *= (double)parity(l) / sqrt(fact(l-m) * fact(l+m));
-            for (uint lp = 2; lp <= maxkl; lp++) {
+            for (uint lp = 2; lp <= ASTEROIDS_MAX_K; lp++) {
                 for (int mp = -lp; mp <= (int)lp; mp++) {
                     prelpmp = nowjlm * slm_c(l + lp, m + mp,
                         rot_pos_r, rot_pos_ct, rot_pos_p);
@@ -162,9 +157,9 @@ Vector3 Asteroid::get_torque() {
         }
     }
     //std::cout << x_torque << ' ' << y_torque << ' ' << z_torque << std::endl;
-    return Vector3({-x_torque.imag(),
-        y_torque.real(),
-        -z_torque.imag()})
+    return Vector3({-std::move(x_torque.imag()),
+        std::move(y_torque.real()),
+        -std::move(z_torque.imag())})
         * -0.5 * G;
 }
 

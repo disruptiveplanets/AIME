@@ -13,6 +13,9 @@
 #include "algebra.hpp"
 #include "wignerd.hpp"
 
+#define ASTEROIDS_MAX_J 1
+#define ASTEROIDS_MAX_K 3
+
 #define MAX_DT 2.0
 #define MIN_DT 1.0e-0
 #define DT_POWER 1// 5M
@@ -28,7 +31,7 @@ using cdouble = std::complex<double>;
 
 class Asteroid {
 public:
-    Asteroid(const std::vector<cdouble> jlms, const std::vector<cdouble> klms,
+    Asteroid(const cdouble* jlms, const cdouble* klms,
         Vector3 spin, double initial_roll,
         double impact_parameter, double speed);
 
@@ -44,11 +47,8 @@ private:
     void update_orientation(double dt);
 
 private:
-    uint maxjl;
-    uint maxkl;
-
-    const std::vector<cdouble> jlms;
-    const std::vector<cdouble> klms;
+    const cdouble* jlms;
+    const cdouble* klms;
 
     Vector3 moi;
     double edge_dist; // Limit of the integration region
@@ -79,17 +79,10 @@ private:
     Vector3 torque;
     Vector3 omegaDot;
     Quaternion d_quat;
-
-
-
-
-
     std::array<double, 3> angles;
     Vector3 rot_pos;
-    //cdouble x_torque, y_torque, z_torque;
-    double rot_pos_r;
-    double rot_pos_ct;
-    double rot_pos_p;
+    cdouble x_torque, y_torque, z_torque;
+    double rot_pos_r, rot_pos_ct, rot_pos_p;
     cdouble nowjlm;
     cdouble prelpmp;
 };

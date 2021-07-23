@@ -100,33 +100,40 @@ int main(int argc, char* argv[]) {
     ss >> word;
     double speed = std::stod(word);
 
-    std::vector<cdouble> jlms, klms;
+    cdouble jlms[(ASTEROIDS_MAX_J+1) * (ASTEROIDS_MAX_J+1)];
+    cdouble klms[(ASTEROIDS_MAX_K+1) * (ASTEROIDS_MAX_K+1)];
+    uint j = 0;
     for (uint l = 0; l <= maxjl; l++) {
         for (int m = -l; m <= (int)l; m++) {
+            assert(j < (ASTEROIDS_MAX_J+1) * (ASTEROIDS_MAX_J+1));
             if (m < 0) {
-                jlms.push_back(std::conj(halfjlms[l * (l + 1) / 2 + l - abs(m)])
-                    * (double)parity(m));
+                jlms[j] = std::conj(halfjlms[l * (l + 1) / 2 + l - abs(m)])
+                    * (double)parity(m);
             }
             else {
-                jlms.push_back(halfjlms[l * (l + 1) / 2 + l - abs(m)]);
+                jlms[j] = halfjlms[l * (l + 1) / 2 + l - abs(m)];
             }
+            j++;
         }
     }
+    uint k = 0;
     for (uint l = 0; l <= maxkl; l++) {
         for (int m = -l; m <= (int)l; m++) {
+            assert(k < (ASTEROIDS_MAX_K+1) * (ASTEROIDS_MAX_K+1));
             if (m < 0) {
-                klms.push_back(std::conj(halfklms[l * (l + 1) / 2 + l - abs(m)])
-                    * (double)parity(m));
+                klms[k] = std::conj(halfklms[l * (l + 1) / 2 + l - abs(m)])
+                    * (double)parity(m);
             }
             else {
-                klms.push_back(halfklms[l * (l + 1) / 2 + l - abs(m)]);
+                klms[k] = halfklms[l * (l + 1) / 2 + l - abs(m)];
             }
+            k++;
         }
     }
 
 
     // Load asteroid
-    Asteroid asteroid(jlms, klms, spin, initial_roll,
+    Asteroid asteroid(&jlms[0], &klms[0], spin, initial_roll,
         impact_parameter, speed);
 
     // Run asteroid
