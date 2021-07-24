@@ -28,4 +28,4 @@ I'm recording (L, n, m), as well as the time on my laptop and the supercomputer 
 
 |Parameterization id | Local time | Supercomputer time |
 |--------------------|------------|--------------------|
-| J=1, M=2           | 45:55:--   | ?                  |
+| J=1, M=2           | 45:55:--   | 18:06 (multi)      |
