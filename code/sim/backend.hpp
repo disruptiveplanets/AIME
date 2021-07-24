@@ -8,13 +8,20 @@
 #include <iostream>
 #include <deque>
 #include <assert.h>
+#include <stdexcept>
 #include <complex>
 
 #include "algebra.hpp"
 #include "wignerd.hpp"
 
+
+
+
 #define ASTEROIDS_MAX_J 1
-#define ASTEROIDS_MAX_K 3
+#define ASTEROIDS_MAX_K 2
+
+
+
 
 #define MAX_DT 2.0
 #define MIN_DT 1.0e-0
@@ -24,7 +31,7 @@
 #define NUM_THREADS 4
     // Torque at closest approach divided by torque at start of sim.
 #define G 6.67408e-11
-#define _DEBUG
+//#define _DEBUG
 
 using uint = unsigned int;
 using cdouble = std::complex<double>;

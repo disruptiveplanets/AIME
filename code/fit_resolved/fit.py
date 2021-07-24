@@ -10,6 +10,8 @@ REGENERATE_DATA = False
 N_WALKERS = 32
 N_STEPS = 5000
 
+ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
+
 MULTIPROCESSING = True
 
 reload = False
@@ -20,28 +22,29 @@ if len(sys.argv) == 2:
 
 np.random.seed(123)
 
-spin = 0.000050189
+spin = [0.00012, 0.00012, 0.00012]
 impact_parameter = 5 * EARTH_RADIUS
 speed = 4000
 jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+klms = [
+    1e6, 1e5, 5e5,
+    0, 0, 0, 0, 0, 0, 0 #m3
+    ]
 
 theta_true = (
-    1.1441, -1.01513, 0.5123, 0.97821, -0.57123,#m2
+    0, 1.2e6, 1.1e5, -4.9e5,
 )
 theta_start = (
-    1.1, -1.0, 0.5, 1.0, -0.6,#m2
+    0.1, 1.0e6, 1.0e5, -5.0e5,
 )
-L = int(np.sqrt(len(theta_true)+4))
-theta_range = ((-5, 5),) * len(theta_start)
-theta_labels = []
-for l in range(2, L):
-    for m in range(-l, l+1):
-        theta_labels.append("M" + str(l) + ',' + str(m))
+theta_range = (
+    (0, 2 * np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
 
 def fit_function(theta):
     #start = time.time()
-    resolved_data = asteroids.simulate(CADENCE, jlms, theta, spin,
-        impact_parameter, speed)
+    resolved_data = asteroids.simulate(CADENCE, jlms, theta[1:],
+        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed)
     #print(time.time() - start)
     return resolved_data
 
@@ -78,11 +81,16 @@ plt.ylabel("Spin (rad/s)")
 plt.legend()
 plt.show()
 
-
+# Confirm that theta start works.
+asteroids.simulate(CADENCE, jlms, theta_start[1:],
+    spin[0], spin[1], spin[2], theta_start[0], impact_parameter, speed)
 
 def log_likelihood(theta, y, yerr):
     # Normal likelihood
-    model = fit_function(theta)
+    try:
+        model = fit_function(theta)
+    except RuntimeError:
+        return -np.inf # Zero likelihood
     sigma2 = yerr ** 2
     return -0.5 * np.sum((y - model) ** 2 / sigma2 + np.log(sigma2))
 

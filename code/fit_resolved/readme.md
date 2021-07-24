@@ -9,9 +9,10 @@ The mcmc checkpoints are saved in `asteroids.h5`, which is excluded from the git
 On the first day of implementing the MCMC, I realized that torque can be written in terms of moment of inertia, which means that the time to run the simulation should be based only on the matrix multiplication and number of integration steps. No dependence on L, n,  should be found; if there is any, it's an implementation mistake. It's a good test to check this.
 
 ## Use
-Simply run `python fit.py`. The true parameterization to be used is written into the python file.
+Simply run `python fit.py`. The true parameterization to be used is written into the python file. If you want to reload an old h5 file and continue the fit, do so with `python fit.py reload`
 
 ## Done
+* Get working locally
 * First run done on Supercloud
 * Capability to add to old runs
 * Ability to display data
@@ -27,4 +28,4 @@ I'm recording (L, n, m), as well as the time on my laptop and the supercomputer 
 
 |Parameterization id | Local time | Supercomputer time |
 |--------------------|------------|--------------------|
-| 1 (1, 1, 1)        | 58:45:--   | ?                  |
+| J=1, M=2           | 45:55:--   | ?                  |

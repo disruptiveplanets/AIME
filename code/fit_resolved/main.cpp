@@ -5,38 +5,75 @@
 
 #include "../sim/backend.hpp"
 #include "../sim/algebra.hpp"
-#include "../sim/triangle.hpp"
 
 using cdouble = std::complex<double>;
 
 std::vector<double> simulate(double cadence, const std::vector<double> jlms_raw,
-    const std::vector<double> mlms_raw, double spin, double impact_parameter,
-    double speed) {
+    const std::vector<double> klms_raw, double spinx, double spiny, double spinz,
+    double initial_roll, double impact_parameter, double speed) {
 
-    int maxjl = sqrt(jlms_raw.size()) - 1;
-    int maxml = sqrt(mlms_raw.size()+4) - 1;
-
-    std::vector<cdouble> jlms;
+    std::vector<cdouble> halfjlms;
     auto jlm_raw_iter = jlms_raw.begin();
-    for (int l = 0; l <= maxjl; l++){
+    for (int l = 0; l <= ASTEROIDS_MAX_J; l++){
         if (l != 0) {
             for (int m = 1; m <= l; m++) {
-                jlms.push_back({*jlm_raw_iter++, *jlm_raw_iter++});
+                halfjlms.push_back({*jlm_raw_iter++, *jlm_raw_iter++});
             }
         }
-        jlms.push_back({*jlm_raw_iter++, 0});
+        halfjlms.push_back({*jlm_raw_iter++, 0});
     }
 
-    std::vector<cdouble> mlms;
-    auto mlm_raw_iter = mlms_raw.begin();
-    for (int l = 2; l <= maxml; l++){
+    std::vector<cdouble> halfklms;
+    auto klm_raw_iter = klms_raw.begin();
+    halfklms.push_back({*klm_raw_iter++, 0}); // K00
+    halfklms.push_back({0, 0}); // K11
+    halfklms.push_back({0, 0}); // K10
+    halfklms.push_back({*klm_raw_iter++, 0}); // K22
+    halfklms.push_back({0, 0}); // K20
+    halfklms.push_back({*klm_raw_iter++, 0}); // K20
+    for (int l = 3; l <= ASTEROIDS_MAX_K; l++){
         for (int m = 1; m <= l; m++) {
-            mlms.push_back({*mlm_raw_iter++, *mlm_raw_iter++});
+            halfklms.push_back({*klm_raw_iter++, *klm_raw_iter++});
         }
-        mlms.push_back({*mlm_raw_iter++, 0});
+        halfklms.push_back({*klm_raw_iter++, 0});
     }
 
-    Asteroid asteroid(jlms, mlms, spin, impact_parameter, speed);
+
+    // Make full jlms
+    cdouble jlms[(ASTEROIDS_MAX_J+1) * (ASTEROIDS_MAX_J+1)];
+    cdouble klms[(ASTEROIDS_MAX_K+1) * (ASTEROIDS_MAX_K+1)];
+    uint j = 0;
+    for (uint l = 0; l <= ASTEROIDS_MAX_J; l++) {
+        for (int m = -l; m <= (int)l; m++) {
+            assert(j < (ASTEROIDS_MAX_J+1) * (ASTEROIDS_MAX_J+1));
+            if (m < 0) {
+                jlms[j] = std::conj(halfjlms[l * (l + 1) / 2 + l - abs(m)])
+                    * (double)parity(m);
+            }
+            else {
+                jlms[j] = halfjlms[l * (l + 1) / 2 + l - abs(m)];
+            }
+            j++;
+        }
+    }
+    uint k = 0;
+    for (uint l = 0; l <= ASTEROIDS_MAX_K; l++) {
+        for (int m = -l; m <= (int)l; m++) {
+            assert(k < (ASTEROIDS_MAX_K+1) * (ASTEROIDS_MAX_K+1));
+            if (m < 0) {
+                klms[k] = std::conj(halfklms[l * (l + 1) / 2 + l - abs(m)])
+                    * (double)parity(m);
+            }
+            else {
+                klms[k] = halfklms[l * (l + 1) / 2 + l - abs(m)];
+            }
+            k++;
+        }
+    }
+
+
+    Asteroid asteroid(jlms, klms, Vector3({spinx, spiny, spinz}),
+        initial_roll, impact_parameter, speed);
 
     // Run asteroid
     std::vector<double> resolved_data;

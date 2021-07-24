@@ -50,6 +50,9 @@ int main(int argc, char* argv[]) {
     uint maxjl = std::stoi(x);
     uint maxkl = std::stoi(y);
 
+    assert(maxjl == ASTEROIDS_MAX_J);
+    assert(maxkl == ASTEROIDS_MAX_K);
+
     // Jlms
     std::vector<cdouble> halfjlms;// 22, 21, 20, 33, 32, 31, 30
     for (uint l = 0; l <= maxjl; l++){
@@ -103,7 +106,7 @@ int main(int argc, char* argv[]) {
     cdouble jlms[(ASTEROIDS_MAX_J+1) * (ASTEROIDS_MAX_J+1)];
     cdouble klms[(ASTEROIDS_MAX_K+1) * (ASTEROIDS_MAX_K+1)];
     uint j = 0;
-    for (uint l = 0; l <= maxjl; l++) {
+    for (uint l = 0; l <= ASTEROIDS_MAX_J; l++) {
         for (int m = -l; m <= (int)l; m++) {
             assert(j < (ASTEROIDS_MAX_J+1) * (ASTEROIDS_MAX_J+1));
             if (m < 0) {
@@ -117,7 +120,7 @@ int main(int argc, char* argv[]) {
         }
     }
     uint k = 0;
-    for (uint l = 0; l <= maxkl; l++) {
+    for (uint l = 0; l <= ASTEROIDS_MAX_K; l++) {
         for (int m = -l; m <= (int)l; m++) {
             assert(k < (ASTEROIDS_MAX_K+1) * (ASTEROIDS_MAX_K+1));
             if (m < 0) {

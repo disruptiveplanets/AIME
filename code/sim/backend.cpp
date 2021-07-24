@@ -9,9 +9,6 @@ Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms,
     calculate_moi(initial_roll);
     set_pos(impact_parameter);
 
-    //for(auto j : jlms) {std::cout << j << ' ';} std::cout << std::endl;
-    //for(auto j : klms) {std::cout << j << ' ';} std::cout << std::endl;
-
     #ifdef _DEBUG
     std::cout << "PARAMETERS:" << std::endl;
     std::cout << "MOI (local): " << moi << std::endl;
@@ -58,7 +55,10 @@ void Asteroid::calculate_moi(double initial_roll) {
     double Izz = (- 4 / 3.0 * klm(2, 0)).real()
         + sph;
 
-    assert(abs(Izz) > abs(Ixx) && abs(Izz) > abs(Iyy));
+    if (abs(Izz) < abs(Ixx) || abs(Izz) < abs(Iyy)) {
+        throw std::runtime_error(
+            "Moment of inertia was not maximized along z.");
+    }
 
     moi = Vector3({Ixx, Iyy, Izz});
 

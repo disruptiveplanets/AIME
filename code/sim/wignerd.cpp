@@ -66,10 +66,10 @@ cdouble ylm_c(uint l, int m, double costheta, double phi) {
     cdouble out = pow(2, l) * pow(1 - costheta * costheta, abs(m) / 2.0) * sum;
 
     if (m >= 0) {
-        return out * std::complex(cos(m * phi), sin(m * phi));
+        return out * cdouble(cos(m * phi), sin(m * phi));
     }
     else {
         return (double)parity(m) * fact(l + m) / fact(l - m) * out
-            * std::complex(cos(m * phi), sin(m * phi));
+            * cdouble(cos(m * phi), sin(m * phi));
     }
 }
