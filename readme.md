@@ -23,7 +23,10 @@ In both the resolved and unresolved cases, we will build a simulation to generat
 
 ## Not done:
 Immediate:
-4. Run a fit
+1. Get MPIexec working
+2. If necessary, do some math to reduce number of computations done in torque
+3. Has the integral converged?
+4. Runge Kutta?
 
 Later:
 1. Run fits with pure J2, J4, etc. coefficients.

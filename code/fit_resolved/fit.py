@@ -9,6 +9,7 @@ CADENCE = 3600.0
 REGENERATE_DATA = False
 N_WALKERS = 32
 N_STEPS = 5000
+REL_SIGMA = 0.1
 
 ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 
@@ -20,9 +21,9 @@ if len(sys.argv) == 2:
         reload = True
         REGENERATE_DATA = False
 
-np.random.seed(123)
+#np.random.seed(123)
 
-spin = [0.00012, 0.00012, 0.00012]
+spin = [0.00012, 0.00022, 0.00032]
 impact_parameter = 5 * EARTH_RADIUS
 speed = 4000
 jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
@@ -46,18 +47,22 @@ def fit_function(theta):
     resolved_data = asteroids.simulate(CADENCE, jlms, theta[1:],
         spin[0], spin[1], spin[2], theta[0], impact_parameter, speed)
     #print(time.time() - start)
-    return resolved_data
+    return np.asarray(resolved_data)
 
 def get_list_from_file(filename):
     f = open(filename, 'r')
     l = [float(line) for line in f.readlines()]
     f.close()
-    return l
+    return np.asarray(l)
 def save_to_file(filename, l):
     f = open(filename, 'w')
     for entry in l:
         f.write(str(entry) + '\n')
     f.close()
+
+def randomize(y):
+    yerr = y * REL_SIGMA
+    return y + np.random.randn(len(y)) * yerr, yerr
 
 # Generate some synthetic data from the model.
 if REGENERATE_DATA:
@@ -67,9 +72,9 @@ if REGENERATE_DATA:
     save_to_file("simulated-data.dat", y)
 else:
     y = get_list_from_file("simulated-data.dat")
+
 x = np.arange(len(y))
-yerr = np.abs(0.1 * np.random.rand(len(y)) * y)
-y += yerr * np.random.randn(len(y))
+y, yerr = randomize(y)
 
 plt.figure(figsize=(12, 4))
 x_display = np.arange(len(y) / 3)

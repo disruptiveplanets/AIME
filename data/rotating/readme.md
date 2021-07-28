@@ -24,4 +24,4 @@ theta_range = (
     (0, 2 * np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
 )
 ```
-Also randomized data.
+Also randomized data, `REL_SIGMA=0.1`
