@@ -27,11 +27,6 @@ spin = [0.00012, 0.00022, 0.00032]
 impact_parameter = 5 * EARTH_RADIUS
 speed = 4000
 jlms = [5.972e24, 0, 0, 4.972e22]
-klms = [
-    1e6, 1e5, 5e5,
-    0, 0, 0, 0, 0, 0, 0 #m3
-    ]
-
 theta_true = (
     0, 1.2e6, 1.1e5, -4.9e5,
 )

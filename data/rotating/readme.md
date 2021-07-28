@@ -25,7 +25,7 @@ theta_start = (
     0.1, 1.0e6, 1.0e5, -5.0e5,
 )
 theta_range = (
-    (0, 2 * np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+    (-np.pi, -np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
 )
 ```
 Also randomized data, `REL_SIGMA=0.1`
@@ -41,7 +41,7 @@ theta_start = (
     0.1, 1.0e6, 1.0e5, -5.0e5,
 )
 theta_range = (
-    (0, 2 * np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
 )
 ```
 Also randomized data, `REL_SIGMA=0.1`
