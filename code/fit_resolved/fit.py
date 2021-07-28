@@ -5,8 +5,8 @@ from multiprocessing import Pool
 
 EARTH_RADIUS = 6370000
 EARTH_MASS =5.972e24
-CADENCE = 3600.0
-REGENERATE_DATA = False
+CADENCE = 60.0
+REGENERATE_DATA = True
 N_WALKERS = 32
 N_STEPS = 5000
 REL_SIGMA = 0.1
@@ -26,7 +26,7 @@ if len(sys.argv) == 2:
 spin = [0.00012, 0.00022, 0.00032]
 impact_parameter = 5 * EARTH_RADIUS
 speed = 4000
-jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+jlms = [5.972e24, 0, 0, 4.972e22]
 klms = [
     1e6, 1e5, 5e5,
     0, 0, 0, 0, 0, 0, 0 #m3
@@ -39,7 +39,7 @@ theta_start = (
     0.1, 1.0e6, 1.0e5, -5.0e5,
 )
 theta_range = (
-    (0, 2 * np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
 )
 
 def fit_function(theta):
