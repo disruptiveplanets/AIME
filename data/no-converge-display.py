@@ -37,7 +37,7 @@ print("flat log prob shape: {0}".format(log_prob_samples.shape))
 #print("flat log prior shape: {0}".format(log_prior_samples.shape))
 
 fig, axes = plt.subplots(len(theta_true), figsize=(10, 7), sharex=True)
-samples = reader.get_chain()
+samples = reader.get_chain(discard=burnin, thin=thin)
 for i in range(ndim):
     ax = axes[i]
     ax.plot(samples[:, :, i], "k", alpha=0.3)
@@ -49,12 +49,13 @@ axes[-1].set_xlabel("step number");
 
 plt.show()
 
-flat_samples = reader.get_chain(discard=100, thin=15, flat=True)
+flat_samples = reader.get_chain(discard=burnin, thin=thin, flat=True)
 print(flat_samples.shape)
 
 fig = corner.corner(
     flat_samples, labels=theta_labels, truths=theta_true
 );
+plt.savefig(bare_name+".png")
 plt.show()
 
 for i in range(ndim):

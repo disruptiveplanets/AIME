@@ -25,7 +25,7 @@ theta_range = (
 CADENCE = 3600.0
 REGENERATE_DATA = True
 N_WALKERS = 32
-N_STEPS = 5000
+N_STEPS = 7500
 SIGMA = 0.2 * np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
 
 ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
@@ -99,7 +99,10 @@ def log_prior(theta):
     return 0.0
 
 def log_probability(theta, x, y, yerr):
-    return log_prior(theta) + log_likelihood(theta, y, yerr)
+    prior = log_prior(theta)
+    if not np.isfinite(prior):
+        return -np.inf
+    return prior + log_likelihood(theta, y, yerr)
 
 pos = theta_start + 1e-4 * np.random.randn(N_WALKERS, len(theta_start))
 nwalkers, ndim = pos.shape
