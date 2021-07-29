@@ -771,6 +771,46 @@ $$\frac{d}{dt}\parens{R_z(\alpha)R_y(\beta)R_z(\gamma)} = \parens{\begin{matrix}
 
 
 
+\section{Shape model}
+When asteroid density is allowed to vary, there is not a direct connection between asteroid shape and $\K_{lm}$, because $\K_{lm}$ has two dimensions whereas shape parameters should have three: one for $\theta$, one for $\phi$, and one for $r$. This argument is far from rigorous and probably incorrect, but it poses a difficult problem to overcome.
+
+We could establish shape coordinates $C_{lmn}$ and allow $\K_{lm}$ to define a combination of $C_{lmn}$. This is made difficult, however, since there is no basis of functions orthogonal to $r^n$ for all $n \in \mathbb{N}$ over $\mathbb{R}$. The basis exists for $n < N$ for some $N$, and can be written in terms of the Legendre polynomials. But as $N\rightarrow\infty$, the basis functions get very squigally and they diverge in the limit. So, the combination would be more complicated than some kind of orthonormal basis.
+
+
+\subsection{Unfitted density}
+Suppose we don't want to deal with density distribution, as a start. Then there is a good shape model available to us. Let
+\begin{equation}
+    \rho(\bm r) = \sum_{lm} Y_{lm}^* \rho_{lm} \begin{cases}
+        1 & r < \R_{lm}\\
+        0 & \text{else}
+    \end{cases}.
+\end{equation}
+with $\rho_{lm} \in \mathbb{C}$, $\R_{lm} \in \mathbb{R}$. Then equation \ref{eqn:klm-def} becomes
+\begin{equation*}
+    \K_{lm} = \int r^2 dr \int d\Omega \sum_{l'm'} Y_{l'm'}^* R_{lm}(\bm r) \begin{cases}
+        \rho_{lm} & r < \R_{lm}\\
+        0 & \text{else}
+    \end{cases}.
+\end{equation*}
+Recall that $R_{lm}(\bm r) \propto Y_{lm}(\bm r)$, and
+$$\int d\Omega Y_{lm}Y^*_{l'm'} = \delta_{ll'}\delta_{mm'} \frac{4\pi (l+m)!}{(2l+1)(l-m)!}$$
+so
+\begin{equation*}
+    \K_{lm} = \frac{4\pi (-1)^m }{(2l+1)(l-m)!} \int r^{2+l} dr \begin{cases}
+        \rho_{lm} & r < \R_{lm}\\
+        0 & \text{else}
+    \end{cases}.
+\end{equation*}
+This in turn is
+\begin{equation*}
+    \K_{lm} = \parens{\frac{4\pi (-1)^m \rho_{lm}}{(2l+1)(l-m)!}} \parens{\frac{\R_{lm}^{3+l}}{3+l}}
+\end{equation*}
+Thus, there are three parameters $\rho_{lm}$ and $\R_{lm}$ to match with two parameters $\K_{lm}$ (counting complex numbers as two parameters), and the problem is nearly determined. Setting $\rho_{lm}$ independentently will cause it to be entirely determined.
+
+It is not at all clear that this setup will give us a good asteroid model, however. If all $\rho_{lm}$ were positive in some sense (they are complex after all), then the center would be denser than the edges. It would be better to have some holistic model without these sharp edges, but those will not integrate as well.
+
+\comment{I thought about a way of subdividing the sphere. Do that?}
+
 
 \bibliography{../asteroid-flybys.bib}
 \end{document}

@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     15689,        413]
-NotebookOptionsPosition[     14575,        386]
-NotebookOutlinePosition[     14966,        402]
-CellTagsIndexPosition[     14923,        399]
+NotebookDataLength[     18559,        492]
+NotebookOptionsPosition[     16811,        455]
+NotebookOutlinePosition[     17202,        471]
+CellTagsIndexPosition[     17159,        468]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -382,6 +382,75 @@ Cell[BoxData[
    3.835887979460703*^9, 3.835888061480816*^9}, 3.835888166568934*^9, {
    3.835888212163859*^9, 3.8358882502321672`*^9}},
  CellLabel->"Out[61]=",ExpressionUUID->"1286ce84-26c0-40a5-88b8-88d2047baaa9"]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{"(*", "Normalization", "*)"}]], "Input",
+ CellChangeTimes->{{3.8365064353248663`*^9, 
+  3.836506439619563*^9}},ExpressionUUID->"b6ca9754-f6ac-4340-b7a4-\
+212149d6be7d"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Integrate", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Ylm", "[", 
+     RowBox[{"2", ",", " ", "1", ",", " ", "\[Theta]", ",", " ", "\[Phi]"}], 
+     "]"}], 
+    RowBox[{"Conjugate", "[", 
+     RowBox[{"Ylm", "[", 
+      RowBox[{"2", ",", "1", ",", " ", "\[Theta]", ",", " ", "\[Phi]"}], 
+      "]"}], "]"}], " ", 
+    RowBox[{"Sin", "[", "\[Theta]", "]"}]}], ",", " ", 
+   RowBox[{"{", 
+    RowBox[{"\[Theta]", ",", " ", "0", ",", " ", "Pi"}], "}"}], ",", " ", 
+   RowBox[{"{", 
+    RowBox[{"\[Phi]", ",", " ", "0", ",", " ", 
+     RowBox[{"2", " ", "Pi"}]}], "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.8365062587318983`*^9, 3.83650636747691*^9}},
+ CellLabel->"In[13]:=",ExpressionUUID->"e080ada0-1716-4a50-b32b-a9c725916c44"],
+
+Cell[BoxData[
+ FractionBox[
+  RowBox[{"24", " ", "\[Pi]"}], "5"]], "Output",
+ CellChangeTimes->{{3.836506317645441*^9, 3.8365063680353394`*^9}},
+ CellLabel->"Out[13]=",ExpressionUUID->"5050aa0f-f289-4946-85ab-39683fe73e44"]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Tog", "[", 
+   RowBox[{"ln_", ",", "mn_"}], "]"}], ":=", 
+  RowBox[{"4", " ", "Pi", " ", 
+   FractionBox[
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{"ln", "+", "mn"}], ")"}], "!"}], 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"2", "ln"}], "+", "1"}], ")"}], 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"ln", "-", "mn"}], ")"}], "!"}]}]]}]}]], "Input",
+ CellChangeTimes->{{3.836506374740767*^9, 3.83650642733925*^9}},
+ CellLabel->"In[17]:=",ExpressionUUID->"b90c6a43-372c-4dbc-a40e-b378e2ba7f1b"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Tog", "[", 
+  RowBox[{"2", ",", "1"}], "]"}]], "Input",
+ CellChangeTimes->{{3.8365064285806227`*^9, 3.836506430243237*^9}},
+ CellLabel->"In[18]:=",ExpressionUUID->"43d55ac6-622d-493a-af26-5301cde95558"],
+
+Cell[BoxData[
+ FractionBox[
+  RowBox[{"24", " ", "\[Pi]"}], "5"]], "Output",
+ CellChangeTimes->{3.836506430459302*^9},
+ CellLabel->"Out[18]=",ExpressionUUID->"b6149e99-8e24-4f44-8ec4-de83f8325905"]
 }, Open  ]]
 },
 WindowSize->{693., 768.75},
@@ -414,6 +483,16 @@ Cell[11261, 302, 580, 10, 33, "Output",ExpressionUUID->"48024e81-e373-44cc-a3de-
 Cell[CellGroupData[{
 Cell[11878, 317, 2130, 55, 243, "Input",ExpressionUUID->"09734475-7991-41d6-a853-077e059762c1"],
 Cell[14011, 374, 548, 9, 33, "Output",ExpressionUUID->"1286ce84-26c0-40a5-88b8-88d2047baaa9"]
+}, Open  ]],
+Cell[14574, 386, 191, 4, 29, "Input",ExpressionUUID->"b6ca9754-f6ac-4340-b7a4-212149d6be7d"],
+Cell[CellGroupData[{
+Cell[14790, 394, 755, 18, 51, "Input",ExpressionUUID->"e080ada0-1716-4a50-b32b-a9c725916c44"],
+Cell[15548, 414, 223, 4, 49, "Output",ExpressionUUID->"5050aa0f-f289-4946-85ab-39683fe73e44"]
+}, Open  ]],
+Cell[15786, 421, 558, 17, 47, "Input",ExpressionUUID->"b90c6a43-372c-4dbc-a40e-b378e2ba7f1b"],
+Cell[CellGroupData[{
+Cell[16369, 442, 226, 4, 29, "Input",ExpressionUUID->"43d55ac6-622d-493a-af26-5301cde95558"],
+Cell[16598, 448, 197, 4, 49, "Output",ExpressionUUID->"b6149e99-8e24-4f44-8ec4-de83f8325905"]
 }, Open  ]]
 }
 ]
