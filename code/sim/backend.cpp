@@ -178,24 +178,24 @@ void Asteroid::update_orientation(double dt) {
         (torque[2] + (moi[0] - moi[1]) * spin[0] * spin[1]) / moi[2],
     });
 
-    if (isnan(omegaDot[0])) {
+    /*if (isnan(omegaDot[0])) {
         std::cout << spin << std::endl;
         std::cout << torque << std::endl;
         std::cout << orientation << std::endl;
         std::cin >> time;
-    }
+    }*/
 
     spin += dt * omegaDot;
 
     d_quat = 0.5 * Quaternion(0, spin[0], spin[1], spin[2]) * orientation;
     orientation += d_quat * dt;
 
-    if (orientation.mag() == 0) {
+    /*if (orientation.mag() == 0) {
         std::cout << spin << std::endl;
         std::cout << torque << std::endl;
         std::cout << orientation << std::endl;
         std::cin >> time;
-    }
+    }*/
 
     #ifdef _DEBUG
     max_quat_mag = max_me(max_quat_mag, d_quat.mag());

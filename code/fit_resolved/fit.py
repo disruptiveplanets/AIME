@@ -2,14 +2,31 @@ import numpy as np
 import matplotlib.pyplot as plt
 import emcee, asteroids, time, sys
 from multiprocessing import Pool
+from random_vector import randomize
+
 
 EARTH_RADIUS = 6370000
 EARTH_MASS =5.972e24
-CADENCE = 60.0
+
+spin = [0.00012, 0.00022, 0.00032]
+impact_parameter = 5 * EARTH_RADIUS
+speed = 4000
+jlms = [EARTH_MASS, 0, 0, 0]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+
+CADENCE = 3600.0
 REGENERATE_DATA = True
 N_WALKERS = 32
 N_STEPS = 5000
-REL_SIGMA = 0.1
+SIGMA = 0.2 * np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
 
 ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 
@@ -22,20 +39,6 @@ if len(sys.argv) == 2:
         REGENERATE_DATA = False
 
 #np.random.seed(123)
-
-spin = [0.00012, 0.00022, 0.00032]
-impact_parameter = 5 * EARTH_RADIUS
-speed = 4000
-jlms = [5.972e24, 0, 0, 4.972e22]
-theta_true = (
-    0, 1.2e6, 1.1e5, -4.9e5,
-)
-theta_start = (
-    0.1, 1.0e6, 1.0e5, -5.0e5,
-)
-theta_range = (
-    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
-)
 
 def fit_function(theta):
     #start = time.time()
@@ -55,10 +58,6 @@ def save_to_file(filename, l):
         f.write(str(entry) + '\n')
     f.close()
 
-def randomize(y):
-    yerr = y * REL_SIGMA
-    return y + np.random.randn(len(y)) * yerr, yerr
-
 # Generate some synthetic data from the model.
 if REGENERATE_DATA:
     start = time.time()
@@ -69,7 +68,7 @@ else:
     y = get_list_from_file("simulated-data.dat")
 
 x = np.arange(len(y))
-y, yerr = randomize(y)
+y, yerr = randomize(y, SIGMA)
 
 plt.figure(figsize=(12, 4))
 x_display = np.arange(len(y) / 3)
@@ -91,8 +90,7 @@ def log_likelihood(theta, y, yerr):
         model = fit_function(theta)
     except RuntimeError:
         return -np.inf # Zero likelihood
-    sigma2 = yerr ** 2
-    return -0.5 * np.sum((y - model) ** 2 / sigma2 + np.log(sigma2))
+    return -np.sum((y - model) ** 2 /  yerr ** 2)
 
 def log_prior(theta):
     for i, param in enumerate(theta):
@@ -101,10 +99,7 @@ def log_prior(theta):
     return 0.0
 
 def log_probability(theta, x, y, yerr):
-    lp = log_prior(theta)
-    if not np.isfinite(lp):
-        return -np.inf
-    return lp + log_likelihood(theta, y, yerr)
+    return log_prior(theta) + log_likelihood(theta, y, yerr)
 
 pos = theta_start + 1e-4 * np.random.randn(N_WALKERS, len(theta_start))
 nwalkers, ndim = pos.shape

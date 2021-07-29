@@ -1,10 +1,10 @@
-import asteroids, time
+import asteroids, time, sys
 
 CADENCE = 3600.0
 
-jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+jlms = [5.972e24, 0, 0, 0]
 klms = [
-    1e6, 1e5, 5e5,
+    1e6, 1e5, -5e5,
     0, 0, 0, 0, 0, 0, 0 #m3
     ]
 spin = [0.00012, 0.00012, 0.00012]
@@ -18,6 +18,7 @@ try:
         spin[0], spin[1], spin[2], initial_roll, impact_parameter, speed)
 except RuntimeError as err:
     print(err)
+    sys.exit()
 end = time.time()
 print("Time taken: {} s".format(end - start))
 
