@@ -21,10 +21,9 @@ except AttributeError:
     print("Could not find the file {}.".format(filename))
     sys.exit()
 
-theta_labels = list(map(r"$\theta_{{{0}}}$".format, range(1, ndim + 1)))
-
 burnin = 0
 thin = 1
+theta_labels = list(map(r"$\theta_{{{0}}}$".format, range(1, ndim + 1)))
 samples = reader.get_chain(discard=burnin, flat=True, thin=thin)
 log_prob_samples = reader.get_log_prob(discard=burnin, flat=True, thin=thin)
 log_prior_samples = reader.get_blobs(discard=burnin, flat=True, thin=thin)
@@ -48,6 +47,13 @@ for i in range(ndim):
 axes[-1].set_xlabel("step number");
 
 plt.show()
+
+burnin = -1
+while burnin < 0:
+    try:
+        burnin = int(input("What is the burnin?"))
+    except:
+        pass
 
 flat_samples = reader.get_chain(discard=burnin, thin=thin, flat=True)
 print(flat_samples.shape)

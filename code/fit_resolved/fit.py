@@ -4,14 +4,16 @@ import emcee, asteroids, time, sys
 from multiprocessing import Pool
 from random_vector import randomize
 
-
+ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6370000
 EARTH_MASS =5.972e24
 
-spin = [0.00012, 0.00022, 0.00032]
+
+CADENCE = 3000
 impact_parameter = 5 * EARTH_RADIUS
 speed = 4000
-jlms = [EARTH_MASS, 0, 0, 0]
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
 theta_true = (
     0, 1.2e6, 1.1e5, -4.9e5,
 )
@@ -21,16 +23,14 @@ theta_start = (
 theta_range = (
     (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
 )
+SIGMA=0.2
 
-CADENCE = 3600.0
+
 REGENERATE_DATA = True
 N_WALKERS = 32
 N_STEPS = 7500
-SIGMA = 0.2 * np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
-
-ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
-
 MULTIPROCESSING = True
+SIGMA *= np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
 
 reload = False
 if len(sys.argv) == 2:

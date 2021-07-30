@@ -50,7 +50,7 @@ theta_start = (
     0.1, 1.0e6, 1.0e5, -5.0e5,
 )
 theta_range = (
-    (-np.pi, -np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
 )
 REL_SIGMA=0.1
 ```
@@ -112,7 +112,7 @@ theta_start = (
     0.1, 1.0e6, 1.0e5, -5.0e5,
 )
 theta_range = (
-    (-np.pi, -np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
 )
 SIGMA=0.2
 ```
@@ -211,3 +211,248 @@ SIGMA=0.2
 </th><th>
 <img src="run-6-5000.png" alt="corner plot" width="400"/>
 </th></tr></table>
+
+Runs 5, 6, and 7 all have the same form. They share the fit method and an initial spin of `[0.00012, 0.00012, 0.00012]` in common. Run 0 is the only other run with that spin and it showed a largely similar effect. Mayve if I ran runs 5, 6, 7 for longer, I would see the slight preference of the true parameters. But instead, I'm going to run with an asymmetric spin, and try to figure out why a symmetric spin should introduce degeneracy.
+
+Except in the case of run 7, introducing higher cadence seems to disrupt the fit. That seems counter-intuitive. Maybe there's a better cadence between.
+
+Maybe increasing the l=1 components of Jlm changes the degeneracy? I'll try it. Weirdly, increasing b might as well, since it expands the time at periapsis.
+
+
+
+---
+### July 30, 2021
+Runs 8.0, 8.1, 8.2, 8.3, 8.4 are cadence scans, otherwise the same as run 3. Run 9 tries increasing the J1m components. Run 10 is the same as run 4 but with cadence of 3600. Run 11.0, 11.1, 11.2 are the same as run 3 but with b multiplied by 2, 4, and 8 resp.
+
+<table><tr>
+<th width=800px>
+Run 8.0:
+
+```
+CADENCE = 3000
+impact_parameter = 5 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.2
+```
+</th><th>
+<img src="run-8.0-5000.png" alt="corner plot" width="400"/>
+</th></tr><tr>
+<th width=800px>
+Run 8.1:
+
+```
+CADENCE = 2500
+impact_parameter = 5 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.2
+```
+</th><th>
+<img src="run-8.1-5000.png" alt="corner plot" width="400"/>
+</th></tr><tr>
+<th width=800px>
+Run 8.2:
+
+```
+CADENCE = 2000
+impact_parameter = 5 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.2
+```
+</th><th>
+<img src="run-8.2-5000.png" alt="corner plot" width="400"/>
+</th></tr><tr>
+<th width=800px>
+Run 8.3:
+
+```
+CADENCE = 1500
+impact_parameter = 5 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.2
+```
+</th><th>
+<img src="run-8.3-5000.png" alt="corner plot" width="400"/>
+</th></tr><tr>
+<th width=800px>
+Run 8.4:
+
+```
+CADENCE = 1000
+impact_parameter = 5 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.2
+```
+</th><th>
+<img src="run-8.4-5000.png" alt="corner plot" width="400"/>
+</th></tr><tr>
+<th width=800px>
+Run 9:
+
+```
+CADENCE = 3600
+impact_parameter = 5 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e23, -5.972e23, 4.972e23]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.2
+```
+</th><th>
+<img src="run-9-5000.png" alt="corner plot" width="400"/>
+</th></tr><tr>
+<th width=800px>
+Run 10:
+
+```
+CADENCE = 3600
+impact_parameter = 5 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 0, 0, 4.972e22]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.2
+```
+</th><th>
+<img src="run-10-5000.png" alt="corner plot" width="400"/>
+</th></tr><tr>
+<th width=800px>
+Run 11.0:
+
+```
+CADENCE = 3600
+impact_parameter = 10 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.2
+```
+</th><th>
+<img src="run-11.0-5000.png" alt="corner plot" width="400"/>
+</th></tr><tr>
+<th width=800px>
+Run 11.1:
+
+```
+CADENCE = 3600
+impact_parameter = 20 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.2
+```
+</th><th>
+<img src="run-11.1-5000.png" alt="corner plot" width="400"/>
+</th></tr><tr>
+<th width=800px>
+Run 11.2:
+
+```
+CADENCE = 3600
+impact_parameter = 40 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.2
+```
+</th><th>
+<img src="run-11.2-5000.png" alt="corner plot" width="400"/>
+</th></tr><tr>
+<th width=800px>
