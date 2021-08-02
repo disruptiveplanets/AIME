@@ -15,14 +15,15 @@ speed = 4000
 spin = [0.00012, 0.00022, 0.00032]
 jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
 theta_true = (
-    0, 1.2e6, 1.1e5, -4.9e5,
+    0, 1.2e6, 1.1e4, -4.9e4,
 )
 theta_start = (
-    0.1, 1.0e6, 1.0e5, -5.0e5,
+    0.1, 1.0e6, 1.0e4, -5.0e4,
 )
 theta_range = (
-    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e4, 2.0e4), (-2.5e4, -1.0e4),
 )
+
 SIGMA=0.2
 
 
@@ -100,9 +101,10 @@ def log_prior(theta):
 
 def log_probability(theta, x, y, yerr):
     prior = log_prior(theta)
-    if not np.isfinite(prior):
+    like = log_likelihood(theta, y, yerr)
+    if not np.isfinite(prior) or not np.isfinite(like):
         return -np.inf
-    return prior + log_likelihood(theta, y, yerr)
+    return prior + like
 
 pos = theta_start + 1e-4 * np.random.randn(N_WALKERS, len(theta_start))
 nwalkers, ndim = pos.shape
