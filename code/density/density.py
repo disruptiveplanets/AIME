@@ -1,16 +1,16 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.special import lpmv
-from PIL import Image
-import cmath
 from math import factorial, atan2
 
-POINTS_TRY = 50
+POINTS_TRY = 1
 
 
 
-class Density:
+class Density(object):
     def __init__(self, grid_size, radius, klms, fn):
+        if grid_size == None:
+            # Empty class
+            return
         self.fn = fn
         self.maxl = int(np.sqrt(len(klms)))
         assert(len(klms) == self.maxl * self.maxl)
@@ -31,7 +31,7 @@ class Density:
         self.densities[self.densities == 0] = np.nan
         self.trials = 0
 
-    def populate(self, trials):
+    def populate(self, trials, discard_negative=False):
         for trial in range(trials):
             points = self._make_points()
             klmn = []
@@ -49,12 +49,52 @@ class Density:
                 continue
             densities = np.matmul(klmn_inv,self.klms)
 
+            if discard_negative and np.min(densities) < 0:
+                print("Negative result")
+                continue
+
             for n in range(len(points)):
                 self.densities[self.chunk_map==n] += np.real(densities[n])
 
             self.trials += 1
 
+    def save_densities(self, fname):
+        f = open(fname, 'w')
+        f.write(str(self.trials) + "\n")
+        f.write(','.join([str(num) for num in self.xs]) + "\n")
+        f.write(','.join([str(num) for num in self.ys]) + "\n")
+        f.write(','.join([str(num) for num in self.zs]) + "\n")
+        f.write(','.join([str(num) for num in self.densities.shape]) + "\n")
+        for slice in self.densities:
+            for line in slice:
+                f.write(','.join([str(num) for num in line]) + "\n")
+        f.close()
+
+    @staticmethod
+    def load_densities(fname):
+        d = Density(None, None, None, None)
+        f = open(fname, 'r')
+        d.trials = int(f.readline())
+        d.xs = [float(x) for x in f.readline().split(',')]
+        d.ys = [float(x) for x in f.readline().split(',')]
+        d.zs = [float(x) for x in f.readline().split(',')]
+        shape = [int(x) for x in f.readline().split(',')]
+        d.densities = []
+        for _ in range(shape[2]):
+            slice = []
+            for _ in range(shape[1]):
+                slice.append(np.asarray([float(x) for x in f.readline().split(',')]))
+            d.densities.append(np.asarray(slice))
+        d.densities = np.asarray(d.densities)
+        f.close()
+        return d
+
     def save_gif(self, path, duration=2.0, frames=None):
+        # Save imports until here for supercomputer run
+        import matplotlib.pyplot as plt
+        from PIL import Image
+        plt.style.use("jcap")
+
         if frames is None:
             frames = len(self.zs)
         imgs = []
@@ -125,12 +165,13 @@ class Density:
                             if self.mask[i,j,k] == 0: continue
                             r = np.sqrt(x*x+y*y+z*z)
                             rlm[i, j, k] = lpmv(m, l, z / r) / factorial(l + m)\
-                                * r**l * cmath.exp(i * m * atan2(y, x))
+                                * r**l * np.exp(1j * m * atan2(y, x))
                 self.rlms.append(rlm)
 
     def _make_points(self):
         best_points = []
         smallest_volume = 0
+        best_map = None
         for trial in range(POINTS_TRY):
             points = self._distribute_points()
             map = self._get_chunk_map(points)
@@ -138,7 +179,8 @@ class Density:
             if np.min(vols) > smallest_volume:
                 smallest_volume = np.min(vols)
                 best_points = points
-        self.chunk_map = self._get_chunk_map(best_points)
+                best_map = map
+        self.chunk_map = best_map
         return best_points
 
     def _get_chunk_map(self, points):
@@ -169,17 +211,25 @@ class Density:
         return np.argmin(np.sum((points - np.asarray([i, j, k]))**2, axis=1))
 
     def _make_frame(self, progress):
+        # Save imports until here for supercomputer run
+        import matplotlib.pyplot as plt
+        from PIL import Image
+        plt.style.use("jcap")
+
         fig = plt.figure()
-        slice = self.densities[:,:,
-            int(min(progress * len(self.zs), len(self.zs) -1))] / self.trials
+        z_index = int(min(progress * len(self.zs), len(self.zs) -1))
+        slice = self.densities[:,:,z_index] / self.trials
         c = plt.pcolormesh(self.xs, self.ys, slice, shading='auto',
-            vmin=max(0, np.nanmin(self.densities) / self.trials),
+            vmin=0,
             vmax=np.nanmax(self.densities) / self.trials,
             cmap='plasma')
-        plt.colorbar(c)
+        plt.colorbar(c, label="Density (kg/m$^3$)")
         plt.axis('equal')
-        plt.axis('off')
-        plt.title("{}%".format(str(progress*100)[:5]))
+        #plt.axis('off')
+        plt.xlabel("$x$ (m)")
+        plt.ylabel("$y$ (m)")
+        plt.title("$z$ = {} m".format(str(self.zs[z_index])[:5]))
+        fig.tight_layout()
         return fig
 
     def add_densities(self, densities, trials):
