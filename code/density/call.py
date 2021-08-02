@@ -40,3 +40,4 @@ if rank == 0:
     for i, k in enumerate(klms):
         print(distro.get_klm(i))
     distro.save_densities("example.txt")
+    print("Done")
