@@ -10,6 +10,18 @@ Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms,
     set_pos(impact_parameter);
 
     #ifdef _DEBUG
+    std::cout<< "Klms: ";
+    for (int i = 0; i < (ASTEROIDS_MAX_K + 1) * (ASTEROIDS_MAX_K + 1); i++) {
+        std::cout << klms[i] << ' ';
+    }
+    std::cout << std::endl;
+
+    std::cout << "Jlms: ";
+    for (int i = 0; i < (ASTEROIDS_MAX_J + 1) * (ASTEROIDS_MAX_K + 1); i++) {
+        std::cout << jlms[i] << ' ';
+    }
+    std::cout << std::endl;
+
     std::cout << "PARAMETERS:" << std::endl;
     std::cout << "MOI (local): " << moi << std::endl;
     std::cout << "Start position: " << position << std::endl;

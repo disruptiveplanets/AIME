@@ -246,7 +246,7 @@ theta_range = (
 SIGMA=0.2
 ```
 </th><th>
-<img src="run-8.0-5000.png" alt="corner plot" width="400"/>
+<img src="run-8.0-7500.png" alt="corner plot" width="400"/>
 </th></tr><tr>
 <th width=800px>
 Run 8.1:
@@ -269,7 +269,7 @@ theta_range = (
 SIGMA=0.2
 ```
 </th><th>
-<img src="run-8.1-5000.png" alt="corner plot" width="400"/>
+<img src="run-8.1-7500.png" alt="corner plot" width="400"/>
 </th></tr><tr>
 <th width=800px>
 Run 8.2:
@@ -292,7 +292,7 @@ theta_range = (
 SIGMA=0.2
 ```
 </th><th>
-<img src="run-8.2-5000.png" alt="corner plot" width="400"/>
+<img src="run-8.2-7500.png" alt="corner plot" width="400"/>
 </th></tr><tr>
 <th width=800px>
 Run 8.3:
@@ -315,7 +315,7 @@ theta_range = (
 SIGMA=0.2
 ```
 </th><th>
-<img src="run-8.3-5000.png" alt="corner plot" width="400"/>
+<img src="run-8.3-7500.png" alt="corner plot" width="400"/>
 </th></tr><tr>
 <th width=800px>
 Run 8.4:
@@ -338,7 +338,7 @@ theta_range = (
 SIGMA=0.2
 ```
 </th><th>
-<img src="run-8.4-5000.png" alt="corner plot" width="400"/>
+<img src="run-8.4-7500.png" alt="corner plot" width="400"/>
 </th></tr><tr>
 <th width=800px>
 Run 9:
@@ -361,7 +361,7 @@ theta_range = (
 SIGMA=0.2
 ```
 </th><th>
-<img src="run-9-5000.png" alt="corner plot" width="400"/>
+<img src="run-9-7500.png" alt="corner plot" width="400"/>
 </th></tr><tr>
 <th width=800px>
 Run 10:
@@ -384,7 +384,7 @@ theta_range = (
 SIGMA=0.2
 ```
 </th><th>
-<img src="run-10-5000.png" alt="corner plot" width="400"/>
+<img src="run-10-7500.png" alt="corner plot" width="400"/>
 </th></tr><tr>
 <th width=800px>
 Run 11.0:
@@ -407,7 +407,7 @@ theta_range = (
 SIGMA=0.2
 ```
 </th><th>
-<img src="run-11.0-5000.png" alt="corner plot" width="400"/>
+<img src="run-11.0-7500.png" alt="corner plot" width="400"/>
 </th></tr><tr>
 <th width=800px>
 Run 11.1:
@@ -430,7 +430,7 @@ theta_range = (
 SIGMA=0.2
 ```
 </th><th>
-<img src="run-11.1-5000.png" alt="corner plot" width="400"/>
+<img src="run-11.1-7500.png" alt="corner plot" width="400"/>
 </th></tr><tr>
 <th width=800px>
 Run 11.2:
@@ -453,6 +453,6 @@ theta_range = (
 SIGMA=0.2
 ```
 </th><th>
-<img src="run-11.2-5000.png" alt="corner plot" width="400"/>
+<img src="run-11.2-7500.png" alt="corner plot" width="400"/>
 </th></tr><tr>
 <th width=800px>
