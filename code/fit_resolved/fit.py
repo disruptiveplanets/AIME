@@ -2,29 +2,28 @@ import numpy as np
 import matplotlib.pyplot as plt
 import emcee, asteroids, time, sys
 from multiprocessing import Pool
-from random_vector import randomize
+from random_vector import *
 
 ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6370000
 EARTH_MASS =5.972e24
 
 
-CADENCE = 3000
+CADENCE = 1500
 impact_parameter = 5 * EARTH_RADIUS
 speed = 4000
 spin = [0.00012, 0.00022, 0.00032]
 jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
 theta_true = (
-    0, 1.2e6, 1.1e4, -4.9e4,
+    0, 1.2e6, 1.1e5, -4.9e5,
 )
 theta_start = (
-    0.1, 1.0e6, 1.0e4, -5.0e4,
+    0.1, 1.0e6, 1.0e5, -5.0e5,
 )
 theta_range = (
-    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e4, 2.0e4), (-2.5e4, -1.0e4),
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
 )
-
-SIGMA=0.2
+SIGMA=0.02
 
 
 REGENERATE_DATA = True
@@ -69,7 +68,8 @@ else:
     y = get_list_from_file("simulated-data.dat")
 
 x = np.arange(len(y))
-y, yerr = randomize(y, SIGMA)
+y, yerr = randomize_flat(y, SIGMA)
+
 
 plt.figure(figsize=(12, 4))
 x_display = np.arange(len(y) / 3)

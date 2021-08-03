@@ -15,6 +15,7 @@ def vnorm(a):
     return np.sqrt(np.sum([ai * ai for ai in a]))
 
 
+# Do the sophisticated, turning error
 def randomize(y, sigma):
     newy = []
     yerr = []
@@ -61,3 +62,8 @@ if __name__ == "__main__":
     plt.axvline(spin[2] + err[2], color="k")
     plt.legend()
     plt.show()
+
+
+def randomize_flat(y, sigma):
+    yerr = np.ones_like(y) * sigma
+    return y + np.random.randn(len(y)) * sigma, yerr

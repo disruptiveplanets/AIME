@@ -12,37 +12,54 @@ spin = [0.00012, 0.00022, 0.00032]
 impact_parameter = 5 * EARTH_RADIUS
 speed = 4000
 jlms = [EARTH_MASS, 0, 6e22, 7e22]
-klms = [
-    1.2e6, 1.1e5, -4.9e5,
+klmss = [
+    [1.2e6, 1.1e5, -4.9e5],
+    [1.2e6, 1.2e5, -5.0e5],
+    [1.2e6, 1.2e5, -4.8e5]
 ]
 SIGMA = 0.2 * np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
-initial_roll = 0
+initial_rolls = [
+    0,
+    0,0
+]
 
-start = time.time()
-try:
-    resolved_data = asteroids.simulate(CADENCE, jlms, klms,
-        spin[0], spin[1], spin[2], initial_roll, impact_parameter, speed)
-except RuntimeError as err:
-    print(err)
-    sys.exit()
-end = time.time()
-print("Time taken: {} s".format(end - start))
-
-f = open("resolved.dat", 'w')
-for i, dat in enumerate(resolved_data):
-    f.write(str(dat) + ' ')
-    if i %3 == 2:
-        f.write('\n')
-f.close()
-
-
-y, yerr = randomize(resolved_data, SIGMA)
 
 plt.figure(figsize=(12, 4))
-x_display = np.arange(len(y) / 3)
-plt.errorbar(x_display, y[::3], yerr=yerr[::3], label = 'x', fmt='.')
-plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], label = 'y', fmt='.')
-plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], label = 'z', fmt='.')
+
+for i in range(len(initial_rolls)):
+    initial_roll = initial_rolls[i]
+    klms = klmss[i]
+
+    start = time.time()
+    try:
+        resolved_data = asteroids.simulate(CADENCE, jlms, klms,
+            spin[0], spin[1], spin[2], initial_roll, impact_parameter, speed)
+    except RuntimeError as err:
+        print(err)
+        sys.exit()
+    end = time.time()
+    print("Time taken: {} s".format(end - start))
+
+    f = open("resolved.dat", 'w')
+    for i, dat in enumerate(resolved_data):
+        f.write(str(dat) + ' ')
+        if i %3 == 2:
+            f.write('\n')
+    f.close()
+
+
+    y, yerr = randomize(resolved_data, SIGMA)
+
+    x_display = np.arange(len(y) / 3)
+    if i == 0:
+        plt.errorbar(x_display, y[::3], yerr=yerr[::3], label='x', fmt='.')
+        #plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], label = 'y', fmt='.')
+        #plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], label = 'z', fmt='.')
+    else:
+        plt.errorbar(x_display, y[::3], yerr=yerr[::3], fmt='.')
+        #plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], fmt='.')
+        #plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], fmt='.')
+
 plt.xlabel("Time (Cadences)")
 plt.ylabel("Spin (rad/s)")
 plt.legend()

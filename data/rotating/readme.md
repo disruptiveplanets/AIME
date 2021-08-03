@@ -646,3 +646,150 @@ SIGMA=0.2
 </th><th>
 <img src="run-14.1-7500.png" alt="corner plot" width="400"/>
 </th></tr></table>
+
+Well, it's looking like randomness plays a huge role in what parameters are accepted. That's unfortunate. And there is some dependence about the initial roll, it's just not as good of an estimate as the computer thinks.
+
+---
+
+### August 3, 2021
+
+I just checked, and my model is not actually degenerate. So I'm going to change my sensitivity model yet again. This time, it's going to be flat. I'll redo runs 12.0-12.2 with the new error and a new cadence, as well as for the old error. In both cases the error bars are going to be much smaller as well.
+<table><tr>
+<th width=800px>
+Run 15.0:
+
+```
+CADENCE = 1500
+impact_parameter = 5 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.02 # Flat
+```
+</th><th>
+<img src="run-15.0-7500.png" alt="corner plot" width="400"/>
+</th></tr><tr>
+<th width=800px>
+Run 15.1:
+
+```
+CADENCE = 1500
+impact_parameter = 5 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.02 # Flat
+```
+</th><th>
+<img src="run-15.1-7500.png" alt="corner plot" width="400"/>
+</th></tr><tr>
+<th width=800px>
+Run 15.2:
+
+```
+CADENCE = 1500
+impact_parameter = 5 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.02 # Flat
+```
+</th><th>
+<img src="run-15.2-7500.png" alt="corner plot" width="400"/>
+</th></tr><tr>
+<th width=800px>
+Run 16.0:
+
+```
+CADENCE = 1500
+impact_parameter = 5 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.02 # Rotate
+```
+</th><th>
+<img src="run-16.0-7500.png" alt="corner plot" width="400"/>
+</th></tr><tr>
+<th width=800px>
+Run 16.1:
+
+```
+CADENCE = 1500
+impact_parameter = 5 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.02 # Rotate
+```
+</th><th>
+<img src="run-16.1-7500.png" alt="corner plot" width="400"/>
+</th></tr><tr>
+<th width=800px>
+Run 16.2:
+
+```
+CADENCE = 1500
+impact_parameter = 5 * EARTH_RADIUS
+speed = 4000
+spin = [0.00012, 0.00022, 0.00032]
+jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
+theta_true = (
+    0, 1.2e6, 1.1e5, -4.9e5,
+)
+theta_start = (
+    0.1, 1.0e6, 1.0e5, -5.0e5,
+)
+theta_range = (
+    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
+)
+SIGMA=0.02 # Rotate
+```
+</th><th>
+<img src="run-16.2-7500.png" alt="corner plot" width="400"/>
+</th></tr></table>
