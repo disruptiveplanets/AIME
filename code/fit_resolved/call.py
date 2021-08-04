@@ -1,6 +1,6 @@
 import asteroids, time, sys
 import matplotlib.pyplot as plt
-from random_vector import randomize
+from random_vector import *
 import numpy as np
 
 CADENCE = 600.0
@@ -17,7 +17,7 @@ klmss = [
     [1.2e6, 1.2e5, -5.0e5],
     [1.2e6, 1.2e5, -4.8e5]
 ]
-SIGMA = 0.2 * np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
+SIGMA = 0.02 * np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
 initial_rolls = [
     0,
     0,0
@@ -48,7 +48,7 @@ for i in range(len(initial_rolls)):
     f.close()
 
 
-    y, yerr = randomize(resolved_data, SIGMA)
+    y, yerr = randomize_flat(resolved_data, SIGMA)
 
     x_display = np.arange(len(y) / 3)
     if i == 0:

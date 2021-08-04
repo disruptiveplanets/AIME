@@ -70,6 +70,8 @@ else:
 x = np.arange(len(y))
 y, yerr = randomize_flat(y, SIGMA)
 
+print("DOF:", len(y))
+
 
 plt.figure(figsize=(12, 4))
 x_display = np.arange(len(y) / 3)
