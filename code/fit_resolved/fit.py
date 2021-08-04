@@ -4,88 +4,58 @@ import emcee, asteroids, time, sys
 from multiprocessing import Pool
 from random_vector import *
 
+
 ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6370000
-EARTH_MASS =5.972e24
-
-
-CADENCE = 1500
-impact_parameter = 5 * EARTH_RADIUS
-speed = 4000
-spin = [0.00012, 0.00022, 0.00032]
-jlms = [5.972e24, 5.972e22, -5.972e22, 4.972e22]
-theta_true = (
-    0, 1.2e6, 1.1e5, -4.9e5,
-)
-theta_start = (
-    0.1, 1.0e6, 1.0e5, -5.0e5,
-)
-theta_range = (
-    (-np.pi, np.pi), (0.5e6, 2e6), (0.5e5, 2.0e5), (-2.5e5, -1.0e6),
-)
-SIGMA=0.02
-
-
-REGENERATE_DATA = True
 N_WALKERS = 32
-N_STEPS = 7500
-MULTIPROCESSING = True
-SIGMA *= np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
+MAX_N_STEPS = 5000
+
+if len(sys.argv) not in [2, 3]:
+    raise Exception("Please pass a file to describe the fit")
+output_name = sys.argv[1]
+f = open(output_name+".dat", 'r')
+cadence = int(f.readline())
+impact_parameter = EARTH_RADIUS * int(f.readline())
+speed = float(f.readline())
+spin = [float(x) for x in f.readline().split(',')]
+jlms = [float(x) for x in f.readline().split(',')]
+theta_true = [float(x) for x in f.readline().split(',')]
+theta_start = [float(x) for x in f.readline().split(',')]
+theta_spread = [float(x) for x in f.readline().split(',')]
+theta_high = np.asarray([float(x) for x in f.readline().split(',')])
+theta_low = np.asarray([float(x) for x in f.readline().split(',')])
+sigma = float(f.readline()) * np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
+while output_name[-1] == '\n':
+    output_name = output_name[:-1]
+f.close()
+assert(len(theta_true) == len(theta_start) == len(theta_spread) == len(theta_high) == len(theta_low))
+assert(len(theta_true) == (ASTEROIDS_MAX_K + 1)**2 - 5)
+assert(np.all(theta_high > theta_low))
+
+print("Cadence {}, impact parameter {}, speed {}".format(cadence, impact_parameter, speed))
+print("Spin", spin)
+print("Jlms", jlms)
+print("Theta true", theta_true)
+print("theta start", theta_start)
+print("theta spread", theta_spread)
+print("Theta high", theta_high)
+print("Theta low", theta_low)
+print("Sigma", sigma)
+print("Name", output_name)
 
 reload = False
-if len(sys.argv) == 2:
-    if sys.argv[1] == "reload":
-        reload = True
-        REGENERATE_DATA = False
-
-#np.random.seed(123)
+if len(sys.argv) == 3 and sys.argv[2] == "reload":
+    reload = True
+    REGENERATE_DATA = False
 
 def fit_function(theta):
     #start = time.time()
-    resolved_data = asteroids.simulate(CADENCE, jlms, theta[1:],
-        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed)
+    #resolved_data = asteroids.simulate(cadence, jlms, theta[1:],
+    #    spin[0], spin[1], spin[2], theta[0], impact_parameter, speed)
+    x = np.linspace(0.1, 10, 900)
+    return theta[0]*x**3 + theta[1]/x**2 + theta[2] * x+ theta[3] / x
     #print(time.time() - start)
     return np.asarray(resolved_data)
-
-def get_list_from_file(filename):
-    f = open(filename, 'r')
-    l = [float(line) for line in f.readlines()]
-    f.close()
-    return np.asarray(l)
-def save_to_file(filename, l):
-    f = open(filename, 'w')
-    for entry in l:
-        f.write(str(entry) + '\n')
-    f.close()
-
-# Generate some synthetic data from the model.
-if REGENERATE_DATA:
-    start = time.time()
-    y = fit_function(theta_true)
-    print("Took {} s".format(time.time() - start))
-    save_to_file("simulated-data.dat", y)
-else:
-    y = get_list_from_file("simulated-data.dat")
-
-x = np.arange(len(y))
-y, yerr = randomize_flat(y, SIGMA)
-
-print("DOF:", len(y))
-
-
-plt.figure(figsize=(12, 4))
-x_display = np.arange(len(y) / 3)
-plt.errorbar(x_display, y[::3], yerr=yerr[::3], label = 'x', fmt='.')
-plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], label = 'y', fmt='.')
-plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], label = 'z', fmt='.')
-plt.xlabel("Time (Cadences)")
-plt.ylabel("Spin (rad/s)")
-plt.legend()
-plt.show()
-
-# Confirm that theta start works.
-asteroids.simulate(CADENCE, jlms, theta_start[1:],
-    spin[0], spin[1], spin[2], theta_start[0], impact_parameter, speed)
 
 def log_likelihood(theta, y, yerr):
     # Normal likelihood
@@ -97,7 +67,7 @@ def log_likelihood(theta, y, yerr):
 
 def log_prior(theta):
     for i, param in enumerate(theta):
-        if param > max(theta_range[i]) or param < min(theta_range[i]):
+        if param > theta_high[i] or param < theta_low[i]:
             return -np.inf
     return 0.0
 
@@ -108,32 +78,58 @@ def log_probability(theta, x, y, yerr):
         return -np.inf
     return prior + like
 
-pos = theta_start + 1e-4 * np.random.randn(N_WALKERS, len(theta_start))
-nwalkers, ndim = pos.shape
+# Generate some synthetic data from the model.
+start = time.time()
+y = fit_function(theta_true)
+print("Data generation took {} s".format(time.time() - start))
+x = np.arange(len(y))
+y, yerr = randomize_rotate(y, sigma)
 
-save_filename = "asteroids.h5"
-backend = emcee.backends.HDFBackend(save_filename)
+print("DOF:", len(y))
+
+plt.figure(figsize=(12, 4))
+x_display = np.arange(len(y) / 3)
+plt.errorbar(x_display, y[::3], yerr=yerr[::3], label = 'x', fmt='.')
+plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], label = 'y', fmt='.')
+plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], label = 'z', fmt='.')
+plt.xlabel("Time (Cadences)")
+plt.ylabel("Spin (rad/s)")
+plt.legend()
+plt.show()
+
+backend = emcee.backends.HDFBackend(output_name+".h5")
+
 if not reload:
+    pos = theta_start + theta_spread * np.random.randn(N_WALKERS, len(theta_start))
+    nwalkers, ndim = pos.shape
     backend.reset(nwalkers, ndim)
 else:
+    pos = None
     print("Initial size: {}".format(backend.iteration))
 
-if MULTIPROCESSING:
-    with Pool() as pool:
-        sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability,
-            args=(x, y, yerr), backend=backend, pool=pool)
-
-        if not reload:
-            sampler.run_mcmc(pos, N_STEPS, progress=True)
-        else:
-            sampler.run_mcmc(None, N_STEPS, progress=True)
-else:
+old_tau = np.inf
+with Pool() as pool:
     sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability,
-        args=(x, y, yerr), backend=backend)
-    if not reload:
-        sampler.run_mcmc(pos, N_STEPS, progress=True)
-    else:
-        sampler.run_mcmc(None, N_STEPS, progress=True)
+        args=(x, y, yerr), backend=backend, pool=pool)
+
+    for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
+        if sampler.iteration % 100 != 0:
+            continue
+
+        # Compute the autocorrelation time so far
+        # Using tol=0 means that we'll always get an estimate even
+        # if it isn't trustworthy
+        tau = sampler.get_autocorr_time(tol=0)
+
+        # Check convergence
+        converged = np.all(tau * 100 < sampler.iteration)
+        converged &= np.all(np.abs(old_tau - tau) / tau < 0.01)
+        if converged:
+            print("Converged")
+            break
+        old_tau = tau
 
 if reload:
     print("New size: {}".format(backend.iteration))
+else:
+    print("Done")

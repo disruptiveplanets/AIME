@@ -14,9 +14,8 @@ def vdot(a, b):
 def vnorm(a):
     return np.sqrt(np.sum([ai * ai for ai in a]))
 
-
 # Do the sophisticated, turning error
-def randomize(y, sigma):
+def randomize_rotate(y, sigma):
     newy = []
     yerr = []
     assert(len(y) % 3 == 0)
