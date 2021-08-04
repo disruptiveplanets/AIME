@@ -49,12 +49,8 @@ if len(sys.argv) == 3 and sys.argv[2] == "reload":
     REGENERATE_DATA = False
 
 def fit_function(theta):
-    #start = time.time()
-    #resolved_data = asteroids.simulate(cadence, jlms, theta[1:],
-    #    spin[0], spin[1], spin[2], theta[0], impact_parameter, speed)
-    x = np.linspace(0.1, 10, 900)
-    return theta[0]*x**3 + theta[1]/x**2 + theta[2] * x+ theta[3] / x
-    #print(time.time() - start)
+    resolved_data = asteroids.simulate(cadence, jlms, theta[1:],
+        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed)
     return np.asarray(resolved_data)
 
 def log_likelihood(theta, y, yerr):
