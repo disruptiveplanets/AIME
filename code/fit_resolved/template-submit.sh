@@ -9,4 +9,4 @@ source /etc/profile
 
 module load anaconda/2021a
 
-python fit.py ../../staged/
+python fit.py 

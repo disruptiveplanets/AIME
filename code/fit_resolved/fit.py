@@ -13,7 +13,7 @@ MAX_N_STEPS = 5000
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
 output_name = sys.argv[1]
-f = open(output_name+".dat", 'r')
+f = open("../../staged/" + output_name+".dat", 'r')
 cadence = int(f.readline())
 impact_parameter = EARTH_RADIUS * int(f.readline())
 speed = float(f.readline())
