@@ -53,7 +53,7 @@ class Display:
 
     def show_params(self):
         self.get_samples()
-        fig, axes = plt.subplots(self.ndim, figsize=(10, 7), sharex=True)
+        fig, axes = plt.subplots(self.ndim, figsize=(6.6, 4.6), sharex=True)
         samples = self.reader.get_chain()
         for i in range(self.ndim):
             ax = axes[i]
@@ -69,7 +69,7 @@ class Display:
         self.get_samples()
         if self.true_results is None:
             self.true_results = self.run(self.theta_true)
-        fig = plt.figure(figsize=(10, 7),)
+        fig = plt.figure(figsize=(6.6, 4.6))
         redchiminmean = 0
         for i in range(self.log_prob_samples.shape[1]):
             redchi = -self.log_prob_samples[:,i] / len(self.true_results)
@@ -77,7 +77,7 @@ class Display:
             plt.plot(redchi, c='k', alpha=0.25)
         plt.ylabel("Reduced chi squared")
         plt.xlabel("Sample")
-        plt.ylim(0, max(10, 2 * redchiminmean))
+        plt.ylim(0, max(2, 2 * redchiminmean))
         plt.savefig(self.bare_name+"-redchi.png")
 
     def show_corner(self):
