@@ -8,7 +8,7 @@ from random_vector import *
 ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6370000
 N_WALKERS = 32
-MAX_N_STEPS = 5000
+MAX_N_STEPS = 10000
 
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
@@ -42,6 +42,7 @@ print("Theta high", theta_high)
 print("Theta low", theta_low)
 print("Sigma", sigma)
 print("Name", output_name)
+N_DIM = len(theta_start)
 
 reload = False
 if len(sys.argv) == 3 and sys.argv[2] == "reload":
@@ -96,17 +97,19 @@ plt.show()
 backend = emcee.backends.HDFBackend(output_name+".h5")
 
 if not reload:
-    pos = theta_start + theta_spread * np.random.randn(N_WALKERS, len(theta_start))
-    nwalkers, ndim = pos.shape
-    backend.reset(nwalkers, ndim)
+    pos = theta_start + theta_spread * np.random.randn(N_WALKERS, N_DIM)
+    backend.reset(N_WALKERS, N_DIM)
 else:
-    pos = None
+    pos=None
     print("Initial size: {}".format(backend.iteration))
 
 old_tau = np.inf
 with Pool() as pool:
-    sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability,
+    sampler = emcee.EnsembleSampler(N_WALKERS, N_DIM, log_probability,
         args=(x, y, yerr), backend=backend, pool=pool)
+
+    if reload:
+        pos = sampler._previous_state
 
     for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
         if sampler.iteration % 100 != 0:
