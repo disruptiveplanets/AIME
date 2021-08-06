@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from random_vector import *
 import numpy as np
 
-CADENCE = 600.0
+CADENCE = 120
 
 EARTH_RADIUS = 6370000
 EARTH_MASS =5.972e24
@@ -14,21 +14,22 @@ speed = 4000
 jlms = [EARTH_MASS, 0, 6e22, 7e22]
 klmss = [
     [1.2e6, 1.1e5, -4.9e5],
-    [1.2e6, 1.2e5, -5.0e5],
-    [1.2e6, 1.2e5, -4.8e5]
+    [1.2e6, 1.1e5, -4.9e5],
 ]
 SIGMA = 0.02 * np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
 initial_rolls = [
     0,
-    0,0
+    0,
 ]
+
+SHOW_ERROR = False
 
 
 plt.figure(figsize=(12, 4))
 
-for i in range(len(initial_rolls)):
-    initial_roll = initial_rolls[i]
-    klms = klmss[i]
+for data_iter in range(len(initial_rolls)):
+    initial_roll = initial_rolls[data_iter]
+    klms = klmss[data_iter]
 
     start = time.time()
     try:
@@ -47,18 +48,28 @@ for i in range(len(initial_rolls)):
             f.write('\n')
     f.close()
 
+    if SHOW_ERROR:
+        y, yerr = randomize_flat(resolved_data, SIGMA)
 
-    y, yerr = randomize_flat(resolved_data, SIGMA)
-
-    x_display = np.arange(len(y) / 3)
-    if i == 0:
-        plt.errorbar(x_display, y[::3], yerr=yerr[::3], label='x', fmt='.')
-        #plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], label = 'y', fmt='.')
-        #plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], label = 'z', fmt='.')
+        x_display = np.arange(len(y) / 3)
+        if data_iter == 0:
+            plt.plot(x_display, y[::3], yerr=yerr[::3], label='x', fmt='.', color='C0', alpha=0.5)
+            #plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], label = 'y', fmt='.')
+            #plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], label = 'z', fmt='.')
+        else:
+            plt.errorbar(x_display, y[::3], yerr=yerr[::3], fmt='.', color='C0', alpha=0.5)
+            #plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], fmt='.')
+            #plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], fmt='.')
     else:
-        plt.errorbar(x_display, y[::3], yerr=yerr[::3], fmt='.')
-        #plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], fmt='.')
-        #plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], fmt='.')
+        x_display = np.arange(len(resolved_data) / 3)
+        if data_iter == 0:
+            plt.plot(x_display, resolved_data[::3], label='x', color='C0', alpha=0.5)
+            plt.plot(x_display, resolved_data[1::3], label = 'y', color='C1', alpha=0.5)
+            plt.plot(x_display, resolved_data[2::3], label = 'z', color='C2', alpha=0.5)
+        else:
+            plt.plot(x_display, resolved_data[::3], color='C0', alpha=0.5, linestyle=':')
+            plt.plot(x_display, resolved_data[1::3], color='C1', alpha=0.5, linestyle=':')
+            plt.plot(x_display, resolved_data[2::3], color='C2', alpha=0.5, linestyle=':')
 
 plt.xlabel("Time (Cadences)")
 plt.ylabel("Spin (rad/s)")
