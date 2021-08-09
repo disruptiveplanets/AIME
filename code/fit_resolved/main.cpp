@@ -25,7 +25,7 @@ std::vector<double> simulate(double cadence, const std::vector<double> jlms_raw,
 
     std::vector<cdouble> halfklms;
     auto klm_raw_iter = klms_raw.begin();
-    halfklms.push_back({*klm_raw_iter++, 0}); // K00
+    halfklms.push_back({1, 0}); // K00
     halfklms.push_back({0, 0}); // K11
     halfklms.push_back({0, 0}); // K10
     halfklms.push_back({*klm_raw_iter++, 0}); // K22

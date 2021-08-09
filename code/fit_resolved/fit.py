@@ -29,7 +29,7 @@ while output_name[-1] == '\n':
     output_name = output_name[:-1]
 f.close()
 assert(len(theta_true) == len(theta_start) == len(theta_spread) == len(theta_high) == len(theta_low))
-assert(len(theta_true) == (ASTEROIDS_MAX_K + 1)**2 - 5)
+assert(len(theta_true) == (ASTEROIDS_MAX_K + 1)**2 - 6)
 assert(np.all(theta_high > theta_low))
 
 print("Cadence {}, impact parameter {}, speed {}".format(cadence, impact_parameter, speed))

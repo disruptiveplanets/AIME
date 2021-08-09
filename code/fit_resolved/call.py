@@ -13,12 +13,10 @@ impact_parameter = 5 * EARTH_RADIUS
 speed = 4000
 jlms = [EARTH_MASS, 0, 6e22, 7e22]
 klmss = [
-    [1.2e6, 1.1e5, -4.9e5],
-    [1.2e6, 1.1e5, -4.9e5],
+    [0.09412789, -0.4],
 ]
 SIGMA = 0.02 * np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
 initial_rolls = [
-    0,
     0,
 ]
 
