@@ -73,7 +73,8 @@ class Display:
         redchiminmean = 0
         for i in range(self.log_prob_samples.shape[1]):
             redchi = -self.log_prob_samples[:,i] / len(self.true_results)
-            redchiminmean += np.min(redchi) / self.log_prob_samples.shape[1]
+            this_min = np.nanmin(redchi) / self.log_prob_samples.shape[1]
+            redchiminmean += this_min if np.isfinite(this_min) else 0
             plt.plot(redchi, c='k', alpha=0.25)
         plt.ylabel("Reduced chi squared")
         plt.xlabel("Sample")
