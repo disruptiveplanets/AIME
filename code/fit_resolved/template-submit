@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Slurm sbatsh options
-#SBATCH -o 
-#SBATCH --exclusive
+#SBATCH -o
+#SBATCH -c 20
 #ggSBATCH --gres=gpu:volta:1
 
 source /etc/profile

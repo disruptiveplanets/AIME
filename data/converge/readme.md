@@ -13,3 +13,7 @@ The fits look good! They're much closer to converging, but I need to run them ag
 ## August 9
 
 I just realized that I still have degeneracy in my model. So I'm removing it and rerunning some fits. The run 2 fits convinced me that big spread is better, or at least faster I think. So run 0 tests two fits for all parameters, with two different spread values. Run 1 tests fits only to one parameter, with the lower spread value.
+
+## August 16
+
+I'm going to rerun August 9, this time with reloading possible. Runs 0.* fit all three parameters at the same time, with different sigma and different degrees of initial separation. Fits 1.* fit one parameter at a time with different sigma.
