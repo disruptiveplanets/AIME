@@ -8,7 +8,7 @@ from random_vector import *
 ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6370000
 N_WALKERS = 32
-MAX_N_STEPS = 15000
+MAX_N_STEPS = 20000
 
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
@@ -110,6 +110,7 @@ with Pool() as pool:
 
     if reload:
         pos = sampler._previous_state
+        print("Reloaded pos is", pos)
 
     for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
         if sampler.iteration % 100 != 0:

@@ -16,4 +16,8 @@ I just realized that I still have degeneracy in my model. So I'm removing it and
 
 ## August 16
 
-I'm going to rerun August 9, this time with reloading possible. Runs 0.* fit all three parameters at the same time, with different sigma and different degrees of initial separation. Fits 1.* fit one parameter at a time with different sigma.
+I'm going to rerun August 9, this time with reloading possible. Runs 0.* fit all three parameters at the same time, with different sigma and different degrees of initial separation. Fits 1.* fit one parameter at a time with different sigma. In this case, smaller sigma are better.
+
+## August 18
+
+It seems as though sigma controls the speed of convergence. I'm rerunning 0.1 and 0.2 which are the only fits that didn't converge and which I think have a chance of doing so. I'm also fitting runs 2.*, which fix one parameter and fit two.
