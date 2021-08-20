@@ -21,3 +21,7 @@ I'm going to rerun August 9, this time with reloading possible. Runs 0.* fit all
 ## August 18
 
 It seems as though sigma controls the speed of convergence. I'm rerunning 0.1 and 0.2 which are the only fits that didn't converge and which I think have a chance of doing so. I'm also fitting runs 2.*, which fix one parameter and fit two.
+
+## August 20
+
+It seems hardest to fit to theta 2, possibly because it's the smallest compared to its sigma. So I'm shortening sigma and running a very long fit in preparation for vacation as 3.*. It fixes zero, one, and two parameters.

@@ -8,7 +8,7 @@ from random_vector import *
 ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6370000
 N_WALKERS = 32
-MAX_N_STEPS = 20000
+MAX_N_STEPS = 50000
 
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
