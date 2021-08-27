@@ -9,7 +9,7 @@ ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 ASTEROIDS_MAX_J = 0 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6370000
 N_WALKERS = 32
-MAX_N_STEPS = 40000
+MAX_N_STEPS = 50000
 
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
@@ -25,6 +25,7 @@ theta_start = [float(x) for x in f.readline().split(',')]
 theta_spread = [float(x) for x in f.readline().split(',')]
 theta_high = np.asarray([float(x) for x in f.readline().split(',')])
 theta_low = np.asarray([float(x) for x in f.readline().split(',')])
+
 sigma = float(f.readline()) * np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
 while output_name[-1] == '\n':
     output_name = output_name[:-1]
@@ -52,7 +53,9 @@ if len(sys.argv) == 3 and sys.argv[2] == "reload":
     REGENERATE_DATA = False
 
 def fit_function(theta):
-    resolved_data = asteroids.simulate(cadence, jlms, theta[1:],
+    resolved_data = asteroids.simulate(cadence, jlms,
+        theta[2:] if ASTEROIDS_MAX_K > 2 else theta[1:], # klm
+        theta[2] if ASTEROIDS_MAX_K > 2 else 1, # radius
         spin[0], spin[1], spin[2], theta[0], impact_parameter, speed)
     return np.asarray(resolved_data)
 

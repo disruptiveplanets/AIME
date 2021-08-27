@@ -79,6 +79,12 @@ int main(int argc, char* argv[]) {
         halfklms.push_back({std::stod(x), 0});
     }
 
+    // Radius
+    std::getline(f, line);
+    ss = std::istringstream (line);
+    ss >> word;
+    double radius = std::stod(word);
+
     // Spin
     std::getline(f, line);
     ss = std::istringstream (line);
@@ -136,8 +142,7 @@ int main(int argc, char* argv[]) {
 
 
     // Load asteroid
-    Asteroid asteroid(&jlms[0], &klms[0], spin, initial_roll,
-        impact_parameter, speed);
+    Asteroid asteroid(&jlms[0], &klms[0], radius, spin, initial_roll, impact_parameter, speed);
 
     // Run asteroid
     std::vector<double> resolved_data;

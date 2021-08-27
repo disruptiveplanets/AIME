@@ -26,11 +26,12 @@
 #define MAX_DT 2.0
 #define MIN_DT 1.0e-0
 #define DT_POWER 1// 5M
+#define GM 3.986004418e14
+#define RADIUS 6371000
 
-#define INTEGRAL_LIMIT_FRAC 1.0e-5// 5e-6
+#define INTEGRAL_LIMIT_FRAC 1.0e-3// 5e-6
 #define NUM_THREADS 4
     // Torque at closest approach divided by torque at start of sim.
-#define G 6.67408e-11
 //#define _DEBUG
 
 using uint = unsigned int;
@@ -38,7 +39,7 @@ using cdouble = std::complex<double>;
 
 class Asteroid {
 public:
-    Asteroid(const cdouble* jlms, const cdouble* klms,
+    Asteroid(const cdouble* jlms, const cdouble* klms, const double asteroid_radius,
         Vector3 spin, double initial_roll,
         double impact_parameter, double speed);
 
@@ -56,6 +57,7 @@ private:
 private:
     const cdouble* jlms;
     const cdouble* klms;
+    double asteroid_radius;
 
     Vector3 moi, inv_moi;
     double edge_dist; // Limit of the integration region

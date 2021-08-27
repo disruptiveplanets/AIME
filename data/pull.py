@@ -4,7 +4,7 @@ from shutil import copyfile
 copyfile("../code/fit_resolved/asteroids.cpython-38-x86_64-linux-gnu.so", "asteroids.cpython-38-x86_64-linux-gnu.so")
 import display
 
-PATH = "long-run"
+PATH = "j0-k2"
 
 for fname in os.listdir("../staged/"):
     fname = os.path.splitext(fname)[0]

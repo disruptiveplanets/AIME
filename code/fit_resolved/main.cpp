@@ -9,7 +9,7 @@
 using cdouble = std::complex<double>;
 
 std::vector<double> simulate(double cadence, const std::vector<double> jlms_raw,
-    const std::vector<double> klms_raw, double spinx, double spiny, double spinz,
+    const std::vector<double> klms_raw,  double radius, double spinx, double spiny, double spinz,
     double initial_roll, double impact_parameter, double speed) {
 
     std::vector<cdouble> halfjlms;
@@ -72,7 +72,7 @@ std::vector<double> simulate(double cadence, const std::vector<double> jlms_raw,
     }
 
 
-    Asteroid asteroid(jlms, klms, Vector3({spinx, spiny, spinz}),
+    Asteroid asteroid(jlms, klms, radius, Vector3({spinx, spiny, spinz}),
         initial_roll, impact_parameter, speed);
 
     // Run asteroid

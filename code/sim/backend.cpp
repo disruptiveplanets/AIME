@@ -1,10 +1,10 @@
 #include "backend.hpp"
 
-Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms,
+Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms, double asteroid_radius,
     Vector3 spin, double initial_roll,
     double impact_parameter, double speed) :
-    jlms(jlms), klms(klms), velocity(Vector3({0, 0, speed})),
-    spin(spin), mu(jlms[0].real() * G) {
+    jlms(jlms), klms(klms), asteroid_radius(asteroid_radius), velocity(Vector3({0, 0, speed})),
+    spin(spin) {
 
     calculate_moi(initial_roll);
     set_pos(impact_parameter);
@@ -27,7 +27,6 @@ Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms,
     std::cout << "Start position: " << position << std::endl;
     std::cout << "Start velocity: " << velocity << std::endl;
     std::cout << "Start spin: " << spin << std::endl;
-    std::cout << "Central mu: " << mu << std::endl;
     std::cout << std::endl;
     #endif
 }
@@ -49,23 +48,20 @@ void Asteroid::set_pos(double b) {
     position *= 1 - EPSILON;
         // So that it reads as just inside the allowed region
 
-    energy = 0.5 * velocity.mag2() - mu / position.mag();
+    energy = 0.5 * velocity.mag2() - GM / position.mag();
     ang_mom = Vector3::cross(position, velocity);
-    double velocity_periapsis = mu / ang_mom.mag() +
-        sqrt(mu * mu / ang_mom.mag2() + 2 * energy);
+    double velocity_periapsis = GM / ang_mom.mag() +
+        sqrt(GM * GM / ang_mom.mag2() + 2 * energy);
     closest_approach = ang_mom.mag() / velocity_periapsis;
     excess_vel = sqrt(2 * energy);
     impact_parameter = ang_mom.mag() / excess_vel;
 }
 
 void Asteroid::calculate_moi(double initial_roll) {
-    double sph = 2/5.0 * klm(0, 0).real();
-    double Ixx = (2/3.0 * klm(2,0) - 2.0 * klm(2, -2) - 2.0 * klm(2, 2)).real()
-        + sph;
-    double Iyy = (2/3.0 * klm(2,0) + 2.0 * klm(2, -2) + 2.0 * klm(2, 2)).real()
-        + sph;
-    double Izz = (- 4 / 3.0 * klm(2, 0)).real()
-        + sph;
+    double Ixx = (2/3.0 * klm(2,0) - 2.0 * klm(2, -2) - 2.0 * klm(2, 2)).real() + 2/3.0;
+    double Iyy = (2/3.0 * klm(2,0) + 2.0 * klm(2, -2) + 2.0 * klm(2, 2)).real() + 2/3.0;
+    double Izz = (- 4 / 3.0 * klm(2, 0)).real() + 2/3.0;
+    // These mois are really moi per radius^2 per M.
 
     if (abs(Izz) < abs(Ixx) || abs(Izz) < abs(Iyy)) {
         throw std::runtime_error(
@@ -101,8 +97,8 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
     double denom = 1.0 / (pow(edge_dist, DT_POWER) - close_power);
 
     for (;position.mag() < edge_dist; frames++) {
-        dt = MIN_DT + (MAX_DT - MIN_DT) *
-            (pow(position.mag(), DT_POWER) - close_power) * denom;
+        dt = 0.5;
+        //MIN_DT + (MAX_DT - MIN_DT) * (pow(position.mag(), DT_POWER) - close_power) * denom;
         update_orientation(dt);
         update_position(dt);
         time += dt;
@@ -150,11 +146,11 @@ Vector3 Asteroid::get_torque() {
                 nowjlm += sqrt(fact(l-mpp) * fact(l+mpp))
                     * std::conj(dgen(l,m,mpp)) * jlm(l,mpp);
             }
-            nowjlm *= (double)parity(l) / sqrt(fact(l-m) * fact(l+m));
+            nowjlm *= (double)parity(l) / sqrt(fact(l-m) * fact(l+m)) * pow(RADIUS, l);
             for (uint lp = 2; lp <= ASTEROIDS_MAX_K; lp++) {
                 for (int mp = -lp; mp <= (int)lp; mp++) {
-                    prelpmp = nowjlm * slm_c(l + lp, m + mp,
-                        rot_pos_r, rot_pos_ct, rot_pos_p);
+                    prelpmp = nowjlm * slm_c(l + lp, m + mp, rot_pos_r, rot_pos_ct, rot_pos_p)
+                        * pow(asteroid_radius, lp - 2);
                     x_torque += prelpmp * ((double)(lp - mp + 1)
                         * std::conj(klm(lp, mp-1))
                         + (double)(lp + mp + 1)
@@ -173,11 +169,12 @@ Vector3 Asteroid::get_torque() {
     return Vector3({-std::move(x_torque.imag()),
         std::move(y_torque.real()),
         -std::move(z_torque.imag())})
-        * -0.5 * G;
+        * -0.5 * GM;
+    // This torque is really torque per radius^2 per M.
 }
 
 void Asteroid::update_position(double dt) {
-    accel = -mu / pow(position.mag(), 3) * position;
+    accel = -GM / pow(position.mag(), 3) * position;
     velocity += accel * dt;
     position += velocity * dt;
 }

@@ -1,7 +1,7 @@
 import os, sys
 from PIL import Image, ImageFont, ImageDraw
 
-PATH = 'long-run'
+PATH = "j0-k2"
 RUNS = 0
 CORNER = 1
 PARAMS = 2
