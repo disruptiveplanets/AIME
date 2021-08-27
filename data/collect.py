@@ -77,7 +77,7 @@ for d in dirs:
     text += "Theta +sigma: {}".format(theta_plus)
 
     draw.text((widths[CORNER]/2+40, 40), text, font=font, align="left", fill='black')
-    new_im.save(PATH+'/'+d+'/'+d+"-all.png")
+    new_im.save(PATH+'/'+d+"-all.png")
 
     for x in ['-compare.png', '-corner.png', '-params.png', '-redchi.png', '-results.txt']:
         os.remove(PATH+'/'+d+'/'+d+x)

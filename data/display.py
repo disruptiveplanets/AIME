@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 EARTH_RADIUS = 6370000
+STANDARD_RESULTS_METHOD = False
+REDCHI_THRESHOLD = 2
 
 class Display:
     def __init__(self, bare_name):
@@ -11,6 +13,7 @@ class Display:
         self.samples = None
         self.theta_true = None
         self.true_results = None
+        self.res = None
         try:
             self.chain_length, self.nwalkers, self.ndim = self.reader.get_chain().shape
         except AttributeError:
@@ -40,10 +43,7 @@ class Display:
 
         self.get_samples_burnin(self.burnin)
 
-        print("burn-in: {0}".format(self.burnin))
-        print("thin: {0}".format(self.thin))
-        print("flat chain shape: {0}".format(self.samples.shape))
-        print("flat log prob shape: {0}".format(self.log_prob_samples.shape))
+        print("Burn-in: {}. Thin: {}".format(self.burnin, self.thin))
 
     def get_samples_burnin(self, burnin):
         self.samples = self.reader.get_chain(discard=burnin, thin=self.thin)
@@ -71,14 +71,19 @@ class Display:
             self.true_results = self.run(self.theta_true)
         fig = plt.figure(figsize=(6.6, 4.6))
         redchiminmean = 0
+        num_converged = 0
         for i in range(self.log_prob_samples.shape[1]):
             redchi = -self.log_prob_samples[:,i] / len(self.true_results)
+            if redchi [-1] < REDCHI_THRESHOLD:
+                num_converged += 1
             this_min = np.nanmin(redchi) / self.log_prob_samples.shape[1]
             redchiminmean += this_min if np.isfinite(this_min) else 0
             plt.plot(redchi, c='k', alpha=0.25)
         plt.ylabel("Reduced chi squared")
         plt.xlabel("Sample")
         plt.ylim(0, max(2, 2 * redchiminmean))
+        plt.text(0.5, 0.5, "{} / {} walkers converged".format(num_converged, self.log_prob_samples.shape[1]),
+        horizontalalignment='center', verticalalignment='center', transform = plt.gca().transAxes)
         plt.savefig(self.bare_name+"-redchi.png")
 
     def show_corner(self):
@@ -124,20 +129,40 @@ class Display:
         for i, (mean, plus, minus) in enumerate(res):
             res_text += "{}: {} +{}, -{}. True: {}\n".format(
                 self.theta_labels[i], mean, plus, minus, self.theta_true[i])
-        print(res_text)
         f = open(self.bare_name + '-results.txt', 'w')
         f.write(res_text)
         f.close()
 
     def get_results(self):
+        if self.res is not None:
+            return self.res
         self.get_samples()
         res = []
-        flat_samples = self.samples.reshape(
-            (self.samples.shape[0] * self.samples.shape[1], self.samples.shape[2]))
+
+        if STANDARD_RESULTS_METHOD:
+            mask = np.ones(self.log_prob_samples.shape[1], dtype=bool)
+        else:
+            # Only allow walkers which have converged. Definition of convergence: redchi
+            self.get_params()
+            if self.true_results is None:
+                self.true_results = self.run(self.theta_true)
+
+            redchi = -self.log_prob_samples[-1,:] / len(self.true_results)
+            mask = redchi < REDCHI_THRESHOLD
+            if np.sum(mask) == 0:
+                mask = np.ones(self.log_prob_samples.shape[1], dtype=bool)
+
+        print("Sampling results from {}/{} walkers".format(np.sum(mask), self.log_prob_samples.shape[1]))
+
+        flat_samples = self.samples[:,mask,:].reshape(
+            (self.samples.shape[0] * np.sum(mask), self.samples.shape[2]))
+
         for i in range(self.ndim):
             mcmc = np.percentile(flat_samples[:, i], [16, 50, 84])
             q = np.diff(mcmc)
             res.append([mcmc[1], q[1], q[0]])# median, high bar, low bar
+
+        self.res = res
         return res
 
     def run(self, theta):
