@@ -18,19 +18,14 @@ In both the resolved and unresolved cases, we will build a simulation to generat
 1. Created a robust and general model for asteroid shape and density profile (Done)
 2. Wrote code to simulate an asteroid flyby for certain parameters (Done)
 3. Wrote code that can calculate torque to all orders of distance
-4. Confirmed that different Mlms with l>2 can have an effect on output (albeit barely)
+4. Confirmed that different Klms with l>2 can have an effect on output (albeit barely)
 5. Be able to do fits
 
 ## Not done:
 Immediate:
-1. Get MPIexec working
-2. If necessary, do some math to reduce number of computations done in torque
-3. Has the integral converged?
-4. Runge Kutta?
-
-Later:
+1. Check to make sure fits still converge now that physics have changed
+2. Run higher order Kl fits
 1. Run fits with pure J2, J4, etc. coefficients.
-2. Establish a relationship between shape and expansion coefficients
 
 Much later:
 1. Show that moons can be added to perturb the Jlms.

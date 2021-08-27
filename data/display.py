@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 EARTH_RADIUS = 6370000
 STANDARD_RESULTS_METHOD = False
 REDCHI_THRESHOLD = 2
+ASTEROIDS_MAX_K = 2
 
 class Display:
     def __init__(self, bare_name):
@@ -167,7 +168,9 @@ class Display:
 
     def run(self, theta):
         self.get_params()
-        resolved_data = asteroids.simulate(self.cadence, self.jlms, theta[1:],
+        resolved_data = asteroids.simulate(self.cadence, self.jlms,
+            theta[2:] if ASTEROIDS_MAX_K > 2 else theta[1:], # klm
+            theta[2] if ASTEROIDS_MAX_K > 2 else 1, # radius
             self.spin[0], self.spin[1], self.spin[2], theta[0],
             self.impact_parameter, self.speed)
         return np.asarray(resolved_data)
