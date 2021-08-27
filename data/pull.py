@@ -4,7 +4,7 @@ from shutil import copyfile
 copyfile("../code/fit_resolved/asteroids.cpython-38-x86_64-linux-gnu.so", "asteroids.cpython-38-x86_64-linux-gnu.so")
 import display
 
-PATH = "converge"
+PATH = "long-run"
 
 for fname in os.listdir("../staged/"):
     fname = os.path.splitext(fname)[0]

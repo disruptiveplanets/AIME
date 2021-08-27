@@ -1,7 +1,7 @@
 import os, sys
 from PIL import Image, ImageFont, ImageDraw
 
-PATH = 'converge'
+PATH = 'long-run'
 RUNS = 0
 CORNER = 1
 PARAMS = 2
@@ -49,21 +49,35 @@ for d in dirs:
     sigma = float(f.readline())
     f.close()
 
+    f = open(PATH+"/"+d+"/"+d+"-results.txt", 'r')
+    theta_median = []
+    theta_plus = []
+    theta_minus = []
+    for line in f.readlines():
+        if line == "": continue
+        median, plus, minus, _ = line.split(": ")[1].split(' ')
+        theta_median.append('%s' % float('%.4g' % float(median)))
+        theta_plus.append('%s' % float('%.4g' % float(plus[:-1]))) # Remove the terminal comma
+        theta_minus.append('%s' % float('%.4g' % -float(minus[:-1])))
+    f.close()
+
     draw = ImageDraw.Draw(new_im)
-    text = """Cadence: {}
-Speed: {}\t Impact parameter: {} Earth radii
-Spin: {}
-Jlms: {}
-True theta: {}
-Theta start: {}
-Theta spread: {}
-Theta high: {}
-Theta low: {}
-""".format(cadence, speed, impact_parameter, spin, jlms, theta_true, theta_start,
-    theta_spread, theta_high, theta_low)
+    text = ""
+    #text += "Cadence: {}\n".format(cadence)
+    #text += "Speed: {}\t Impact parameter: {} Earth radii\n".format(speed, impact_parameter)
+    #text += "Spin: {}\n".format(spin)
+    #text += "Jlms: {}\n".format(jlms)
+    text += "True theta: {}\n".format(theta_true)
+    text += "Theta start: {}\n".format(theta_start)
+    text += "Theta spread: {}\n".format(theta_spread)
+    text += "Theta high: {}\n".format(theta_high)
+    text += "Theta low: {}\n\n".format(theta_low)
+    text += "Theta median: {}\n".format(theta_median)
+    text += "Theta -sigma: {}\n".format(theta_minus)
+    text += "Theta +sigma: {}".format(theta_plus)
 
     draw.text((widths[CORNER]/2+40, 40), text, font=font, align="left", fill='black')
     new_im.save(PATH+'/'+d+'/'+d+"-all.png")
 
-    for x in ['-compare.png', '-corner.png', '-params.png', '-redchi.png']:
-        os.remove(PATH+'/'+d+'/'+d+x) 
+    for x in ['-compare.png', '-corner.png', '-params.png', '-redchi.png', '-results.txt']:
+        os.remove(PATH+'/'+d+'/'+d+x)

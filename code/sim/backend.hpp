@@ -17,7 +17,7 @@
 
 
 
-#define ASTEROIDS_MAX_J 1
+#define ASTEROIDS_MAX_J 0
 #define ASTEROIDS_MAX_K 2
 
 
@@ -57,7 +57,7 @@ private:
     const cdouble* jlms;
     const cdouble* klms;
 
-    Vector3 moi;
+    Vector3 moi, inv_moi;
     double edge_dist; // Limit of the integration region
     Vector3 position;
     Vector3 velocity;

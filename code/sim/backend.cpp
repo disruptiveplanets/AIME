@@ -73,6 +73,7 @@ void Asteroid::calculate_moi(double initial_roll) {
     }
 
     moi = Vector3({Ixx, Iyy, Izz});
+    inv_moi = Vector3({1.0 / Ixx, 1.0 / Iyy, 1.0 / Izz});
 
     Vector3 nspin = spin / spin.mag();
 
@@ -185,9 +186,9 @@ void Asteroid::update_orientation(double dt) {
     torque = get_torque();
 
     omegaDot = Vector3({
-        (torque[0] + (moi[1] - moi[2]) * spin[1] * spin[2]) / moi[0],
-        (torque[1] + (moi[2] - moi[0]) * spin[2] * spin[0]) / moi[1],
-        (torque[2] + (moi[0] - moi[1]) * spin[0] * spin[1]) / moi[2],
+        (torque[0] + (moi[1] - moi[2]) * spin[1] * spin[2]) * inv_moi[0],
+        (torque[1] + (moi[2] - moi[0]) * spin[2] * spin[0]) * inv_moi[1],
+        (torque[2] + (moi[0] - moi[1]) * spin[0] * spin[1]) * inv_moi[2],
     });
 
     /*if (isnan(omegaDot[0])) {

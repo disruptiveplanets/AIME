@@ -84,11 +84,20 @@ class Display:
     def show_corner(self):
         self.get_samples()
         self.get_params()
+
+        res = self.get_results()
+        transpose_res = [np.asarray([l[i] for l in res]) for i in range(3)]
+
         flat_samples = self.samples.reshape(
             (self.samples.shape[0] * self.samples.shape[1], self.samples.shape[2]))
         fig = corner.corner(
             flat_samples, labels=self.theta_labels, truths=self.theta_true
         );
+
+        corner.overplot_lines(fig, transpose_res[0], color='red')
+        corner.overplot_lines(fig, transpose_res[0] + transpose_res[1], color='red', linestyle='dotted')
+        corner.overplot_lines(fig, transpose_res[0] - transpose_res[2], color='red', linestyle='dotted')
+
         plt.savefig(self.bare_name+"-corner.png")
 
     def get_params(self):
@@ -111,9 +120,14 @@ class Display:
     def show_results(self):
         self.get_params()
         res = self.get_results()
+        res_text = ""
         for i, (mean, plus, minus) in enumerate(res):
-            print("{}: {} +{}, -{}. True: {}".format(
-                self.theta_labels[i], mean, plus, minus, self.theta_true[i]))
+            res_text += "{}: {} +{}, -{}. True: {}\n".format(
+                self.theta_labels[i], mean, plus, minus, self.theta_true[i])
+        print(res_text)
+        f = open(self.bare_name + '-results.txt', 'w')
+        f.write(res_text)
+        f.close()
 
     def get_results(self):
         self.get_samples()
@@ -123,7 +137,7 @@ class Display:
         for i in range(self.ndim):
             mcmc = np.percentile(flat_samples[:, i], [16, 50, 84])
             q = np.diff(mcmc)
-            res.append([mcmc[1], q[0], q[1]])
+            res.append([mcmc[1], q[1], q[0]])# median, high bar, low bar
         return res
 
     def run(self, theta):

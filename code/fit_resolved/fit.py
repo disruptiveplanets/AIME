@@ -6,9 +6,10 @@ from random_vector import *
 
 
 ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
+ASTEROIDS_MAX_J = 0 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6370000
 N_WALKERS = 32
-MAX_N_STEPS = 50000
+MAX_N_STEPS = 40000
 
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
@@ -30,6 +31,7 @@ while output_name[-1] == '\n':
 f.close()
 assert(len(theta_true) == len(theta_start) == len(theta_spread) == len(theta_high) == len(theta_low))
 assert(len(theta_true) == (ASTEROIDS_MAX_K + 1)**2 - 6)
+assert(len(jlms) == (ASTEROIDS_MAX_J + 1)**2)
 assert(np.all(theta_high > theta_low))
 
 print("Cadence {}, impact parameter {}, speed {}".format(cadence, impact_parameter, speed))
