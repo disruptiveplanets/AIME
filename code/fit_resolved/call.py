@@ -14,7 +14,7 @@ jlms = [1.0]
 klmss = [
     [0.09412789, -0.4],
 ]
-radius = 1
+radius = 100
 SIGMA = 0.02 * np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
 initial_rolls = [
     0,

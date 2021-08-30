@@ -24,4 +24,4 @@ It seems as though sigma controls the speed of convergence. I'm rerunning 0.1 an
 
 ## August 20
 
-It seems hardest to fit to theta 2, possibly because it's the smallest compared to its sigma. So I'm shortening sigma and running a very long fit in preparation for vacation as 3.*. It fixes zero, one, and two parameters.
+It seems hardest to fit to theta 2, possibly because it's the smallest compared to its sigma. So I'm shortening sigma and running a very long fit in preparation for vacation as 3.*. It fixes zero, one, and two parameters. All the fits converge except for three parameters and two parameters with theta 1 fixed; I'm running these for another 100,000 iterations.

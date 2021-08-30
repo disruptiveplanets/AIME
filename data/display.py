@@ -111,7 +111,8 @@ class Display:
             return
         f = open(self.bare_name + ".dat", 'r')
         self.cadence = int(f.readline())
-        self.impact_parameter = EARTH_RADIUS * int(f.readline())
+        self.impact_parameter = EARTH_RADIUS * float(f.readline())
+        self.radius = float(f.readline())
         self.speed = float(f.readline())
         self.spin = [float(x) for x in f.readline().split(',')]
         self.jlms = [float(x) for x in f.readline().split(',')]
@@ -168,10 +169,8 @@ class Display:
 
     def run(self, theta):
         self.get_params()
-        resolved_data = asteroids.simulate(self.cadence, self.jlms,
-            theta[2:] if ASTEROIDS_MAX_K > 2 else theta[1:], # klm
-            theta[2] if ASTEROIDS_MAX_K > 2 else 1, # radius
-            self.spin[0], self.spin[1], self.spin[2], theta[0],
+        resolved_data = asteroids.simulate(self.cadence, self.jlms, theta[1:],
+            self.radius, self.spin[0], self.spin[1], self.spin[2], theta[0],
             self.impact_parameter, self.speed)
         return np.asarray(resolved_data)
 

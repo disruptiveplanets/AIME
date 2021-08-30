@@ -38,6 +38,7 @@ for d in dirs:
     f = open(PATH+"/"+d+"/"+d+".dat", 'r')
     cadence = int(f.readline())
     impact_parameter = int(f.readline())
+    radius = float(f.readline())
     speed = float(f.readline())
     spin = [float(x) for x in f.readline().split(',')]
     jlms = [float(x) for x in f.readline().split(',')]
