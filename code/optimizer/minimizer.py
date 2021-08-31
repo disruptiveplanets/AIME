@@ -74,7 +74,7 @@ y, yerr = randomize_rotate(y, sigma)
 bfgs_min = minimize(red_chi, theta_start, args=(y, yerr), method='L-BFGS-B', bounds=bounds, options={"eps": 1e-10})
 print(bfgs_min)
 print(bfgs_min.hess_inv)
-print(bfgs_min.hess_inv.H)
+print(bfgs_min.hess_inv(bfgs_min.x))
 
 #bfgs_real_min = minimize(minus_log_likelihood, theta_true, args=(y, yerr), method='L-BFGS-B', bounds=bounds, options={"eps": 1e-10})
 #print(bfgs_min)

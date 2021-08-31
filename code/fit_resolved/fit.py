@@ -5,11 +5,11 @@ from multiprocessing import Pool
 from random_vector import *
 
 
-ASTEROIDS_MAX_K = 3 # Remember to change the counterpart in backend.hpp
+ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 ASTEROIDS_MAX_J = 0 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6370000
 N_WALKERS = 32
-MAX_N_STEPS = 100_000
+MAX_N_STEPS = 150_000
 
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")

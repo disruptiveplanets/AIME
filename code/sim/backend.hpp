@@ -18,7 +18,7 @@
 
 
 #define ASTEROIDS_MAX_J 0
-#define ASTEROIDS_MAX_K 3
+#define ASTEROIDS_MAX_K 2
 
 
 
