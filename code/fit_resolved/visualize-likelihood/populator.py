@@ -1,5 +1,6 @@
 from scipy.optimize import minimize
 import time, sys, os, inspect
+from multiprocessing import Pool
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -77,7 +78,7 @@ red_chis = []
 xs = np.linspace(theta_low[THETA_X_INDEX], theta_high[THETA_X_INDEX], PLOT_SIZE)
 ys = np.linspace(theta_low[THETA_Y_INDEX], theta_high[THETA_Y_INDEX], PLOT_SIZE)
 
-for theta_y in ys:
+def gen_line(theta_y):
     line = []
     for theta_x in xs:
         theta = [0] * len(theta_true)
@@ -89,7 +90,10 @@ for theta_y in ys:
             else:
                 theta[i] = t
         line.append(red_chi(theta, y, yerr))
-    red_chis.append(line)
+    return line
+
+with Pool() as pool:
+    red_chis = pool.map(gen_line, ys)
 
 f = open("redchi-{}-{}.dat".format(THETA_X_INDEX, THETA_Y_INDEX), 'w')
 f.write("{}, {}\n".format(THETA_X_INDEX, THETA_Y_INDEX))
