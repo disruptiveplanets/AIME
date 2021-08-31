@@ -22,6 +22,10 @@ I'm going to rerun August 9, this time with reloading possible. Runs 0.* fit all
 
 It seems as though sigma controls the speed of convergence. I'm rerunning 0.1 and 0.2 which are the only fits that didn't converge and which I think have a chance of doing so. I'm also fitting runs 2.*, which fix one parameter and fit two.
 
-## August 20
+## August 30
 
 It seems hardest to fit to theta 2, possibly because it's the smallest compared to its sigma. So I'm shortening sigma and running a very long fit in preparation for vacation as 3.*. It fixes zero, one, and two parameters. All the fits converge except for three parameters and two parameters with theta 1 fixed; I'm running these for another 100,000 iterations.
+
+## August 31
+
+I got back the previous iterations and they are not converging. So I ran the whole fit again, hoping I got unlucky. That is in the `small_order` directory. I'm also exploring l=3 in the `asteroid-tidal-torque` directory. Finally, I'm following up on Julien's suggestion that I explore the parameter space for minima first, then fit. That is in the minimize-first branch (this branch)
