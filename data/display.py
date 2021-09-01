@@ -117,8 +117,6 @@ class Display:
         self.spin = [float(x) for x in f.readline().split(',')]
         self.jlms = [float(x) for x in f.readline().split(',')]
         self.theta_true = [float(x) for x in f.readline().split(',')]
-        theta_start = [float(x) for x in f.readline().split(',')]
-        theta_spread = [float(x) for x in f.readline().split(',')]
         theta_high = np.asarray([float(x) for x in f.readline().split(',')])
         theta_low = np.asarray([float(x) for x in f.readline().split(',')])
         sigma = float(f.readline()) * np.sqrt(self.spin[0]**2 + self.spin[1]**2 + self.spin[2]**2)
@@ -181,17 +179,32 @@ class Display:
             self.true_results = self.run(self.theta_true)
         mean_res = self.run(theta_results)
 
-        plt.figure(figsize=(12, 4))
+        f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(12, 6), sharex=True)
 
-        x_display = np.arange(len(self.true_results) / 3)
-        plt.plot(x_display, self.true_results[::3], label = 'true x', alpha=0.5, color='C0')
-        plt.plot(x_display, self.true_results[1::3], label = 'true y', alpha=0.5, color='C1')
-        plt.plot(x_display, self.true_results[2::3], label = 'true z', alpha=0.5, color='C2')
+        x_display = np.arange(len(self.true_results) / 3) * self.cadence / 3600.0
+        ax1.plot(x_display, self.true_results[::3], label = 'true x', alpha=0.5, color='C0')
+        ax1.plot(x_display, self.true_results[1::3], label = 'true y', alpha=0.5, color='C1')
+        ax1.plot(x_display, self.true_results[2::3], label = 'true z', alpha=0.5, color='C2')
 
-        plt.plot(x_display, mean_res[::3], label = 'mean x', alpha=0.5, linestyle='dotted', color='C0')
-        plt.plot(x_display, mean_res[1::3], label = 'mean y', alpha=0.5, linestyle='dotted', color='C1')
-        plt.plot(x_display, mean_res[2::3], label = 'mean z', alpha=0.5, linestyle='dotted', color='C2')
-        plt.xlabel("Time (Cadences)")
-        plt.ylabel("Spin (rad/s)")
-        plt.legend()
+        ax1.plot(x_display, mean_res[::3], label = 'mean x', alpha=0.5, linestyle='dotted', color='C0')
+        ax1.plot(x_display, mean_res[1::3], label = 'mean y', alpha=0.5, linestyle='dotted', color='C1')
+        ax1.plot(x_display, mean_res[2::3], label = 'mean z', alpha=0.5, linestyle='dotted', color='C2')
+        ax1.set_ylabel("Spin (rad/s)")
+        ax1.legend()
+
+        ax2.plot(x_display, mean_res[::3] - self.true_results[::3], color='C0')
+        ax2.plot(x_display, mean_res[1::3] - self.true_results[1::3], color='C1')
+        ax2.plot(x_display, mean_res[2::3] - self.true_results[2::3], color='C2')
+
+        ax2.set_ylabel("Residuals (rad/s)")
+        ax2.set_xlabel("Time (hours)")
+
         plt.savefig(self.bare_name+"-compare.png")
+
+
+if __name__ == "__main__":
+    d = Display("minimizer/run-3.0/run-3.0")
+    d.thin = 1
+    d.get_samples_burnin(4000)
+    d.show_compare()
+    plt.show()

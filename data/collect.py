@@ -1,7 +1,7 @@
 import os, sys
 from PIL import Image, ImageFont, ImageDraw
 
-PATH = "converge"
+PATH = "minimizer"
 RUNS = 0
 CORNER = 1
 PARAMS = 2
@@ -43,8 +43,6 @@ for d in dirs:
     spin = [float(x) for x in f.readline().split(',')]
     jlms = [float(x) for x in f.readline().split(',')]
     theta_true = [float(x) for x in f.readline().split(',')]
-    theta_start = [float(x) for x in f.readline().split(',')]
-    theta_spread = [float(x) for x in f.readline().split(',')]
     theta_high = [float(x) for x in f.readline().split(',')]
     theta_low = [float(x) for x in f.readline().split(',')]
     sigma = float(f.readline())
@@ -69,8 +67,6 @@ for d in dirs:
     #text += "Spin: {}\n".format(spin)
     #text += "Jlms: {}\n".format(jlms)
     text += "True theta: {}\n".format(theta_true)
-    text += "Theta start: {}\n".format(theta_start)
-    text += "Theta spread: {}\n".format(theta_spread)
     text += "Theta high: {}\n".format(theta_high)
     text += "Theta low: {}\n\n".format(theta_low)
     text += "Theta median: {}\n".format(theta_median)
