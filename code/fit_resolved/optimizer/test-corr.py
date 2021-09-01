@@ -2,12 +2,10 @@ from matplotlib import pyplot as plt
 from scipy import linalg
 import numpy as np
 
-n = 3
+n = 2
 
 
-sigmas = np.asarray([np.asarray([1.16596921e+08, 5.71074134e+10, 1.08431228e+10]),
-       np.asarray([5.71078263e+10, 2.79705506e+13, 5.31083605e+12]),
-       np.asarray([1.08432269e+10, 5.31084862e+12, 1.00838366e+12])])
+sigmas = [[10, 8], [8, 30]]
 
 def log_like(dxs, sigmas):
     return -np.sum([np.sum([dxs[i] * dxs[j] * sigmas[j][i] / 2 for i in range(n)]) for j in range(n)])
@@ -45,9 +43,10 @@ for i in range(n):
 
         pts = populate(sigmas, 1000)
         plt.scatter(pts[i], pts[j], marker='.', alpha=0.5, s=10)
-        pts = populate_ball(sigmas, 1000)
-        plt.scatter(pts[i], pts[j], marker='.', alpha=0.5, s=10)
+        #pts = populate_ball(sigmas, 1000)
+        #plt.scatter(pts[i], pts[j], marker='.', alpha=0.5, s=10)
         plt.xlim(-1, 1)
         plt.ylim(-1, 1)
 
+        plt.savefig("out.png")
 plt.show()
