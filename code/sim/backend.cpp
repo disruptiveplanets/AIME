@@ -63,6 +63,12 @@ void Asteroid::calculate_moi(double initial_roll) {
     double Izz = (- 4 / 3.0 * klm(2, 0)).real() + 2/3.0;
     // These mois are really moi per radius^2 per M.
 
+    if (Izz < 0 || Iyy < 0 || Ixx < 0) {
+        throw std::runtime_error(
+            "Moment of inertia values were negative."
+        );
+    }
+
     if (abs(Izz) < abs(Ixx) || abs(Izz) < abs(Iyy)) {
         throw std::runtime_error(
             "Moment of inertia was not maximized along z.");

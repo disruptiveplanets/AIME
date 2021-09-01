@@ -39,5 +39,6 @@ for file in os.listdir():
     plt.colorbar(c)
     plt.xlabel("Theta {}".format(index_x))
     plt.ylabel("Theta {}".format(index_y))
-    plt.scatter([theta_true[index_x]], [theta_true[index_y]], marker='*')
-    plt.show()
+    plt.scatter([theta_true[index_x]], [theta_true[index_y]], marker='*', color='C1')
+    plt.savefig(file[:-4]+".png")
+plt.show()
