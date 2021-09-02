@@ -29,3 +29,9 @@ It seems hardest to fit to theta 2, possibly because it's the smallest compared 
 ## August 31
 
 I got back the previous iterations and they are not converging. So I ran the whole fit again, hoping I got unlucky. That is in the `small_order` directory. I'm also exploring l=3 in the `asteroid-tidal-torque` directory. Finally, I'm following up on Julien's suggestion that I explore the parameter space for minima first, then fit. That is in the minimize-first branch (this branch)
+
+## September 2
+
+The fits did converge the second time around for run 3.6.2, so it was just bad luck that split the walkers across the disallowed interface. The 3.0.2 fit still didn't merge; it requires another try. One walker got close, but the fit did stabilize.
+
+The high order runs could not fit higher order parameters. They were totally unfitted, a uniform distribution. Maybe I would have to try ML? Yikes. Maybe with lower sigma. Maybe with a closer encounter. Maybe with a more massive object. Maybe with larger J2. Scaling up the radius may help, which I think from the math. Jlm are unlikely, since they are degraded by 1/D? Of course, decreasing periapsis helps. Maybe I should be looking at objects in orbit?
