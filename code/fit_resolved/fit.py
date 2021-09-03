@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import emcee, asteroids, time, sys
 from multiprocessing import Pool
 from random_vector import *
-import scipy
+from scipy import optimize, linalg
 
 
 ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
@@ -11,7 +11,12 @@ ASTEROIDS_MAX_J = 0 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6370000
 N_WALKERS = 32
 MAX_N_STEPS = 50_000
-NUM_MINIMIZE_POINTS = 8
+NUM_MINIMIZE_POINTS = 48
+NUM_FITS = 3
+EPSILON = 1e-10 # If ABNORMAL_TERMINATION_IN_LNSRCH occurs, EPSILON may be too large.
+
+CADENCE_CUT = 650
+MIN_THETA_DIST = 0.01
 
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
@@ -54,7 +59,7 @@ if len(sys.argv) == 3 and sys.argv[2] == "reload":
 
 def fit_function(theta):
     resolved_data = asteroids.simulate(cadence, jlms, theta[1:], radius,
-        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed)
+        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, -1)
     return np.asarray(resolved_data)
 
 def log_likelihood(theta, y, yerr):
@@ -95,20 +100,26 @@ plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], label = 'y', fmt='.')
 plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], label = 'z', fmt='.')
 plt.xlabel("Time (Cadences)")
 plt.ylabel("Spin (rad/s)")
+plt.axvline(x=CADENCE_CUT, color='k')
 plt.legend()
 plt.show()
 
 ####################################################################
 # Minimize likelihood
 ####################################################################
+y_min = y[:CADENCE_CUT * 3 + 3]
+yerr_min = yerr[:CADENCE_CUT * 3 + 3]
+
 print()
-def minus_log_like(theta, y, yerr):
+def redchi(theta):
     # Normal likelihood
     try:
-        model = fit_function(theta)
+        resolved_data = asteroids.simulate(cadence, jlms, theta[1:], radius,
+            spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, CADENCE_CUT)
+        model = np.asarray(resolved_data)
     except RuntimeError:
         return 1e10 # Zero likelihood
-    return np.sum((y - model) ** 2 /  yerr ** 2)
+    return np.sum((y_min - model) ** 2 /  yerr_min ** 2) / len(y_min)
 
 bounds = np.asarray([(theta_low[i], theta_high[i]) for i in range(len(theta_high))])
 bound_widths = np.asarray([theta_high[i] - theta_low[i] for i in range(len(theta_high))])
@@ -124,47 +135,34 @@ while len(parameter_points) < NUM_MINIMIZE_POINTS:
     parameter_points.append(point)
 
 def get_minimum(point):
-    bfgs_min = scipy.optimize.minimize(minus_log_like, point, args=(y, yerr),
-        method='L-BFGS-B', bounds=bounds, options={"eps": 1e-10})
+    bfgs_min = optimize.minimize(redchi, point, method='L-BFGS-B', options={"eps": EPSILON}, bounds=bounds)
     if not bfgs_min.success:
         print("One of the minimum finding points failed.")
+        print(bfgs_min)
+    try:
+        return bfgs_min.fun, bfgs_min.x, linalg.inv(bfgs_min.hess_inv.todense())
+    except:
+        print("Something broke (variables not defined or matrix inversion failed)")
         return None, None, None
-    else:
-        try:
-            scipy.linalg.inv(bfgs_min.hess_inv.todense())
-        except:
-            print("Matrix could not be inverted")
-            return None, None, None
-        return bfgs_min.fun, bfgs_min.x, scipy.linalg.inv(bfgs_min.hess_inv.todense())
 
 
 with Pool() as pool:
     results = pool.map(get_minimum, parameter_points)
 
-min_like = None
-min_theta = None
-min_hessian = None
-for like, theta, hess in results:
+print("All red chis:")
+for like, theta, _ in results:
     if like is None: continue
-    if min_like is None or like < min_like:
-        min_like = like
-        min_theta = theta
-        min_hessian = hess
-
-print("Maximum log likelihood was {} (redchi: {}) at parameters {}".format(
-    -min_like, min_like / len(y), min_theta))
-
-theta_start = min_theta
+    print(like, "at parameters", theta)
 
 def populate(sigmas, count):
-    evals, diagonalizer = scipy.linalg.eigh(sigmas)
+    evals, diagonalizer = linalg.eigh(sigmas)
     print(1 / evals)
     diagonal_points = 1/np.sqrt(np.abs(evals)) * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
     global_points = np.asarray([np.matmul(diagonalizer, d) for d in diagonal_points])
     return global_points
 
 def populate_ball(sigmas, count):
-    evals, diagonalizer = scipy.linalg.eigh(sigmas)
+    evals, diagonalizer = linalg.eigh(sigmas)
     weights = [np.sum([diagonalizer[i][j] / evals[j] for j in range(N_DIM)]) for i in range(N_DIM)]
     print(weights)
     global_points = np.sqrt(np.abs(weights)) * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
@@ -174,43 +172,60 @@ def populate_ball(sigmas, count):
 ####################################################################
 # Run MCMC
 ####################################################################
-print()
-backend = emcee.backends.HDFBackend(output_name+".h5")
 
-if not reload:
-    pos = populate(-min_hessian, N_WALKERS)
-    backend.reset(N_WALKERS, N_DIM)
-else:
-    pos=None
-    print("Initial size: {}".format(backend.iteration))
+def mcmc_fit(theta_start, hess, index):
+    print()
+    backend = emcee.backends.HDFBackend(output_name+"{}.h5".format(index))
 
-old_tau = np.inf
-with Pool() as pool:
-    sampler = emcee.EnsembleSampler(N_WALKERS, N_DIM, log_probability,
-        args=(y, yerr), backend=backend, pool=pool)
+    if not reload:
+        pos = populate(-hess, N_WALKERS) + theta_start
+        backend.reset(N_WALKERS, N_DIM)
+    else:
+        pos=None
+        print("Initial size: {}".format(backend.iteration))
+
+    old_tau = np.inf
+    with Pool() as pool:
+        sampler = emcee.EnsembleSampler(N_WALKERS, N_DIM, log_probability,
+            args=(y, yerr), backend=backend, pool=pool)
+
+        if reload:
+            pos = sampler._previous_state
+
+        for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
+            if sampler.iteration % 100 != 0:
+                continue
+
+            # Compute the autocorrelation time so far
+            # Using tol=0 means that we'll always get an estimate even
+            # if it isn't trustworthy
+            tau = sampler.get_autocorr_time(tol=0)
+
+            # Check convergence
+            converged = np.all(tau * 100 < sampler.iteration)
+            converged &= np.all(np.abs(old_tau - tau) / tau < 0.01)
+            if converged:
+                print("Converged")
+                break
+            old_tau = tau
+        sampler._previous_state = sample
 
     if reload:
-        pos = sampler._previous_state
+        print("New size: {}".format(backend.iteration))
+    else:
+        print("Done")
 
-    for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
-        if sampler.iteration % 100 != 0:
-            continue
+sorted_results = sorted(results, key=lambda x: x[0])
+distinct_results = []
 
-        # Compute the autocorrelation time so far
-        # Using tol=0 means that we'll always get an estimate even
-        # if it isn't trustworthy
-        tau = sampler.get_autocorr_time(tol=0)
-
-        # Check convergence
-        converged = np.all(tau * 100 < sampler.iteration)
-        converged &= np.all(np.abs(old_tau - tau) / tau < 0.01)
-        if converged:
-            print("Converged")
+for redchi, theta, hess in sorted_results:
+    if len(distinct_results) >= NUM_FITS:
+        break
+    for _, dr, _ in distinct_results:
+        if np.sum([(theta[i] - dr[i])**2 for i in range(len(theta))]) < MIN_THETA_DIST * MIN_THETA_DIST:
             break
-        old_tau = tau
-    sampler._previous_state = sample
+    print("Chose redchi", redchi)
+    distinct_results.append((redchi, theta, hess))
 
-if reload:
-    print("New size: {}".format(backend.iteration))
-else:
-    print("Done")
+for i, (_, theta, hess) in enumerate(distinct_results):
+    mcmc_fit(theta, hess, i)

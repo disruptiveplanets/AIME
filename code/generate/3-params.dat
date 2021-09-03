@@ -1,9 +1,10 @@
-0 2 # Max j, Max k
+0 3 # Max j, Max k
 1.0 # J00 (must be 1)
 1.0 # K00 (must be 1)
 0 0 0 # K1 (must be 0)
-0.1 0 0 0 -0.5 K2 (must be x 0 0 0 y)
-10.0 # radius (remember it's not really the radius)
+0.09 0 0 0 -0.3 # K2 (must be x 0 0 0 y)
+0.1 0.2 0.3 0.4 -0.5 -0.6 0.7 # K3
+10000.0 # radius (remember it's not really the radius)
 0.00032 0.00022 0.00012 # Spin
 1.0 # Initial roll
 31850000 # Impact parameter

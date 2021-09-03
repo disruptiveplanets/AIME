@@ -10,12 +10,17 @@ from multiprocessing import Pool
 from random_vector import *
 from scipy import optimize, linalg
 
+np.random.seed(123)
+
 
 ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 ASTEROIDS_MAX_J = 0 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6370000
 NUM_MINIMIZE_POINTS = 8
-EPSILON = 1e-8
+EPSILON = 1e-11
+
+CADENCE_CUT = 650
+
 
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
@@ -49,7 +54,7 @@ if len(sys.argv) == 3 and sys.argv[2] == "reload":
 
 def fit_function(theta):
     resolved_data = asteroids.simulate(cadence, jlms, theta[1:], radius,
-        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed)
+        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, CADENCE_CUT)
     return np.asarray(resolved_data)
 
 def log_likelihood(theta, y, yerr):
@@ -81,17 +86,28 @@ y = fit_function(theta_true)
 print("Data generation took {} s".format(time.time() - start))
 y, yerr = randomize_rotate(y, sigma)
 
+plt.figure(figsize=(12, 4))
+x_display = np.arange(len(y) / 3)
+plt.errorbar(x_display, y[::3], yerr=yerr[::3], label = 'x', fmt='.')
+plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], label = 'y', fmt='.')
+plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], label = 'z', fmt='.')
+plt.xlabel("Time (Cadences)")
+plt.ylabel("Spin (rad/s)")
+plt.axvline(x=CADENCE_CUT, color='k')
+plt.legend()
+plt.show()
+
 ####################################################################
 # Minimize likelihood
 ####################################################################
 print()
-def minus_log_like(theta, y, yerr):
+def redchi(theta, y, yerr):
     # Normal likelihood
     try:
         model = fit_function(theta)
     except RuntimeError:
         return 1e10 # Zero likelihood
-    return np.sum((y - model) ** 2 /  yerr ** 2)
+    return np.sum((y - model) ** 2 /  yerr ** 2) / len(y)
 
 bounds = np.asarray([(theta_low[i], theta_high[i]) for i in range(len(theta_high))])
 bound_widths = np.asarray([theta_high[i] - theta_low[i] for i in range(len(theta_high))])
@@ -107,19 +123,15 @@ while len(parameter_points) < NUM_MINIMIZE_POINTS:
     parameter_points.append(point)
 
 def get_minimum(point):
-    bfgs_min = optimize.minimize(minus_log_like, point, args=(y, yerr), method='BFGS', options={"eps": EPSILON})
+    bfgs_min = optimize.minimize(redchi, point, args=(y, yerr), method='L-BFGS-B', options={"eps": EPSILON}, bounds=bounds)
     if not bfgs_min.success:
         print("One of the minimum finding points failed.")
         print(bfgs_min)
-        return None, None, None
-    else:
-        try:
-            linalg.inv(bfgs_min.hess_inv.todense())
-        except:
-            print("Matrix could not be inverted")
-            return None, None, None
-        print(bfgs_min.x, point)
+    try:
         return bfgs_min.fun, bfgs_min.x, linalg.inv(bfgs_min.hess_inv.todense())
+    except:
+        print("Something broke (variables not defined or matrix inversion failed)")
+        return None, None, None
 
 
 with Pool() as pool:
@@ -135,13 +147,12 @@ for like, theta, hess in results:
         min_theta = theta
         min_hessian = hess
 
-print("Maximum log likelihood was {} (redchi: {}) at parameters {}".format(
-    -min_like, min_like / len(y), min_theta))
+print("Redchi was {} at parameters {}".format(min_like / len(y), min_theta))
 
 print("All red chis:")
 for like, theta, _ in results:
     if like is None: continue
-    print(like / len(y), "at parameters", theta)
+    print(like, "at parameters", theta)
 
 ####################################################################
 # Plot minimizing locations:
@@ -185,7 +196,6 @@ for file in os.listdir():
     plt.colorbar(c)
     plt.xlabel("Theta {}".format(index_x))
     plt.ylabel("Theta {}".format(index_y))
-    plt.scatter([theta_true[index_x]], [theta_true[index_y]], marker='*', color='red', s=16)
     thetas_x = []
     thetas_y = []
     for i, (_, theta, _) in enumerate(results):
@@ -193,7 +203,9 @@ for file in os.listdir():
         plt.plot([parameter_points[i][index_x], theta[index_x]], [parameter_points[i][index_y], theta[index_y]], linestyle='dashed', color="C1")
         thetas_x.append(theta[index_x])
         thetas_y.append(theta[index_y])
-    plt.scatter(thetas_x, thetas_y,  color='C1', s=12)
-    plt.scatter(min_theta[index_x], min_theta[index_y], color='red', s=12)
+    plt.scatter(thetas_x, thetas_y,  color='C1', s=12, label="end points")
+    plt.scatter(min_theta[index_x], min_theta[index_y], color='red', s=12, label="Minimum chisq")
+    plt.plot(theta_true[index_x], theta_true[index_y], marker='*', markerfacecolor='red', markersize=8, markeredgecolor='black')
+    plt.legend()
     plt.savefig("theta-{}-{}.png".format(index_x, index_y))
 plt.show()

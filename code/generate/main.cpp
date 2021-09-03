@@ -6,7 +6,7 @@
 #include "../sim/backend.hpp"
 #include "../sim/algebra.hpp"
 
-#define CADENCE 3600.0 // Seconds between record
+#define CADENCE 120.0 // Seconds between record
 
 int main(int argc, char* argv[]) {
     // Open files
@@ -142,7 +142,7 @@ int main(int argc, char* argv[]) {
 
 
     // Load asteroid
-    Asteroid asteroid(&jlms[0], &klms[0], radius, spin, initial_roll, impact_parameter, speed);
+    Asteroid asteroid(&jlms[0], &klms[0], radius, spin, initial_roll, impact_parameter, speed, -1);
 
     // Run asteroid
     std::vector<double> resolved_data;

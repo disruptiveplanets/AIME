@@ -16,9 +16,11 @@ ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 ASTEROIDS_MAX_J = 0 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6370000
 
-THETA_X_INDEX = 1
-THETA_Y_INDEX = 2
+THETA_X_INDEX = 0
+THETA_Y_INDEX = 1
 PLOT_SIZE = 100
+
+CADENCE_CUT = 650
 
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
@@ -55,7 +57,7 @@ N_DIM = len(theta_true)
 
 def fit_function(theta):
     resolved_data = asteroids.simulate(cadence, jlms, theta[1:], radius,
-        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed)
+        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, CADENCE_CUT)
     return np.asarray(resolved_data)
 
 def red_chi(theta, y, yerr):
@@ -71,6 +73,17 @@ start = time.time()
 y = fit_function(theta_true)
 print("Data generation took {} s".format(time.time() - start))
 y, yerr = randomize_rotate(y, sigma)
+
+plt.figure(figsize=(12, 4))
+x_display = np.arange(len(y) / 3)
+plt.errorbar(x_display, y[::3], yerr=yerr[::3], label = 'x', fmt='.')
+plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], label = 'y', fmt='.')
+plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], label = 'z', fmt='.')
+plt.xlabel("Time (Cadences)")
+plt.ylabel("Spin (rad/s)")
+plt.axvline(x=CADENCE_CUT, color='k')
+plt.legend()
+plt.show()
 
 
 red_chis = []
@@ -95,7 +108,7 @@ def gen_line(theta_y):
 with Pool() as pool:
     red_chis = pool.map(gen_line, ys)
 
-f = open("redchi-{}-{}.dat".format(THETA_X_INDEX, THETA_Y_INDEX), 'w')
+f = open("redchi-{}-{}{}-cut.dat".format(THETA_X_INDEX, THETA_Y_INDEX, "" if CADENCE_CUT > 0 else "-no"), 'w')
 f.write("{}, {}\n".format(THETA_X_INDEX, THETA_Y_INDEX))
 f.write(", ".join([str(t) for t in theta_true]) + "\n")
 f.write(", ".join([str(t) for t in xs]) + "\n")

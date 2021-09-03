@@ -40,8 +40,7 @@ using cdouble = std::complex<double>;
 class Asteroid {
 public:
     Asteroid(const cdouble* jlms, const cdouble* klms, const double asteroid_radius,
-        Vector3 spin, double initial_roll,
-        double impact_parameter, double speed);
+        Vector3 spin, double initial_roll, double impact_parameter, double speed, int cadence_cut);
 
     int simulate(double cadence, std::vector<double>& resolved_data);
 
@@ -58,6 +57,7 @@ private:
     const cdouble* jlms;
     const cdouble* klms;
     double asteroid_radius;
+    int cadence_cut;
 
     Vector3 moi, inv_moi;
     double edge_dist; // Limit of the integration region
