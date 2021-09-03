@@ -19,7 +19,7 @@ EARTH_RADIUS = 6370000
 NUM_MINIMIZE_POINTS = 8
 EPSILON = 1e-11
 
-CADENCE_CUT = 650
+DISTANCE_RATIO_CUT = 2
 
 
 if len(sys.argv) not in [2, 3]:
@@ -54,7 +54,7 @@ if len(sys.argv) == 3 and sys.argv[2] == "reload":
 
 def fit_function(theta):
     resolved_data = asteroids.simulate(cadence, jlms, theta[1:], radius,
-        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, CADENCE_CUT)
+        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, DISTANCE_RATIO_CUT)
     return np.asarray(resolved_data)
 
 def log_likelihood(theta, y, yerr):
@@ -93,7 +93,6 @@ plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], label = 'y', fmt='.')
 plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], label = 'z', fmt='.')
 plt.xlabel("Time (Cadences)")
 plt.ylabel("Spin (rad/s)")
-plt.axvline(x=CADENCE_CUT, color='k')
 plt.legend()
 plt.show()
 

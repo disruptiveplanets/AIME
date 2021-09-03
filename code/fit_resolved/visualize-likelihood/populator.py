@@ -20,7 +20,7 @@ THETA_X_INDEX = 0
 THETA_Y_INDEX = 1
 PLOT_SIZE = 100
 
-CADENCE_CUT = 650
+DISTANCE_RATIO_CUT = 2
 
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
@@ -57,7 +57,7 @@ N_DIM = len(theta_true)
 
 def fit_function(theta):
     resolved_data = asteroids.simulate(cadence, jlms, theta[1:], radius,
-        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, CADENCE_CUT)
+        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, DISTANCE_RATIO_CUT)
     return np.asarray(resolved_data)
 
 def red_chi(theta, y, yerr):
@@ -81,7 +81,6 @@ plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], label = 'y', fmt='.')
 plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], label = 'z', fmt='.')
 plt.xlabel("Time (Cadences)")
 plt.ylabel("Spin (rad/s)")
-plt.axvline(x=CADENCE_CUT, color='k')
 plt.legend()
 plt.show()
 
@@ -108,7 +107,7 @@ def gen_line(theta_y):
 with Pool() as pool:
     red_chis = pool.map(gen_line, ys)
 
-f = open("redchi-{}-{}{}-cut.dat".format(THETA_X_INDEX, THETA_Y_INDEX, "" if CADENCE_CUT > 0 else "-no"), 'w')
+f = open("redchi-{}-{}{}-cut.dat".format(THETA_X_INDEX, THETA_Y_INDEX, "" if DISTANCE_RATIO_CUT > 0 else "-no"), 'w')
 f.write("{}, {}\n".format(THETA_X_INDEX, THETA_Y_INDEX))
 f.write(", ".join([str(t) for t in theta_true]) + "\n")
 f.write(", ".join([str(t) for t in xs]) + "\n")

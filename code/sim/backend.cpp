@@ -1,9 +1,10 @@
 #include "backend.hpp"
 
 Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms, double asteroid_radius,
-    Vector3 spin, double initial_roll, double impact_parameter, double speed, int cadence_cut) :
+    Vector3 spin, double initial_roll, double impact_parameter, double speed,
+    double distance_ratio_cut) :
     jlms(jlms), klms(klms), asteroid_radius(asteroid_radius), velocity(Vector3({0, 0, speed})),
-    spin(spin), cadence_cut(cadence_cut) {
+    spin(spin), distance_ratio_cut(distance_ratio_cut) {
 
     calculate_moi(initial_roll);
     set_pos(impact_parameter);
@@ -121,7 +122,8 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
             resolved_data.push_back(global_spin[1]);
             resolved_data.push_back(global_spin[2]);
             cadence_index = int(time / cadence);
-            if (cadence_cut >= 0 && cadence_index >= cadence_cut) {
+            if (distance_ratio_cut >= 0 && Vector3::dot(position, velocity) > 0
+                && position.mag() / closest_approach >= distance_ratio_cut) {
                 break;
             }
             //std::cout << spin[0] <<' '<< spin[1]<<' ' << spin[2] << ' ' << dt << std::endl;

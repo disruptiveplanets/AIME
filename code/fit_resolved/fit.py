@@ -8,14 +8,14 @@ from scipy import optimize, linalg
 
 ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 ASTEROIDS_MAX_J = 0 # Remember to change the counterpart in backend.hpp
-EARTH_RADIUS = 6370000
+EARTH_RADIUS = 6_370_000
 N_WALKERS = 32
 MAX_N_STEPS = 50_000
 NUM_MINIMIZE_POINTS = 48
 NUM_FITS = 3
 EPSILON = 1e-10 # If ABNORMAL_TERMINATION_IN_LNSRCH occurs, EPSILON may be too large.
 
-CADENCE_CUT = 650
+DISTANCE_RATIO_CUT = 2
 MIN_THETA_DIST = 0.01
 
 if len(sys.argv) not in [2, 3]:
@@ -62,6 +62,11 @@ def fit_function(theta):
         spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, -1)
     return np.asarray(resolved_data)
 
+def minimize_function(theta):
+    resolved_data = asteroids.simulate(cadence, jlms, theta[1:], radius,
+        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, DISTANCE_RATIO_CUT)
+    return np.asarray(resolved_data)
+
 def log_likelihood(theta, y, yerr):
     # Normal likelihood
     try:
@@ -91,6 +96,8 @@ y = fit_function(theta_true)
 print("Data generation took {} s".format(time.time() - start))
 y, yerr = randomize_rotate(y, sigma)
 
+cadence_cut = len(minimize_function(theta_true))
+
 print("DOF:", len(y))
 
 plt.figure(figsize=(12, 4))
@@ -100,23 +107,21 @@ plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], label = 'y', fmt='.')
 plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], label = 'z', fmt='.')
 plt.xlabel("Time (Cadences)")
 plt.ylabel("Spin (rad/s)")
-plt.axvline(x=CADENCE_CUT, color='k')
+plt.axvline(x=cadence_cut // 3, color='k')
 plt.legend()
 plt.show()
 
 ####################################################################
 # Minimize likelihood
 ####################################################################
-y_min = y[:CADENCE_CUT * 3 + 3]
-yerr_min = yerr[:CADENCE_CUT * 3 + 3]
+y_min = y[:cadence_cut]
+yerr_min = yerr[:cadence_cut]
 
 print()
 def redchi(theta):
     # Normal likelihood
     try:
-        resolved_data = asteroids.simulate(cadence, jlms, theta[1:], radius,
-            spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, CADENCE_CUT)
-        model = np.asarray(resolved_data)
+        model = minimize_function(theta)
     except RuntimeError:
         return 1e10 # Zero likelihood
     return np.sum((y_min - model) ** 2 /  yerr_min ** 2) / len(y_min)
@@ -175,7 +180,7 @@ def populate_ball(sigmas, count):
 
 def mcmc_fit(theta_start, hess, index):
     print()
-    backend = emcee.backends.HDFBackend(output_name+"{}.h5".format(index))
+    backend = emcee.backends.HDFBackend(output_name+"-{}.h5".format(index))
 
     if not reload:
         pos = populate(-hess, N_WALKERS) + theta_start
@@ -221,10 +226,10 @@ distinct_results = []
 for redchi, theta, hess in sorted_results:
     if len(distinct_results) >= NUM_FITS:
         break
-    for _, dr, _ in distinct_results:
-        if np.sum([(theta[i] - dr[i])**2 for i in range(len(theta))]) < MIN_THETA_DIST * MIN_THETA_DIST:
+    for _, accepted_theta, accepted_hess in distinct_results:
+        if np.sum([(theta[i] - accepted_theta[i])**2 for i in range(len(theta))]) < MIN_THETA_DIST * MIN_THETA_DIST:
             break
-    print("Chose redchi", redchi)
+    print("Chose redchi", redchi, "at", theta)
     distinct_results.append((redchi, theta, hess))
 
 for i, (_, theta, hess) in enumerate(distinct_results):
