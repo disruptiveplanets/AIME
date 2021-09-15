@@ -10,4 +10,4 @@ I ran my first fit by minimizing first and it converged! The only task now is to
 
 Today I fixed the minimizer. The fit now runs exactly as it should, finding minima with the minimizer and then fitting on the lowest few points found.
 
-Note: After I pull from the supercomputer, I need to un-comment-out the pull.py line that takes the .so from the fit_resolved directory. 
+Note: After I pull from the supercomputer, I need to un-comment-out the pull.py line that takes the .so from the fit_resolved directory.

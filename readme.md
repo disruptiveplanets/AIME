@@ -20,10 +20,10 @@ In both the resolved and unresolved cases, we will build a simulation to generat
 3. Wrote code that can calculate torque to all orders of distance
 4. Confirmed that different Klms with l>2 can have an effect on output (albeit barely)
 5. Be able to do fits
+6. Check to make sure fits still converge now that physics have changed
 
 ## Not done:
 Immediate:
-1. Check to make sure fits still converge now that physics have changed
 2. Run higher order Kl fits
 1. Run fits with pure J2, J4, etc. coefficients.
 
