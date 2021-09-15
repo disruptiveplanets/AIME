@@ -12,7 +12,7 @@ impact_parameter = 5 * EARTH_RADIUS
 speed = 4000
 jlms = [1.0]
 klmss = [
-    [0.09412789, -0.4],
+    [0.04, -0.1],
 ]
 radius = 100
 SIGMA = 0.02 * np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
@@ -32,7 +32,7 @@ for data_iter in range(len(initial_rolls)):
     start = time.time()
     try:
         resolved_data = asteroids.simulate(CADENCE, jlms, klms, radius,
-            spin[0], spin[1], spin[2], initial_roll, impact_parameter, speed)
+            spin[0], spin[1], spin[2], initial_roll, impact_parameter, speed, -1)
     except RuntimeError as err:
         print(err)
         sys.exit()

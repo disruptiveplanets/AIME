@@ -16,11 +16,11 @@ ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 ASTEROIDS_MAX_J = 0 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6370000
 
-THETA_X_INDEX = 0
-THETA_Y_INDEX = 1
+THETA_X_INDEX = 1
+THETA_Y_INDEX = 2
 PLOT_SIZE = 100
 
-DISTANCE_RATIO_CUT = 2
+DISTANCE_RATIO_CUT = 2 # -1
 
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")

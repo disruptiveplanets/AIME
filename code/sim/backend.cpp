@@ -74,6 +74,10 @@ void Asteroid::calculate_moi(double initial_roll) {
             "Moment of inertia was not maximized along z.");
     }
 
+    if (Izz > Ixx + Iyy || Iyy > Ixx + Izz || Ixx > Izz + Iyy) {
+        std::runtime_error("Triangle inequality violated");
+    }
+
     moi = Vector3({Ixx, Iyy, Izz});
     inv_moi = Vector3({1.0 / Ixx, 1.0 / Iyy, 1.0 / Izz});
 
