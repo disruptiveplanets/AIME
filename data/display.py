@@ -72,6 +72,8 @@ class Display:
         self.get_samples()
         if self.true_results is None:
             self.true_results = self.run(self.theta_true)
+        if self.true_results is None:
+            return
         fig = plt.figure(figsize=(6.6, 4.6))
         redchiminmean = 0
         num_converged = 0
@@ -101,6 +103,8 @@ class Display:
             self.get_params()
             if self.true_results is None:
                 self.true_results = self.run(self.theta_true)
+            if self.true_results is None:
+                return np.zeros_like(mask)
 
             redchi = -self.log_prob_samples[-1,:] / len(self.true_results)
             mask = redchi < REDCHI_THRESHOLD
@@ -179,9 +183,13 @@ class Display:
 
     def run(self, theta):
         self.get_params()
-        resolved_data = asteroids.simulate(self.cadence, self.jlms, theta[1:],
-            self.radius, self.spin[0], self.spin[1], self.spin[2], theta[0],
-            self.impact_parameter, self.speed, -1)
+        try:
+            resolved_data = asteroids.simulate(self.cadence, self.jlms, theta[1:],
+                self.radius, self.spin[0], self.spin[1], self.spin[2], theta[0],
+                self.impact_parameter, self.speed, -1)
+        except:
+            print("Coordinates are invalid ({})".format(theta))
+            return None
         return np.asarray(resolved_data)
 
     def show_compare(self):
@@ -193,10 +201,11 @@ class Display:
 
         f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(12, 6), sharex=True)
 
-        x_display = np.arange(len(self.true_results) / 3) * self.cadence / 3600.0
-        ax1.plot(x_display, self.true_results[::3], label = 'true x', alpha=0.5, color='C0')
-        ax1.plot(x_display, self.true_results[1::3], label = 'true y', alpha=0.5, color='C1')
-        ax1.plot(x_display, self.true_results[2::3], label = 'true z', alpha=0.5, color='C2')
+        if self.true_results is not None:
+            x_display = np.arange(len(self.true_results) / 3) * self.cadence / 3600.0
+            ax1.plot(x_display, self.true_results[::3], label = 'true x', alpha=0.5, color='C0')
+            ax1.plot(x_display, self.true_results[1::3], label = 'true y', alpha=0.5, color='C1')
+            ax1.plot(x_display, self.true_results[2::3], label = 'true z', alpha=0.5, color='C2')
 
         ax1.plot(x_display, mean_res[::3], label = 'mean x', alpha=0.5, linestyle='dotted', color='C0')
         ax1.plot(x_display, mean_res[1::3], label = 'mean y', alpha=0.5, linestyle='dotted', color='C1')
@@ -204,9 +213,10 @@ class Display:
         ax1.set_ylabel("Spin (rad/s)")
         ax1.legend()
 
-        ax2.plot(x_display, mean_res[::3] - self.true_results[::3], color='C0')
-        ax2.plot(x_display, mean_res[1::3] - self.true_results[1::3], color='C1')
-        ax2.plot(x_display, mean_res[2::3] - self.true_results[2::3], color='C2')
+        if self.true_results is not None:
+            ax2.plot(x_display, mean_res[::3] - self.true_results[::3], color='C0')
+            ax2.plot(x_display, mean_res[1::3] - self.true_results[1::3], color='C1')
+            ax2.plot(x_display, mean_res[2::3] - self.true_results[2::3], color='C2')
 
         ax2.set_ylabel("Residuals (rad/s)")
         ax2.set_xlabel("Time (hours)")

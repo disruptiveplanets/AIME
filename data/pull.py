@@ -12,7 +12,7 @@ for fname in os.listdir("../staged/"):
         os.mkdir("{1}/{0}".format(fname, PATH))
         i = 0
         while True:
-            out = os.system("scp jdinsmore@txe1-login.mit.edu:~/asteroid-tidal-torque/code/fit_resolved/{0}{2}.h5 {1}/{0}/{0}{2}.h5".format(fname, PATH, i))
+            out = os.system("scp jdinsmore@txe1-login.mit.edu:~/asteroid-tidal-torque/code/fit_resolved/{0}-{2}.h5 {1}/{0}/{0}-{2}.h5".format(fname, PATH, i))
             if out != "":
                 print(out)
                 break
@@ -23,7 +23,7 @@ for fname in os.listdir("../staged/"):
     i = 0
     while True:
         try:
-            disp = display.Display("{1}/{0}/{0}".format(fname, PATH), "{1}/{0}/{0}{2}".format(fname, PATH, i))
+            disp = display.Display("{1}/{0}/{0}".format(fname, PATH), "{1}/{0}/{0}-{2}".format(fname, PATH, i))
         except Exception as e:
             if i == 0:
                 raise e

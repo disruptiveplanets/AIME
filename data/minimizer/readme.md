@@ -11,3 +11,9 @@ I ran my first fit by minimizing first and it converged! The only task now is to
 Today I fixed the minimizer. The fit now runs exactly as it should, finding minima with the minimizer and then fitting on the lowest few points found.
 
 Note: After I pull from the supercomputer, I need to un-comment-out the pull.py line that takes the .so from the fit_resolved directory.
+
+## Sept 19
+
+Today a run was completed wherein I scanned for l=3 parameters (run 4). However, none of them can resolve the high order parameters. If sigma is too low, the fit fails. But sigma = 0.01 works well. The lack of response to l=3 is probably because they have little effect on the dynamics (check with generate). I could force an effect by increasing the radius or lowering the perigee, but the radius is 100 m and the perigee is 5 earth radii: as low as it can be.
+
+I'll run the fit again with radii of 1000 m, (run 5.0, 5.1, 5.2) and 10 km (5.3, 5.4, 5.5). Beyond that, the only thing to do is change J.
