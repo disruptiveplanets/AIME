@@ -7,11 +7,16 @@ STANDARD_RESULTS_METHOD = False
 REDCHI_THRESHOLD = 2
 ASTEROIDS_MAX_K = 2
 
+if len(sys.argv) not in [2, 3]:
+    raise Exception("Please pass a h5 file path to view")
+output_name = sys.argv[1]
+bare_name = "../../staged/" + sys.argv[2]
+
 class Display:
     def __init__(self, bare_name, h5_name):
         self.bare_name = bare_name
         self.h5_name = h5_name
-        self.reader = emcee.backends.HDFBackend(self.h5_name+".h5", read_only=True)
+        self.reader = emcee.backends.HDFBackend(self.h5_name, read_only=True)
         self.samples = None
         self.theta_true = None
         self.true_results = None
@@ -224,9 +229,6 @@ class Display:
         plt.savefig(self.h5_name+"-compare.png")
 
 
-if __name__ == "__main__":
-    d = Display("minimizer/run-3.0/run-3.0")
-    d.thin = 1
-    d.get_samples_burnin(4000)
-    d.show_compare()
-    plt.show()
+d = Display(bare_name, output_name)
+d.show_corner()
+plt.show()

@@ -14,15 +14,6 @@
 #include "algebra.hpp"
 #include "wignerd.hpp"
 
-
-
-
-#define ASTEROIDS_MAX_J 0
-#define ASTEROIDS_MAX_K 3
-
-
-
-
 #define MAX_DT 2.0
 #define MIN_DT 1.0e-0
 #define DT_POWER 1// 5M

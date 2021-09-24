@@ -13,10 +13,10 @@ for d in dirs:
     hindex = 0
     while True:
         try:
-            images = [Image.open(PATH+'/'+d+'/'+d+str(hindex)+x) for x in ['-compare.png', '-corner.png', '-params.png', '-redchi.png']]
+            images = [Image.open(PATH+'/'+d+'/'+d+'-'+str(hindex)+x) for x in ['-compare.png', '-corner.png', '-params.png', '-redchi.png']]
         except:
             if hindex == 0:
-                raise Exception("Could not find files")
+                print("Could not find files for {}".format(d))
             break
 
         widths, heights = zip(*(i.size for i in images))
@@ -53,7 +53,7 @@ for d in dirs:
         sigma = float(f.readline())
         f.close()
 
-        f = open(PATH+"/"+d+"/"+d+str(hindex)+"-results.txt", 'r')
+        f = open(PATH+"/"+d+"/"+d+"-"+str(hindex)+"-results.txt", 'r')
         theta_median = []
         theta_plus = []
         theta_minus = []
@@ -82,6 +82,6 @@ for d in dirs:
         new_im.save(PATH+'/'+d+"/"+d+"-"+str(hindex)+"-all.png")
 
         for x in ['-compare.png', '-corner.png', '-params.png', '-redchi.png', '-results.txt']:
-            os.remove(PATH+'/'+d+'/'+d+str(hindex)+x)
+            os.remove(PATH+'/'+d+'/'+d+"-"+str(hindex)+x)
 
         hindex += 1

@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import emcee, asteroids, time, sys
+import emcee, time, sys
+import asteroids_0_2, asteroids_0_3
 from multiprocessing import Pool
 from random_vector import *
 from scipy import optimize, linalg
@@ -12,7 +13,7 @@ EARTH_RADIUS = 6_370_000
 N_WALKERS = 32
 MAX_N_STEPS = 50_000
 NUM_MINIMIZE_POINTS = 48
-NUM_FITS = 3
+NUM_FITS = [3, 1]
 EPSILON = 1e-10 # If ABNORMAL_TERMINATION_IN_LNSRCH occurs, EPSILON may be too large.
 
 DISTANCE_RATIO_CUT = 2
@@ -58,13 +59,8 @@ if len(sys.argv) == 3 and sys.argv[2] == "reload":
     REGENERATE_DATA = False
 
 def fit_function(theta):
-    resolved_data = asteroids.simulate(cadence, jlms, theta[1:], radius,
+    resolved_data = asteroids_0_3.simulate(cadence, jlms, theta[1:], radius,
         spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, -1)
-    return np.asarray(resolved_data)
-
-def minimize_function(theta):
-    resolved_data = asteroids.simulate(cadence, jlms, theta[1:], radius,
-        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, DISTANCE_RATIO_CUT)
     return np.asarray(resolved_data)
 
 def log_likelihood(theta, y, yerr):
@@ -96,9 +92,10 @@ y = fit_function(theta_true)
 print("Data generation took {} s".format(time.time() - start))
 y, yerr = randomize_rotate(y, sigma)
 
-cadence_cut = len(minimize_function(theta_true))
-
 print("DOF:", len(y))
+
+cadence_cut = len( asteroids_0_2.simulate(cadence, jlms, theta_true[1:], radius,
+    spin[0], spin[1], spin[2], theta_true[0], impact_parameter, speed, DISTANCE_RATIO_CUT))
 
 plt.figure(figsize=(12, 4))
 x_display = np.arange(len(y) / 3)
@@ -111,36 +108,34 @@ plt.axvline(x=cadence_cut // 3, color='k')
 plt.legend()
 plt.show()
 
+
 ####################################################################
 # Minimize likelihood
 ####################################################################
+print()
 y_min = y[:cadence_cut]
 yerr_min = yerr[:cadence_cut]
 
-print()
-def redchi(theta):
+def minimize_function(theta, simulate_func):
+    resolved_data = simulate_func(cadence, jlms, theta[1:], radius,
+        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, DISTANCE_RATIO_CUT)
+    return np.asarray(resolved_data)
+
+def redchi(float_theta, fix_theta, simulate_func):
     # Normal likelihood
     try:
-        model = minimize_function(theta)
+        model = minimize_function(list(fix_theta) + list(float_theta), simulate_func)
     except RuntimeError:
         return 1e10 # Zero likelihood
     return np.sum((y_min - model) ** 2 /  yerr_min ** 2) / len(y_min)
 
-bounds = np.asarray([(theta_low[i], theta_high[i]) for i in range(len(theta_high))])
-bound_widths = np.asarray([theta_high[i] - theta_low[i] for i in range(len(theta_high))])
-
-parameter_points = []
-
-while len(parameter_points) < NUM_MINIMIZE_POINTS:
-    point = np.asarray(theta_low) + bound_widths * np.asarray([random.random() for i in range(len(theta_high))])
-    try:
-        model = fit_function(point)
-    except RuntimeError:
-        continue
-    parameter_points.append(point)
-
-def get_minimum(point):
-    bfgs_min = optimize.minimize(redchi, point, method='L-BFGS-B', options={"eps": EPSILON}, bounds=bounds)
+def get_minimum(arg):
+    point, fix_theta, l, bounds = arg
+    if l == 2:
+        simulate_func = asteroids_0_2.simulate
+    elif l == 3:
+        simulate_func = asteroids_0_3.simulate
+    bfgs_min = optimize.minimize(redchi, point, args=(fix_theta, simulate_func), method='L-BFGS-B', options={"eps": EPSILON}, bounds=bounds)
     if not bfgs_min.success:
         print("One of the minimum finding points failed.")
         print(bfgs_min)
@@ -150,18 +145,89 @@ def get_minimum(point):
         print("Something broke (variables not defined or matrix inversion failed)")
         return None, None, None
 
+def minimize(l, num_return, fix_theta):
+    assert l <= ASTEROIDS_MAX_K
+    assert len(fix_theta) == max((l)**2 - 6, 0)
 
-with Pool() as pool:
-    results = pool.map(get_minimum, parameter_points)
+    if l == 2:
+        simulate = asteroids_0_2.simulate
+    elif l == 3:
+        simulate = asteroids_0_3.simulate
+    else:
+        raise Exception("l={} is not supported".format(l))
 
-print("All red chis:")
-for like, theta, _ in results:
-    if like is None: continue
-    print(like, "at parameters", theta)
+    theta_indices = range(max(0, (l)**2 - 6), (l+1)**2 - 6)
+    bounds = np.asarray([(theta_low[i], theta_high[i]) for i in theta_indices])
+    bound_widths = np.asarray([theta_high[i] - theta_low[i] for i in theta_indices])
+
+    # Choose the seed parameters
+    parameter_points = []
+
+    while len(parameter_points) < NUM_MINIMIZE_POINTS:
+        randoms = np.asarray([random.random() for i in theta_indices])
+        point = np.asarray(theta_low)[theta_indices] + bound_widths * randoms
+        try:
+            model = minimize_function(point, simulate)
+        except RuntimeError:
+            continue
+        parameter_points.append((point, fix_theta, l, bounds))
+
+    # Perform the minimization
+    with Pool() as pool:
+        results = pool.map(get_minimum, parameter_points)
+
+    # Extract the lowest redchis
+    sorted_results = sorted(results, key=lambda x: x[0])
+    distinct_results = []
+
+    for redchi, theta, hess in sorted_results:
+        if len(distinct_results) >= num_return:
+            break
+        choose = True
+        for accepted_theta, accepted_hess in distinct_results:
+            if np.sum([(theta[i] - accepted_theta[i])**2 for i in range(len(theta))]) < MIN_THETA_DIST * MIN_THETA_DIST:
+                choose = False
+                break
+        if choose:
+            print("Chose redchi", redchi, "at", theta)
+            distinct_results.append((theta, hess))
+    return distinct_results
+
+# Stepped minimization
+queue = [([], [])]
+for i, num_fits in enumerate(NUM_FITS):
+    new_queue = []
+    for fix_theta, hessians in queue:
+        tier_results = minimize(i+2, num_fits, fix_theta)
+        for result_theta, result_hess in tier_results:
+            new_queue.append((fix_theta + list(result_theta), hessians + [result_hess]))
+    queue = new_queue
+
+# Stitch together the hessians
+kernel = []
+for theta, hesses in queue:
+    hess_len = 0
+    for hess in hesses:
+        hess_len += len(hess)
+    new_hess = np.zeros((hess_len, hess_len))
+    hess_iter = 0
+    for hess in hesses:
+        for i, line in enumerate(hess):
+            for j, h in enumerate(line):
+                new_hess[hess_iter+i][hess_iter+j] = h
+        hess_iter += len(hess)
+    kernel.append((theta, new_hess))
+
+print("There are {} MCMC starting points, and there should be {}".format(len(kernel), np.prod(NUM_FITS)))
+
+
+####################################################################
+# Run MCMC
+####################################################################
+print()
 
 def populate(sigmas, count):
     evals, diagonalizer = linalg.eigh(sigmas)
-    print(1 / evals)
     diagonal_points = 1/np.sqrt(np.abs(evals)) * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
     global_points = np.asarray([np.matmul(diagonalizer, d) for d in diagonal_points])
     return global_points
@@ -169,17 +235,10 @@ def populate(sigmas, count):
 def populate_ball(sigmas, count):
     evals, diagonalizer = linalg.eigh(sigmas)
     weights = [np.sum([diagonalizer[i][j] / evals[j] for j in range(N_DIM)]) for i in range(N_DIM)]
-    print(weights)
     global_points = np.sqrt(np.abs(weights)) * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
     return global_points
 
-
-####################################################################
-# Run MCMC
-####################################################################
-
 def mcmc_fit(theta_start, hess, index):
-    print()
     backend = emcee.backends.HDFBackend(output_name+"-{}.h5".format(index))
 
     if not reload:
@@ -220,17 +279,5 @@ def mcmc_fit(theta_start, hess, index):
     else:
         print("Done")
 
-sorted_results = sorted(results, key=lambda x: x[0])
-distinct_results = []
-
-for redchi, theta, hess in sorted_results:
-    if len(distinct_results) >= NUM_FITS:
-        break
-    for _, accepted_theta, accepted_hess in distinct_results:
-        if np.sum([(theta[i] - accepted_theta[i])**2 for i in range(len(theta))]) < MIN_THETA_DIST * MIN_THETA_DIST:
-            break
-    print("Chose redchi", redchi, "at", theta)
-    distinct_results.append((redchi, theta, hess))
-
-for i, (_, theta, hess) in enumerate(distinct_results):
+for i, (theta, hess) in enumerate(kernel):
     mcmc_fit(theta, hess, i)

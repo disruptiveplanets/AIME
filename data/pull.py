@@ -1,7 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 from shutil import copyfile
-#copyfile("../code/fit_resolved/asteroids.cpython-38-x86_64-linux-gnu.so", "asteroids.cpython-38-x86_64-linux-gnu.so")
+copyfile("../code/fit_resolved/asteroids_0_3.cpython-38-x86_64-linux-gnu.so", "asteroids_0_3.cpython-38-x86_64-linux-gnu.so")
 import display
 
 PATH = "minimizer"
@@ -13,7 +13,7 @@ for fname in os.listdir("../staged/"):
         i = 0
         while True:
             out = os.system("scp jdinsmore@txe1-login.mit.edu:~/asteroid-tidal-torque/code/fit_resolved/{0}-{2}.h5 {1}/{0}/{0}-{2}.h5".format(fname, PATH, i))
-            if out != "":
+            if out != 0:
                 print(out)
                 break
             i += 1
@@ -34,5 +34,8 @@ for fname in os.listdir("../staged/"):
         disp.show_compare()
         disp.show_results()
         plt.show()
+        del disp
         print()
         i += 1
+
+    break # I was encountering memory leaks, so only run one run at a time.

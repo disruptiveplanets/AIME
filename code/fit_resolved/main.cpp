@@ -83,7 +83,7 @@ std::vector<double> simulate(double cadence, const std::vector<double> jlms_raw,
     return resolved_data;// Unfortunately, copying the data is necessary.
 }
 
-PYBIND11_MODULE(asteroids, m) {
+PYBIND11_MODULE(NAME, m) {
     m.doc() = "Asteroid simulation wrapper to be used by the python module"
         "emcee"; // optional module docstring
 
