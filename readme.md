@@ -33,7 +33,6 @@ Much later:
 
 
 ### Resolved case
-
 3. Generate a sample dataset for asteroid rotation data with the simulation in step 2
 4. Use an MCMC to fit a shape and density distribution to the data generated in step 3
 
@@ -46,3 +45,12 @@ Much later:
 8. Apply the fitting software to an actual flyby.
 
 The intent is to start writing the paper for this project by the end of the summer of 2021, the summer between Jack's junior and senior years.
+
+## End data products
+* What data range is the best to minimize over? Defined by the maximum radius achieved by the satellite? The period of the satellite?
+* What is the effect of sigma?
+* What does a moon add?
+* What is the effect of J2?
+* What is the effect of radius?
+* Are parts of the parameter space more sensitive than others?
+* Which l can you resolve?

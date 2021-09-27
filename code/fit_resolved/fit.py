@@ -7,16 +7,16 @@ from random_vector import *
 from scipy import optimize, linalg
 
 
-ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
+ASTEROIDS_MAX_K = 3 # Remember to change the counterpart in backend.hpp
 ASTEROIDS_MAX_J = 0 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6_370_000
 N_WALKERS = 32
-MAX_N_STEPS = 50_000
+MAX_N_STEPS = 100_000
 NUM_MINIMIZE_POINTS = 48
 NUM_FITS = [3, 1]
 EPSILON = 1e-10 # If ABNORMAL_TERMINATION_IN_LNSRCH occurs, EPSILON may be too large.
 
-DISTANCE_RATIO_CUT = 2
+DISTANCE_RATIO_CUT = 10
 MIN_THETA_DIST = 0.01
 
 if len(sys.argv) not in [2, 3]:
@@ -137,8 +137,9 @@ def get_minimum(arg):
         simulate_func = asteroids_0_3.simulate
     bfgs_min = optimize.minimize(redchi, point, args=(fix_theta, simulate_func), method='L-BFGS-B', options={"eps": EPSILON}, bounds=bounds)
     if not bfgs_min.success:
-        print("One of the minimum finding points failed.")
-        print(bfgs_min)
+        #print("One of the minimum finding points failed.")
+        #print(bfgs_min)
+        pass
     try:
         return bfgs_min.fun, bfgs_min.x, linalg.inv(bfgs_min.hess_inv.todense())
     except:
@@ -189,7 +190,7 @@ def minimize(l, num_return, fix_theta):
                 choose = False
                 break
         if choose:
-            print("Chose redchi", redchi, "at", theta)
+            #print("Chose redchi", redchi, "at", theta)
             distinct_results.append((theta, hess))
     return distinct_results
 
@@ -216,6 +217,7 @@ for theta, hesses in queue:
             for j, h in enumerate(line):
                 new_hess[hess_iter+i][hess_iter+j] = h
         hess_iter += len(hess)
+    print("The kernel includes a point with theta {}".format(theta))
     kernel.append((theta, new_hess))
 
 print("There are {} MCMC starting points, and there should be {}".format(len(kernel), np.prod(NUM_FITS)))
