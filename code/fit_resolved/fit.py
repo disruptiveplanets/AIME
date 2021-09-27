@@ -7,7 +7,7 @@ from random_vector import *
 from scipy import optimize, linalg
 
 
-ASTEROIDS_MAX_K = 3 # Remember to change the counterpart in backend.hpp
+ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 ASTEROIDS_MAX_J = 0 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6_370_000
 N_WALKERS = 32

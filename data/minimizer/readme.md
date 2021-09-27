@@ -21,3 +21,5 @@ I'll run the fit again with radii of 1000 m, (run 5.0, 5.1, 5.2) and 10 km (5.3,
 # Sept 23
 
 The other fits failed to resolve a difference; some of them even failed to converge! On closer inspection, so many failed to converge that I fear a minimizer issue. I am therefore trying a tiered minimizer technique, where you minimize for small l, then fix those parameters and increment l. Run 6 is a rerun of 5 using this technique.
+
+However, I'm still running into problems with minima finding. Run 2 returns to l=2 order fits.
