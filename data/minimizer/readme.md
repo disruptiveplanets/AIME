@@ -25,6 +25,5 @@ The other fits failed to resolve a difference; some of them even failed to conve
 # Sept 27
 However, I'm still running into problems with minima finding. Run 2 returns to l=2 order fits, but I don't have data for it because it's only useful for checking the minimizing parameters. I've learned that stopping at r = 2rp is worse than 5rp which is worse than 10 rp, but stopping at the end point of the simulation is bad. So, I'm running run-7, which is run-6 except minimizing up to rp=10. I will also run it for twice as long.
 
-LOOK INTO RUN 6.4-1! THERE'S SOME success
-
-RUN 7 (the fit file is tested already, but need to interpret run 6 still)
+# Oct 2
+I ran some fits again, and they are still running, but I have already determined that some are not converging. I'm moving over to l=2 to test my model again, with 100k iterations. It's run 8.

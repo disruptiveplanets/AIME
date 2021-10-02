@@ -7,8 +7,6 @@ from random_vector import *
 from scipy import optimize, linalg
 
 
-ASTEROIDS_MAX_K = 3 # Remember to change the counterpart in backend.hpp
-ASTEROIDS_MAX_J = 0 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6_370_000
 N_WALKERS = 32
 MAX_N_STEPS = 100_000
@@ -23,6 +21,9 @@ if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
 output_name = sys.argv[1]
 f = open("../../staged/" + output_name+".dat", 'r')
+ASTEROIDS_MAX_J, ASTEROIDS_MAX_K = f.readline().split(', ')
+ASTEROIDS_MAX_J = int(ASTEROIDS_MAX_J)
+ASTEROIDS_MAX_K = int(ASTEROIDS_MAX_K)
 cadence = int(f.readline())
 impact_parameter = EARTH_RADIUS * int(f.readline())
 radius = float(f.readline())
@@ -42,6 +43,8 @@ assert(len(theta_true) == (ASTEROIDS_MAX_K + 1)**2 - 6)
 assert(len(jlms) == (ASTEROIDS_MAX_J + 1)**2)
 assert(np.all(theta_high > theta_low))
 
+NUM_FITS = NUM_FITS[:ASTEROIDS_MAX_K-1]
+
 print("Cadence {}, impact parameter {}, speed {}".format(cadence, impact_parameter, speed))
 print("Spin", spin)
 print("Jlms", jlms)
@@ -59,8 +62,12 @@ if len(sys.argv) == 3 and sys.argv[2] == "reload":
     REGENERATE_DATA = False
 
 def fit_function(theta):
-    resolved_data = asteroids_0_3.simulate(cadence, jlms, theta[1:], radius,
-        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, -1)
+    if ASTEROIDS_MAX_K == 3:
+        resolved_data = asteroids_0_3.simulate(cadence, jlms, theta[1:], radius,
+            spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, -1)
+    elif ASTEROIDS_MAX_K == 2:
+        resolved_data = asteroids_0_2.simulate(cadence, jlms, theta[1:], radius,
+            spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, -1)
     return np.asarray(resolved_data)
 
 def log_likelihood(theta, y, yerr):
@@ -121,7 +128,7 @@ def minimize_function(theta, simulate_func):
         spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, DISTANCE_RATIO_CUT)
     return np.asarray(resolved_data)
 
-def redchi(float_theta, fix_theta, simulate_func):
+def get_redchi(float_theta, fix_theta, simulate_func):
     # Normal likelihood
     try:
         model = minimize_function(list(fix_theta) + list(float_theta), simulate_func)
@@ -135,7 +142,7 @@ def get_minimum(arg):
         simulate_func = asteroids_0_2.simulate
     elif l == 3:
         simulate_func = asteroids_0_3.simulate
-    bfgs_min = optimize.minimize(redchi, point, args=(fix_theta, simulate_func), method='L-BFGS-B', options={"eps": EPSILON}, bounds=bounds)
+    bfgs_min = optimize.minimize(get_redchi, point, args=(fix_theta, simulate_func), method='L-BFGS-B', options={"eps": EPSILON}, bounds=bounds)
     if not bfgs_min.success:
         #print("One of the minimum finding points failed.")
         #print(bfgs_min)
@@ -178,20 +185,20 @@ def minimize(l, num_return, fix_theta):
         results = pool.map(get_minimum, parameter_points)
 
     # Extract the lowest redchis
-    sorted_results = sorted(results, key=lambda x: x[0])
+    sorted_results = sorted(results, key=lambda x: x[0] if not np.isnan(x[0]) else 1e10)
     distinct_results = []
 
     for redchi, theta, hess in sorted_results:
         if len(distinct_results) >= num_return:
             break
         choose = True
-        for accepted_theta, accepted_hess in distinct_results:
+        for accepted_theta, accepted_hess, _ in distinct_results:
             if np.sum([(theta[i] - accepted_theta[i])**2 for i in range(len(theta))]) < MIN_THETA_DIST * MIN_THETA_DIST:
                 choose = False
                 break
         if choose:
             #print("Chose redchi", redchi, "at", theta)
-            distinct_results.append((theta, hess))
+            distinct_results.append((theta, hess, redchi))
     return distinct_results
 
 # Stepped minimization
@@ -200,13 +207,13 @@ for i, num_fits in enumerate(NUM_FITS):
     new_queue = []
     for fix_theta, hessians in queue:
         tier_results = minimize(i+2, num_fits, fix_theta)
-        for result_theta, result_hess in tier_results:
-            new_queue.append((fix_theta + list(result_theta), hessians + [result_hess]))
+        for result_theta, result_hess, result_redchi in tier_results:
+            new_queue.append((fix_theta + list(result_theta), hessians + [result_hess], result_redchi))
     queue = new_queue
 
 # Stitch together the hessians
 kernel = []
-for theta, hesses in queue:
+for theta, hesses, redchi in queue:
     hess_len = 0
     for hess in hesses:
         hess_len += len(hess)
@@ -217,7 +224,7 @@ for theta, hesses in queue:
             for j, h in enumerate(line):
                 new_hess[hess_iter+i][hess_iter+j] = h
         hess_iter += len(hess)
-    print("The kernel includes a point with theta {}".format(theta))
+    print("The kernel includes a point with theta {}, redchi {}".format(theta, redchi))
     kernel.append((theta, new_hess))
 
 print("There are {} MCMC starting points, and there should be {}".format(len(kernel), np.prod(NUM_FITS)))

@@ -1,4 +1,4 @@
-import sys, corner, emcee, os, asteroids_0_3
+import sys, corner, emcee, os, asteroids_0_3. asteroids_0_2
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -17,6 +17,9 @@ class Display:
         self.true_results = None
         self.res = None
         self.mask = None
+        self.maxj = None
+        self.maxk = None
+        self.module = None
         try:
             self.chain_length, self.nwalkers, self.ndim = self.reader.get_chain().shape
         except AttributeError:
@@ -140,6 +143,9 @@ class Display:
         if self.theta_true is not None:
             return
         f = open(self.bare_name + ".dat", 'r')
+        asteroids_max_j, asteroids_max_k = f.readline().split(', ')
+        self.maxj = int(asteroids_max_j)
+        self.maxk = int(asteroids_max_k)
         self.cadence = int(f.readline())
         self.impact_parameter = EARTH_RADIUS * float(f.readline())
         self.radius = float(f.readline())
@@ -151,6 +157,12 @@ class Display:
         theta_low = np.asarray([float(x) for x in f.readline().split(',')])
         sigma = float(f.readline()) * np.sqrt(self.spin[0]**2 + self.spin[1]**2 + self.spin[2]**2)
         f.close()
+
+        if self.maxj == 0:
+            if self.maxk == 2:
+                self.module = asteroids_0_2
+            elif self.maxk == 3:
+                self.module = asteroids_0_3
 
     def show_results(self):
         self.get_params()
@@ -184,7 +196,7 @@ class Display:
     def run(self, theta):
         self.get_params()
         try:
-            resolved_data = asteroids_0_3.simulate(self.cadence, self.jlms, theta[1:],
+            resolved_data = self.module.simulate(self.cadence, self.jlms, theta[1:],
                 self.radius, self.spin[0], self.spin[1], self.spin[2], theta[0],
                 self.impact_parameter, self.speed, -1)
         except:

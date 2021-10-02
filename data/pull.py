@@ -2,9 +2,12 @@ import os
 import matplotlib.pyplot as plt
 from shutil import copyfile
 copyfile("../code/fit_resolved/asteroids_0_3.cpython-38-x86_64-linux-gnu.so", "asteroids_0_3.cpython-38-x86_64-linux-gnu.so")
+copyfile("../code/fit_resolved/asteroids_0_2.cpython-38-x86_64-linux-gnu.so", "asteroids_0_2.cpython-38-x86_64-linux-gnu.so")
 import display
 
 PATH = "minimizer"
+
+I_LIMIT = -1
 
 for fname in os.listdir("../staged/"):
     fname = os.path.splitext(fname)[0]
@@ -12,6 +15,7 @@ for fname in os.listdir("../staged/"):
         os.mkdir("{1}/{0}".format(fname, PATH))
         i = 0
         while True:
+            if i >= I_LIMIT and I_LIMIT > 0: break
             out = os.system("scp jdinsmore@txe1-login.mit.edu:~/asteroid-tidal-torque/code/fit_resolved/{0}-{2}.h5 {1}/{0}/{0}-{2}.h5".format(fname, PATH, i))
             if out != 0:
                 print(out)

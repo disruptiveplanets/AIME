@@ -1,10 +1,13 @@
 #include "backend.hpp"
 
+const int max_k = (ASTEROIDS_MAX_K + 1) * (ASTEROIDS_MAX_K + 1);
+const int max_j = (ASTEROIDS_MAX_J + 1) * (ASTEROIDS_MAX_J + 1);
+
 Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms, double asteroid_radius,
     Vector3 spin, double initial_roll, double impact_parameter, double speed,
     double distance_ratio_cut) :
-    jlms(jlms), klms(klms), asteroid_radius(asteroid_radius), velocity(Vector3({0, 0, speed})),
-    spin(spin), distance_ratio_cut(distance_ratio_cut) {
+    jlms(jlms), klms(klms), asteroid_radius(asteroid_radius), distance_ratio_cut(distance_ratio_cut),
+    velocity(Vector3({0, 0, speed})), spin(spin) {
 
     calculate_moi(initial_roll);
     set_pos(impact_parameter);
@@ -32,11 +35,17 @@ Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms, double asteroid_rad
 }
 
 cdouble Asteroid::jlm(uint l, int m) const {
+    if (l * l + l + m < 0 || l * l + l + m > max_j) {
+        throw std::runtime_error("Jlm array exceeded.");
+    }
     return jlms[l * l + l + m];
 }
 
 cdouble Asteroid::klm(uint l, int m) const {
     if (abs(m) > l) {return 0;}
+    if (l * l + l + m < 0 || l * l + l + m > max_k) {
+        throw std::runtime_error("Klm array exceeded.");
+    }
     return klms[l * l + l + m];
 }
 
@@ -103,8 +112,8 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
     int frames = 0;
     int cadence_index = -1;
     double dt;
-    double close_power = pow(closest_approach, DT_POWER);
-    double denom = 1.0 / (pow(edge_dist, DT_POWER) - close_power);
+    //double close_power = pow(closest_approach, DT_POWER);
+    //double denom = 1.0 / (pow(edge_dist, DT_POWER) - close_power);
 
     for (;position.mag() < edge_dist; frames++) {
         dt = 0.5;
