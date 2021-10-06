@@ -27,3 +27,6 @@ However, I'm still running into problems with minima finding. Run 2 returns to l
 
 # Oct 2
 I ran some fits again, and they are still running, but I have already determined that some are not converging. I'm moving over to l=2 to test my model again, with 100k iterations. It's run 8.
+
+# Oct 5
+Well, the l=2 run goes exactly as expected. I must now determine why the l=3 fit fails, despite running on the same code. I could try to half-ass this, or do it this weekend instead.

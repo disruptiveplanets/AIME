@@ -1,4 +1,4 @@
-import sys, corner, emcee, os, asteroids_0_3. asteroids_0_2
+import sys, corner, emcee, os, asteroids_0_3, asteroids_0_2
 import numpy as np
 import matplotlib.pyplot as plt
 

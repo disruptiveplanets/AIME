@@ -41,6 +41,8 @@ for d in dirs:
             heights[RUNS] + int((im_height - heights[RUNS] - bi_height) / 2)))
 
         f = open(PATH+"/"+d+"/"+d+".dat", 'r')
+        max_j, max_l = f.readline().split(", ")
+        max_j, max_l = (int(max_j), int(max_l))
         cadence = int(f.readline())
         impact_parameter = int(f.readline())
         radius = float(f.readline())
