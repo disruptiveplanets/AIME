@@ -1,11 +1,23 @@
+TEST = False
+
 import numpy as np
 import matplotlib.pyplot as plt
 import emcee, time, sys
-import asteroids_0_2, asteroids_0_3
+if not TEST:
+    import asteroids_0_2, asteroids_0_3
+if TEST:
+    import test_0_2 as asteroids_0_2
+    import test_0_2 as asteroids_0_3
 from multiprocessing import Pool
 from random_vector import *
 from scipy import optimize, linalg
+from mpmath import mp
+import plotille
+import display, collect
 
+
+REPORT_INITIAL = True
+PLOT_POSES = True
 
 EARTH_RADIUS = 6_370_000
 N_WALKERS = 32
@@ -45,15 +57,16 @@ assert(np.all(theta_high > theta_low))
 
 NUM_FITS = NUM_FITS[:ASTEROIDS_MAX_K-1]
 
-print("Cadence {}, impact parameter {}, speed {}".format(cadence, impact_parameter, speed))
-print("Spin", spin)
-print("Jlms", jlms)
-print("Radius", radius)
-print("Theta true", theta_true)
-print("Theta high", theta_high)
-print("Theta low", theta_low)
-print("Sigma", sigma)
-print("Name", output_name)
+if REPORT_INITIAL:
+    print("Cadence {}, impact parameter {}, speed {}".format(cadence, impact_parameter, speed))
+    print("Spin", spin)
+    print("Jlms", jlms)
+    print("Radius", radius)
+    print("Theta true", theta_true)
+    print("Theta high", theta_high)
+    print("Theta low", theta_low)
+    print("Sigma", sigma)
+    print("Name", output_name)
 N_DIM = len(theta_true)
 
 reload = False
@@ -69,6 +82,7 @@ def fit_function(theta):
         resolved_data = asteroids_0_2.simulate(cadence, jlms, theta[1:], radius,
             spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, -1)
     return np.asarray(resolved_data)
+
 
 def log_likelihood(theta, y, yerr):
     # Normal likelihood
@@ -101,7 +115,7 @@ y, yerr = randomize_rotate(y, sigma)
 
 print("DOF:", len(y))
 
-cadence_cut = len( asteroids_0_2.simulate(cadence, jlms, theta_true[1:], radius,
+cadence_cut = len(asteroids_0_2.simulate(cadence, jlms, theta_true[1:], radius,
     spin[0], spin[1], spin[2], theta_true[0], impact_parameter, speed, DISTANCE_RATIO_CUT))
 
 plt.figure(figsize=(12, 4))
@@ -113,7 +127,17 @@ plt.xlabel("Time (Cadences)")
 plt.ylabel("Spin (rad/s)")
 plt.axvline(x=cadence_cut // 3, color='k')
 plt.legend()
-plt.show()
+#plt.show()
+
+def is_identity(h):
+    for i in range(len(h)):
+        if abs(h[i][i] - 1) > EPSILON:
+            return False
+    for i in range(len(h)-1):
+        for j in range(i+1, len(h)):
+            if abs(h[i][j]) > EPSILON:
+                return False
+    return True
 
 
 ####################################################################
@@ -128,13 +152,21 @@ def minimize_function(theta, simulate_func):
         spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, DISTANCE_RATIO_CUT)
     return np.asarray(resolved_data)
 
-def get_redchi(float_theta, fix_theta, simulate_func):
+def minimize_log_prob(float_theta, fix_theta, simulate_func):
     # Normal likelihood
+    theta = list(fix_theta) + list(float_theta)
     try:
-        model = minimize_function(list(fix_theta) + list(float_theta), simulate_func)
+        model = minimize_function(theta, simulate_func)
     except RuntimeError:
         return 1e10 # Zero likelihood
-    return np.sum((y_min - model) ** 2 /  yerr_min ** 2) / len(y_min)
+
+    # Flat priors
+    for i, t in enumerate(theta):
+        if t > theta_high[i] or t < theta_low[i]:
+            return 1e10 # Zero likelihood
+
+    # Return log like
+    return np.sum((y_min - model) ** 2 /  yerr_min ** 2)
 
 def get_minimum(arg):
     point, fix_theta, l, bounds = arg
@@ -142,16 +174,24 @@ def get_minimum(arg):
         simulate_func = asteroids_0_2.simulate
     elif l == 3:
         simulate_func = asteroids_0_3.simulate
-    bfgs_min = optimize.minimize(get_redchi, point, args=(fix_theta, simulate_func), method='L-BFGS-B', options={"eps": EPSILON}, bounds=bounds)
+    bfgs_min = optimize.minimize(minimize_log_prob, point, args=(fix_theta, simulate_func),
+        method='L-BFGS-B', options={"eps": EPSILON}, bounds=bounds)
     if not bfgs_min.success:
-        #print("One of the minimum finding points failed.")
+        print("One of the minimum finding points failed.")
         #print(bfgs_min)
-        pass
+        return None, None, None
+    if is_identity(bfgs_min.hess_inv.todense()):
+        print("One of the Hessians was the identity.")
+        return None, None, None
+
     try:
-        return bfgs_min.fun, bfgs_min.x, linalg.inv(bfgs_min.hess_inv.todense())
+        hess_inv = bfgs_min.hess_inv.todense()
     except:
         print("Something broke (variables not defined or matrix inversion failed)")
         return None, None, None
+
+    # Return redchi, minimizing params, hessian
+    return bfgs_min.fun / len(y_min), bfgs_min.x, hess_inv
 
 def minimize(l, num_return, fix_theta):
     assert l <= ASTEROIDS_MAX_K
@@ -185,10 +225,13 @@ def minimize(l, num_return, fix_theta):
         results = pool.map(get_minimum, parameter_points)
 
     # Extract the lowest redchis
-    sorted_results = sorted(results, key=lambda x: x[0] if not np.isnan(x[0]) else 1e10)
-    distinct_results = []
+    sorted_results = sorted(results, key=
+        lambda x: x[0] if (x[0] is not None and not np.isnan(x[0])) else 1e10)
 
-    for redchi, theta, hess in sorted_results:
+    distinct_results = []
+    for redchi, theta, hess_inv in sorted_results:
+        if redchi is None:
+            continue
         if len(distinct_results) >= num_return:
             break
         choose = True
@@ -198,34 +241,44 @@ def minimize(l, num_return, fix_theta):
                 break
         if choose:
             #print("Chose redchi", redchi, "at", theta)
-            distinct_results.append((theta, hess, redchi))
+
+            distinct_results.append((theta, hess_inv, redchi))
     return distinct_results
 
 # Stepped minimization
-queue = [([], [])]
+queue = [([], [], [], 0)]
 for i, num_fits in enumerate(NUM_FITS):
     new_queue = []
-    for fix_theta, hessians in queue:
+    for fix_theta, evals, evecs, _ in queue:
         tier_results = minimize(i+2, num_fits, fix_theta)
         for result_theta, result_hess, result_redchi in tier_results:
-            new_queue.append((fix_theta + list(result_theta), hessians + [result_hess], result_redchi))
+            if is_identity(result_hess):
+                raise Exception("One of the Hessians was the identity")
+            eval, evec = mp.eigsy(mp.matrix(result_hess))
+            print("Deg {} redchi: {}".format(i, result_redchi))
+
+            for e in eval:
+                evals.append(float(e))
+            for i in range(int(len(evec))):
+                evecs.append(np.array([evec[j, i] for j in range(int(len(evec)))], dtype=np.float64))
+            new_queue.append((fix_theta + list(result_theta), evals, evecs, result_redchi))
     queue = new_queue
 
 # Stitch together the hessians
 kernel = []
-for theta, hesses, redchi in queue:
-    hess_len = 0
-    for hess in hesses:
-        hess_len += len(hess)
-    new_hess = np.zeros((hess_len, hess_len))
-    hess_iter = 0
-    for hess in hesses:
-        for i, line in enumerate(hess):
-            for j, h in enumerate(line):
-                new_hess[hess_iter+i][hess_iter+j] = h
-        hess_iter += len(hess)
+for theta, evals, evecs, redchi in queue:
+    resized_evecs = []
+    max_len = (1 + ASTEROIDS_MAX_K)**2 - 6
+    for e in evecs:
+        l_value = (len(e) - 1) // 2
+        start_index = l_value**2 - 6
+        if l_value < 2:
+            l_value = 2
+            start_index = 0
+        evec = [0] * start_index + list(e) + [0] * (max_len - start_index - len(e))
+        resized_evecs.append(np.array(evec))
     print("The kernel includes a point with theta {}, redchi {}".format(theta, redchi))
-    kernel.append((theta, new_hess))
+    kernel.append((theta, evals, np.array(resized_evecs)))
 
 print("There are {} MCMC starting points, and there should be {}".format(len(kernel), np.prod(NUM_FITS)))
 
@@ -235,23 +288,27 @@ print("There are {} MCMC starting points, and there should be {}".format(len(ker
 ####################################################################
 print()
 
-def populate(sigmas, count):
-    evals, diagonalizer = linalg.eigh(sigmas)
-    diagonal_points = 1/np.sqrt(np.abs(evals)) * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
+def populate(evals, diagonalizer, count):
+    diagonal_points = np.sqrt(np.abs(evals)) * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
     global_points = np.asarray([np.matmul(diagonalizer, d) for d in diagonal_points])
     return global_points
 
-def populate_ball(sigmas, count):
-    evals, diagonalizer = linalg.eigh(sigmas)
-    weights = [np.sum([diagonalizer[i][j] / evals[j] for j in range(N_DIM)]) for i in range(N_DIM)]
-    global_points = np.sqrt(np.abs(weights)) * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
-    return global_points
-
-def mcmc_fit(theta_start, hess, index):
+def mcmc_fit(theta_start, evals, evecs, index):
     backend = emcee.backends.HDFBackend(output_name+"-{}.h5".format(index))
 
     if not reload:
-        pos = populate(-hess, N_WALKERS) + theta_start
+        pos = populate(evals, evecs, N_WALKERS) + theta_start
+        if PLOT_POSES:
+            for i in range(len(hess_inv)):
+                print(plotille.histogram(
+                    pos[:,i],
+                    bins=8,
+                    width=80,
+                    height=15,
+                    X_label='theta {}'.format(i),
+                    Y_label='Counts',
+                    linesep='\n',
+                ))
         backend.reset(N_WALKERS, N_DIM)
     else:
         pos=None
@@ -288,5 +345,31 @@ def mcmc_fit(theta_start, hess, index):
     else:
         print("Done")
 
-for i, (theta, hess) in enumerate(kernel):
-    mcmc_fit(theta, hess, i)
+for i, (theta, evals, evecs) in enumerate(kernel):
+    mcmc_fit(theta, evals, evecs, i)
+
+
+####################################################################
+# Process data
+####################################################################
+print()
+
+i = 0
+while True:
+    print("Showing i = {}".format(i))
+    try:
+        disp = display.Display("{0}".format(output_name), "{0}-{1}".format(output_name, i))
+    except Exception as e:
+        if i == 0:
+            raise e
+        break
+    disp.show_redchi()
+    disp.show_params()
+    disp.show_corner()
+    disp.show_compare()
+    disp.show_results()
+    plt.show()
+    if not collect.collect(output_name + "-" + str(i), output_name):
+        break
+    del disp
+    i += 1

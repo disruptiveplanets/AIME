@@ -1,27 +1,31 @@
-import sys, corner, emcee, os, asteroids_0_3
+TEST = False
+
+import sys, corner, emcee, os
+if not TEST:
+    import asteroids_0_3, asteroids_0_2
+else:
+    import test_0_2 as asteroids_0_2
+    import test_0_2 as asteroids_0_3
 import numpy as np
 import matplotlib.pyplot as plt
 
 EARTH_RADIUS = 6370000
 STANDARD_RESULTS_METHOD = False
 REDCHI_THRESHOLD = 2
-ASTEROIDS_MAX_K = 2
-
-if len(sys.argv) not in [2, 3]:
-    raise Exception("Please pass a h5 file path to view")
-output_name = sys.argv[1]
-bare_name = "../../staged/" + sys.argv[2]
 
 class Display:
     def __init__(self, bare_name, h5_name):
         self.bare_name = bare_name
         self.h5_name = h5_name
-        self.reader = emcee.backends.HDFBackend(self.h5_name, read_only=True)
+        self.reader = emcee.backends.HDFBackend(self.h5_name+".h5", read_only=True)
         self.samples = None
         self.theta_true = None
         self.true_results = None
         self.res = None
         self.mask = None
+        self.maxj = None
+        self.maxk = None
+        self.module = None
         try:
             self.chain_length, self.nwalkers, self.ndim = self.reader.get_chain().shape
         except AttributeError:
@@ -38,31 +42,17 @@ class Display:
         except:
             print("Could not find autocorrelation time because the chain is too short.")
             self.thin = 1
-            self.get_samples_burnin(0)
-            self.burnin = 0
-            self.show_params()
-            plt.show()
-            self.burnin = -1
-            while self.burnin < 0:
-                try:
-                    self.burnin = int(input("What is the burnin? "))
-                except:
-                    pass
+            self.burnin = 1000
 
-        self.get_samples_burnin(self.burnin)
+        self.samples = self.reader.get_chain(discard=self.burnin, thin=self.thin)
+        self.log_prob_samples = self.reader.get_log_prob(discard=self.burnin, thin=self.thin)
+        self.log_prior_samples = self.reader.get_blobs(discard=self.burnin, thin=self.thin)
 
         print("Burn-in: {}. Thin: {}".format(self.burnin, self.thin))
-
-    def get_samples_burnin(self, burnin):
-        self.samples = self.reader.get_chain(discard=burnin, thin=self.thin)
-        self.log_prob_samples = self.reader.get_log_prob(discard=burnin, thin=self.thin)
-        self.log_prior_samples = self.reader.get_blobs(discard=burnin, thin=self.thin)
-
 
     def show_params(self):
         self.get_samples()
         fig, axes = plt.subplots(self.ndim, figsize=(6.6, 4.6), sharex=True)
-        samples = self.reader.get_chain()
         for i in range(self.ndim):
             ax = axes[i]
             ax.plot(self.samples[:, :, i], "k", alpha=0.3)
@@ -95,6 +85,7 @@ class Display:
         plt.text(0.5, 0.5, "{} / {} walkers converged".format(num_converged, self.log_prob_samples.shape[1]),
         horizontalalignment='center', verticalalignment='center', transform = plt.gca().transAxes)
         plt.savefig(self.h5_name+"-redchi.png")
+
 
     def get_mask(self):
         if self.mask is not None:
@@ -144,7 +135,10 @@ class Display:
     def get_params(self):
         if self.theta_true is not None:
             return
-        f = open(self.bare_name + ".dat", 'r')
+        f = open("../../staged/" + self.bare_name + ".dat", 'r')
+        asteroids_max_j, asteroids_max_k = f.readline().split(', ')
+        self.maxj = int(asteroids_max_j)
+        self.maxk = int(asteroids_max_k)
         self.cadence = int(f.readline())
         self.impact_parameter = EARTH_RADIUS * float(f.readline())
         self.radius = float(f.readline())
@@ -156,6 +150,12 @@ class Display:
         theta_low = np.asarray([float(x) for x in f.readline().split(',')])
         sigma = float(f.readline()) * np.sqrt(self.spin[0]**2 + self.spin[1]**2 + self.spin[2]**2)
         f.close()
+
+        if self.maxj == 0:
+            if self.maxk == 2:
+                self.module = asteroids_0_2
+            elif self.maxk == 3:
+                self.module = asteroids_0_3
 
     def show_results(self):
         self.get_params()
@@ -189,7 +189,7 @@ class Display:
     def run(self, theta):
         self.get_params()
         try:
-            resolved_data = asteroids_0_3.simulate(self.cadence, self.jlms, theta[1:],
+            resolved_data = self.module.simulate(self.cadence, self.jlms, theta[1:],
                 self.radius, self.spin[0], self.spin[1], self.spin[2], theta[0],
                 self.impact_parameter, self.speed, -1)
         except:
@@ -229,6 +229,9 @@ class Display:
         plt.savefig(self.h5_name+"-compare.png")
 
 
-d = Display(bare_name, output_name)
-d.show_corner()
-plt.show()
+if __name__ == "__main__":
+    d = Display("minimizer/run-3.0/run-3.0")
+    d.thin = 1
+    d.get_samples_burnin(4000)
+    d.show_compare()
+    plt.show()
