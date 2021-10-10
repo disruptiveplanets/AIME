@@ -250,6 +250,8 @@ queue = [([], [], [], 0)]
 for i, num_fits in enumerate(NUM_FITS):
     new_queue = []
     for fix_theta, evals, evecs, _ in queue:
+        new_evals = evals[:]
+        new_evecs = evecs[:]
         tier_results = minimize(i+2, num_fits, fix_theta)
         for result_theta, result_hess, result_redchi in tier_results:
             if is_identity(result_hess):
@@ -258,15 +260,19 @@ for i, num_fits in enumerate(NUM_FITS):
             print("Deg {} redchi: {}".format(i, result_redchi))
 
             for e in eval:
-                evals.append(float(e))
+                new_evals.append(float(e))
             for i in range(int(len(evec))):
-                evecs.append(np.array([evec[j, i] for j in range(int(len(evec)))], dtype=np.float64))
-            new_queue.append((fix_theta + list(result_theta), evals, evecs, result_redchi))
+                new_evecs.append(np.array([evec[j, i] for j in range(int(len(evec)))],
+                dtype=np.float64))
+            new_queue.append((fix_theta + list(result_theta), np.asarray(new_evals),
+            np.asarray(new_evecs), result_redchi))
     queue = new_queue
 
 # Stitch together the hessians
 kernel = []
 for theta, evals, evecs, redchi in queue:
+    if np.any(evals < 0):
+        raise Exception("An eigenvalue was negative.")
     resized_evecs = []
     max_len = (1 + ASTEROIDS_MAX_K)**2 - 6
     for e in evecs:
@@ -289,7 +295,7 @@ print("There are {} MCMC starting points, and there should be {}".format(len(ker
 print()
 
 def populate(evals, diagonalizer, count):
-    diagonal_points = np.sqrt(np.abs(evals)) * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
+    diagonal_points = np.sqrt(evals) * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
     global_points = np.asarray([np.matmul(diagonalizer, d) for d in diagonal_points])
     return global_points
 
@@ -299,7 +305,7 @@ def mcmc_fit(theta_start, evals, evecs, index):
     if not reload:
         pos = populate(evals, evecs, N_WALKERS) + theta_start
         if PLOT_POSES:
-            for i in range(len(hess_inv)):
+            for i in range(len(pos[0])):
                 print(plotille.histogram(
                     pos[:,i],
                     bins=8,
