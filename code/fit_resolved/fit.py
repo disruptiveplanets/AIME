@@ -28,6 +28,7 @@ MAX_N_STEPS = 100_000
 NUM_MINIMIZE_POINTS = 48
 NUM_FITS = [3, 1]
 EPSILON = 1e-10 # If ABNORMAL_TERMINATION_IN_LNSRCH occurs, EPSILON may be too large.
+MIN_SPREAD = 1e-4 ** 2
 
 DISTANCE_RATIO_CUT = 10
 MIN_THETA_DIST = 0.01
@@ -308,7 +309,7 @@ print("There are {} MCMC starting points, and there should be {}".format(len(ker
 print()
 
 def populate(evals, diagonalizer, count):
-    diagonal_points = np.sqrt(evals) * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
+    diagonal_points = np.sqrt(np.maximum(MIN_SPREAD, evals)) * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
     global_points = np.asarray([np.matmul(diagonalizer, d) for d in diagonal_points])
     return global_points
 
