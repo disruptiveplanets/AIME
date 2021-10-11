@@ -168,7 +168,7 @@ def minimize_log_prob(float_theta, fix_theta, simulate_func):
         if t > theta_high[i] or t < theta_low[i]:
             return 1e10 # Zero likelihood
 
-    # Return log like
+    # Return redchi
     return np.sum((y_min - model) ** 2 /  yerr_min ** 2)
 
 def get_minimum(arg):
@@ -182,20 +182,45 @@ def get_minimum(arg):
     if not bfgs_min.success:
         print("One of the minimum finding points failed.")
         #print(bfgs_min)
-        return None, None, None
-        return None, None, None
+        return None, None, None, None
 
     if RECALC_HESS:
-        hess = nd.Hessian(lambda x: minimize_log_prob(x, fix_theta, simulate_func))(bfgs_min.x)
-        hess_inv = linalg.inv(hess)
+        def hess_func(min_coords):
+            r = minimize_log_prob(min_coords, fix_theta, simulate_func)
+            return r
+
+        grad = nd.Gradient(hess_func, step=EPSILON)(bfgs_min.x)
+        hess = nd.Hessian(hess_func, step=EPSILON)(bfgs_min.x)
+
+        try:
+            hess_inv = linalg.inv(hess)
+            #print("Min hess:", bfgs_min.hess_inv.todense())
+        except:
+            print("Singular matrix: {}".format(hess))
+            return None, None, None, None
     else:
         if is_identity(bfgs_min.hess_inv.todense()):
             print("One of the Hessians was the identity.")
-            return None, None, None
+            return None, None, None, None
         hess_inv = bfgs_min.hess_inv.todense()
 
+    new_evals = []
+    new_evecs = []
+    evals, evecs = mp.eigsy(mp.matrix(hess_inv))
+    for e in evals:
+        ### Correct for non positive definite hessians
+        #new_evals.append(float(e))
+        new_evals.append(abs(float(e)))
+    if np.any(np.asarray(new_evals) < 0):
+        print("One of the Hessians was not positive definite")
+        return None, None, None, None
+
+    for k in range(int(len(evecs))):
+        new_evecs.append(np.array([evecs[j, k] for j in range(int(len(evecs)))],
+        dtype=np.float64))
+
     # Return redchi, minimizing params, hessian
-    return bfgs_min.fun / len(y_min), bfgs_min.x, hess_inv
+    return bfgs_min.fun / len(y_min), bfgs_min.x, new_evals, new_evecs
 
 def minimize(l, num_return, fix_theta):
     assert l <= ASTEROIDS_MAX_K
@@ -233,20 +258,18 @@ def minimize(l, num_return, fix_theta):
         lambda x: x[0] if (x[0] is not None and not np.isnan(x[0])) else 1e10)
 
     distinct_results = []
-    for redchi, theta, hess_inv in sorted_results:
+    for redchi, theta, evals, evecs in sorted_results:
         if redchi is None:
             continue
         if len(distinct_results) >= num_return:
             break
         choose = True
-        for accepted_theta, accepted_hess, _ in distinct_results:
-            if np.sum([(theta[i] - accepted_theta[i])**2 for i in range(len(theta))]) < MIN_THETA_DIST * MIN_THETA_DIST:
+        for distinct_theta, _, _, _ in distinct_results:
+            if np.sum([(theta[i] - distinct_theta[i])**2 for i in range(len(theta))]) < MIN_THETA_DIST**2:
                 choose = False
                 break
         if choose:
-            #print("Chose redchi", redchi, "at", theta)
-
-            distinct_results.append((theta, hess_inv, redchi))
+            distinct_results.append((theta, evals, evecs, redchi))
     return distinct_results
 
 # Stepped minimization
@@ -254,31 +277,16 @@ queue = [([], [], [], 0)]
 for i, num_fits in enumerate(NUM_FITS):
     new_queue = []
     for fix_theta, evals, evecs, _ in queue:
-        new_evals = evals[:]
-        new_evecs = evecs[:]
         tier_results = minimize(i+2, num_fits, fix_theta)
-        for result_theta, result_hess, result_redchi in tier_results:
-            if is_identity(result_hess):
-                raise Exception("One of the Hessians was the identity")
-
-            print(result_hess)
-            eval, evec = mp.eigsy(mp.matrix(result_hess))
+        for result_theta, result_evals, result_evecs, result_redchi in tier_results:
             print("Deg {} redchi: {}".format(i, result_redchi))
-
-            for e in eval:
-                new_evals.append(float(e))
-            for i in range(int(len(evec))):
-                new_evecs.append(np.array([evec[j, i] for j in range(int(len(evec)))],
-                dtype=np.float64))
-            new_queue.append((fix_theta + list(result_theta), new_evals, new_evecs, result_redchi))
+            new_queue.append((fix_theta + list(result_theta), evals + list(result_evals),
+                evecs + list(result_evecs), result_redchi))
     queue = new_queue
 
 # Stitch together the hessians
 kernel = []
 for theta, evals, evecs, redchi in queue:
-    if np.any(np.asarray(evals) < 0):
-        print("Eigenvalues:", evals)
-        raise Exception("An eigenvalue was negative.")
     resized_evecs = []
     max_len = (1 + ASTEROIDS_MAX_K)**2 - 6
     for e in evecs:

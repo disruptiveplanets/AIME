@@ -19,9 +19,9 @@ def simulate(cadence, jlms, theta, radius, spinx, spiny, spinz, initial_roll, im
         mul = 1
         if n >= 3:
             mul = 0.000001
-        y1 += mul * p * np.sin(x * n)
-        y2 += mul * p * np.cos(x * n)
-        y3 += mul * p * np.cos(x * (n+1))
+        y1 += mul * p**2 * np.sin(x * n)
+        y2 += mul * p**2 * np.cos(x * n)
+        y3 += mul * p**2 * np.cos(x * (n+1))
 
     y = []
     for i in range(DATA_WIDTH):

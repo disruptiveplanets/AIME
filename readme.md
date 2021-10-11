@@ -24,8 +24,10 @@ In both the resolved and unresolved cases, we will build a simulation to generat
 
 ## Not done:
 Immediate:
-2. Run higher order Kl fits
-1. Run fits with pure J2, J4, etc. coefficients.
+1. Run higher order Kl fits
+2. Run fits with pure J2, J4, etc. coefficients.
+3. Write up everything in a summary
+4. Fix the minimization process such that it always yields positive definite Hessians and zero Jacobians.
 
 Much later:
 1. Show that moons can be added to perturb the Jlms.

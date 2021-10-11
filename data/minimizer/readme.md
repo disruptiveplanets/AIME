@@ -35,3 +35,5 @@ Well, the l=2 run goes exactly as expected. I must now determine why the l=3 fit
 It is now the weekend. I spent a long time on this code, building a test model which can be turned off and on with the TEST variable in display and fit.py. I used this model to make changes to the matrix calculation technique, the initial point picking, and extra log files. I got successful fits for the toy model. Now I want to see if I get good fits for the true model.
 
 I'm using run 9 as my test, which contains both l=2 and l=3. I've also adjusted the fit and pull code so that the corner plotting happens on the cluster. That way, I don't get memory problems, and I don't have to store GB of data locally.
+
+I had to introduce a fix that took the abs of the eigenvalues, because I wasn't getting pos def Hessians. Fix this in the future.
