@@ -15,8 +15,7 @@ from mpmath import mp
 import plotille
 import display, collect
 
-from autograd import elementwise_grad as egrad
-from autograd import jacobian
+import numdifftools as nd
 
 
 REPORT_INITIAL = True
@@ -187,10 +186,8 @@ def get_minimum(arg):
         return None, None, None
 
     if RECALC_HESS:
-        def hessian_function(x):
-            return minimize_log_prob(x, fix_theta, simulate_func)
-        H_f = jacobian(egrad(hessian_function))
-        hess_inv = linalg.inv(H_f(bfgs_min.x))
+        hess = nd.Hessian(lambda x: minimize_log_prob(x, fix_theta, simulate_func))(bfgs_min.x)
+        hess_inv = linalg.inv(hess)
     else:
         if is_identity(bfgs_min.hess_inv.todense()):
             print("One of the Hessians was the identity.")
@@ -280,6 +277,7 @@ for i, num_fits in enumerate(NUM_FITS):
 kernel = []
 for theta, evals, evecs, redchi in queue:
     if np.any(np.asarray(evals) < 0):
+        print("Eigenvalues:", evals)
         raise Exception("An eigenvalue was negative.")
     resized_evecs = []
     max_len = (1 + ASTEROIDS_MAX_K)**2 - 6
@@ -296,7 +294,6 @@ for theta, evals, evecs, redchi in queue:
 
 print("There are {} MCMC starting points, and there should be {}".format(len(kernel), np.prod(NUM_FITS)))
 
-sys.exit()
 ####################################################################
 # Run MCMC
 ####################################################################
