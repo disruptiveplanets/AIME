@@ -1,4 +1,5 @@
 import os, sys
+import numpy as np
 from PIL import Image, ImageFont, ImageDraw
 
 RUNS = 0
@@ -12,7 +13,7 @@ def collect(d, bare):
         images = [Image.open(d+x) for x in ['-compare.png', '-corner.png', '-params.png', '-redchi.png']]
     except:
         print("Could not find files for {}".format(d))
-        return
+        return False
 
     widths, heights = zip(*(i.size for i in images))
 
@@ -54,12 +55,19 @@ def collect(d, bare):
     theta_median = []
     theta_plus = []
     theta_minus = []
+    red_chis = []
     for line in f.readlines():
         if line == "": continue
         median, plus, minus, _ = line.split(": ")[1].split(' ')
         theta_median.append('%s' % float('%.4g' % float(median)))
         theta_plus.append('%s' % float('%.4g' % float(plus[:-1]))) # Remove the terminal comma
         theta_minus.append('%s' % float('%.4g' % -float(minus[:-1])))
+    f.close()
+
+    f = open(d+"-redchis.txt", 'r')
+    for line in f.readlines():
+        if line == "": continue
+        red_chis.append(float(line))
     f.close()
 
     draw = ImageDraw.Draw(new_im)
@@ -73,10 +81,14 @@ def collect(d, bare):
     text += "Theta low: {}\n\n".format(theta_low)
     text += "Theta median: {}\n".format(theta_median)
     text += "Theta -sigma: {}\n".format(theta_minus)
-    text += "Theta +sigma: {}".format(theta_plus)
+    text += "Theta +sigma: {}\n".format(theta_plus)
+    text += "Average reduced chi squared: {}\n".format(np.mean(red_chis))
+    text += "Minimum reduced chi squared: {}".format(np.min(red_chis))
 
     draw.text((widths[CORNER]/2+40, 40), text, font=font, align="left", fill='black')
     new_im.save(d+"-all.png")
 
-    for x in ['-compare.png', '-corner.png', '-params.png', '-redchi.png', '-results.txt']:
+    for x in ['-compare.png', '-corner.png', '-params.png', '-redchi.png', '-results.txt', '-redchis.txt']:
         os.remove(d+x)
+
+    return True

@@ -13,6 +13,8 @@ EARTH_RADIUS = 6370000
 STANDARD_RESULTS_METHOD = False
 REDCHI_THRESHOLD = 2
 
+AUTO_BURNIN = 1000
+
 class Display:
     def __init__(self, bare_name, h5_name):
         self.bare_name = bare_name
@@ -41,8 +43,8 @@ class Display:
             self.thin = int(0.5 * np.min(tau))
         except:
             print("Could not find autocorrelation time because the chain is too short.")
+            self.burnin = AUTO_BURNIN
             self.thin = 1
-            self.burnin = 1000
 
         self.samples = self.reader.get_chain(discard=self.burnin, thin=self.thin)
         self.log_prob_samples = self.reader.get_log_prob(discard=self.burnin, thin=self.thin)
@@ -72,13 +74,18 @@ class Display:
         fig = plt.figure(figsize=(6.6, 4.6))
         redchiminmean = 0
         num_converged = 0
+
+        f = open(self.h5_name + '-redchis.txt', 'w')
         for i in range(self.log_prob_samples.shape[1]):
             redchi = -self.log_prob_samples[:,i] / len(self.true_results)
             if redchi [-1] < REDCHI_THRESHOLD:
+                f.write(str(redchi[-1]) + "\n")
                 num_converged += 1
             this_min = np.nanmin(redchi) / self.log_prob_samples.shape[1]
             redchiminmean += this_min if np.isfinite(this_min) else 0
             plt.plot(redchi, c='k', alpha=0.25)
+        f.close()
+
         plt.ylabel("Reduced chi squared")
         plt.xlabel("Sample")
         plt.ylim(0, max(2, 2 * redchiminmean))
