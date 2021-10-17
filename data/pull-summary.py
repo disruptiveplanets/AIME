@@ -17,5 +17,5 @@ for fname in os.listdir("../staged/"):
             break
         i += 1
 
-    #os.rename("../staged/{0}.dat".format(fname), "{1}/{0}/{0}.dat".format(fname, PATH))
+    os.rename("../staged/{0}.dat".format(fname), "{1}/{0}/{0}.dat".format(fname, PATH))
     print(fname)

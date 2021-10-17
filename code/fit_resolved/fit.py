@@ -366,8 +366,8 @@ def mcmc_fit(theta_start, evals, evecs, index):
         print("Done")
 
 for i, (theta, evals, evecs) in enumerate(kernel):
-    #pass
-    mcmc_fit(theta, evals, evecs, i)
+    pass
+    #mcmc_fit(theta, evals, evecs, i)
 
 
 ####################################################################
@@ -389,7 +389,7 @@ while True:
     disp.show_corner()
     disp.show_compare()
     disp.show_results()
-    #plt.show()
+    plt.show()
     if not collect.collect(output_name + "-" + str(i), output_name):
         break
     del disp

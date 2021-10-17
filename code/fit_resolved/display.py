@@ -8,6 +8,7 @@ else:
     import test_0_2 as asteroids_0_3
 import numpy as np
 import matplotlib.pyplot as plt
+import random_vector
 
 EARTH_RADIUS = 6370000
 STANDARD_RESULTS_METHOD = False
@@ -155,7 +156,7 @@ class Display:
         self.theta_true = [float(x) for x in f.readline().split(',')]
         theta_high = np.asarray([float(x) for x in f.readline().split(',')])
         theta_low = np.asarray([float(x) for x in f.readline().split(',')])
-        sigma = float(f.readline()) * np.sqrt(self.spin[0]**2 + self.spin[1]**2 + self.spin[2]**2)
+        self.sigma = float(f.readline()) * np.sqrt(self.spin[0]**2 + self.spin[1]**2 + self.spin[2]**2)
         f.close()
 
         if self.maxj == 0:
@@ -209,6 +210,7 @@ class Display:
         theta_results = [f[0] for f in self.get_results()]
         if self.true_results is None:
             self.true_results = self.run(self.theta_true)
+        _, true_error = random_vector.randomize_rotate(self.true_results, self.sigma)
         mean_res = self.run(theta_results)
 
         f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(12, 6), sharex=True)
@@ -217,6 +219,13 @@ class Display:
         ax1.plot(x_display, self.true_results[::3], label = 'true x', alpha=0.5, color='C0')
         ax1.plot(x_display, self.true_results[1::3], label = 'true y', alpha=0.5, color='C1')
         ax1.plot(x_display, self.true_results[2::3], label = 'true z', alpha=0.5, color='C2')
+
+        ax1.fill_between(x_display, self.true_results[::3] + true_error[::3],
+            self.true_results[::3] - true_error[::3], color="C0", alpha=0.2)
+        ax1.fill_between(x_display, self.true_results[1::3] + true_error[1::3],
+            self.true_results[1::3] - true_error[1::3], color="C1", alpha=0.2)
+        ax1.fill_between(x_display, self.true_results[2::3] + true_error[2::3],
+            self.true_results[2::3] - true_error[2::3], color="C2", alpha=0.2)
 
         if mean_res is not None:
             ax1.plot(x_display, mean_res[::3], label = 'mean x', alpha=0.5, linestyle='dotted', color='C0')

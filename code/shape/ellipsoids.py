@@ -13,11 +13,10 @@ xs = np.linspace(-RADIUS, RADIUS, SHAPE[0])
 MAX_L = 2
 RLMS = []
 volume_element = DELTA**3
-
 TRUE = np.asarray([
     1,
     0, 0, 0,
-    0, 0, 0, 0, -0.1])
+    0.0412789, 0, 0, 0, -0.1])
 ERROR = np.asarray([
     EPS,
     EPS, EPS, EPS,

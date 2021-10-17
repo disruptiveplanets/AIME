@@ -37,3 +37,11 @@ It is now the weekend. I spent a long time on this code, building a test model w
 I'm using run 9 as my test, which contains both l=2 and l=3. I've also adjusted the fit and pull code so that the corner plotting happens on the cluster. That way, I don't get memory problems, and I don't have to store GB of data locally.
 
 I had to introduce a fix that took the abs of the eigenvalues, because I wasn't getting pos def Hessians. Fix this in the future.
+
+## Oct 16
+
+The fit that was run on Oct 10 finally completed, and everything worked! All of it! All the fits converged, and I compiled the data and sent it to Julien. The next step is to check how convergence depends on different parameters, all listed in these slides.
+
+https://docs.google.com/presentation/d/1MnxdqLsHV0_Zz0K89QB5WmE6kMjzDtfWsZxUnFayEhw/edit?usp=sharing
+
+This will be done in a later data bundle. As for now, the goal of this one was go get high order convergence with the minimization technique, which has been achieved.
