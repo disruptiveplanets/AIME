@@ -1,7 +1,7 @@
 import os
 from shutil import copyfile
 
-PATH = "minimizer"
+PATH = "probe"
 
 I_LIMIT = -1
 

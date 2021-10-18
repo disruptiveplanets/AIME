@@ -36,7 +36,7 @@ def collect(d, bare):
         (widths[PARAMS] + widths[CORNER] + int((im_width - widths[CORNER] - bi_width) / 2),
         heights[RUNS] + int((im_height - heights[RUNS] - bi_height) / 2)))
 
-    f = open("../../staged/"+bare+".dat", 'r')
+    f = open("../../staged/"+bare+".txt", 'r')
     max_j, max_l = f.readline().split(", ")
     max_j, max_l = (int(max_j), int(max_l))
     cadence = int(f.readline())

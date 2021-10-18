@@ -26,7 +26,6 @@ EARTH_RADIUS = 6_370_000
 N_WALKERS = 32
 MAX_N_STEPS = 100_000
 NUM_MINIMIZE_POINTS = 48
-NUM_FITS = [3, 1]
 EPSILON = 1e-10 # If ABNORMAL_TERMINATION_IN_LNSRCH occurs, EPSILON may be too large.
 MIN_SPREAD = 1e-4 ** 2
 
@@ -36,10 +35,14 @@ MIN_THETA_DIST = 0.01
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
 output_name = sys.argv[1]
-f = open("../../staged/" + output_name+".dat", 'r')
+f = open("../../staged/" + output_name+".txt", 'r')
 ASTEROIDS_MAX_J, ASTEROIDS_MAX_K = f.readline().split(', ')
 ASTEROIDS_MAX_J = int(ASTEROIDS_MAX_J)
 ASTEROIDS_MAX_K = int(ASTEROIDS_MAX_K)
+
+NUM_FITS = f.readline().split(', ')
+NUM_FITS = [int(i) for i in NUM_FITS]
+
 cadence = int(f.readline())
 impact_parameter = EARTH_RADIUS * int(f.readline())
 radius = float(f.readline())
@@ -366,8 +369,7 @@ def mcmc_fit(theta_start, evals, evecs, index):
         print("Done")
 
 for i, (theta, evals, evecs) in enumerate(kernel):
-    pass
-    #mcmc_fit(theta, evals, evecs, i)
+    mcmc_fit(theta, evals, evecs, i)
 
 
 ####################################################################
@@ -394,3 +396,27 @@ while True:
         break
     del disp
     i += 1
+
+####################################################################
+# Save samples
+####################################################################
+
+for index in range(len(kernel)):
+    reader = emcee.backends.HDFBackend(output_name+"-{}.h5".format(index), read_only=True)
+
+    try:
+        tau = reader.get_autocorr_time()
+        burnin = int(2 * np.max(tau))
+        thin = int(0.5 * np.min(tau))
+    except:
+        print("Could not find autocorrelation time because the chain is too short.")
+        thin = 1
+        burnin = 1000
+
+    samples = reader.get_chain(discard=burnin, thin=thin)
+    #log_prob_samples = reader.get_log_prob(discard=burnin, thin=thin)
+    #log_prior_samples = reader.get_blobs(discard=burnin, thin=thin)
+
+    flat_samples = np.array([samples[:,:,i].flatten() for i in range(3)])
+
+    np.savetxt(output_name+"-{}-samples.dat".format(index), flat_samples)

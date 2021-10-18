@@ -5,7 +5,7 @@ copyfile("../code/fit_resolved/asteroids_0_3.cpython-38-x86_64-linux-gnu.so", "a
 copyfile("../code/fit_resolved/asteroids_0_2.cpython-38-x86_64-linux-gnu.so", "asteroids_0_2.cpython-38-x86_64-linux-gnu.so")
 import display
 
-PATH = "minimizer"
+PATH = "probe"
 
 I_LIMIT = -1
 

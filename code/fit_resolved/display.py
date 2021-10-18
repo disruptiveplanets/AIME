@@ -143,7 +143,7 @@ class Display:
     def get_params(self):
         if self.theta_true is not None:
             return
-        f = open("../../staged/" + self.bare_name + ".dat", 'r')
+        f = open("../../staged/" + self.bare_name + ".txt", 'r')
         asteroids_max_j, asteroids_max_k = f.readline().split(', ')
         self.maxj = int(asteroids_max_j)
         self.maxk = int(asteroids_max_k)
