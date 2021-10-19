@@ -2,9 +2,9 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-BASE_NAME = "param-scan-1."
+BASE_NAME = "param-1."
 SIGMA = 0.1
-NUM_SUBDIVISIONS = 7
+NUM_SUBDIVISIONS = 16
 TRIANGLE_BASE = 0.25
 TRIANGLE_HEIGHT = 0.25
 INITIAL_ANGLE = 0.2
@@ -27,14 +27,14 @@ def get_text(params):
 tot_index = 0
 l2zs = []
 l2xs = []
-for i in range(NUM_SUBDIVISIONS + 1):
+for i in range(NUM_SUBDIVISIONS+1):
     l2z = -TRIANGLE_HEIGHT / NUM_SUBDIVISIONS * i
     half_width = TRIANGLE_BASE / NUM_SUBDIVISIONS / 2 * i
-    for j in range(1 + i):
+    for j in range(0, i+1):
         l2x = j * TRIANGLE_BASE / NUM_SUBDIVISIONS  - half_width
-        print("{} Generating theta2={}, theta3={}".format(tot_index, l2x, l2z))
+        print("{:03} Generating theta2={}, theta3={}".format(tot_index, l2x, l2z))
 
-        f = open("../../staged/{}{}.txt".format(BASE_NAME, tot_index), 'w')
+        f = open("../../staged/{}{:03}.txt".format(BASE_NAME, tot_index), 'w')
         f.write(get_text((l2x, l2z)))
         f.close()
 
@@ -44,6 +44,8 @@ for i in range(NUM_SUBDIVISIONS + 1):
 
 plt.scatter(l2xs, l2zs)
 plt.scatter(np.array(SPECIALS)[:,0], np.array(SPECIALS)[:,1])
+plt.xlim(-0.125, 0.125)
+plt.ylim(-0.25, 0)
 plt.show()
 
 
