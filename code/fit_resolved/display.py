@@ -145,6 +145,7 @@ class Display:
             return
         f = open("../../staged/" + self.bare_name + ".txt", 'r')
         asteroids_max_j, asteroids_max_k = f.readline().split(', ')
+        accept_nums = [int(i) for i in f.readline().split(', ')]
         self.maxj = int(asteroids_max_j)
         self.maxk = int(asteroids_max_k)
         self.cadence = int(f.readline())
