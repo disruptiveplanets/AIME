@@ -24,7 +24,7 @@ for fname in os.listdir("../../staged/"):
             res = input("The path {} exists. Are you sure you want to overwrite it? (y/n)".format(fname+".h5"))
         if res == 'n':
             continue
-    f = open("submit-{}.sh".format(fname), 'w')
+    f = open("{}.sh".format(fname), 'w')
     write_text = '\n'.join(template_text[:3])+ '\n' + template_text[3] + \
         fname + '.log\n' + '\n'.join(template_text[4:]) + ' ' + fname + reload
 

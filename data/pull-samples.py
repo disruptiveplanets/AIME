@@ -12,10 +12,10 @@ for fname in os.listdir("../staged/"):
     i = 0
     while True:
         if i >= I_LIMIT and I_LIMIT > 0: break
-        out = os.system("scp jdinsmore@txe1-login.mit.edu:~/asteroid-tidal-torque/code/fit_resolved/{0}-{2}-all.png {1}/{0}/{0}-{2}-all.png".format(fname, PATH, i))
+        out = os.system("scp jdinsmore@txe1-login.mit.edu:~/asteroid-tidal-torque/code/fit_resolved/{0}-{2}-samples.dat {1}/{0}/{0}-{2}-samples.dat".format(fname, PATH, i))
         if out != 0:
             break
         i += 1
 
-    #os.rename("../staged/{0}.txt".format(fname), "{1}/{0}/{0}.txt".format(fname, PATH))
+    os.rename("../staged/{0}.txt".format(fname), "{1}/{0}/{0}.txt".format(fname, PATH))
     print(fname)
