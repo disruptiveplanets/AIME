@@ -30,4 +30,4 @@ for fname in os.listdir("../../staged/"):
 
     f.write(write_text)
     f.close()
-    os.system("sbatch submit-{}.sh".format(fname))
+    os.system("sbatch {}.sh".format(fname))
