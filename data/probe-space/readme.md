@@ -8,3 +8,6 @@ Next is sigma varying and theta0 varying, run only for the fixed points identifi
 The above run finished, so I submitted a new one increasing the resolution. On Julien's advice, I also ran some fits like October 18 for higher experimental precision to understand exactly when the higher order parameters converge. These are the small-sigma runs.
 
 Next step is to scan sigma and l1 at specific shape parameters.
+
+## October 25
+I finished the higher resolution scan and put the higher sigma scan in the `minimizer` directory. Both scan went great and the results are visible here.
