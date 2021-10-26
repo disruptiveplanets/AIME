@@ -113,6 +113,8 @@ def covariance():
             index = i * (i + 1) // 2 + j
             if i < j:
                 cov = np.array([[np.nan, np.nan], [np.nan, np.nan]])
+            elif j == 0 or j == i or i == side_length - 1:
+                cov = np.array([[np.nan, np.nan], [np.nan, np.nan]])
             else:
                 # Which data file is the given coords?
                 min_dist = None
@@ -125,7 +127,8 @@ def covariance():
                         min_file = file
                         min_dist = abs(mean - points[index][MEAN_DETERMINE_AXIS])
 
-                if min_dist is None or min_dist > DIFF_THRESHOLD[MEAN_DETERMINE_AXIS]:
+                if min_dist is None:# or min_dist > DIFF_THRESHOLD[MEAN_DETERMINE_AXIS]:
+                    print(index, f"(i={i}, j={j})", min_dist, DIFF_THRESHOLD[MEAN_DETERMINE_AXIS])
                     cov = np.array([[np.nan, np.nan], [np.nan, np.nan]])
                 else:
                     array = np.loadtxt("{}/{}".format(names[index], min_file))
