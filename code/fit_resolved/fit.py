@@ -9,7 +9,7 @@ if TEST:
     import test_0_2 as asteroids_0_2
     import test_0_2 as asteroids_0_3
 from multiprocessing import Pool
-from random_vector import *
+import random_vector, random
 from scipy import optimize, linalg
 from mpmath import mp
 import plotille
@@ -53,7 +53,7 @@ theta_true = [float(x) for x in f.readline().split(',')]
 theta_high = np.asarray([float(x) for x in f.readline().split(',')])
 theta_low = np.asarray([float(x) for x in f.readline().split(',')])
 
-sigma = float(f.readline()) * np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
+sigma = float(f.readline())
 while output_name[-1] == '\n':
     output_name = output_name[:-1]
 f.close()
@@ -118,7 +118,7 @@ def log_probability(theta, y, yerr):
 start = time.time()
 y = fit_function(theta_true)
 print("Data generation took {} s".format(time.time() - start))
-y, yerr = randomize_rotate(y, sigma)
+y, yerr = random_vector.randomize_rotate_uniform(y, sigma)
 
 print("DOF:", len(y))
 
@@ -127,14 +127,17 @@ cadence_cut = len(asteroids_0_2.simulate(cadence, jlms, theta_true[1:], radius,
 
 plt.figure(figsize=(12, 4))
 x_display = np.arange(len(y) / 3)
-plt.errorbar(x_display, y[::3], yerr=yerr[::3], label = 'x', fmt='.')
-plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], label = 'y', fmt='.')
-plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], label = 'z', fmt='.')
+plt.fill_between(x_display, y[::3]+yerr[::3], y[::3]-yerr[::3], alpha=0.5)
+plt.fill_between(x_display, y[1::3]+yerr[1::3], y[1::3]-yerr[1::3],alpha=0.5)
+plt.fill_between(x_display, y[2::3]+yerr[2::3], y[2::3]-yerr[2::3],  alpha=0.5)
+plt.plot(x_display, y[::3], label='x')
+plt.plot(x_display, y[1::3], label='y')
+plt.plot(x_display, y[2::3], label='z')
 plt.xlabel("Time (Cadences)")
 plt.ylabel("Spin (rad/s)")
 plt.axvline(x=cadence_cut // 3, color='k')
 plt.legend()
-#plt.show()
+plt.show()
 
 def is_identity(h):
     for i in range(len(h)):

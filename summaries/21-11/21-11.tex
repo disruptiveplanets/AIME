@@ -1,0 +1,405 @@
+\documentclass[aps,twocolumn,secnumarabic,balancelastpage,amsmath,amssymb,nofootinbib,floatfix]{revtex4-1}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\usepackage{graphicx}      % tools for importing graphics
+%\usepackage{lgrind}        % convert program code listings to a form
+                            % includable in a LaTeX document
+%\usepackage{xcolor}        % produces boxes or entire pages with
+                            % colored backgrounds
+%\usepackage{longtable}     % helps with long table options
+%\usepackage{epsf}          % old package handles encapsulated postscript issues
+\usepackage{bm}            % special bold-math package. usge: \bm{mathsymbol}
+\usepackage{subcaption}
+%\usepackage{asymptote}     % For typesetting of mathematical illustrations
+%\usepackage{thumbpdf}
+\usepackage[colorlinks=true]{hyperref}  % this package should be added after
+                                        % all others.
+                                        % usage: \url{http://web.mit.edu/8.13}
+\usepackage{wasysym}
+
+\begin{document}
+\title{Summary for August, 2021}
+\author{Jack Dinsmore}
+\email{jtdinsmo@mit.edu}
+\date{\today}
+\affiliation{MIT Department of Physics}
+
+\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\parens}[1]{\left( #1 \right)}
+\newcommand{\brackets}[1]{\left[ #1 \right]}
+\newcommand{\comment}[1]{\textcolor{red}{\emph{ #1 }}}
+\newcommand{\x}{\bm{\hat x}}
+\newcommand{\y}{\bm{\hat y}}
+\newcommand{\z}{\bm{\hat z}}
+\newcommand{\J}{\mathcal{J}}
+\newcommand{\K}{\mathcal{K}}
+\newcommand{\R}{\mathcal{R}}
+
+
+
+
+
+\begin{abstract}
+    The purpose of this summary is to derive the math governing the way an asteroid reacts to a non-point source. It was motivated by the discovery that, under the assumption of a gravitating point source and a small asteroid, the tidal torque can be written in terms of components of the moment of inertia, which means inference is limited to the six components of the inertia matrix. By violating these assumptions and considering other effects (oblateness, etc.), we can break the degeneracy. This month I correct some old mistakes.
+\end{abstract}
+
+\maketitle
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Definitions}
+Please see \href{https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.56.5257&rep=rep1&type=pdf}{info on spherical harmonics}
+$$P_{lm}=\frac{1}{2^ll!}(1-t^2)^{m/2} \frac{d^{l+m}}{dl^{l+m}}(t^2-1)^l$$
+$$Y_{lm}(\theta, \phi) = P_{lm}(\cos\theta)e^{im\phi}$$
+$$\bar Y_{lm}(\theta, \phi) = (-1)^m \sqrt{\frac{2l+1}{4\pi}\frac{(l-m)!}{(l+m)!}} Y_{lm}(\theta, \phi)$$
+$$R_{lm}(\bm r) = (-1)^m \frac{r^l}{(l+m)!}Y_{lm}(\bm r)$$
+$$S_{lm}(\bm r) = (-1)^m \frac{(l-m)!}{r^{l+1}}Y_{lm}(\bm r)$$
+We write $Y(\bm r)=Y(\hat{\bm r})$.
+
+These definitions lead to several key facts. For $r' < r$,
+\begin{equation}
+\frac{1}{|\bm r - \bm r'|}=\sum_{lm}R_{lm}(\bm r')S^*_{lm}(\bm r).
+\label{eqn:expansion}
+\end{equation}
+We also have a translation rule:
+\begin{equation}
+S_{lm}(\bm r' - \bm r)=(-1)^l\sum_{l'm'}R^*_{l'm'}(\bm r')S_{l+l',m+m'}(\bm r)
+\label{eqn:trans}.
+\end{equation}
+Similarly, we have some gradient formulas that result in
+\begin{equation}
+\begin{aligned}
+\bm r \times \nabla R_{lm}^*=&-\frac{1}{2}[(i\x + \y)(l-m+1)R^*_{l,m-1}\\
+&+(i\x-\y)(l+m+1)R^*_{l,m+1}+2im\z R^*_{lm}].
+\end{aligned}
+\label{eqn:grad}
+\end{equation}
+Finally, we have the symmetry relations $R_{l,-m}=(-1)^mR_{lm}^*$, $S_{l,-m}=(-1)^mS_{lm}^*$.
+
+
+\section{Linear law of motion}
+We use Newton's law of gravity for the linear law of motion:
+\begin{equation}
+\ddot{\bm D} = \hat {\bm D} \frac{\mu}{D^2}
+\label{eqn:linear-eom}
+\end{equation}
+where $\bm D$ points from the asteroid to the planet, and $\mu$ is the reduced mass of the system. We assume that the asteroid mass is so much smaller than the planet's mass that the difference between $\mu$ and the mass of the planet cannot be detected. The initial conditions for $\bm D$ should have large magnitude of $D$ and $\dot D$ greater than the escape velocity of the system.
+
+\section{Angular law of motion}
+Recall that angular momentum satisfies $ \dot{\bm L} = \bm \tau = \frac{d}{dt}(I \bm \omega)$,
+where $I$ is the moment of inertia matrix. This equation is not easily simplified in general, but in a coordinate system fixed to the rotating body, we make use of the fact that $\dot I = 0$. Also,
+$$\dot{\bm L} = \dot{\bm L}_\text{rot} + L_x \dot{\x} + L_y \dot{\y} + L_z \dot{\z},$$
+where $\dot{\bm L}_\text{rot} = \dot L_x \x + \dot L_y \y + \dot L_z \z$. By considering $\bm\omega \parallel \z$, we see that
+$$L_x \dot{\x} + L_y \dot{\y} + L_z \dot{\z} = \bm\omega \times \bm L,$$
+and since this pattern is replicated for all axes, it must be generally true. Furthermore, $\dot{\bm L}_\text{rot} = \dot I_\text{rot} \bm \omega + I \dot{\bm \omega}_\text{rot}$, and since $\dot I_\text{rot} = 0$, we have
+$$\bm \tau = I \dot{\bm \omega} + \bm\omega \times \bm L.$$
+Here we have removed the rot subscript on $\dot{\bm \omega}$ because $\dot{\bm \omega} = \dot{\bm \omega}_\text{rot} + \omega \times \omega =  \dot{\bm \omega}_\text{rot}.$ Reversing to solve for $\dot{\bm \omega}$, we have
+\begin{equation}
+\dot{\bm \omega} = I^{-1}\parens{\bm \tau - \bm \omega \times (I \bm \omega)}.
+\label{eqn:euler}
+\end{equation}
+Once again, this is valid only in a frame fixed to the body. The torque $\bm \tau$ will be calculated in the next section.
+
+The initial conditions are that $\omega$ is initially parallel to the eigenvector of $I$ with the largest eigenvalue, to minimize energy. The norm and direction of $\omega$ is observed.
+
+It will turn out that our equation for $\tau$ will invoke the use of $\bm D$ in the rotating frame. To track $\bm D$ in that frame, we need $\dot{\bm D}_\text{rot}$. To find it,
+$$\dot{\bm D} = \dot{\bm D}_\text{rot} + \bm \omega \times \bm D$$
+or
+\begin{equation}
+\dot{\bm D}_\text{rot} = \bm D \times \bm \omega + \hat{\bm D}.
+\label{eqn:d-eom}
+\end{equation}
+where $\dot D$ is given by the evolution of equation \ref{eqn:linear-eom}
+
+\section{Torque}
+By definition, the differential torque on a small unit of mass $dm$ within an asteroid is $d\bm \tau = \bm r \times d\bm F$, where $\bm r$ points to $dm$ from the center of mass of the asteroid. In the regime where $d\bm F$ is constant, there is no tidal torque. But if $d\bm F$ is allowed to vary across the asteroid, we will get tidal torque as shown.
+
+The differential force is $d\bm F = -dm \nabla_{\bm R} V(\bm R)$, where
+$$V(\bm R) = -\int d^3 r' \frac{\rho_M(\bm r')}{|\bm r' - \bm R|}$$
+is the gravitational potential field of the planet, and $\bm R = \bm r - \bm D$ points from $dm$ to the center of mass of the planet. Also, we have $\rho_M$ as the mass distribution of the planet. Expanding this potential field using equation \ref{eqn:expansion}, we get
+$$V(\bm R) = -\sum_{lm}S^*_{lm}(\bm R)\int d^3 r' \rho_M(\bm r') R_{lm}(\bm r').$$
+We introduce the useful symbol
+\begin{equation}
+\J_{lm} = \frac{1}{M_M}\int d^3 r \rho_M(\bm r) a_M^{-l} R_{lm} (\bm r)
+\label{eqn:jlm-def}
+\end{equation}
+where $M_M$ is the mass of the Earth and $a_M$ is its radius. Then we have
+\begin{equation}
+V(\bm R) = -M_M\sum_{lm} a_M^{l} S^*_{lm} (\bm R) \J_{lm}.
+\label{eqn:potential}
+\end{equation}
+Incidentally, since $R_{00} = 1$, we have that $\J_{00}=1$. Choosing coordinates in which the Earth's center of mass is at the origin, we have $\J_{1m}=0$ as well.
+
+The total torque on the asteroid can therefore be written as
+\begin{equation}
+\bm \tau = GM_M \int d^3 r \rho(\bm r) \bm r \times \nabla_{\bm R} \sum_{lm} a_M^l S^*_{lm}(\bm R) \J_{lm}.
+\label{eqn:first-torque}
+\end{equation}
+Here, $\rho(\bm r)$ is now the mass density of the asteroid. Since $\nabla_{\bm R} = \nabla_{\bm r}$, we will drop the subscript henceforth.
+
+Note that the bounds of integration of equations \ref{eqn:jlm-def} and \ref{eqn:first-torque} can be chosen to be the surfaces of the bodies in question, or any surface encompassing the bodies. It will be useful in the future to imagine these bounds as spherically symmetrical.
+
+We expand equation \ref{eqn:first-torque} using equation \ref{eqn:trans}:
+\begin{equation*}
+\begin{aligned}
+\bm \tau = &GM_M \sum_{lm}(-1)^l a_M^l \J_{lm}\sum_{l'm'}S_{l+l',m+m'}(\bm D) \\
+&\int d^3 r \rho(\bm r) \bm r \times \nabla R^*_{l'm'}(\bm r).
+\end{aligned}
+\end{equation*}
+Now we can move straight on to substitution equation \ref{eqn:grad}:
+\begin{equation*}
+\begin{aligned}
+\bm \tau = &-\frac{GM_M}{2}\sum_{lm}(-1)^l a_M^l \J_{lm}\sum_{l'm'}S_{l+l',m+m'}(\bm D) \\
+&\int d^3 r \rho(\bm r) [(i\x + \y)(l'-m'+1)R^*_{l',m'-1}(\bm r)\\
+&+(i\x-\y)(l'+m'+1)R^*_{l',m'+1}(\bm r)+2im'\z R^*_{l'm'}(\bm r)].
+\end{aligned}
+\end{equation*}
+We define the new varialble
+\begin{equation}
+\K_{lm} = m\int d^3 a_m^{-l}r \rho(\bm r) R_{lm} (\bm r),
+\label{eqn:klm-def}
+\end{equation}
+where $M_m$ is the mass of the asteroid and $a_m$ is a constant with units of length which we define later. Think of it as something like the radius of the asteroid. Note the convenient fact that
+\begin{equation}
+\begin{aligned}
+\K_{lm}^* = &M_m\int d^3 a_m^{-l}r \rho(\bm r) R_{lm}^* (\bm r) \\
+= &(-1)^mM_m\int d^3 a_m^{-l}r \rho(\bm r) R_{l,-m} (\bm r) = (-1)^mK_{l,-m}.\\
+\label{eqn:klm-def}
+\end{aligned}
+\end{equation}
+
+We can simplify the torque to
+\begin{equation}
+\begin{aligned}
+\frac{\bm \tau}{M_m} = &-\frac{GM_M}{2}\sum_{lm}(-1)^l \J_{lm}\sum_{l'm'}S_{l+l',m+m'}(\bm D) a_M^l a_m^{l'}\\
+&\bigg[(i\x + \y)(l'-m'+1)\K^*_{l',m'-1}\\
+&+(i\x-\y)(l'+m'+1)\K^*_{l',m'+1}+2im'\z \K^*_{l'm'}\bigg].
+\label{eqn:complex-torque}
+\end{aligned}
+\end{equation}
+which evidently obeys unit analysis, since $\J_{lm}$ and $\K_{lm}$ are unit-less. This equation is also real, but the proof is nontrivial. We will instead investigate the outcomes of this equation under the simplifying assumptions that $l=m=0$ and $l'=2$. But first, we discuss the torque in relation to the equations of motion.
+
+
+\section{Moment of inertia}
+The moment of inertia matrix of an object is written as
+$$I_{xx}=\int d^3 r \rho(\bm r) (y^2 + z^2), \indent \dots$$
+$$I_{xy}=-\int d^3 r \rho(\bm r) xy, \indent \dots.$$
+Note that
+$$x^2=r^2\brackets{-\frac{1}{3}(Y_{20}-1)+2Y_{2,-2}+\frac{1}{12}Y_{22}}$$
+$$y^2=r^2\brackets{-\frac{1}{3}(Y_{20}-1)-2Y_{2,-2}-\frac{1}{12}Y_{22}}$$
+$$z^2=r^2\brackets{\frac{2}{3}Y_{20}+\frac{1}{3}}$$
+$$xz=r^2\brackets{\frac{Y_{21}}{6}-Y_{2,-1}}$$
+$$yz=r^2\brackets{\frac{Y_{21}}{6i}+\frac{Y_{2,-1}}{i}}$$
+$$xy=r^2\brackets{\frac{Y_{22}}{12i}-2\frac{Y_{2,-2}}{i}}.$$
+Then we can write the above in terms of $R_{2m}$:
+$$I_{xx}=\int d^3r \rho(\bm r)-\frac{1}{3}(2R_{20}-r^2)+2R_{2,-2}+2R_{22}$$
+$$I_{yy}=\int d^3r \rho(\bm r)-\frac{1}{3}(2R_{20}-r^2)-2R_{2,-2}-2R_{22}$$
+$$I_{zz}=\int d^3r \rho(\bm r)\frac{4}{3}R_{20}+\frac{r^2}{3}$$
+$$I_{xz}=-\int d^3r \rho(\bm r)R_{21}-R_{2,-1}$$
+$$I_{yz}=-\int d^3r \rho(\bm r)\frac{R_{21}+R_{2,-1}}{i}$$
+$$I_{xy}=-\int d^3r \rho(\bm r)2\frac{R_{22}-R_{2,-2}}{i}$$
+and therefore
+$$I_{xx}=\parens{\frac{2}{3}\K_{20}-2\K_{2,-2}-2\K_{22}+\frac{2}{3}}M_ma_m^2$$
+$$I_{yy}=\parens{\frac{2}{3}\K_{20}+2\K_{2,-2}+2\K_{22}+\frac{2}{3}}M_ma_m^2$$
+$$I_{zz}=\parens{-\frac{4}{3}\K_{20} + \frac{2}{3}}M_ma_m^2$$
+$$I_{xz}=\parens{\K_{21}-\K_{2,-1}}M_ma_m^2$$
+$$I_{yz}=\parens{\frac{\K_{21}+\K_{2,-1}}{i}}M_ma_m^2$$
+$$I_{xy}=\parens{-2\frac{\K_{22}-\K_{2,-2}}{i}}M_ma_m^2.$$
+Here, we have judiciously defined $a_m$ so that the above equations are true. That definition is
+\begin{equation}
+a_m^2 = \brackets{\int d^3 r \rho(\bm r) r^2}\brackets{\int d^3 r \rho(\bm r)}^{-1}
+\label{eqn:am}
+\end{equation}
+and it is something like the radius of the asteroid. If the asteroid were a sphere of radius $R$, we would have $a_m = R\sqrt{3/5}$
+
+Thus, the moment of inertia is determined entirely by $\K_{lm}$
+
+
+
+\section{Computing torque}
+Note that the $S$ present in equation \ref{eqn:complex-torque} forces $l$ and $l'$ to be low in the dominant terms. However, $l'=0$ contributes nothing to torque, nor does $l'=1$ due to the fact that $\K_{1m}=0$, which is caused by $\K_{lm}$ being centered on the center of mass of the asteroid. Therefore, $l'=2$ is the minimum value, and the dominant torque term is proportional to $D^{-3}$.
+
+Note that $\K_{lm}$ are constants, since we are using coordinates fixed to the body. Our derivation requires that we use the same coordinates for $\J_{lm}$, which are therefore not constant. We can find their values at any point in the orbit using the \href{https://en.wikipedia.org/wiki/Wigner_D-matrix#Relation_to_spherical_harmonics_and_Legendre_polynomials}{Wigner-$D$ matrices}, which rotate spherical harmonics according to
+$$Y_{lm}(\bm r') = \sum_{m'=-l}^l\sqrt{\frac{(l+m)!}{(l-m)!}\frac{(l-m')!}{(l+m')!}}\parens{D^l_{mm'}(\R}^*Y_{lm'}(\bm r),$$
+where $\R$ indicates a rotation, and $\bm r' = \R \bm r$. Generally, $\R$ is represented by Euler angles.
+
+Let $\R$ rotate from the body-fixed axes to some inertial coordinate system. We choose this coordinate system so that the orbit of the asteroid lies in the $xz$-plane, but the exact orientation of the axes is left to the reader. The constants $\J_{lm}$ are then fixed in this frame at $\J_{lm}^0$. Then we must rotate both the $\J_{lm}$ in equation \ref{eqn:complex-torque} according to
+\begin{equation*}
+\begin{aligned}
+\J^\text{rot}_{lm} =&\sum_{m'=-l}^l\sqrt{\frac{(l-m')!}{(l-m)!}\frac{(l+m')!}{(l+m)!}}\parens{D^l_{mm'}(t)}^*\J_{lm'}.
+\end{aligned}
+\end{equation*}
+Thus, equation \ref{eqn:complex-torque} becomes
+\begin{equation*}
+\begin{aligned}
+\bm \tau = &-\frac{1}{2}\sum_{lm}(-1)^l\sum_{l'm'}S_{l+l',m+m'}(\bm D)\\
+&\brackets{\sum_{m''=-l}^l\sqrt{\frac{(l-m'')!}{(l-m)!}\frac{(l+m'')!}{(l+m)!}}\parens{D^l_{mm''}(\R)}^*\J_{lm''}^0}\\
+&\bigg[(i\x + \y)(l'-m'+1)\K^*_{l',m'-1}\\
+&+(i\x-\y)(l'+m'+1)\K^*_{l',m'+1}+2im'\z \K^*_{l'm'}\bigg].
+\label{eqn:torque-final}
+\end{aligned}
+\end{equation*}
+The only value left unfixed is the body-fixed coordinate system. We fix it to the principal axes of the asteroid, so that $\z$ aligns with the axis with maximal inertia. Then $\bm\omega = \omega \z$ initially in the body-fixed system. Now everything is determined; the choice of $\J_{lm}$ determines position and velocity $\bm D$ and $\bm v$ which evolve via the linear equation of motion, equation \ref{eqn:linear-eom}. The body's initial orientation--unknown when the spin axis has not been resolved and known up to a roll parameter when the spin axis is resolved---fixes the initial orientation, represented by $\R$. The orientation and angular velocity $\omega$ then evolve according to equation \ref{eqn:euler}, which references the torque displayed in equation \ref{eqn:torque-final}.
+
+In practice, we represent the orientation as a quaternion $\bm q$ and evolve it according to the quaternion equation of motion
+$$\dot {\bm q} = \frac{1}{2}\bm \omega \bm q$$
+and we extract Euler angles from it to get $\R$, and a matrix from it to convert $\bm D$. from the inertial axes to the body-fixed system.
+
+A benefit to requiring that the body-fixed system be aligned with principal axes is that, in this regime, equation \ref{eqn:euler} simplifies to
+\begin{equation}
+\begin{aligned}
+\dot \omega_x = I_x^{-1}\parens{\tau_x + (I_y - I_z)\omega_y \omega_z}\\
+\dot \omega_y = I_y^{-1}\parens{\tau_y + (I_z - I_x)\omega_z \omega_x}\\
+\dot \omega_z = I_z^{-1}\parens{\tau_z + (I_x - I_y)\omega_x \omega_y}\\
+\label{eqn:sep-euler}
+\end{aligned}
+\end{equation}
+and the inertial matrix is diagonal, meaning that
+$$\K_{21} = \K_{2,-1}=\Im K_{22} = \Im K_{2,-2}= 0.$$
+The only free parameters with $l\leq 2$ are $\K_{00}$, $\K_{20}$, and $\Re \K_{22}$, which is three total.
+
+Equation \ref{eqn:sep-euler} indicates that the mass of the asteroid $M_m$ factors out of all the physics of the simulation. Both the inertia and the torque are directly proportional to $M_m$, and they always appear in ratios. So the mass of the asteroid cannot be computed from tidal torque observation.
+
+Furthermore, unless $\K_{l>2}$ are regressed for, $a_m$ cannot be determined either since it cancels out of the angular part of equation \ref{eqn:sep-euler}, and out of the torque part except when $\K_{l>2}$ terms are introduced.
+
+
+
+\section{First order torque}
+I want to reduce equation \ref{eqn:complex-torque} to a real form for $l=m=0$, $l'=2$. After this, I will demonstrate that the equation of motion is non-degenerate in $\K_{lm}$. Thus, $\K_{lm}$ and the initial position $\theta_0$ can be fitted to data without fear of degeneracy. Unfortunately, the radius $a_m$ cannot be fitted because scaling up the radius is equivalent to scaling up $K_{l>2}$. However, it can be guessed, and then $K_{l}$ fitted without harm. Then it can be later chosen such that $K_l$ have desired properties: that they decay or remain of equivalent size with larger $l$, for instance.
+
+Now for the reduction. Removing the sums and remembering that $\J_{00}=1$, we get
+\begin{equation*}
+\begin{aligned}
+\frac{\bm \tau}{M_m} = &-\frac{GM_M}{2} \sum_{m'=-2}^2 S_{2,m'}a_m^2\\
+&\bigg[(i\x + \y)(3-m')\K^*_{l',m'-1}\\
+&+(i\x-\y)(3+m')\K^*_{2,m'+1}+2im'\z \K^*_{2,m'}\bigg].
+\end{aligned}
+\end{equation*}
+Choosing $\K_{21}=\K{2,-1}=0$ and $\Im \K_{22}=\Im \K_{2,-2}=0$, we have
+\begin{equation*}
+\begin{aligned}
+\frac{\bm \tau}{M_m} = &-\frac{GM_M}{2} a_m^2\\
+&\bigg[(i\x + \y)(4S_{2,-1}\K^*_{2,-2}+2S_{21}\K^*_{20})\\
+&+(i\x-\y)(4S_{2,1}K^*_{22}+2S_{2,-1}\K^*_{20})\\
+&+4i\z (S_{2,2}\K^*_{2,2}-S_{2,-2}\K^*_{2,-2})\bigg].
+\end{aligned}
+\end{equation*}
+Recalling the $\pm m$ relation for $\K_{lm}$, the $\bm{\hat z}$ term vanishes, and we have
+\begin{equation*}
+\begin{aligned}
+\frac{\bm \tau}{M_m} = &-\frac{GM_M}{2}a_m^2\\
+&\bigg[(i\x + \y)(4S_{2,-1}\K_{22}+2S_{21}\K_{20})\\
+&+(-i\x-\y)^*(-4S_{2,-1}K_{22}-2S_{2,1}\K_{20})^*\bigg]
+\end{aligned}
+\end{equation*}
+where we have removed conjugates over $\K_{20}$ because it is real. This in turn becomes
+\begin{equation*}
+\begin{aligned}
+\frac{\bm \tau}{M_m} = &-2GM_M a_m^2\\
+&\Re\big[(i\x + \y)(2S_{2,-1}\K_{22}+S_{21}\K_{20})\big].
+\end{aligned}
+\end{equation*}
+Since $S$ is complex, we can expand this as follows:
+\begin{equation*}
+\begin{aligned}
+\frac{\bm \tau}{M_m} = &-2GM_M  a_m^2\\
+&\bigg[-\x\Im(2S_{2,-1}\K_{22}+S_{21}\K_{20})\\
+&+\y\Re(2S_{2,-1}\K_{22}+S_{21}\K_{20})\bigg].
+\end{aligned}
+\end{equation*}
+Since $\Re S_{2,-1}=-\Re S_{21}$ and $\Im S_{2,-1}=\Im S_{21}$,
+\begin{equation*}
+\begin{aligned}
+\frac{\bm \tau}{M_m} = &-2GM_M a_m^2\\
+&\bigg[-\x \Im S_{21}(2\K_{22}+\K_{20})+\y \Re S_{21}(-2\K_{22}+\K_{20})\bigg].
+\end{aligned}
+\end{equation*}
+These differences can be expressed in a neater manner, because $(I_{yy}-I_{zz})/2=2\K_{22}+\K_{20}$ and $(I_{xx}-I_{zz})/2=-2\K_{22}+\K_{20}$. Thus,
+\begin{equation*}
+\begin{aligned}
+\frac{\bm \tau}{M_m} = &GM_M \sum_{m'=-2}^2 a_m^2\\
+&\bigg[\x \Im S_{21}(I_{yy}-I_{zz})+\y \Re S_{21}(I_{zz}-I_{xx})\bigg].
+\end{aligned}
+\end{equation*}
+Plugging this into the equations of motion (eq. \ref{eqn:sep-euler}),
+\begin{equation*}
+\bm{\dot \omega} = GM_M\parens{\begin{matrix}
+\parens{\frac{I_{yy}-I_{zz}}{I_{xx}}}\parens{\Im S_{21}+\omega_y\omega_z}\\
+\parens{\frac{I_{zz}-I_{xx}}{I_{yy}}}\parens{\Re S_{21}+\omega_z\omega_x}\\
+\parens{\frac{I_{zz}-I_{xx}}{I_{yy}}}\parens{\omega_x\omega_y}\\
+\end{matrix}}
+\end{equation*}
+
+$S_{21}$ and $\omega$ vary non-trivially over time, so if degeneracy were to occur, the ratios in each component would have to be degenerate for multiple combinations of $\K_{lm}$. This is true for the general case of torque, not just low order $l$ and $l'$. We may test if this is possible by letting $\K_{20}\rightarrow \alpha \K_{20}$ and $\K_{22}\rightarrow \beta \K_{22}$. We require that the MOI ratio in the $x$-component be preserved under this transformation by fixing $\beta$ in terms of $\alpha$. Only one solution is possible. Then require that the second ratio be conserved. That fixes $\alpha=1$. This was done in Mathematica and demonstrates that no degeneracy is present between $\K_{lm}$.
+
+
+
+\section{Evolution of Euler Angles}
+The Wigner-$D$ matrices are commonly expressed in terms of the Euler angles, so we will use these to track the evolution of the body. Let us use $z-y-z$ Euler angles, or $\bm E = (\alpha, \beta, \gamma)$, with
+\begin{equation}
+\R = R_z(\alpha) R_y(\beta) R_z(\gamma)
+\label{eqn:euler-angle-rotation}
+\end{equation}
+where $R_z$ and $R_y$ represent right-handed rotations around the $\z$ and $\y$ axes respectively. These angles control the orientation of the asteroid, so we need an equation of motion to describe them.
+
+By definition of angular velocity, we know $\frac{d}{dt}(\R \bm v) = \bm \omega \times \bm v,$ where $\bm v$ is any constant vector, and therefore $\dot \R \bm v = \bm \omega \times \bm v,$. Let $\omega_{\times}$ be the skew-symmetric matrix for $\omega$, such that $\omega_{\times} \bm v = \bm\omega \times \bm v$. Then $\dot \R \bm v = \omega_\times \bm v$. Since this is true for all $\bm v$, we see that $\dot \R = \omega_\times$, or
+$$\frac{d}{dt}\parens{R_z(\alpha)R_y(\beta)R_z(\gamma)} = \parens{\begin{matrix}
+0 & -\omega_z & \omega_y \\
+\omega_z & 0 & -\omega_x \\
+-\omega_y & \omega_x & 0
+ \end{matrix}}.$$
+ This is
+ $$\dot \alpha \dot R_z(\alpha)R_y(\beta)R_z(\gamma) + \dot \beta R_z(\alpha)\dot R_y(\beta)R_z(\gamma) + \dot \gamma R_z(\alpha)R_y(\beta)\dot R_z(\gamma) = \parens{\begin{matrix}
+ 0 & -\omega_z & \omega_y \\
+ \omega_z & 0 & -\omega_x \\
+ -\omega_y & \omega_x & 0
+  \end{matrix}}.$$
+  This looks hard, so instead, I suggest using the old Quaternion strategy.
+
+
+
+\section{Shape model}
+When asteroid density is allowed to vary, there is not a direct connection between asteroid shape and $\K_{lm}$, because $\K_{lm}$ has two dimensions whereas shape parameters should have three: one for $\theta$, one for $\phi$, and one for $r$. This argument is far from rigorous and probably incorrect, but it poses a difficult problem to overcome.
+
+We could establish shape coordinates $C_{lmn}$ and allow $\K_{lm}$ to define a combination of $C_{lmn}$. This is made difficult, however, since there is no basis of functions orthogonal to $r^n$ for all $n \in \mathbb{N}$ over $\mathbb{R}$. The basis exists for $n < N$ for some $N$, and can be written in terms of the Legendre polynomials. But as $N\rightarrow\infty$, the basis functions get very squigally and they diverge in the limit. So, the combination would be more complicated than some kind of orthonormal basis.
+
+
+\subsection{Unfitted density}
+Suppose we don't want to deal with density distribution, as a start. Then there is a good shape model available to us. Let
+\begin{equation}
+    \rho(\bm r) = \sum_{lm} Y_{lm}^* \rho_{lm} \begin{cases}
+        1 & r < \R_{lm}\\
+        0 & \text{else}
+    \end{cases}.
+\end{equation}
+with $\rho_{lm} \in \mathbb{C}$, $\R_{lm} \in \mathbb{R}$. Then equation \ref{eqn:klm-def} becomes
+\begin{equation*}
+    \K_{lm} = \int r^2 dr \int d\Omega \sum_{l'm'} Y_{l'm'}^* R_{lm}(\bm r) \begin{cases}
+        \rho_{lm} & r < \R_{lm}\\
+        0 & \text{else}
+    \end{cases}.
+\end{equation*}
+Recall that $R_{lm}(\bm r) \propto Y_{lm}(\bm r)$, and
+$$\int d\Omega Y_{lm}Y^*_{l'm'} = \delta_{ll'}\delta_{mm'} \frac{4\pi (l+m)!}{(2l+1)(l-m)!}$$
+so
+\begin{equation*}
+    \K_{lm} = \frac{4\pi (-1)^m }{(2l+1)(l-m)!} \int r^{2+l} dr \begin{cases}
+        \rho_{lm} & r < \R_{lm}\\
+        0 & \text{else}
+    \end{cases}.
+\end{equation*}
+This in turn is
+\begin{equation*}
+    \K_{lm} = \parens{\frac{4\pi (-1)^m \rho_{lm}}{(2l+1)(l-m)!}} \parens{\frac{\R_{lm}^{3+l}}{3+l}}
+\end{equation*}
+Thus, there are three parameters $\rho_{lm}$ and $\R_{lm}$ to match with two parameters $\K_{lm}$ (counting complex numbers as two parameters), and the problem is nearly determined. Setting $\rho_{lm}$ independentently will cause it to be entirely determined.
+
+It is not at all clear that this setup will give us a good asteroid model, however. If all $\rho_{lm}$ were positive in some sense (they are complex after all), then the center would be denser than the edges. It would be better to have some holistic model without these sharp edges, but those will not integrate as well.
+
+
+\bibliography{../asteroid-flybys.bib}
+\end{document}
