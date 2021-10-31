@@ -4,13 +4,13 @@ const int max_k = (ASTEROIDS_MAX_K + 1) * (ASTEROIDS_MAX_K + 1);
 const int max_j = (ASTEROIDS_MAX_J + 1) * (ASTEROIDS_MAX_J + 1);
 
 Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms, double asteroid_radius,
-    Vector3 spin, double initial_roll, double impact_parameter, double speed,
+    Vector3 spin, double initial_roll, double perigee, double speed,
     double distance_ratio_cut) :
     jlms(jlms), klms(klms), asteroid_radius(asteroid_radius), distance_ratio_cut(distance_ratio_cut),
-    velocity(Vector3({0, 0, speed})), spin(spin) {
+    velocity(Vector3({0, 0, speed})), spin(spin), perigee(perigee) {
 
     calculate_moi(initial_roll);
-    set_pos(impact_parameter);
+    set_pos(speed);
 
     #ifdef _DEBUG
     std::cout<< "Klms: ";
@@ -49,21 +49,21 @@ cdouble Asteroid::klm(uint l, int m) const {
     return klms[l * l + l + m];
 }
 
-void Asteroid::set_pos(double b) {
+void Asteroid::set_pos(double speed) {
     // Asteroid enters at +x and is traveling towards -x, with offset in +y
     // direction.
-    edge_dist = b * pow(INTEGRAL_LIMIT_FRAC, -1/3.0);
-    position = Vector3({0, b, -sqrt(edge_dist * edge_dist - b * b)});
+    edge_dist = perigee * pow(INTEGRAL_LIMIT_FRAC, -1/3.0);
+    double semi_major_axis = GM / speed / speed;
+    double eccentricity = perigee / semi_major_axis + 1;
+    impact_parameter = semi_major_axis * sqrt(eccentricity * eccentricity - 1);
+    ang_mom = Vector3::x() * impact_parameter * speed;
+    double semi_latus_rectum = ang_mom.mag2() / GM;
+    double nu = -acos((semi_latus_rectum / edge_dist - 1) / eccentricity);
+    position = Vector3({0, cos(nu), sin(nu)}) * edge_dist;
     position *= 1 - EPSILON;
         // So that it reads as just inside the allowed region
-
-    energy = 0.5 * velocity.mag2() - GM / position.mag();
-    ang_mom = Vector3::cross(position, velocity);
-    double velocity_periapsis = GM / ang_mom.mag() +
-        sqrt(GM * GM / ang_mom.mag2() + 2 * energy);
-    closest_approach = ang_mom.mag() / velocity_periapsis;
-    excess_vel = sqrt(2 * energy);
-    impact_parameter = ang_mom.mag() / excess_vel;
+    velocity = sqrt(GM / semi_latus_rectum) * Vector3({0, -sin(nu), eccentricity + cos(nu)});
+    energy = 0.5 * speed * speed;
 }
 
 void Asteroid::calculate_moi(double initial_roll) {
@@ -112,7 +112,7 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
     int frames = 0;
     int cadence_index = -1;
     double dt;
-    //double close_power = pow(closest_approach, DT_POWER);
+    //double close_power = pow(perigee, DT_POWER);
     //double denom = 1.0 / (pow(edge_dist, DT_POWER) - close_power);
 
     for (;position.mag() < edge_dist; frames++) {
@@ -136,7 +136,7 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
             resolved_data.push_back(global_spin[2]);
             cadence_index = int(time / cadence);
             if (distance_ratio_cut >= 0 && Vector3::dot(position, velocity) > 0
-                && position.mag() / closest_approach >= distance_ratio_cut) {
+                && position.mag() / perigee >= distance_ratio_cut) {
                 break;
             }
             //std::cout << spin[0] <<' '<< spin[1]<<' ' << spin[2] << ' ' << dt << std::endl;

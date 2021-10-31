@@ -6,5 +6,5 @@
 10.0 # radius (remember it's not really the radius)
 0.00032 0.00022 0.00012 # Spin
 1.0 # Initial roll
-31850000 # Impact parameter
+31850000 # Perigee
 4000 # Speed

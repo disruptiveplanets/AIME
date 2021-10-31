@@ -31,7 +31,7 @@ using cdouble = std::complex<double>;
 class Asteroid {
 public:
     Asteroid(const cdouble* jlms, const cdouble* klms, const double asteroid_radius,
-        Vector3 spin, double initial_roll, double impact_parameter, double speed, double distance_ratio_cut);
+        Vector3 spin, double initial_roll, double perigee, double speed, double distance_ratio_cut);
 
     int simulate(double cadence, std::vector<double>& resolved_data);
 
@@ -39,7 +39,7 @@ private:
     cdouble jlm(uint l, int m) const;
     cdouble klm(uint l, int m) const;
     void calculate_moi(double initial_roll);
-    void set_pos(double impact_parameter);
+    void set_pos(double speed);
     Vector3 get_torque();
     void update_position(double dt);
     void update_orientation(double dt);
@@ -64,7 +64,7 @@ private:
     // Orbital factors
     double energy;
     Vector3 ang_mom;
-    double closest_approach;
+    double perigee;
     double excess_vel;
     double impact_parameter;
 

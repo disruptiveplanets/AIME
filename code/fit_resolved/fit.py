@@ -21,6 +21,10 @@ import numdifftools as nd
 REPORT_INITIAL = True
 PLOT_POSES = True
 RECALC_HESS = True
+GM = 3.986004418e14
+UNCERTAINTY_MODEL = 1
+
+INTEGRAL_LIMIT_FRAC = 1.0e-3
 
 EARTH_RADIUS = 6_370_000
 N_WALKERS = 32
@@ -44,7 +48,7 @@ NUM_FITS = f.readline().split(', ')
 NUM_FITS = [int(i) for i in NUM_FITS]
 
 cadence = int(f.readline())
-impact_parameter = EARTH_RADIUS * int(f.readline())
+perigee = EARTH_RADIUS * int(f.readline())
 radius = float(f.readline())
 speed = float(f.readline())
 spin = [float(x) for x in f.readline().split(',')]
@@ -65,7 +69,7 @@ assert(np.all(theta_high > theta_low))
 NUM_FITS = NUM_FITS[:ASTEROIDS_MAX_K-1]
 
 if REPORT_INITIAL:
-    print("Cadence {}, impact parameter {}, speed {}".format(cadence, impact_parameter, speed))
+    print("Cadence {}, perigee {}, speed {}".format(cadence, perigee, speed))
     print("Spin", spin)
     print("Jlms", jlms)
     print("Radius", radius)
@@ -84,10 +88,10 @@ if len(sys.argv) == 3 and sys.argv[2] == "reload":
 def fit_function(theta):
     if ASTEROIDS_MAX_K == 3:
         resolved_data = asteroids_0_3.simulate(cadence, jlms, theta[1:], radius,
-            spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, -1)
+            spin[0], spin[1], spin[2], theta[0], perigee, speed, -1)
     elif ASTEROIDS_MAX_K == 2:
         resolved_data = asteroids_0_2.simulate(cadence, jlms, theta[1:], radius,
-            spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, -1)
+            spin[0], spin[1], spin[2], theta[0], perigee, speed, -1)
     return np.asarray(resolved_data)
 
 
@@ -118,12 +122,41 @@ def log_probability(theta, y, yerr):
 start = time.time()
 y = fit_function(theta_true)
 print("Data generation took {} s".format(time.time() - start))
-y, yerr = random_vector.randomize_rotate_uniform(y, sigma)
+if UNCERTAINTY_MODEL == 1:
+    y, yerr = random_vector.randomize_rotate_uniform(y, sigma)
+if UNCERTAINTY_MODEL == 2:
+    a = GM / speed**2
+
+    edge_dist = perigee * pow(INTEGRAL_LIMIT_FRAC, -1/3.0)
+    semi_major_axis = GM / speed / speed
+    eccentricity = perigee / semi_major_axis + 1
+    impact_parameter = semi_major_axis * np.sqrt(eccentricity * eccentricity - 1)
+    ang_mom = [impact_parameter * speed, 0, 0]
+    semi_latus_rectum = random_vector.vnorm(ang_mom)**2 / GM
+    nu = -np.arccos((semi_latus_rectum / edge_dist - 1) / eccentricity)
+    alt = [0, edge_dist * np.cos(nu), edge_dist * np.sin(nu)]
+    vel = [0, -np.sqrt(GM / semi_latus_rectum) * np.sin(nu), np.sqrt(GM / semi_latus_rectum) * (eccentricity + np.cos(nu))]
+
+    alts = []
+    time = 0
+    index = -1
+    dt = 2
+    while True:
+        if time // cadence > index:
+            index = time // cadence
+            alts.append(random_vector.vnorm(alt))
+        if index == len(y) // 3:
+            break
+        accel = random_vector.vmul(alt, -GM / random_vector.vnorm(alt)**3)
+        vel = random_vector.vadd(vel, random_vector.vmul(accel, dt))
+        alt = random_vector.vadd(alt, random_vector.vmul(vel, dt))
+        time += dt
+    y, yerr = random_vector.randomize_rotate_dist(y, sigma, alts, perigee)
 
 print("DOF:", len(y))
 
 cadence_cut = len(asteroids_0_2.simulate(cadence, jlms, theta_true[1:], radius,
-    spin[0], spin[1], spin[2], theta_true[0], impact_parameter, speed, DISTANCE_RATIO_CUT))
+    spin[0], spin[1], spin[2], theta_true[0], perigee, speed, DISTANCE_RATIO_CUT))
 
 plt.figure(figsize=(12, 4))
 x_display = np.arange(len(y) / 3)

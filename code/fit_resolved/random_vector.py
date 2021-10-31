@@ -45,7 +45,36 @@ def randomize_rotate_uniform(y, sigma):
         newy.append(newvec[0])
         newy.append(newvec[1])
         newy.append(newvec[2])
+    return np.asarray(newy), np.asarray(yerr)
 
+# Do the sophisticated, turning error
+def randomize_rotate_dist(y, sigma, alts, perigee):
+    # Problem; I set the scale factor for how sigma depends on distance equal to the perigee,
+    # and it might not be.
+
+    newy = []
+    yerr = []
+    assert(len(y) % 3 == 0)
+    for i in range(0, len(y), 3):
+        this_sigma = np.arctan(sigma * ((alts[i//3] / perigee)**2 - 1) + np.tan(sigma))
+        norm = np.sqrt(y[i]**2 + y[i+1]**2 + y[i+2]**2)
+        theta = np.arccos(y[i+2] / norm)
+        phi = np.arctan2(y[i+1], y[i])
+        rot_mat = np.matmul(
+            np.array([[np.cos(-theta), 0, np.sin(-theta)], [0, 1, 0], [-np.sin(-theta), 0, np.cos(-theta)]]),
+            np.array([[np.cos(-phi), -np.sin(-phi), 0], [np.sin(-phi), np.cos(-phi), 0], [0, 0, 1]])
+        )
+        tilt_phi = np.random.uniform() * 2 * np.pi
+        tilt_theta = np.random.randn() * this_sigma
+        untilt_vec = [np.sin(tilt_theta) * np.cos(tilt_phi), np.sin(tilt_theta) * np.sin(tilt_phi), np.cos(tilt_theta)]
+        newvec = np.matmul(rot_mat.transpose(), untilt_vec) * norm
+        errs = randomize_rotate_uniform_err(theta, phi, this_sigma)
+        yerr.append(errs[0] * abs(y[i]))
+        yerr.append(errs[1] * abs(y[i+1]))
+        yerr.append(errs[2] * abs(y[i+2]))
+        newy.append(newvec[0])
+        newy.append(newvec[1])
+        newy.append(newvec[2])
     return np.asarray(newy), np.asarray(yerr)
 
 if __name__ == "__main__":
