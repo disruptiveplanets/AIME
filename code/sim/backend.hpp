@@ -9,7 +9,6 @@
 #include <deque>
 #include <assert.h>
 #include <stdexcept>
-#include <complex>
 
 #include "algebra.hpp"
 #include "wignerd.hpp"
@@ -26,7 +25,6 @@
 //#define _DEBUG
 
 using uint = unsigned int;
-using cdouble = std::complex<double>;
 
 class Asteroid {
 public:
@@ -38,6 +36,7 @@ public:
 private:
     cdouble jlm(uint l, int m) const;
     cdouble klm(uint l, int m) const;
+    cdouble klmc(uint l, int m) const;
     void calculate_moi(double initial_roll);
     void set_pos(double speed);
     Vector3 get_torque();
@@ -47,6 +46,7 @@ private:
 private:
     const cdouble* jlms;
     const cdouble* klms;
+    cdouble* klmcs;
     double asteroid_radius;
     double distance_ratio_cut;
 

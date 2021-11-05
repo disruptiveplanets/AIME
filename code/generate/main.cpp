@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
         for (int m = -l; m <= (int)l; m++) {
             assert(j < (ASTEROIDS_MAX_J+1) * (ASTEROIDS_MAX_J+1));
             if (m < 0) {
-                jlms[j] = std::conj(halfjlms[l * (l + 1) / 2 + l - abs(m)])
+                jlms[j] = halfjlms[l * (l + 1) / 2 + l - abs(m)].conj()
                     * (double)parity(m);
             }
             else {
@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
         for (int m = -l; m <= (int)l; m++) {
             assert(k < (ASTEROIDS_MAX_K+1) * (ASTEROIDS_MAX_K+1));
             if (m < 0) {
-                klms[k] = std::conj(halfklms[l * (l + 1) / 2 + l - abs(m)])
+                klms[k] = halfklms[l * (l + 1) / 2 + l - abs(m)].conj()
                     * (double)parity(m);
             }
             else {

@@ -212,12 +212,12 @@ std::array<double, 3> Matrix3::get_evals() const {
 
     double p = b / 3.0;
     double q = p*p*p + (b*c + 3*d) / 6.0;
-    std::complex<double> R = -c / 3.0;
+    double R = -c / 3.0;
 
-    std::complex<double> r_c = pow(q + std::sqrt(q*q + pow(R - p*p, 3)), 1/3.0)
-             + pow(q - std::sqrt(q*q + pow(R - p*p, 3)), 1/3.0) + p;
+    cdouble r_c = my_pow(q + my_sqrt(q*q + pow(R - p*p, 3)), 1/3.0)
+             + my_pow(q - my_sqrt(q*q + pow(R - p*p, 3)), 1/3.0) + p;
 
-    double r = r_c.real();
+    double r = r_c.r;
     double disc = (b - r) * (b - r) - 4 * d / r;
     if (disc < EPSILON) { disc = 0; }
     double r1 = (b - r + sqrt(disc)) / 2;

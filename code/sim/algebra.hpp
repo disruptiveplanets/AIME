@@ -3,17 +3,11 @@
 #include <array>
 #include <math.h>
 #include <iostream>
-#include <complex>
-#include <boost/math/special_functions/spherical_harmonic.hpp>
 
 #include "wignerd.hpp"
 
 #define PI 3.141592653589793438462643383
 #define EPSILON 1e-10
-
-using cdouble = std::complex<double>;
-
-class Vector3;
 
 class Vector3 {
 public:
@@ -138,7 +132,3 @@ Vector3 operator*(double d, Vector3 const& v);
 Matrix3 operator*(double d, Matrix3 const& m);
 Quaternion operator*(double d, Quaternion const& q);
 void force_diagonal(std::array<Vector3, 3>& vs);
-
-class cdouble {
-    
-}

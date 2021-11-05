@@ -1,12 +1,9 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <complex>
 #include <vector>
 
 #include "../sim/backend.hpp"
 #include "../sim/algebra.hpp"
-
-using cdouble = std::complex<double>;
 
 std::vector<double> simulate(double cadence, const std::vector<double> jlms_raw,
     const std::vector<double> klms_raw,  double radius, double spinx, double spiny, double spinz,
@@ -47,7 +44,7 @@ std::vector<double> simulate(double cadence, const std::vector<double> jlms_raw,
         for (int m = -l; m <= (int)l; m++) {
             assert(j < (ASTEROIDS_MAX_J+1) * (ASTEROIDS_MAX_J+1));
             if (m < 0) {
-                jlms[j] = std::conj(halfjlms[l * (l + 1) / 2 + l - abs(m)])
+                jlms[j] = halfjlms[l * (l + 1) / 2 + l - abs(m)].conj()
                     * (double)parity(m);
             }
             else {
@@ -61,7 +58,7 @@ std::vector<double> simulate(double cadence, const std::vector<double> jlms_raw,
         for (int m = -l; m <= (int)l; m++) {
             assert(k < (ASTEROIDS_MAX_K+1) * (ASTEROIDS_MAX_K+1));
             if (m < 0) {
-                klms[k] = std::conj(halfklms[l * (l + 1) / 2 + l - abs(m)])
+                klms[k] = halfklms[l * (l + 1) / 2 + l - abs(m)].conj()
                     * (double)parity(m);
             }
             else {

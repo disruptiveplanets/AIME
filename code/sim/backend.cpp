@@ -9,10 +9,10 @@ Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms, double asteroid_rad
     jlms(jlms), klms(klms), asteroid_radius(asteroid_radius), distance_ratio_cut(distance_ratio_cut),
     velocity(Vector3({0, 0, speed})), spin(spin), perigee(perigee) {
 
-    std::cout << ylm_c(2, 1, 0.1, 0.2) << std::endl;
-    std::cout << ylm_c(2, 0, 0.421098, -1.2412) << std::endl;
-    std::cout << ylm_c(5, 3, -0.0941284, 4.4098124) << std::endl;
-    std::cout << ylm_c(3, -2, -0.942190, -3.5891) << std::endl;
+    klmcs = new cdouble[(ASTEROIDS_MAX_K + 1) * (ASTEROIDS_MAX_K + 1)];
+    for (int i = 0; i < (ASTEROIDS_MAX_K + 1) * (ASTEROIDS_MAX_K + 1); i++) {
+        klmcs[i] = klms[i].conj();
+    }
 
     calculate_moi(initial_roll);
     set_pos(speed);
@@ -54,6 +54,14 @@ cdouble Asteroid::klm(uint l, int m) const {
     return klms[l * l + l + m];
 }
 
+cdouble Asteroid::klmc(uint l, int m) const {
+    if (abs(m) > l) {return 0;}
+    if (l * l + l + m < 0 || l * l + l + m > max_k) {
+        throw std::runtime_error("Klm array exceeded.");
+    }
+    return klmcs[l * l + l + m];
+}
+
 void Asteroid::set_pos(double speed) {
     // Asteroid enters at +x and is traveling towards -x, with offset in +y
     // direction.
@@ -72,9 +80,9 @@ void Asteroid::set_pos(double speed) {
 }
 
 void Asteroid::calculate_moi(double initial_roll) {
-    double Ixx = (2/3.0 * klm(2,0) - 2.0 * klm(2, -2) - 2.0 * klm(2, 2)).real() + 2/3.0;
-    double Iyy = (2/3.0 * klm(2,0) + 2.0 * klm(2, -2) + 2.0 * klm(2, 2)).real() + 2/3.0;
-    double Izz = (- 4 / 3.0 * klm(2, 0)).real() + 2/3.0;
+    double Ixx = (2/3.0 * klm(2,0) - 2.0 * klm(2, -2) - 2.0 * klm(2, 2)).r + 2/3.0;
+    double Iyy = (2/3.0 * klm(2,0) + 2.0 * klm(2, -2) + 2.0 * klm(2, 2)).r + 2/3.0;
+    double Izz = (- 4 / 3.0 * klm(2, 0)).r + 2/3.0;
     // These mois are really moi per radius^2 per M.
 
     if (Izz < 0 || Iyy < 0 || Ixx < 0) {
@@ -174,7 +182,7 @@ Vector3 Asteroid::get_torque() {
             nowjlm = 0;
             for (int mpp = -l; mpp <= (int)l; mpp++) {
                 nowjlm += sqrt(fact(l-mpp) * fact(l+mpp))
-                    * std::conj(dgen(l,m,mpp)) * jlm(l,mpp);
+                    * dgen(l,m,mpp).conj() * jlm(l,mpp);
                 // About 0.07 s, L=2
             }
             nowjlm *= (double)parity(l) / sqrt(fact(l-m) * fact(l+m)) * pow(RADIUS, l);
@@ -182,25 +190,21 @@ Vector3 Asteroid::get_torque() {
                 for (int mp = -lp; mp <= (int)lp; mp++) {
                     prelpmp = nowjlm * slm_c(l + lp, m + mp, rot_pos_r, rot_pos_ct, rot_pos_p)
                         * pow(asteroid_radius, lp - 2);
-                    // About 0.4 s, L=2
-                    x_torque += prelpmp * ((double)(lp - mp + 1)
-                        * std::conj(klm(lp, mp-1))
-                        + (double)(lp + mp + 1)
-                        * std::conj(klm(lp, mp+1)));
-                    y_torque += prelpmp * ((double)(lp - mp + 1)
-                        * std::conj(klm(lp, mp-1))
-                        - (double)(lp + mp + 1)
-                        * std::conj(klm(lp, mp+1)));
-                    z_torque += prelpmp * 2.0 * (double)mp
-                        * std::conj(klm(lp, mp));
+                    // About 0.15 s, L=2. all slm_c
+                    x_torque += prelpmp * ((double)(lp - mp + 1) * klmc(lp, mp-1)
+                        + (double)(lp + mp + 1) * klmc(lp, mp+1));
+                    y_torque += prelpmp * ((double)(lp - mp + 1) * klmc(lp, mp-1)
+                        - (double)(lp + mp + 1) * klmc(lp, mp+1));
+                    z_torque += prelpmp * 2.0 * (double)mp * klmc(lp, mp);
+                    // About 0.05 s, L=2
                 }
             }
         }
     }
     //std::cout << x_torque << ' ' << y_torque << ' ' << z_torque << std::endl;
-    return Vector3({-std::move(x_torque.imag()),
-        std::move(y_torque.real()),
-        -std::move(z_torque.imag())})
+    return Vector3({-std::move(x_torque.i),
+        std::move(y_torque.r),
+        -std::move(z_torque.i)})
         * -0.5 * GM;
     // This torque is really torque per radius^2 per M.
 }

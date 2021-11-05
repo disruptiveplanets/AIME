@@ -40,7 +40,7 @@ cdouble DMatGen::operator()(uint l, int mp, int m) {
         small_d_state.insert({{l, mp, m}, wigner_small_d(l, mp, m)});
         d_pos = small_d_state.find({l, mp, m});
     }
-    return std::exp(-(double)mp * alpha) * std::exp(-(double)m * gamma)
+    return my_exp(-(double)mp * alpha) * my_exp(-(double)m * gamma)
         * d_pos->second;
 }
 
@@ -77,4 +77,22 @@ cdouble ylm_c(uint l, int m, double costheta, double phi) {
         return (double)parity(m) * fact(l + m) / fact(l - m) * out
             * cdouble(cos(m * phi), sin(m * phi));
     }
+}
+
+std::ostream& operator<<(std::ostream& os, const cdouble& c) {os << c.r << " + " << c.i << " i"; return os; }
+cdouble operator*(double d, cdouble c) { return cdouble(d * c.r, d * c.i); }
+cdouble operator/(double d, cdouble c) { return cdouble(d * c.r / c.norm2(), -d * c.i / c.norm2()); }
+cdouble my_exp(cdouble c) {return cdouble(cos(c.r), sin(c.i)); }
+cdouble my_sqrt(double d) {
+    if (d < 0) {return cdouble (0, sqrt(-d));}
+    return cdouble(sqrt(d), 0);
+}
+cdouble my_pow(cdouble c, double p) {
+    return my_exp(p * cdouble(0.5 * log(c.norm2()), atan2(c.i, c.r)));
+}
+cdouble operator+(double d, cdouble c) {
+    return cdouble(d + c.r, c.i);
+}
+cdouble operator-(double d, cdouble c) {
+    return cdouble(d - c.r, -c.i);
 }
