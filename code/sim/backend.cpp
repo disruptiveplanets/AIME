@@ -9,6 +9,11 @@ Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms, double asteroid_rad
     jlms(jlms), klms(klms), asteroid_radius(asteroid_radius), distance_ratio_cut(distance_ratio_cut),
     velocity(Vector3({0, 0, speed})), spin(spin), perigee(perigee) {
 
+    std::cout << ylm_c(2, 1, 0.1, 0.2) << std::endl;
+    std::cout << ylm_c(2, 0, 0.421098, -1.2412) << std::endl;
+    std::cout << ylm_c(5, 3, -0.0941284, 4.4098124) << std::endl;
+    std::cout << ylm_c(3, -2, -0.942190, -3.5891) << std::endl;
+
     calculate_moi(initial_roll);
     set_pos(speed);
 
@@ -162,18 +167,22 @@ Vector3 Asteroid::get_torque() {
     x_torque = 0;
     y_torque = 0;
     z_torque = 0;
+    // Up until now, takes about 0.1 s, L=2
+
     for (uint l = 0; l <= ASTEROIDS_MAX_J; l++) {
         for (int m = -l; m <= (int)l; m++) {
             nowjlm = 0;
             for (int mpp = -l; mpp <= (int)l; mpp++) {
                 nowjlm += sqrt(fact(l-mpp) * fact(l+mpp))
                     * std::conj(dgen(l,m,mpp)) * jlm(l,mpp);
+                // About 0.07 s, L=2
             }
             nowjlm *= (double)parity(l) / sqrt(fact(l-m) * fact(l+m)) * pow(RADIUS, l);
             for (uint lp = 2; lp <= ASTEROIDS_MAX_K; lp++) {
                 for (int mp = -lp; mp <= (int)lp; mp++) {
                     prelpmp = nowjlm * slm_c(l + lp, m + mp, rot_pos_r, rot_pos_ct, rot_pos_p)
                         * pow(asteroid_radius, lp - 2);
+                    // About 0.4 s, L=2
                     x_torque += prelpmp * ((double)(lp - mp + 1)
                         * std::conj(klm(lp, mp-1))
                         + (double)(lp + mp + 1)

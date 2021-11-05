@@ -1,14 +1,16 @@
 #include "wignerd.hpp"
 
-#include <boost/math/special_functions/spherical_harmonic.hpp>
-
 // z-y-z Euler angle convention
 
 // https://en.wikipedia.org/wiki/Wigner_D-matrix
+
+
+
 uint fact(uint i) {
     if (i == 0) return 1;
     return i * fact(i-1);
 }
+
 
 uint choose(uint a, uint b) {
     uint num = 1;
@@ -54,16 +56,19 @@ double DMatGen::wigner_small_d(uint j, int mp, int m) {
 }
 
 cdouble slm_c(uint l, int m, double r, double costheta, double phi) {
+    // About 0.33 s
     return (double)parity(m) * fact(l - m) / pow(r, l+1) * ylm_c(l, m, costheta, phi);
 }
 
 cdouble ylm_c(uint l, int m, double costheta, double phi) {
     double sum = 0;
-    for (uint k = abs(m); k <= l; k++) {
-        sum += fact(k) / (double)fact(k - abs(m)) * pow(costheta, k - abs(m))
-            * choose(l, k) * gen_choose((l + k - 1) / 2.0, l);
+    //for (uint k = abs(m); k <= l; k++) {
+    double power = 1;
+    for (uint u = 0; u <= l - abs(m); u++) {
+        sum += power / fact(l - u - abs(m)) * gen_choose((l + u + abs(m) - 1) / 2.0, l);
+        power *= costheta / (u + 1);
     }
-    cdouble out = pow(2, l) * pow(1 - costheta * costheta, abs(m) / 2.0) * sum;
+    cdouble out = pow(2, l) * pow(1 - costheta * costheta, abs(m) / 2.0) * sum * fact(l);
 
     if (m >= 0) {
         return out * cdouble(cos(m * phi), sin(m * phi));

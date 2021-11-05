@@ -10,7 +10,7 @@
 
 int main(int argc, char* argv[]) {
     // Open files
-    std::string filename = "params.dat";
+    std::string filename = "2-params.dat";
     if (argc >= 2) {
         filename = std::string(argv[1]);
     }

@@ -138,3 +138,7 @@ Vector3 operator*(double d, Vector3 const& v);
 Matrix3 operator*(double d, Matrix3 const& m);
 Quaternion operator*(double d, Quaternion const& q);
 void force_diagonal(std::array<Vector3, 3>& vs);
+
+class cdouble {
+    
+}
