@@ -72,10 +72,10 @@ void Asteroid::set_pos(double speed) {
     ang_mom = Vector3::x() * impact_parameter * speed;
     double semi_latus_rectum = ang_mom.mag2() / GM;
     double nu = -acos((semi_latus_rectum / edge_dist - 1) / eccentricity);
-    position = Vector3({0, cos(nu), sin(nu)}) * edge_dist;
-    position *= 1 - EPSILON;
+    position0 = Vector3({0, cos(nu), sin(nu)}) * edge_dist;
+    position0 *= 1 - EPSILON;
         // So that it reads as just inside the allowed region
-    velocity = sqrt(GM / semi_latus_rectum) * Vector3({0, -sin(nu), eccentricity + cos(nu)});
+    velocity0 = sqrt(GM / semi_latus_rectum) * Vector3({0, -sin(nu), eccentricity + cos(nu)});
     energy = 0.5 * speed * speed;
 }
 
@@ -109,38 +109,39 @@ void Asteroid::calculate_moi(double initial_roll) {
     double B = sqrt((nspin[0] * nspin[0] + nspin[1] * nspin[1])
         / (2 * (1 - nspin[2])));
     double phi = atan2(nspin[0], nspin[1]) - initial_roll;
-    orientation = Quaternion(B*sin(phi), A * sin(initial_roll),
+    orientation0 = Quaternion(B*sin(phi), A * sin(initial_roll),
         A * cos(initial_roll), B * cos(phi));
 
-    orientation = orientation.inverse();
-    orientation /= orientation.mag();
-    if (orientation.is_nan()) {
-        orientation = Quaternion(cos(initial_roll), 0, 0, sin(initial_roll));
+    orientation0 = orientation0.inverse();
+    orientation0 /= orientation0.mag();
+    if (orientation0.is_nan()) {
+        orientation0 = Quaternion(cos(initial_roll), 0, 0, sin(initial_roll));
     }
-    spin = Vector3::z() * spin.mag();
+    spin0 = Vector3::z() * spin.mag();
 }
 
 int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
-    time = 0;
+    double time = 0;
     int frames = 0;
     int cadence_index = -1;
-    double dt;
-    //double close_power = pow(perigee, DT_POWER);
-    //double denom = 1.0 / (pow(edge_dist, DT_POWER) - close_power);
+    double dt = 10;
+    Vector3 spin = spin0;
+    Quaternion orientation = orientation0;
+    Vector3 d_spin1, d_orientation1;
+    Vector3 d_spin2, d_orientation2;
+    Vector3 d_spin3, d_orientation3;
+    Vector3 d_spin4, d_orientation4;
 
-    for (;position.mag() < edge_dist; frames++) {
-        dt = 0.5;
-        //MIN_DT + (MAX_DT - MIN_DT) * (pow(position.mag(), DT_POWER) - close_power) * denom;
-        update_orientation(dt);
-        update_position(dt);
-        time += dt;
-
-        /*if (frames == 200) {
-            int i = 0;
-            std::cout << time << std::endl;
-            for(i = 0; i < 1e15; i++);
-            std::cout << i << std::endl;
-        }*/
+    for (double time = 0;; time += time_step) {
+        get_diffs(time, spin, orientation, d_spin1, d_orientation1);
+        get_diffs(time + dt / 2, spin + dt * d_spin1 / 2, orientation + dt * d_orientation1 / 2,
+            d_spin2, d_orientation2);
+        get_diffs(time + dt / 2, spin + dt * d_spin2 / 2, orientation + dt * d_orientation2 / 2,
+            d_spin3, d_orientation3);
+        get_diffs(time + dt, spin + dt * d_spin3, orientation + dt * d_orientation3,
+            d_spin4, d_orientation4);
+        spin += dt / 6.0 * (d_spin1 + 2 * d_spin2 + 2 * d_spin3 + d_spin4)
+        orientation += dt / 6.0 * (d_orientation1 + 2 * d_orientation2 + 2 * d_orientation3 + d_orientation4)
 
         if (int(time / cadence) > cadence_index) {
             Vector3 global_spin = orientation.matrix().transpose() * spin;
@@ -165,17 +166,54 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
     return frames;
 }
 
-Vector3 Asteroid::get_torque() {
-    angles = orientation.euler_angles();
-    DMatGen dgen = DMatGen(angles[0], angles[1], angles[2]);
-    rot_pos = orientation.matrix() * -position;
-    rot_pos_r = position.mag();
-    rot_pos_ct = rot_pos[2] / rot_pos.mag();
-    rot_pos_p = atan2(rot_pos[1], rot_pos[0]);
-    x_torque = 0;
-    y_torque = 0;
-    z_torque = 0;
-    // Up until now, takes about 0.1 s, L=2
+void generate_positions() {
+    #ifdef _DEBUG
+    auto start = high_resolution_clock::now();
+    #endif
+    Vector3 position = position0;
+    Vector3 velocity = velocity0;
+    Vector3 accel;
+    for (int i = 0; position.mag() < edge_dist; i++) {
+        accel = -GM / pow(position.mag(), 3) * position;
+        velocity += accel * POSITION_DT;
+        position += velocity * POSITION_DT;
+        positions.push_back(position);
+        velocities.push_back(velocity);
+        max_time_index = i;
+    }
+    #ifdef _DEBUG
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+    std::cout << "Position time" << std::endl;
+    #endif
+}
+
+bool extract_position(double time, Vector& position, Vector& velocity) {
+    int time_index = time / POSITION_DT;
+    if time_index >= max_time_index {
+        return false;
+    }
+    double mixer = (time - time_index * POSITION_DT) / POSITION_DT
+    position = positions[time_index] * mixer + positions[time_index] * (1 - mixer)
+    velocity = velocity[time_index] * mixer + velocity[time_index] * (1 - mixer)
+    return true;
+}
+
+Vector3 Asteroid::get_diff_orientation(double time, Vector3 spin, Quaternion orientation,
+    Vector3& d_spin, Quaternion& d_orientation) {
+    if not extract_position(time, position, velocity) {
+        // Hit simulation end
+        return;
+    }
+    const std::vector<double, 3> angles = orientation.euler_angles();
+    const DMatGen dgen = DMatGen(angles[0], angles[1], angles[2]);
+    const Vector3 rot_pos = orientation.matrix() * -position;
+    const double rot_pos_r = position.mag();
+    const double rot_pos_ct = rot_pos[2] / rot_pos.mag();
+    const double rot_pos_p = atan2(rot_pos[1], rot_pos[0]);
+    double x_torque = 0;
+    double y_torque = 0;
+    double z_torque = 0;
 
     for (uint l = 0; l <= ASTEROIDS_MAX_J; l++) {
         for (int m = -l; m <= (int)l; m++) {
@@ -183,69 +221,33 @@ Vector3 Asteroid::get_torque() {
             for (int mpp = -l; mpp <= (int)l; mpp++) {
                 nowjlm += sqrt(fact(l-mpp) * fact(l+mpp))
                     * dgen(l,m,mpp).conj() * jlm(l,mpp);
-                // About 0.07 s, L=2
             }
             nowjlm *= (double)parity(l) / sqrt(fact(l-m) * fact(l+m)) * pow(RADIUS, l);
             for (uint lp = 2; lp <= ASTEROIDS_MAX_K; lp++) {
                 for (int mp = -lp; mp <= (int)lp; mp++) {
                     prelpmp = nowjlm * slm_c(l + lp, m + mp, rot_pos_r, rot_pos_ct, rot_pos_p)
                         * pow(asteroid_radius, lp - 2);
-                    // About 0.15 s, L=2. all slm_c
                     x_torque += prelpmp * ((double)(lp - mp + 1) * klmc(lp, mp-1)
                         + (double)(lp + mp + 1) * klmc(lp, mp+1));
                     y_torque += prelpmp * ((double)(lp - mp + 1) * klmc(lp, mp-1)
                         - (double)(lp + mp + 1) * klmc(lp, mp+1));
                     z_torque += prelpmp * 2.0 * (double)mp * klmc(lp, mp);
-                    // About 0.05 s, L=2
                 }
             }
         }
     }
-    //std::cout << x_torque << ' ' << y_torque << ' ' << z_torque << std::endl;
-    return Vector3({-std::move(x_torque.i),
-        std::move(y_torque.r),
-        -std::move(z_torque.i)})
-        * -0.5 * GM;
     // This torque is really torque per radius^2 per M.
-}
 
-void Asteroid::update_position(double dt) {
-    accel = -GM / pow(position.mag(), 3) * position;
-    velocity += accel * dt;
-    position += velocity * dt;
-}
-
-void Asteroid::update_orientation(double dt) {
-    torque = get_torque();
-
-    omegaDot = Vector3({
-        (torque[0] + (moi[1] - moi[2]) * spin[1] * spin[2]) * inv_moi[0],
-        (torque[1] + (moi[2] - moi[0]) * spin[2] * spin[0]) * inv_moi[1],
-        (torque[2] + (moi[0] - moi[1]) * spin[0] * spin[1]) * inv_moi[2],
+    d_spin = Vector3({
+        (x_torque.i * -0.5 * GM + (moi[1] - moi[2]) * spin[1] * spin[2]) * inv_moi[0],
+        (y_torque.r * -0.5 * GM + (moi[2] - moi[0]) * spin[2] * spin[0]) * inv_moi[1],
+        (z_torque.i * -0.5 * GM + (moi[0] - moi[1]) * spin[0] * spin[1]) * inv_moi[2],
     });
 
-    /*if (isnan(omegaDot[0])) {
-        std::cout << spin << std::endl;
-        std::cout << torque << std::endl;
-        std::cout << orientation << std::endl;
-        std::cin >> time;
-    }*/
 
-    spin += dt * omegaDot;
-
+    /// HERE"S WHERE THE PROBLEM COMES IN: THE ANGULAR CHANGE IS A SECOND DERIVATIVE
+    spin += dt * d_spin;
     d_quat = 0.5 * Quaternion(0, spin[0], spin[1], spin[2]) * orientation;
-    orientation += d_quat * dt;
 
-    /*if (orientation.mag() == 0) {
-        std::cout << spin << std::endl;
-        std::cout << torque << std::endl;
-        std::cout << orientation << std::endl;
-        std::cin >> time;
-    }*/
-
-    #ifdef _DEBUG
-    max_quat_mag = max_me(max_quat_mag, d_quat.mag());
-    #endif
-
-    orientation /= orientation.mag();
+    return d_orientation
 }

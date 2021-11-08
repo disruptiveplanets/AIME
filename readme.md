@@ -21,15 +21,12 @@ In both the resolved and unresolved cases, we will build a simulation to generat
 4. Confirmed that different Klms with l>2 can have an effect on output (albeit barely)
 5. Be able to do fits
 6. Check to make sure fits still converge now that physics have changed
+7. Fix the minimization process such that it always yields positive definite Hessians and zero Jacobians.
 
 ## Not done:
-Immediate:
-1. Scan for scenarios with interesting behavior
+1. Generate data
 2. Write up everything in a summary
-3. Fix the minimization process such that it always yields positive definite Hessians and zero Jacobians.
-
-Much later:
-2. Ask about two asteroids, or rings?
+3. Final checks
 
 
 ### Resolved case
@@ -47,10 +44,14 @@ Much later:
 The intent is to start writing the paper for this project by the end of the summer of 2021, the summer between Jack's junior and senior years.
 
 ## End data products
-* What data range is the best to minimize over? Defined by the maximum radius achieved by the satellite? The period of the satellite?
-* What is the effect of sigma?
+* How do fit results vary over
+    - a/c, b/c
+    - sigma
+    - phi zero
+    - planet mass
+    - asteroid radius
+    - orbit shape
+    - sensitivity model
+* What do rings add
 * What does a moon add?
-* What is the effect of J2?
-* What is the effect of radius?
-* Are parts of the parameter space more sensitive than others?
-* Which l can you resolve?
+* What does a close lunar flyby add
