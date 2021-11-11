@@ -3,7 +3,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 
 SIGMA = 0.1
-SHAPE = 10000
+SHAPE = 1000000
 
 def randomize_rotate_uniform(vec):
     theta = np.arccos(vec[2] / np.linalg.norm(vec))
@@ -23,25 +23,29 @@ def randomize_rotate_uniform(vec):
         vecs.append(np.matmul(displace, vec))
     return np.array(vecs)
 
-def randomize_rotate_uniform_err(theta, phi, sigma):
-    return np.sqrt(np.array([
+def randomize_rotate_uniform_err(vec, sigma):
+    #Old method, with no covariance
+    '''return np.sqrt(np.array([
             1/2 * np.sinh(sigma**2) * (np.cos(theta)**2 * np.cos(phi)**2 + np.sin(phi)**2) + (np.cosh(sigma**2) - 1) * np.cos(phi)**2 * np.sin(theta)**2,
             1/2 * np.sinh(sigma**2) * (np.cos(theta)**2 * np.sin(phi)**2 + np.cos(phi)**2) + (np.cosh(sigma**2) - 1) * np.sin(phi)**2 * np.sin(theta)**2,
-            1/2 * np.sinh(sigma**2) * np.sin(theta)**2 + (np.cosh(sigma**2) - 1) * np.cos(theta)**2]))
-
+            1/2 * np.sinh(sigma**2) * np.sin(theta)**2 + (np.cosh(sigma**2) - 1) * np.cos(theta)**2]))'''
+    # New method, with covariance.
+    diag = np.linalg.norm(vec)**2/4 * (1 - np.exp(-2 * sigma**2))
+    const = 1/4 * (1 - np.exp(-sigma**2)) * (1 - 3 * np.exp(-sigma**2))
+    return np.array([
+            [diag + const * vec[0]**2, const * vec[0] * vec[1], const * vec[0] * vec[2]],
+            [const * vec[0] * vec[1], diag + const * vec[1]**2, const * vec[1] * vec[2]],
+            [const * vec[0] * vec[2], const * vec[1] * vec[2], diag + const * vec[2]**2]])
 
 def display_one(vec):
     vecs = randomize_rotate_uniform(vec).transpose()
-    theta = np.arccos(vec[2] / np.linalg.norm(vec))
-    phi = np.arctan2(vec[1], vec[0])
-    bins = np.linspace(-1, 1, 100)
+    bins = np.linspace(-np.linalg.norm(vec), np.linalg.norm(vec), 100)
     plt.hist(vecs[0], label='x', bins=bins)
     plt.hist(vecs[1], label='y', bins=bins)
     plt.hist(vecs[2], label='z', bins=bins)
-    errs = randomize_rotate_uniform_err(theta, phi, SIGMA)
-    print(np.std(vecs[0]) / np.linalg.norm(vec), errs[0])
-    print(np.std(vecs[1]) / np.linalg.norm(vec), errs[1])
-    print(np.std(vecs[2]) / np.linalg.norm(vec), errs[2])
+    errs = randomize_rotate_uniform_err(vec, SIGMA)
+    print(np.cov(vecs))
+    print(errs)
     plt.legend()
     plt.show()
 
@@ -88,5 +92,5 @@ def display_all():
 
 
 if __name__ == "__main__":
-    display_one([0.000012, 0.0005, 0.0003])
-    display_all()
+    display_one([0.1, 0.4, -0.532151])
+    #display_all()
