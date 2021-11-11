@@ -28,6 +28,9 @@ public:
     double operator[](int i) const;
     double mag();
     double mag2() const;
+    bool is_nan() const {
+        return isnan(e[0]) || isnan(e[1])|| isnan(e[2]);
+    }
 
     static Vector3 x() { return Vector3({1, 0, 0}); }
     static Vector3 y() { return Vector3({0, 1, 0}); }

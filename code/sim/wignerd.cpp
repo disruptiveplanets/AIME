@@ -34,17 +34,7 @@ DMatGen::DMatGen(double alpha, double beta, double gamma)
     cs = cos(beta/2);
 }
 
-cdouble DMatGen::operator()(uint l, int mp, int m) {
-    auto d_pos = small_d_state.find({l, mp, m});
-    if (d_pos == small_d_state.end()) {
-        small_d_state.insert({{l, mp, m}, wigner_small_d(l, mp, m)});
-        d_pos = small_d_state.find({l, mp, m});
-    }
-    return my_exp(-(double)mp * alpha) * my_exp(-(double)m * gamma)
-        * d_pos->second;
-}
-
-double DMatGen::wigner_small_d(uint j, int mp, int m) {
+cdouble DMatGen::operator()(uint j, int mp, int m) const {
     double pre = sqrt(fact(j+mp) * fact(j-mp) * fact(j+m) * fact(j-m));
     double sum = 0;
     for(uint s = max_me(0, m-mp); s <= min_me(j+m, j-mp); s++) {
@@ -52,7 +42,24 @@ double DMatGen::wigner_small_d(uint j, int mp, int m) {
         * pow(sn, mp - m + 2 * s)) /
         (fact(j + m - s) * fact(s) * fact(mp - m + s) * fact(j - mp - s));
     }
-    return pre * sum;
+    return my_exp(-(double)mp * alpha) * my_exp(-(double)m * gamma) * pre * sum;
+}
+
+cdouble DMatGen::db(uint j, int mp, int m) const {
+    #ifdef _DEBUG
+    assert(sn != 0);
+    assert(cn != 0);
+    #endif
+
+    double pre = sqrt(fact(j+mp) * fact(j-mp) * fact(j+m) * fact(j-m));
+    double sum = 0;
+    for(uint s = max_me(0, m-mp); s <= min_me(j+m, j-mp); s++) {
+        sum += ((double)parity(mp-m+s) * pow(cs, 2 * j + m - mp - 2 * s)
+        * pow(sn, mp - m + 2 * s)) /
+        (fact(j + m - s) * fact(s) * fact(mp - m + s) * fact(j - mp - s))
+        * 0.5 * ((m - mp + 2 * s) * cs/sn - (2 * j + mp - m - 2 * s) * sn/cs);
+    }
+    return my_exp(-(double)mp * alpha) * my_exp(-(double)m * gamma) * pre * sum;
 }
 
 cdouble slm_c(uint l, int m, double r, double costheta, double phi) {

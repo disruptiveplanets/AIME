@@ -9,6 +9,7 @@
 #include <deque>
 #include <assert.h>
 #include <stdexcept>
+#include <chrono>
 
 #include "algebra.hpp"
 #include "wignerd.hpp"
@@ -23,7 +24,7 @@
 #define INTEGRAL_LIMIT_FRAC 1.0e-3// 5e-6
 #define NUM_THREADS 4
     // Torque at closest approach divided by torque at start of sim.
-//#define _DEBUG
+#define _DEBUG
 
 using uint = unsigned int;
 
@@ -39,19 +40,22 @@ private:
     cdouble klm(uint l, int m) const;
     cdouble klmc(uint l, int m) const;
     void calculate_moi(double initial_roll);
+    void calculate_poses();
+    bool extract_pos(double time, Vector3& position, Vector3& velocity);
+    Vector3 extract_spin(Vector3 angles, Vector3 momenta);
     void set_pos(double speed);
     Vector3 get_torque();
-    void update_position(double dt);
-    void update_orientation(double dt);
+    void get_derivatives(Vector3 position, const Vector3 angles, const Vector3 momenta, Vector3& dangles, Vector3& dmomenta);
+    Matrix3 local_to_global(Vector3 angles);
 
 private:
     const cdouble* jlms;
     const cdouble* klms;
-    cdouble* klmcs;
+    cdouble klmcs[(ASTEROIDS_MAX_K + 1) * (ASTEROIDS_MAX_K + 1)];
     double asteroid_radius;
     double distance_ratio_cut;
 
-    Vector3 moi, inv_moi;
+    Matrix3 moi, inv_moi;
     double edge_dist; // Limit of the integration region
     double mu;
     double time;
@@ -62,15 +66,11 @@ private:
     std::vector<Vector3> velocities;
 
     // Orbital factors
-    double energy;
-    Vector3 ang_mom;
-    double perigee;
+    double pericenter_pos;
     double excess_vel;
-    double impact_parameter;
-    Vector3 position0;
-    Vector3 velocity0;
-    Vector3 spin0;
-    Quaternion orientation0;
+    Vector3 initial_spin;
+    double expire_time;
+    double initial_roll;
 
     #ifdef _DEBUG
     double max_quat_mag;

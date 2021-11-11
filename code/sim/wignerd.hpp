@@ -45,12 +45,10 @@ double gen_choose(double a, uint b);
 class DMatGen {
 public:
     DMatGen(double alpha, double beta, double gamma);
-    cdouble operator()(uint l, int m, int mp);
-
-    double wigner_small_d(uint j, int mp, int m);
+    cdouble operator()(uint l, int m, int mp) const;
+    cdouble db(uint l, int m, int mp) const;
 
 private:
-    std::map<std::tuple<int, int, int>, double> small_d_state;
     cdouble premul;
     double cs;// cos(beta / 2)
     double sn;// sin(beta / 2)
