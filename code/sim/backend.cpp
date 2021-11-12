@@ -125,10 +125,19 @@ Vector3 Asteroid::extract_spin(Vector3 angles, Vector3 momenta) {
     double sa = sin(angles[0]);
     double cb = cos(angles[1]);
     double sb = sin(angles[1]);
-    Matrix3 a_inv = 1 / sb * Matrix3({
+    double cc = cos(angles[2]);
+    double sc = sin(angles[2]);
+    /*Matrix3 a_inv = 1 / sb * Matrix3({
         -ca * cb, -sa * cb, sb,
         -sa * sb, ca * sb, 0,
-        ca, sa, 0});
+        ca, sa, 0});*/
+
+
+    const Matrix3 a_inv = 1 / sb * Matrix3({
+        -cc, sc, 0,
+        sc * sb, cc * sb, 0,
+        cc * cb, -sc * cb, 1});
+
     return inv_moi * a_inv.transpose() * momenta;
     /// Check to make sure the multiplication is done in the correct order.
 }
@@ -160,6 +169,8 @@ Matrix3 Asteroid::local_to_global(Vector3 angles) {
     const double cc = cos(angles[2]);
     const double sc = sin(angles[2]);
 
+    return Matrix3::identity();
+
     return Matrix3({cc, -sc, 0, sc, cc, 0, 0, 0, 1})
         * Matrix3({cb, 0, sb, 0, 1, 0, -sb, 0, cb})
         * Matrix3({ca, -sa, 0, sa, ca, 0, 0, 0, 1});
@@ -170,10 +181,12 @@ void Asteroid::get_derivatives(Vector3 position, const Vector3 angles, const Vec
     const double sa = sin(angles[0]);
     const double cb = cos(angles[1]);
     const double sb = sin(angles[1]);
+    const double cc = cos(angles[2]);
+    const double sc = sin(angles[2]);
     const double pos_costheta = position[2] / position.mag();
     const double pos_phi = atan2(position[1], position[0]);
     DMatGen wignerd = DMatGen(angles[0], angles[1], angles[2]);
-    const Matrix3 a_inv = 1 / sb * Matrix3({
+    /*const Matrix3 a_inv = 1 / sb * Matrix3({
         -ca * cb, -sa * cb, sb,
         -sa * sb, ca * sb, 0,
         ca, sa, 0});
@@ -185,14 +198,29 @@ void Asteroid::get_derivatives(Vector3 position, const Vector3 angles, const Vec
     const Matrix3 a_inv_y = 1 / sb / sb * Matrix3({
         ca, sa, 0,
         0, 0, 0,
-        -ca * cb, -sa * cb, 0});
+        -ca * cb, -sa * cb, 0});*/
+    const Matrix3 a_inv = 1 / sb * Matrix3({
+        -cc, sc, 0,
+        sc * sb, cc * sb, 0,
+        cc * cb, -sc * cb, sb});
+
+    const Matrix3 a_inv_z= 1 / sb * Matrix3({
+        sc, cc, 0,
+        cc * sb, -sc * sb, 0,
+        -sc * cb, -cb * cc, 0});
+    const Matrix3 a_inv_y = 1 / sb / sb * Matrix3({
+        cb * cc, -cb * cc, 0,
+        0, 0, 0,
+        -cc, sc, 0});
 
 
     const Vector3 inv_transpose_p = inv_moi * a_inv.transpose() * momenta;
     dangles = a_inv * inv_transpose_p;
-    dmomenta = Vector3({Vector3::dot(momenta, a_inv_x * inv_transpose_p),
-        Vector3::dot(momenta, a_inv_y * inv_transpose_p), 0});
+    dmomenta = Vector3({0, Vector3::dot(momenta, a_inv_y * inv_transpose_p),
+        Vector3::dot(momenta, a_inv_z * inv_transpose_p)});
 
+
+/*
     cdouble dpx;
     cdouble dpy;
     cdouble dpz;
@@ -213,24 +241,29 @@ void Asteroid::get_derivatives(Vector3 position, const Vector3 angles, const Vec
                 }
             }
         }
-    }
+    }*/
     //std::cout << momenta << ' ' << dmomenta << std::endl;
     if (dangles.is_nan() || dmomenta.is_nan()) {
-        throw std::runtime_error("Nan encountered");
+        //throw std::runtime_error("Nan encountered");
     }
     //std::cout << dpx << ' ' << dpy << ' ' << dpz << ' ' << std::endl;
     /// Update momentum
 }
 
 int Asteroid::simulate(const double cadence, std::vector<double>& resolved_data) {
+    //double alpha = atan2(initial_spin[1], initial_spin[0]);
+    //double beta = acos(initial_spin[2] / initial_spin.mag());
+    //double gamma = initial_roll;
+    double alpha = initial_roll;
     double beta = acos(initial_spin[2] / initial_spin.mag());
     double gamma = atan2(initial_spin[1], initial_spin[0]);
-    Vector3 angles = Vector3({initial_roll, beta, gamma});
+    Vector3 angles = Vector3({alpha, beta, gamma});
+    //Vector3 momenta = 2 / 3.0 * (-2 * klm(2, 0).r + 1) * initial_spin.mag() * Vector3({1, 0, cos(angles[1])});
 
-    Vector3 momenta = 2 / 3.0 * (-2 * klm(2, 0).r + 1) * initial_spin.mag() * Vector3({1, 0, cos(angles[1])});
-
-
-    momenta += Vector3::y() * momenta[2] / 100;
+    //Matrix3 a = Matrix3({-sin(beta) * cos(gamma), sin(gamma), 0, sin(beta) * sin(gamma), cos(gamma), 0, cos(beta), 0, 1});
+    Matrix3 a = Matrix3({0, -sin(alpha), sin(beta) * cos(alpha), 0, cos(alpha), sin(beta) * sin(alpha), 1, 0, cos(beta)});
+    Vector3 momenta = a.transpose() * moi * Vector3({0, 0, 1}) * initial_spin.mag();
+    //momenta += Vector3::y() * momenta[2] / 100;
 
 
     Vector3 dangles, dmomenta;
@@ -251,7 +284,7 @@ int Asteroid::simulate(const double cadence, std::vector<double>& resolved_data)
         // Update
         get_derivatives(position, angles, momenta, dangles, dmomenta);
         angles += dangles * dt;
-        momenta += dmomenta * dt;
+        //momenta += dmomenta * dt;
 
         if (int(time / cadence) > cadence_index) {
 

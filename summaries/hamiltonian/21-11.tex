@@ -150,12 +150,12 @@ With this definition of $a_m$, and an arbitrary definition of $a_M$ which may be
 
 Henceforth, we define the body-fixed axis to be coincident with the principal axes of the asteroids, so that the off-diagonal components of $I$ are zero.
 
-To calculate the kinetic energy, we write the angular velocity in the body-fixed frame in terms of the Euler angles:
+To calculate the kinetic energy, we write the angular velocity in the inertial frame in terms of the Euler angles:
 \begin{equation}
-\bm \omega_{xyz} = \parens{\begin{matrix}
-0 & -\sin \alpha & \sin \beta \cos \alpha \\
-0 & \cos \alpha & \sin \beta \sin \alpha \\
-1 & 0 & \cos \beta
+\bm \omega_{XYZ} = \parens{\begin{matrix}
+-\sin\beta \cos \gamma & \sin \gamma & 0\\
+\sin \beta \sin \gamma & \cos \gamma & 0 \\
+\cos \beta & 0 & 1
 \end{matrix}}
 \parens{\begin{matrix}
 \dot \alpha\\
@@ -166,10 +166,13 @@ To calculate the kinetic energy, we write the angular velocity in the body-fixed
 \end{equation}
 The rotational kinetic energy is then
 \begin{equation}
-K = \frac{1}{2} \bm\omega^T I \bm \omega
+K = \frac{1}{2} \bm\omega_{XYZ}^T M I M^T \bm \omega_{XYZ}
 \label{eqn:ke}
 \end{equation}
 where $\bm \omega$ and $I$ are both given in the body-fixed frame.
+
+\jtd{The below does not have the Ms here because I added them after realizing that it's invalid to write $K$ in the rotating frame. But it complicates the derivatives too much.}
+
 
 
 \subsection{Hamiltonian and Equations of motion}
@@ -259,6 +262,7 @@ For the initial conjugate momenta, we use equation \ref{eqn:momenta} and the fac
 \begin{equation}
 \bm p_0 = \frac{2}{3}\mu_m a_m^2 (-2K_{20}+1) \omega \parens{\begin{matrix}1 \\0 \\ \cos \beta\end{matrix}}.
 \end{equation}
+If in fact $\omega_{xyz} = \omega \unit z + \epsilon \omega \unit x$, we would have
 
 \subsection{Fit parameters}
 By requiring that the $\unit x, \unit y, \unit z$ axes coincide with principal axes, we force the diagonal components of $I$ to be zero. Thus, we may require $K_{21}=K_{2,-1}=0$ and $\Im K_{22}=\Im K_{2,-2}=0$ with no loss of generality. By requiring that the body-fixed frame be located at the center of mass of the asteroid, we also require $K_{1m}=0$. Finally, $K_{00}=1$ follows automatically from the definition. Thus, $K_{20}$, $\Re K_{22}$, and $K_{\ell>2, m}$ are the only physical parameters of the asteroid density distribution, beyond $a_m$.
