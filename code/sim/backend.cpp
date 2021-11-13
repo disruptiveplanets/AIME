@@ -128,19 +128,19 @@ void Asteroid::calculate_moi(double initial_roll) {
     double Izz = (- 4 / 3.0 * klm(2, 0)).r + 2/3.0;
     // These mois are really moi per radius^2 per M.
 
-    if (Izz < 0 || Iyy < 0 || Ixx < 0) {
+    if (Izz <= 0 || Iyy <= 0 || Ixx <= 0) {
         throw std::runtime_error(
             "Moment of inertia values were negative."
         );
     }
 
-    if (abs(Izz) < abs(Ixx) || abs(Izz) < abs(Iyy)) {
+    if (abs(Izz) <= abs(Ixx) || abs(Izz) <= abs(Iyy)) {
         throw std::runtime_error(
             "Moment of inertia was not maximized along z.");
     }
 
-    if (Izz > Ixx + Iyy || Iyy > Ixx + Izz || Ixx > Izz + Iyy) {
-        std::runtime_error("Triangle inequality violated");
+    if (Izz >= Ixx + Iyy || Iyy >= Ixx + Izz || Ixx >= Izz + Iyy) {
+        throw std::runtime_error("Triangle inequality violated");
     }
 
     moi = Vector3({Ixx, Iyy, Izz});
@@ -189,10 +189,11 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
         z_torque.r})
         * 0.5 * mu;
 
-    if (torque.is_nan() ) {
-        std::cout << "Torque was nan" << std::endl;
-    }
 
+    if (torque.is_nan()) {
+        std::cout << "Torque was nan" << std::endl;
+        throw std::runtime_error("Torque was nan");
+    }
     // This torque is really torque per radius^2 per M.
 
     dspin = Vector3({
@@ -200,6 +201,7 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
         (torque[1] + (moi[2] - moi[0]) * spin[2] * spin[0]) * inv_moi[1],
         (torque[2] + (moi[0] - moi[1]) * spin[0] * spin[1]) * inv_moi[2],
     });
+
 
     dquat = 0.5 * Quaternion(0, spin[0], spin[1], spin[2]) * quat;
 }
@@ -237,12 +239,12 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
         if (frames % 10 == 0) {
             dt = my_min(MAX_DT, (avg_moi * spin.mag()) / torque.mag() * 1e-5);
         }
+
         extract_pos(time+dt/2, position, velocity);
         get_derivatives(position, spin + dt / 2 * dspin1, quat + dt / 2 * dquat1, dspin2, dquat2);
         get_derivatives(position, spin + dt / 2 * dspin2, quat + dt / 2 * dquat2, dspin3, dquat3);
         extract_pos(time+dt, position, velocity);
         get_derivatives(position, spin + dt * dspin3, quat + dt * dquat3, dspin4, dquat4);
-
 
         spin += dt / 6 * (dspin1 + 2 * dspin2 + 2 * dspin3 + dspin4);
         quat += dt / 6 * (dquat1 + 2 * dquat2 + 2 * dquat3 + dquat4);
