@@ -142,7 +142,7 @@ int main(int argc, char* argv[]) {
 
 
     // Load asteroid
-    Asteroid asteroid(&jlms[0], &klms[0], radius, spin, initial_roll, impact_parameter, speed, -1);
+    Asteroid asteroid(&jlms[0], &klms[0], radius, spin, initial_roll, impact_parameter, speed, 6.67e-11 * 5.97e24, 6371000, -1);
 
     // Run asteroid
     std::vector<double> resolved_data;

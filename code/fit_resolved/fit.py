@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import emcee, time, sys
 if not TEST:
-    import asteroids_0_2, asteroids_0_3
+    import asteroids_0_2, asteroids_0_3, asteroids_2_2, asteroids_2_3, asteroids_3_2, asteroids_3_3
 if TEST:
     import test_0_2 as asteroids_0_2
     import test_0_2 as asteroids_0_3
@@ -48,7 +48,7 @@ NUM_FITS = f.readline().split(', ')
 NUM_FITS = [int(i) for i in NUM_FITS]
 
 cadence = int(f.readline())
-perigee = EARTH_RADIUS * int(f.readline())
+perigee = EARTH_RADIUS * float(f.readline())
 radius = float(f.readline())
 speed = float(f.readline())
 spin = [float(x) for x in f.readline().split(',')]
@@ -87,11 +87,25 @@ if len(sys.argv) == 3 and sys.argv[2] == "reload":
 
 def fit_function(theta):
     if ASTEROIDS_MAX_K == 3:
-        resolved_data = asteroids_0_3.simulate(cadence, jlms, theta[1:], radius,
-            spin[0], spin[1], spin[2], theta[0], perigee, speed, -1)
+        if ASTEROIDS_MAX_J == 0:
+            resolved_data = asteroids_0_3.simulate(cadence, jlms, theta[1:], radius,
+                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, -1)
+        elif ASTEROIDS_MAX_J == 2:
+            resolved_data = asteroids_2_3.simulate(cadence, jlms, theta[1:], radius,
+                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, -1)
+        elif ASTEROIDS_MAX_J == 3:
+            resolved_data = asteroids_3_3.simulate(cadence, jlms, theta[1:], radius,
+                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, -1)
     elif ASTEROIDS_MAX_K == 2:
-        resolved_data = asteroids_0_2.simulate(cadence, jlms, theta[1:], radius,
-            spin[0], spin[1], spin[2], theta[0], perigee, speed, -1)
+        if ASTEROIDS_MAX_J == 0:
+            resolved_data = asteroids_0_2.simulate(cadence, jlms, theta[1:], radius,
+                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, -1)
+        elif ASTEROIDS_MAX_J == 2:
+            resolved_data = asteroids_2_2.simulate(cadence, jlms, theta[1:], radius,
+                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, -1)
+        elif ASTEROIDS_MAX_J == 3:
+            resolved_data = asteroids_3_2.simulate(cadence, jlms, theta[1:], radius,
+                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, -1)
     return np.asarray(resolved_data)
 
 
@@ -130,8 +144,8 @@ if UNCERTAINTY_MODEL == 2:
     edge_dist = perigee * pow(INTEGRAL_LIMIT_FRAC, -1/3.0)
     semi_major_axis = GM / speed / speed
     eccentricity = perigee / semi_major_axis + 1
-    impact_parameter = semi_major_axis * np.sqrt(eccentricity * eccentricity - 1)
-    ang_mom = [impact_parameter * speed, 0, 0]
+    perigee = semi_major_axis * np.sqrt(eccentricity * eccentricity - 1)
+    ang_mom = [perigee * speed, 0, 0]
     semi_latus_rectum = random_vector.vnorm(ang_mom)**2 / GM
     nu = -np.arccos((semi_latus_rectum / edge_dist - 1) / eccentricity)
     alt = [0, edge_dist * np.cos(nu), edge_dist * np.sin(nu)]
@@ -156,7 +170,8 @@ if UNCERTAINTY_MODEL == 2:
 print("DOF:", len(y))
 
 cadence_cut = len(asteroids_0_2.simulate(cadence, jlms, theta_true[1:], radius,
-    spin[0], spin[1], spin[2], theta_true[0], perigee, speed, DISTANCE_RATIO_CUT))
+    spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
+    DISTANCE_RATIO_CUT))
 
 plt.figure(figsize=(12, 4))
 x_display = np.arange(len(y) / 3)
@@ -192,7 +207,7 @@ yerr_min = yerr[:cadence_cut]
 
 def minimize_function(theta, simulate_func):
     resolved_data = simulate_func(cadence, jlms, theta[1:], radius,
-        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, DISTANCE_RATIO_CUT)
+        spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, DISTANCE_RATIO_CUT)
     return np.asarray(resolved_data)
 
 def minimize_log_prob(float_theta, fix_theta, simulate_func):
@@ -214,9 +229,19 @@ def minimize_log_prob(float_theta, fix_theta, simulate_func):
 def get_minimum(arg):
     point, fix_theta, l, bounds = arg
     if l == 2:
-        simulate_func = asteroids_0_2.simulate
+        if ASTEROIDS_MAX_J == 0:
+            simulate_func = asteroids_0_2.simulate
+        elif ASTEROIDS_MAX_J == 2:
+            simulate_func = asteroids_2_2.simulate
+        elif ASTEROIDS_MAX_J == 3:
+            simulate_func = asteroids_3_2.simulate
     elif l == 3:
-        simulate_func = asteroids_0_3.simulate
+        if ASTEROIDS_MAX_J == 0:
+            simulate_func = asteroids_0_3.simulate
+        elif ASTEROIDS_MAX_J == 2:
+            simulate_func = asteroids_2_3.simulate
+        elif ASTEROIDS_MAX_J == 3:
+            simulate_func = asteroids_3_3.simulate
     bfgs_min = optimize.minimize(minimize_log_prob, point, args=(fix_theta, simulate_func),
         method='L-BFGS-B', options={"eps": EPSILON}, bounds=bounds)
     if not bfgs_min.success:
@@ -267,9 +292,19 @@ def minimize(l, num_return, fix_theta):
     assert len(fix_theta) == max((l)**2 - 6, 0)
 
     if l == 2:
-        simulate = asteroids_0_2.simulate
+        if ASTEROIDS_MAX_J == 0:
+            simulate = asteroids_0_2.simulate
+        elif ASTEROIDS_MAX_J == 2:
+            simulate = asteroids_2_2.simulate
+        elif ASTEROIDS_MAX_J == 3:
+            simulate = asteroids_3_2.simulate
     elif l == 3:
-        simulate = asteroids_0_3.simulate
+        if ASTEROIDS_MAX_J == 0:
+            simulate = asteroids_0_3.simulate
+        elif ASTEROIDS_MAX_J == 2:
+            simulate = asteroids_2_3.simulate
+        elif ASTEROIDS_MAX_J == 3:
+            simulate = asteroids_3_3.simulate
     else:
         raise Exception("l={} is not supported".format(l))
 
@@ -453,6 +488,6 @@ for index in range(len(kernel)):
     #log_prob_samples = reader.get_log_prob(discard=burnin, thin=thin)
     #log_prior_samples = reader.get_blobs(discard=burnin, thin=thin)
 
-    flat_samples = np.array([samples[:,:,i].flatten() for i in range(3)])
+    flat_samples = np.array([samples[:,:,i].flatten() for i in range(len(theta_true))])
 
     np.savetxt(output_name+"-{}-samples.dat".format(index), flat_samples)

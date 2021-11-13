@@ -338,17 +338,21 @@ Matrix3 operator*(double d, Matrix3 const& m) {
 
 
 
-Matrix3 Quaternion::matrix() {
+/*Matrix3 Quaternion::matrix() {
     if (invalid_mat) {
         double s = 1/mag2();
         mat = Matrix3({
             1 - 2*s*(j_*j_ + k_*k_), 2*s*(i_*j_ - k_*r_), 2*s*(i_*k_ + j_*r_),
             2*s*(i_*j_ + k_*r_), 1 - 2*s*(i_*i_ + k_*k_), 2*s*(j_*k_ - i_*r_),
             2*s*(i_*k_ - j_*r_), 2*s*(j_*k_ + i_*r_), 1 - 2*s*(i_*i_ + j_*j_)
-        });
+        }).transpose();
         invalid_mat = false;
     }
     return mat;
+}*/
+Vector3 Quaternion::rotate(const Vector3 v) const {
+    const Quaternion q = Quaternion(0, v[0], v[1], v[2]);
+    return (inverse() * q * *this).vec();
 }
 Quaternion Quaternion::inverse() const {
     return conjugate() / mag2();
@@ -373,28 +377,28 @@ void Quaternion::operator+=(Quaternion const& q) {
     i_ += q.i();
     j_ += q.j();
     k_ += q.k();
-    invalid_mat = true;
+    invalid_mag = true;
 }
 void Quaternion::operator-=(Quaternion const& q) {
     r_ -= q.r();
     i_ -= q.i();
     j_ -= q.j();
     k_ -= q.k();
-    invalid_mat = true;
+    invalid_mag = true;
 }
 void Quaternion::operator*=(double d) {
     r_ *= d;
     i_ *= d;
     j_ *= d;
     k_ *= d;
-    invalid_mat = true;
+    invalid_mag = true;
 }
 void Quaternion::operator/=(double d) {
     r_ /= d;
     i_ /= d;
     j_ /= d;
     k_ /= d;
-    invalid_mat = true;
+    invalid_mag = true;
 }
 Quaternion Quaternion::operator*(Quaternion const& q) const {
     Vector3 mv = vec();
@@ -403,15 +407,18 @@ Quaternion Quaternion::operator*(Quaternion const& q) const {
     Vector3 v = r_ * qv + q.r() * mv + Vector3::cross(mv, qv);
     return Quaternion(d, v[0], v[1], v[2]);
 }
-double Quaternion::mag() const {
-    return sqrt(r_*r_+i_*i_+j_*j_+k_*k_);
+double Quaternion::mag() {
+    if (invalid_mag) {
+        mag_ = sqrt(r_*r_+i_*i_+j_*j_+k_*k_);
+    }
+    return mag_;
 }
 double Quaternion::mag2() const {
     return r_*r_+i_*i_+j_*j_+k_*k_;
 }
 
 std::ostream& operator<<(std::ostream& os, const Quaternion& q) {
-    os << q.r() << " + " << q.i() << " i + " << q.j() << " j + " << q.k();
+    os << q.r() << " + " << q.i() << " i + " << q.j() << " j + " << q.k() << " k";
     return os;
 }
 Quaternion operator*(double d, Quaternion const& q) {

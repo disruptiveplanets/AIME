@@ -28,6 +28,9 @@ public:
     double operator[](int i) const;
     double mag();
     double mag2() const;
+    bool is_nan() const {
+        return isnan(e[0]) || isnan(e[1]) || isnan(e[2]);
+    }
 
     static Vector3 x() { return Vector3({1, 0, 0}); }
     static Vector3 y() { return Vector3({0, 1, 0}); }
@@ -85,7 +88,7 @@ class Quaternion {
 public:
     Quaternion() {};
     Quaternion(double r, double i, double j, double k) : r_(r), i_(i), j_(j),
-        k_(k), invalid_mat(true) {}
+        k_(k), invalid_mag(true) {}
 
     static Quaternion zero() {return Quaternion(0, 0, 0, 0); }
     static Quaternion identity() {return Quaternion(1, 0, 0, 0); }
@@ -109,9 +112,9 @@ public:
     }
 
     Quaternion inverse() const;
-    Matrix3 matrix();
+    Vector3 rotate(const Vector3 v) const;
     Vector3 vec() const;
-    double mag() const;
+    double mag();
     double mag2() const;
     Quaternion conjugate() const { return Quaternion(r_, -i_, -j_, -k_); }
 
@@ -120,8 +123,8 @@ private:
     double i_;
     double j_;
     double k_;
-    Matrix3 mat;
-    bool invalid_mat;
+    bool invalid_mag;
+    double mag_;
 };
 
 

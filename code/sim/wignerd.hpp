@@ -9,9 +9,6 @@
 #define min_me(a, b) ((a) > (b) ? (b) : (a))
 #define parity(a) ((a) % 2 == 0 ? (1) : (-1))
 
-using uint = unsigned int;
-
-
 
 struct cdouble {
     cdouble(double r, double i) : r(r), i(i) {}
@@ -38,16 +35,16 @@ struct cdouble {
     double i;
 };
 
-uint fact(uint i);
-uint choose(uint a, uint b);
-double gen_choose(double a, uint b);
+int fact(int i);
+int choose(int a, int b);
+double gen_choose(double a, int b);
 
 class DMatGen {
 public:
     DMatGen(double alpha, double beta, double gamma);
-    cdouble operator()(uint l, int m, int mp);
+    cdouble operator()(int l, int m, int mp);
 
-    double wigner_small_d(uint j, int mp, int m);
+    double wigner_small_d(int j, int mp, int m);
 
 private:
     std::map<std::tuple<int, int, int>, double> small_d_state;
@@ -58,8 +55,8 @@ private:
     cdouble gamma;
 };
 
-cdouble slm_c(uint l, int m, double r, double costheta, double phi);
-cdouble ylm_c(uint l, int m, double costheta, double phi);
+cdouble slm_c(int l, int m, double r, double costheta, double phi);
+cdouble ylm_c(int l, int m, double costheta, double phi);
 
 std::ostream& operator<<(std::ostream& os, const cdouble& c);
 cdouble operator*(double d, cdouble c);

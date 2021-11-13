@@ -1,82 +1,125 @@
 #include "backend.hpp"
 
+#define my_min(a, b) ((a) < (b) ? (a) : (b))
+
 const int max_k = (ASTEROIDS_MAX_K + 1) * (ASTEROIDS_MAX_K + 1);
 const int max_j = (ASTEROIDS_MAX_J + 1) * (ASTEROIDS_MAX_J + 1);
 
 Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms, double asteroid_radius,
-    Vector3 spin, double initial_roll, double perigee, double speed,
-    double distance_ratio_cut) :
+    Vector3 spin, double initial_roll, double perigee, double speed, double central_mu,
+    double central_radius, double distance_ratio_cut) :
     jlms(jlms), klms(klms), asteroid_radius(asteroid_radius), distance_ratio_cut(distance_ratio_cut),
-    velocity(Vector3({0, 0, speed})), spin(spin), perigee(perigee) {
+    mu(central_mu), pericenter_pos(perigee), excess_vel(speed), initial_spin(spin),
+    initial_roll(initial_roll) {
 
-    klmcs = new cdouble[(ASTEROIDS_MAX_K + 1) * (ASTEROIDS_MAX_K + 1)];
     for (int i = 0; i < (ASTEROIDS_MAX_K + 1) * (ASTEROIDS_MAX_K + 1); i++) {
         klmcs[i] = klms[i].conj();
     }
 
     calculate_moi(initial_roll);
-    set_pos(speed);
+    calculate_poses();
 
-    #ifdef _DEBUG
-    std::cout<< "Klms: ";
-    for (int i = 0; i < (ASTEROIDS_MAX_K + 1) * (ASTEROIDS_MAX_K + 1); i++) {
-        std::cout << klms[i] << ' ';
+    #ifdef TEXT_DEBUG
+    std::cout<< "Klms: " << std::endl;
+    for (int l = 0; l <= ASTEROIDS_MAX_K; l++){
+        for (int m = -l; m<= l; m++) {
+            std::cout << l << ' ' << m << ": " << klm(l, m) << std::endl;
+        }
     }
-    std::cout << std::endl;
-
-    std::cout << "Jlms: ";
-    for (int i = 0; i < (ASTEROIDS_MAX_J + 1) * (ASTEROIDS_MAX_K + 1); i++) {
-        std::cout << jlms[i] << ' ';
+    std::cout<< "Jlms: " << std::endl;
+    for (int l = 0; l <= ASTEROIDS_MAX_J; l++){
+        for (int m = -l; m<= l; m++) {
+            std::cout << l << ' ' << m << ": " << jlm(l, m) << std::endl;
+        }
     }
-    std::cout << std::endl;
 
-    std::cout << "PARAMETERS:" << std::endl;
     std::cout << "MOI (local): " << moi << std::endl;
-    std::cout << "Start position: " << position << std::endl;
-    std::cout << "Start velocity: " << velocity << std::endl;
-    std::cout << "Start spin: " << spin << std::endl;
     std::cout << std::endl;
     #endif
 }
 
-cdouble Asteroid::jlm(uint l, int m) const {
+cdouble Asteroid::jlm(int l, int m) const {
+    #ifdef TEXT_DEBUG
     if (l * l + l + m < 0 || l * l + l + m > max_j) {
+        std::cout << "Jlm array exceeded" << std::endl;
         throw std::runtime_error("Jlm array exceeded.");
     }
+    #endif
     return jlms[l * l + l + m];
 }
 
-cdouble Asteroid::klm(uint l, int m) const {
+cdouble Asteroid::klm(int l, int m) const {
     if (abs(m) > l) {return 0;}
+    #ifdef TEXT_DEBUG
     if (l * l + l + m < 0 || l * l + l + m > max_k) {
+        std::cout << "Klm array exceeded" << std::endl;
         throw std::runtime_error("Klm array exceeded.");
     }
+    #endif
     return klms[l * l + l + m];
 }
 
-cdouble Asteroid::klmc(uint l, int m) const {
+cdouble Asteroid::klmc(int l, int m) const {
     if (abs(m) > l) {return 0;}
+    #ifdef TEXT_DEBUG
     if (l * l + l + m < 0 || l * l + l + m > max_k) {
+        std::cout << "Klmc array exceeded" << std::endl;
         throw std::runtime_error("Klm array exceeded.");
     }
+    #endif
     return klmcs[l * l + l + m];
 }
 
-void Asteroid::set_pos(double speed) {
-    // Asteroid enters at +x and is traveling towards -x, with offset in +y
-    // direction.
-    edge_dist = perigee * pow(INTEGRAL_LIMIT_FRAC, -1/3.0);
-    double semi_major_axis = GM / speed / speed;
-    double eccentricity = perigee / semi_major_axis + 1;
-    impact_parameter = semi_major_axis * sqrt(eccentricity * eccentricity - 1);
-    ang_mom = Vector3::x() * impact_parameter * speed;
-    double semi_latus_rectum = ang_mom.mag2() / GM;
-    double nu = -acos((semi_latus_rectum / edge_dist - 1) / eccentricity);
-    position = Vector3({0, cos(nu), sin(nu)}) * edge_dist;
-    position *= 1 - EPSILON;
-        // So that it reads as just inside the allowed region
-    velocity = sqrt(GM / semi_latus_rectum) * Vector3({0, -sin(nu), eccentricity + cos(nu)});
-    energy = 0.5 * speed * speed;
+void Asteroid::calculate_poses() {
+    #ifdef TEXT_DEBUG
+    //auto start = std::chrono::high_resolution_clock::now();
+    #endif
+
+    double pericenter_vel = sqrt(excess_vel * excess_vel + 2 * mu / pericenter_pos);
+    const double cutoff_dist_squared = pericenter_pos * pericenter_pos * pow(INTEGRAL_LIMIT_FRAC, -2/3.0);
+    #ifdef TEXT_DEBUG
+    std::cout << "cutoff distance: " << sqrt(cutoff_dist_squared) << std::endl;
+    std::cout << "periapsis: " << pericenter_pos << std::endl;
+    #endif
+    Vector3 velocity = Vector3({0, pericenter_vel, 0});
+    Vector3 position = Vector3({pericenter_pos, 0, 0});
+
+    double time;
+    for (time = 0; position.mag2() < cutoff_dist_squared; time += POSITION_DT) {
+        Vector3 accel = -mu / position.mag2() * position / position.mag();
+        velocity += POSITION_DT * accel;
+        position += POSITION_DT * velocity;
+        positions.push_back(position);
+        velocities.push_back(velocity);
+    }
+    expire_time = time;
+
+    #ifdef TEXT_DEBUG
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << "Position time " << duration.count()/ 1000000.0 << std::endl;
+    std::cout << "Expire time (h): " << expire_time / 3600 << std::endl;
+    #endif
+}
+
+bool Asteroid::extract_pos(double time, Vector3& position, Vector3& velocity) {
+    bool flip = false;
+    if (time < 0) {
+        flip = true;
+        time *= -1;
+    }
+    int time_index = time / POSITION_DT;
+    if (time > expire_time) {
+        return false;
+    }
+    double mixer = (time - time_index * POSITION_DT) / POSITION_DT;
+    position = positions[time_index] * mixer + positions[time_index] * (1 - mixer);
+    velocity = velocities[time_index] * mixer + velocities[time_index] * (1 - mixer);
+    if (flip) {
+        position = Vector3({position[0], -position[1], 0});
+        position = Vector3({-position[0], position[1], 0});
+    }
+    return true;
 }
 
 void Asteroid::calculate_moi(double initial_roll) {
@@ -101,151 +144,126 @@ void Asteroid::calculate_moi(double initial_roll) {
     }
 
     moi = Vector3({Ixx, Iyy, Izz});
+    avg_moi = (abs(moi[0]) + abs(moi[1]) + abs(moi[2])) / 3;
     inv_moi = Vector3({1.0 / Ixx, 1.0 / Iyy, 1.0 / Izz});
-
-    Vector3 nspin = spin / spin.mag();
-
-    double A = sqrt((1 - nspin[2]) / 2);
-    double B = sqrt((nspin[0] * nspin[0] + nspin[1] * nspin[1])
-        / (2 * (1 - nspin[2])));
-    double phi = atan2(nspin[0], nspin[1]) - initial_roll;
-    orientation = Quaternion(B*sin(phi), A * sin(initial_roll),
-        A * cos(initial_roll), B * cos(phi));
-
-    orientation = orientation.inverse();
-    orientation /= orientation.mag();
-    if (orientation.is_nan()) {
-        orientation = Quaternion(cos(initial_roll), 0, 0, sin(initial_roll));
-    }
-    spin = Vector3::z() * spin.mag();
 }
 
-int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
-    time = 0;
-    int frames = 0;
-    int cadence_index = -1;
-    double dt;
-    //double close_power = pow(perigee, DT_POWER);
-    //double denom = 1.0 / (pow(edge_dist, DT_POWER) - close_power);
-
-    for (;position.mag() < edge_dist; frames++) {
-        dt = 0.5;
-        //MIN_DT + (MAX_DT - MIN_DT) * (pow(position.mag(), DT_POWER) - close_power) * denom;
-        update_orientation(dt);
-        update_position(dt);
-        time += dt;
-
-        /*if (frames == 200) {
-            int i = 0;
-            std::cout << time << std::endl;
-            for(i = 0; i < 1e15; i++);
-            std::cout << i << std::endl;
-        }*/
-
-        if (int(time / cadence) > cadence_index) {
-            Vector3 global_spin = orientation.matrix().transpose() * spin;
-            resolved_data.push_back(global_spin[0]);
-            resolved_data.push_back(global_spin[1]);
-            resolved_data.push_back(global_spin[2]);
-            cadence_index = int(time / cadence);
-            if (distance_ratio_cut >= 0 && Vector3::dot(position, velocity) > 0
-                && position.mag() / perigee >= distance_ratio_cut) {
-                break;
-            }
-            //std::cout << spin[0] <<' '<< spin[1]<<' ' << spin[2] << ' ' << dt << std::endl;
-        }
-    }
-
-    #ifdef _DEBUG
-    std::cout << "Simulation took " << time << " seconds." << std::endl;
-    std::cout << "Maximum dquaternion magnitude (want 0) " << max_quat_mag
-        << std::endl;
-    #endif
-
-    return frames;
-}
-
-Vector3 Asteroid::get_torque() {
-    angles = orientation.euler_angles();
+void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, Vector3& dspin, Quaternion& dquat) {
+    Vector3 angles = quat.euler_angles();
     DMatGen dgen = DMatGen(angles[0], angles[1], angles[2]);
-    rot_pos = orientation.matrix() * -position;
-    rot_pos_r = position.mag();
-    rot_pos_ct = rot_pos[2] / rot_pos.mag();
-    rot_pos_p = atan2(rot_pos[1], rot_pos[0]);
-    x_torque = 0;
-    y_torque = 0;
-    z_torque = 0;
+    double pos_r = position.mag();
+    double pos_ct = position[2] / position.mag();
+    double pos_p = atan2(position[1], position[0]);
+    cdouble x_torque = 0;
+    cdouble y_torque = 0;
+    cdouble z_torque = 0;
     // Up until now, takes about 0.1 s, L=2
 
-    for (uint l = 0; l <= ASTEROIDS_MAX_J; l++) {
-        for (int m = -l; m <= (int)l; m++) {
-            nowjlm = 0;
-            for (int mpp = -l; mpp <= (int)l; mpp++) {
-                nowjlm += sqrt(fact(l-mpp) * fact(l+mpp))
-                    * dgen(l,m,mpp).conj() * jlm(l,mpp);
-                // About 0.07 s, L=2
-            }
-            nowjlm *= (double)parity(l) / sqrt(fact(l-m) * fact(l+m)) * pow(RADIUS, l);
-            for (uint lp = 2; lp <= ASTEROIDS_MAX_K; lp++) {
-                for (int mp = -lp; mp <= (int)lp; mp++) {
-                    prelpmp = nowjlm * slm_c(l + lp, m + mp, rot_pos_r, rot_pos_ct, rot_pos_p)
-                        * pow(asteroid_radius, lp - 2);
-                    // About 0.15 s, L=2. all slm_c
-                    x_torque += prelpmp * ((double)(lp - mp + 1) * klmc(lp, mp-1)
-                        + (double)(lp + mp + 1) * klmc(lp, mp+1));
-                    y_torque += prelpmp * ((double)(lp - mp + 1) * klmc(lp, mp-1)
-                        - (double)(lp + mp + 1) * klmc(lp, mp+1));
-                    z_torque += prelpmp * 2.0 * (double)mp * klmc(lp, mp);
-                    // About 0.05 s, L=2
+    for (int l = 0; l <= ASTEROIDS_MAX_J; l++) {
+        for (int m = -l; m <= l; m++) {
+            cdouble prelm = pow(central_radius, l) * jlm(l, m);
+            for (int lp = 2; lp <= ASTEROIDS_MAX_K; lp++) {
+                for (int mp = -lp; mp <= lp; mp++) {
+                    cdouble prelpmp = prelm * parity(lp) * pow(asteroid_radius, lp - 2)
+                        * slm_c(l+lp, m+mp, pos_r, pos_ct, pos_p).conj();
+
+                    for (int mpp = -lp; mpp <= (int)lp; mpp++) {
+                        cdouble mppfactor = prelpmp * dgen(lp, mp, mpp).conj()
+                            * sqrt(fact(lp - mpp) * fact(lp+mpp) / fact(lp-mp) / fact(lp+mp));
+
+                        x_torque += mppfactor * (cdouble(0, lp - mpp + 1) * klm(lp, mpp - 1)
+                            + cdouble(0, lp + mpp + 1) * klm(lp, mpp + 1));
+
+                        y_torque += mppfactor * (-(lp - mpp + 1) * klm(lp, mpp - 1)
+                            + (lp + mpp + 1) * klm(lp, mpp + 1));
+
+                        z_torque += mppfactor * cdouble(0, 2) * mpp * klm(lp, mpp);
+                    }
                 }
             }
         }
     }
-    //std::cout << x_torque << ' ' << y_torque << ' ' << z_torque << std::endl;
-    return Vector3({-std::move(x_torque.i),
-        std::move(y_torque.r),
-        -std::move(z_torque.i)})
-        * -0.5 * GM;
+
+    Vector3 torque = Vector3({x_torque.r,
+        y_torque.r,
+        z_torque.r})
+        * 0.5 * mu;
+
+    last_torque = torque;
+
     // This torque is really torque per radius^2 per M.
-}
 
-void Asteroid::update_position(double dt) {
-    accel = -GM / pow(position.mag(), 3) * position;
-    velocity += accel * dt;
-    position += velocity * dt;
-}
-
-void Asteroid::update_orientation(double dt) {
-    torque = get_torque();
-
-    omegaDot = Vector3({
+    dspin = Vector3({
         (torque[0] + (moi[1] - moi[2]) * spin[1] * spin[2]) * inv_moi[0],
         (torque[1] + (moi[2] - moi[0]) * spin[2] * spin[0]) * inv_moi[1],
         (torque[2] + (moi[0] - moi[1]) * spin[0] * spin[1]) * inv_moi[2],
     });
 
-    /*if (isnan(omegaDot[0])) {
-        std::cout << spin << std::endl;
-        std::cout << torque << std::endl;
-        std::cout << orientation << std::endl;
-        std::cin >> time;
-    }*/
+    dquat = 0.5 * Quaternion(0, spin[0], spin[1], spin[2]) * quat;
+}
 
-    spin += dt * omegaDot;
 
-    d_quat = 0.5 * Quaternion(0, spin[0], spin[1], spin[2]) * orientation;
-    orientation += d_quat * dt;
+int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
+    int frames = 0;
+    int cadence_index = -expire_time / cadence-1;
+    double dt = MIN_DT;
+    Quaternion dquat1, dquat2, dquat3, dquat4;
+    Vector3 dspin1, dspin2, dspin3, dspin4, position, velocity;
 
-    /*if (orientation.mag() == 0) {
-        std::cout << spin << std::endl;
-        std::cout << torque << std::endl;
-        std::cout << orientation << std::endl;
-        std::cin >> time;
-    }*/
 
-    #ifdef _DEBUG
-    max_quat_mag = max_me(max_quat_mag, d_quat.mag());
+    double alpha = initial_roll;
+    double beta = acos(initial_spin[2] / initial_spin.mag());
+    double gamma = atan2(initial_spin[1], -initial_spin[0]);
+
+    Quaternion quat = Quaternion(cos(alpha / 2), 0, 0, sin(alpha / 2))
+        * Quaternion(cos(beta / 2), 0, sin(beta / 2), 0)
+        * Quaternion(cos(gamma / 2), 0, 0, sin(gamma / 2));
+    Vector3 spin = Vector3::z() * initial_spin.mag();
+
+    double time;
+    for (time = MIN_DT-expire_time; time+MIN_DT < expire_time; time += dt) {
+        if (!extract_pos(time, position, velocity)) {
+            std::cout << time << ' ' << expire_time << std::endl;
+            throw std::runtime_error("Simulation ran out of bounds");
+        }
+        if (distance_ratio_cut > 0 &&
+            position.mag2() > distance_ratio_cut * pericenter_pos &&
+            Vector3::dot(position, velocity) > 0) {
+            break;
+        }
+
+        if (frames % 10 == 0) {
+            dt = my_min(MAX_DT, (avg_moi * spin.mag()) / last_torque.mag() * 1e-5);
+        }
+
+        get_derivatives(position, spin, quat, dspin1, dquat1);
+        extract_pos(time+dt/2, position, velocity);
+        get_derivatives(position, spin + dt / 2 * dspin1, quat + dt / 2 * dquat1, dspin2, dquat2);
+        get_derivatives(position, spin + dt / 2 * dspin2, quat + dt / 2 * dquat2, dspin3, dquat3);
+        extract_pos(time+dt, position, velocity);
+        get_derivatives(position, spin + dt * dspin3, quat + dt * dquat3, dspin4, dquat4);
+
+
+        spin += dt / 6 * (dspin1 + 2 * dspin2 + 2 * dspin3 + dspin4);
+        quat += dt / 6 * (dquat1 + 2 * dquat2 + 2 * dquat3 + dquat4);
+
+        quat /= quat.mag();
+
+
+        if (int(time / cadence) > cadence_index) {
+            Vector3 global_spin = quat.rotate(spin);
+            resolved_data.push_back(global_spin[0]);
+            resolved_data.push_back(global_spin[1]);
+            resolved_data.push_back(global_spin[2]);
+            cadence_index = int(time / cadence);
+        }
+        frames++;
+    }
+
+    #ifdef TEXT_DEBUG
+    std::cout << "Simulation took " << time << " seconds." << std::endl;
+    std::cout << "Maximum dquaternion magnitude (want 0) " << max_quat_mag << std::endl;
     #endif
 
-    orientation /= orientation.mag();
+    return frames;
 }

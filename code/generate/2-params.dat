@@ -3,8 +3,8 @@
 1.0 # K00 (must be 1)
 0 0 0 # K1 (must be 0)
 0.04 0 0 0 -0.1 # K2 (must be x 0 0 0 y)
-10.0 # radius (remember it's not really the radius)
+1000.0 # radius (remember it's not really the radius)
 0.00032 0.00022 0.00012 # Spin
 1.0 # Initial roll
-31850000 # Perigee
+682200000 # 31850000 # Perigee
 4000 # Speed

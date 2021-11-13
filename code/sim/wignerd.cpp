@@ -6,23 +6,23 @@
 
 
 
-uint fact(uint i) {
+int fact(int i) {
     if (i == 0) return 1;
     return i * fact(i-1);
 }
 
 
-uint choose(uint a, uint b) {
-    uint num = 1;
-    for (uint i = 0; i < b; i++) {
+int choose(int a, int b) {
+    int num = 1;
+    for (int i = 0; i < b; i++) {
         num *= a - i;
     }
     return num / fact(b);
 }
 
-double gen_choose(double a, uint b) {
+double gen_choose(double a, int b) {
     double num = 1;
-    for (uint i = 0; i < b; i++) {
+    for (int i = 0; i < b; i++) {
         num *= a - i;
     }
     return num / fact(b);
@@ -34,7 +34,7 @@ DMatGen::DMatGen(double alpha, double beta, double gamma)
     cs = cos(beta/2);
 }
 
-cdouble DMatGen::operator()(uint l, int mp, int m) {
+cdouble DMatGen::operator()(int l, int mp, int m) {
     auto d_pos = small_d_state.find({l, mp, m});
     if (d_pos == small_d_state.end()) {
         small_d_state.insert({{l, mp, m}, wigner_small_d(l, mp, m)});
@@ -44,10 +44,10 @@ cdouble DMatGen::operator()(uint l, int mp, int m) {
         * d_pos->second;
 }
 
-double DMatGen::wigner_small_d(uint j, int mp, int m) {
+double DMatGen::wigner_small_d(int j, int mp, int m) {
     double pre = sqrt(fact(j+mp) * fact(j-mp) * fact(j+m) * fact(j-m));
     double sum = 0;
-    for(uint s = max_me(0, m-mp); s <= min_me(j+m, j-mp); s++) {
+    for(int s = max_me(0, m-mp); s <= min_me(j+m, j-mp); s++) {
         sum += ((double)parity(mp-m+s) * pow(cs, 2 * j + m - mp - 2 * s)
         * pow(sn, mp - m + 2 * s)) /
         (fact(j + m - s) * fact(s) * fact(mp - m + s) * fact(j - mp - s));
@@ -55,16 +55,16 @@ double DMatGen::wigner_small_d(uint j, int mp, int m) {
     return pre * sum;
 }
 
-cdouble slm_c(uint l, int m, double r, double costheta, double phi) {
+cdouble slm_c(int l, int m, double r, double costheta, double phi) {
     // About 0.33 s
     return (double)parity(m) * fact(l - m) / pow(r, l+1) * ylm_c(l, m, costheta, phi);
 }
 
-cdouble ylm_c(uint l, int m, double costheta, double phi) {
+cdouble ylm_c(int l, int m, double costheta, double phi) {
     double sum = 0;
-    //for (uint k = abs(m); k <= l; k++) {
+    //for (int k = abs(m); k <= l; k++) {
     double power = 1;
-    for (uint u = 0; u <= l - abs(m); u++) {
+    for (int u = 0; u <= l - abs(m); u++) {
         sum += power / fact(l - u - abs(m)) * gen_choose((l + u + abs(m) - 1) / 2.0, l);
         power *= costheta / (u + 1);
     }
