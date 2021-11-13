@@ -9,7 +9,7 @@ Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms, double asteroid_rad
     Vector3 spin, double initial_roll, double perigee, double speed, double central_mu,
     double central_radius, double distance_ratio_cut) :
     jlms(jlms), klms(klms), asteroid_radius(asteroid_radius), distance_ratio_cut(distance_ratio_cut),
-    mu(central_mu), pericenter_pos(perigee), excess_vel(speed), initial_spin(spin),
+    mu(central_mu), central_radius(central_radius), pericenter_pos(perigee), excess_vel(speed), initial_spin(spin),
     initial_roll(initial_roll) {
 
     for (int i = 0; i < (ASTEROIDS_MAX_K + 1) * (ASTEROIDS_MAX_K + 1); i++) {
@@ -184,12 +184,14 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
         }
     }
 
-    Vector3 torque = Vector3({x_torque.r,
+    torque = Vector3({x_torque.r,
         y_torque.r,
         z_torque.r})
         * 0.5 * mu;
 
-    last_torque = torque;
+    if (torque.is_nan() ) {
+        std::cout << "Torque was nan" << std::endl;
+    }
 
     // This torque is really torque per radius^2 per M.
 
@@ -223,7 +225,6 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
     double time;
     for (time = MIN_DT-expire_time; time+MIN_DT < expire_time; time += dt) {
         if (!extract_pos(time, position, velocity)) {
-            std::cout << time << ' ' << expire_time << std::endl;
             throw std::runtime_error("Simulation ran out of bounds");
         }
         if (distance_ratio_cut > 0 &&
@@ -232,11 +233,10 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
             break;
         }
 
-        if (frames % 10 == 0) {
-            dt = my_min(MAX_DT, (avg_moi * spin.mag()) / last_torque.mag() * 1e-5);
-        }
-
         get_derivatives(position, spin, quat, dspin1, dquat1);
+        if (frames % 10 == 0) {
+            dt = my_min(MAX_DT, (avg_moi * spin.mag()) / torque.mag() * 1e-5);
+        }
         extract_pos(time+dt/2, position, velocity);
         get_derivatives(position, spin + dt / 2 * dspin1, quat + dt / 2 * dquat1, dspin2, dquat2);
         get_derivatives(position, spin + dt / 2 * dspin2, quat + dt / 2 * dquat2, dspin3, dquat3);

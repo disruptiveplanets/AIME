@@ -51,7 +51,7 @@ private:
     double distance_ratio_cut;
 
     Vector3 moi, inv_moi;
-    Vector3 last_torque;
+    Vector3 torque;
     double avg_moi;
     double mu;
     double central_radius;
@@ -65,6 +65,6 @@ private:
     double expire_time;
     double initial_roll;
 
-    double max_quat_mag;
+    //double max_quat_mag;
     /// Throws a segfault when this is not present.
 };
