@@ -6,7 +6,7 @@ EARTH_RADIUS = 6_370_000
 x = np.linspace(0, 12 * np.pi, DATA_WIDTH)
 
 def simulate(cadence, jlms, theta, radius, spinx, spiny, spinz, initial_roll, impact_parameter,
-    speed, cut):
+    speed, mu, central_radius, cut):
 
     params = [initial_roll]
     for j in theta:

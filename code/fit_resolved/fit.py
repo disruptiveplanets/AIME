@@ -8,6 +8,8 @@ if not TEST:
 if TEST:
     import test_0_2 as asteroids_0_2
     import test_0_2 as asteroids_0_3
+    import test_0_2 as asteroids_2_2
+    import test_0_2 as asteroids_2_3
 from multiprocessing import Pool
 import random_vector, random
 from scipy import optimize, linalg
@@ -128,9 +130,9 @@ def log_prior(theta):
             return -np.inf
     return 0.0
 
-def log_probability(theta, y, yerr):
+def log_probability(theta, y, y_inv_covs):
     prior = log_prior(theta)
-    like = log_likelihood(theta, y, yerr)
+    like = log_likelihood(theta, y, y_inv_covs)
     if not np.isfinite(prior) or not np.isfinite(like):
         return -np.inf
     return prior + like
@@ -403,7 +405,7 @@ def mcmc_fit(theta_start, evals, evecs, index):
     old_tau = np.inf
     with Pool() as pool:
         sampler = emcee.EnsembleSampler(N_WALKERS, N_DIM, log_probability,
-            args=(y, yerr), backend=backend, pool=pool)
+            args=(y, y_inv_covs), backend=backend, pool=pool)
 
         if reload:
             pos = sampler._previous_state

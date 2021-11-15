@@ -2,10 +2,14 @@ TEST = False
 
 import sys, corner, emcee, os
 if not TEST:
-    import asteroids_0_3, asteroids_0_2
+    import asteroids_0_3, asteroids_0_2, asteroids_2_3, asteroids_2_2, asteroids_3_3, asteroids_3_2
 else:
     import test_0_2 as asteroids_0_2
     import test_0_2 as asteroids_0_3
+    import test_0_2 as asteroids_2_2
+    import test_0_2 as asteroids_2_3
+    import test_0_2 as asteroids_3_2
+    import test_0_2 as asteroids_3_3
 import numpy as np
 import matplotlib.pyplot as plt
 import random_vector
@@ -13,6 +17,8 @@ import random_vector
 EARTH_RADIUS = 6370000
 STANDARD_RESULTS_METHOD = False
 REDCHI_THRESHOLD = 2
+CENTRAL_RADIUS = EARTH_RADIUS
+CENTRAL_MU = 5.972e24 * 6.674e-11
 
 AUTO_BURNIN = 1000
 
@@ -78,7 +84,7 @@ class Display:
 
         f = open(self.h5_name + '-redchis.txt', 'w')
         for i in range(self.log_prob_samples.shape[1]):
-            redchi = -self.log_prob_samples[:,i] / len(self.true_results) / 3
+            redchi = -self.log_prob_samples[:,i] / len(self.true_results)
             if redchi [-1] < REDCHI_THRESHOLD:
                 f.write(str(redchi[-1]) + "\n")
                 num_converged += 1
@@ -108,7 +114,7 @@ class Display:
             if self.true_results is None:
                 self.true_results = self.run(self.theta_true)
             if self.true_results is None:
-                return np.zeros_like(mask)
+                raise Exception("No true results were generated. {}".format(self.theta_true))
 
             redchi = -self.log_prob_samples[-1,:] / len(self.true_results)
             mask = redchi < REDCHI_THRESHOLD
@@ -166,6 +172,20 @@ class Display:
             elif self.maxk == 3:
                 self.module = asteroids_0_3
 
+        elif self.maxj == 2:
+            if self.maxk == 2:
+                self.module = asteroids_2_2
+            elif self.maxk == 3:
+                self.module = asteroids_2_3
+
+        elif self.maxj == 3:
+            if self.maxk == 2:
+                self.module = asteroids_3_2
+            elif self.maxk == 3:
+                self.module = asteroids_3_3
+        else:
+            raise Exception("Could not find module for simulation.")
+
     def show_results(self):
         self.get_params()
         res = self.get_results()
@@ -200,8 +220,9 @@ class Display:
         try:
             resolved_data = self.module.simulate(self.cadence, self.jlms, theta[1:],
                 self.radius, self.spin[0], self.spin[1], self.spin[2], theta[0],
-                self.impact_parameter, self.speed, -1)
+                self.impact_parameter, self.speed, CENTRAL_MU, CENTRAL_RADIUS, -1)
         except:
+            print(self.module)
             print("Coordinates are invalid ({})".format(theta))
             return None
         return np.asarray(resolved_data)
@@ -216,7 +237,7 @@ class Display:
 
         f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(12, 6), sharex=True)
 
-        x_display = np.arange(len(self.true_results) / 3) * self.cadence / 3600.0
+        x_display = np.arange(len(self.true_results)) * self.cadence / 3600.0
         ax1.plot(x_display, self.true_results[::3], label = 'true x', alpha=0.5, color='C0')
         ax1.plot(x_display, self.true_results[1::3], label = 'true y', alpha=0.5, color='C1')
         ax1.plot(x_display, self.true_results[2::3], label = 'true z', alpha=0.5, color='C2')
