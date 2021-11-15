@@ -35,6 +35,7 @@ MIN_SPREAD = 1e-4 ** 2
 
 DISTANCE_RATIO_CUT = 10
 MIN_THETA_DIST = 0.01
+LARGE_NUMBER = 1e100
 
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
@@ -106,16 +107,20 @@ def fit_function(theta):
         elif ASTEROIDS_MAX_J == 3:
             resolved_data = asteroids_3_2.simulate(cadence, jlms, theta[1:], radius,
                 spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, -1)
-    return np.asarray(resolved_data)
+    return np.asarray(resolved_data).reshape(-1, 3)
 
 
-def log_likelihood(theta, y, yerr):
+def log_likelihood(theta, y, y_inv_covs):
     # Normal likelihood
     try:
         model = fit_function(theta)
     except RuntimeError:
         return -np.inf # Zero likelihood
-    return -np.sum((y - model) ** 2 /  yerr ** 2)
+    # Return chisq
+    chisq = 0
+    for i in range(len(y)):
+        chisq += np.matmul(y[i] - model[i], np.matmul(y_inv_covs[i], y[i] - model[i]))
+    return chisq
 
 def log_prior(theta):
     for i, param in enumerate(theta):
@@ -137,50 +142,33 @@ start = time.time()
 y = fit_function(theta_true)
 print("Data generation took {} s".format(time.time() - start))
 if UNCERTAINTY_MODEL == 1:
-    y, yerr = random_vector.randomize_rotate_uniform(y, sigma)
+    y, y_inv_covs = random_vector.randomize_rotate_uniform(y, sigma)
 if UNCERTAINTY_MODEL == 2:
-    a = GM / speed**2
-
-    edge_dist = perigee * pow(INTEGRAL_LIMIT_FRAC, -1/3.0)
-    semi_major_axis = GM / speed / speed
-    eccentricity = perigee / semi_major_axis + 1
-    perigee = semi_major_axis * np.sqrt(eccentricity * eccentricity - 1)
-    ang_mom = [perigee * speed, 0, 0]
-    semi_latus_rectum = random_vector.vnorm(ang_mom)**2 / GM
-    nu = -np.arccos((semi_latus_rectum / edge_dist - 1) / eccentricity)
-    alt = [0, edge_dist * np.cos(nu), edge_dist * np.sin(nu)]
-    vel = [0, -np.sqrt(GM / semi_latus_rectum) * np.sin(nu), np.sqrt(GM / semi_latus_rectum) * (eccentricity + np.cos(nu))]
-
-    alts = []
-    time = 0
-    index = -1
-    dt = 2
-    while True:
-        if time // cadence > index:
-            index = time // cadence
-            alts.append(random_vector.vnorm(alt))
-        if index == len(y) // 3:
-            break
-        accel = random_vector.vmul(alt, -GM / random_vector.vnorm(alt)**3)
-        vel = random_vector.vadd(vel, random_vector.vmul(accel, dt))
-        alt = random_vector.vadd(alt, random_vector.vmul(vel, dt))
-        time += dt
-    y, yerr = random_vector.randomize_rotate_dist(y, sigma, alts, perigee)
+    raise Exception("Unimplemented")
 
 print("DOF:", len(y))
 
-cadence_cut = len(asteroids_0_2.simulate(cadence, jlms, theta_true[1:], radius,
-    spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
-    DISTANCE_RATIO_CUT))
+if ASTEROIDS_MAX_J == 0:
+    cadence_cut = len(asteroids_0_2.simulate(cadence, jlms, theta_true[1:], radius,
+        spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
+        DISTANCE_RATIO_CUT))
+elif ASTEROIDS_MAX_J == 2:
+    cadence_cut = len(asteroids_2_2.simulate(cadence, jlms, theta_true[1:], radius,
+        spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
+        DISTANCE_RATIO_CUT))
+elif ASTEROIDS_MAX_J == 3:
+    cadence_cut = len(asteroids_3_2.simulate(cadence, jlms, theta_true[1:], radius,
+        spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
+        DISTANCE_RATIO_CUT))
 
 plt.figure(figsize=(12, 4))
-x_display = np.arange(len(y) / 3)
-plt.fill_between(x_display, y[::3]+yerr[::3], y[::3]-yerr[::3], alpha=0.5)
-plt.fill_between(x_display, y[1::3]+yerr[1::3], y[1::3]-yerr[1::3],alpha=0.5)
-plt.fill_between(x_display, y[2::3]+yerr[2::3], y[2::3]-yerr[2::3],  alpha=0.5)
-plt.plot(x_display, y[::3], label='x')
-plt.plot(x_display, y[1::3], label='y')
-plt.plot(x_display, y[2::3], label='z')
+x_display = np.arange(len(y))
+plt.fill_between(x_display, y[:,0]+y_inv_covs[:,0,0]**(-0.5), y[:,0]-y_inv_covs[:,0,0]**(-0.5), alpha=0.5)
+plt.fill_between(x_display, y[:,1]+y_inv_covs[:,1,1]**(-0.5), y[:,1]-y_inv_covs[:,1,1]**(-0.5),alpha=0.5)
+plt.fill_between(x_display, y[:,2]+y_inv_covs[:,2,2]**(-0.5), y[:,2]-y_inv_covs[:,2,2]**(-0.5),  alpha=0.5)
+plt.plot(x_display, y[:,0], label='x')
+plt.plot(x_display, y[:,1], label='y')
+plt.plot(x_display, y[:,2], label='z')
 plt.xlabel("Time (Cadences)")
 plt.ylabel("Spin (rad/s)")
 plt.axvline(x=cadence_cut // 3, color='k')
@@ -203,12 +191,12 @@ def is_identity(h):
 ####################################################################
 print()
 y_min = y[:cadence_cut]
-yerr_min = yerr[:cadence_cut]
+y_inv_covs_min = y_inv_covs[:cadence_cut]
 
 def minimize_function(theta, simulate_func):
     resolved_data = simulate_func(cadence, jlms, theta[1:], radius,
         spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, DISTANCE_RATIO_CUT)
-    return np.asarray(resolved_data)
+    return np.asarray(resolved_data).reshape(-1, 3)
 
 def minimize_log_prob(float_theta, fix_theta, simulate_func):
     # Normal likelihood
@@ -216,28 +204,18 @@ def minimize_log_prob(float_theta, fix_theta, simulate_func):
     try:
         model = minimize_function(theta, simulate_func)
     except RuntimeError as e:
-        return 1e10 # Zero likelihood
+        return LARGE_NUMBER # Zero likelihood
 
     # Flat priors
     for i, t in enumerate(theta):
         if t > theta_high[i] or t < theta_low[i]:
-            return 1e10 # Zero likelihood
+            return LARGE_NUMBER # Zero likelihood
 
-    # Return redchi
-    return np.sum((y_min - model) ** 2 /  yerr_min ** 2)
-
-# Map params onto square layout for easier minimization
-def to_square(pt):
-    new = [f for f in pt]
-    if len(new) >= 3:
-        new[1] = (0.5 * new[2] - new[1]) / new[2]
-    return new
-
-def from_square(pt):
-    new = [f for f in pt]
-    if len(new) >= 3:
-        new[1] = (0.5 - new[1]) * new[2]
-    return new
+    # Return chisq
+    chisq = 0
+    for i in range(len(y_min)):
+        chisq += np.matmul(y_min[i] - model[i], np.matmul(y_inv_covs_min[i], y_min[i] - model[i]))
+    return chisq
 
 def get_minimum(arg):
     point, fix_theta, l, bounds = arg
@@ -255,33 +233,27 @@ def get_minimum(arg):
             simulate_func = asteroids_2_3.simulate
         elif ASTEROIDS_MAX_J == 3:
             simulate_func = asteroids_3_3.simulate
-
-    def minimize_square(coord, ft, sc):
-        return minimize_log_prob(from_square(coord), ft, sc)
-
-    bfgs_min = optimize.minimize(minimize_square, to_square(point), args=(fix_theta, simulate_func),
+    bfgs_min = optimize.minimize(minimize_log_prob, point, args=(fix_theta, simulate_func),
         method='L-BFGS-B', options={"eps": EPSILON}, bounds=bounds)
-
     if not bfgs_min.success:
         print("One of the minimum finding points failed.")
         #print(bfgs_min)
         return None, None, None, None
-
-    min_point = from_square(bfgs_min.x)
 
     if RECALC_HESS:
         def hess_func(min_coords):
             r = minimize_log_prob(min_coords, fix_theta, simulate_func)
             return r
 
-        grad = nd.Gradient(hess_func, step=EPSILON)(min_point)
-        hess = nd.Hessian(hess_func, step=EPSILON)(min_point)
+        grad = nd.Gradient(hess_func, step=EPSILON)(bfgs_min.x)
+        hess = nd.Hessian(hess_func, step=EPSILON)(bfgs_min.x)
 
         try:
             hess_inv = linalg.inv(hess)
             #print("Min hess:", bfgs_min.hess_inv.todense())
         except:
-            print("Singular matrix: {}, coords {}, start {}, grad {}".format(hess, min_point, point, grad))
+            print(bfgs_min)
+            print("Singular matrix: {}, coords {}, start {}, grad {}".format(hess, bfgs_min.x, point, grad))
             return None, None, None, None
     else:
         if is_identity(bfgs_min.hess_inv.todense()):
@@ -305,7 +277,7 @@ def get_minimum(arg):
         dtype=np.float64))
 
     # Return redchi, minimizing params, hessian
-    return bfgs_min.fun / len(y_min), min_point, new_evals, new_evecs
+    return bfgs_min.fun / len(y_min) / 3, bfgs_min.x, new_evals, new_evecs
 
 def minimize(l, num_return, fix_theta):
     assert l <= ASTEROIDS_MAX_K
@@ -334,8 +306,6 @@ def minimize(l, num_return, fix_theta):
 
     # Choose the seed parameters
     parameter_points = []
-    minimize_bounds = np.asarray([(theta_low[i], theta_high[i]) for i in theta_indices])
-    minimize_bounds[1] = [0.0001, 0.9999]
 
     while len(parameter_points) < NUM_MINIMIZE_POINTS:
         randoms = np.asarray([random.random() for i in theta_indices])
@@ -344,7 +314,7 @@ def minimize(l, num_return, fix_theta):
             model = minimize_function(point, simulate)
         except RuntimeError:
             continue
-        parameter_points.append((point, fix_theta, l, minimize_bounds))
+        parameter_points.append((point, fix_theta, l, bounds))
 
     # Perform the minimization
     with Pool() as pool:
@@ -352,7 +322,7 @@ def minimize(l, num_return, fix_theta):
 
     # Extract the lowest redchis
     sorted_results = sorted(results, key=
-        lambda x: x[0] if (x[0] is not None and not np.isnan(x[0])) else 1e10)
+        lambda x: x[0] if (x[0] is not None and not np.isnan(x[0])) else LARGE_NUMBER)
 
     distinct_results = []
     for redchi, theta, evals, evecs in sorted_results:

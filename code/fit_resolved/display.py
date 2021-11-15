@@ -78,7 +78,7 @@ class Display:
 
         f = open(self.h5_name + '-redchis.txt', 'w')
         for i in range(self.log_prob_samples.shape[1]):
-            redchi = -self.log_prob_samples[:,i] / len(self.true_results)
+            redchi = -self.log_prob_samples[:,i] / len(self.true_results) / 3
             if redchi [-1] < REDCHI_THRESHOLD:
                 f.write(str(redchi[-1]) + "\n")
                 num_converged += 1

@@ -117,7 +117,7 @@ bool Asteroid::extract_pos(double time, Vector3& position, Vector3& velocity) {
     velocity = velocities[time_index] * mixer + velocities[time_index] * (1 - mixer);
     if (flip) {
         position = Vector3({position[0], -position[1], 0});
-        position = Vector3({-position[0], position[1], 0});
+        velocity = Vector3({-velocity[0], velocity[1], 0});
     }
     return true;
 }
@@ -129,14 +129,12 @@ void Asteroid::calculate_moi(double initial_roll) {
     // These mois are really moi per radius^2 per M.
 
     if (Izz <= 0 || Iyy <= 0 || Ixx <= 0) {
-        throw std::runtime_error(
-            "Moment of inertia values were negative."
+        throw std::runtime_error("Moment of inertia values were negative."
         );
     }
 
     if (abs(Izz) <= abs(Ixx) || abs(Izz) <= abs(Iyy)) {
-        throw std::runtime_error(
-            "Moment of inertia was not maximized along z.");
+        throw std::runtime_error("Moment of inertia was not maximized along z.");
     }
 
     if (Izz >= Ixx + Iyy || Iyy >= Ixx + Izz || Ixx >= Izz + Iyy) {
@@ -236,9 +234,7 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
         }
 
         get_derivatives(position, spin, quat, dspin1, dquat1);
-        if (frames % 10 == 0) {
-            dt = my_min(MAX_DT, (avg_moi * spin.mag()) / torque.mag() * 1e-5);
-        }
+        dt = my_min(MAX_DT, (avg_moi * spin.mag()) / torque.mag() * 1e-5);
 
         extract_pos(time+dt/2, position, velocity);
         get_derivatives(position, spin + dt / 2 * dspin1, quat + dt / 2 * dquat1, dspin2, dquat2);
@@ -251,15 +247,21 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
 
         quat /= quat.mag();
 
-
-        if (int(time / cadence) > cadence_index) {
+        while (int(time / cadence) > cadence_index) {
             Vector3 global_spin = quat.rotate(spin);
             resolved_data.push_back(global_spin[0]);
             resolved_data.push_back(global_spin[1]);
             resolved_data.push_back(global_spin[2]);
-            cadence_index = int(time / cadence);
+            cadence_index++; //cadence_index = int(time / cadence)
         }
         frames++;
+    }
+    while (int(expire_time / cadence) > cadence_index) {
+        Vector3 global_spin = quat.rotate(spin);
+        resolved_data.push_back(global_spin[0]);
+        resolved_data.push_back(global_spin[1]);
+        resolved_data.push_back(global_spin[2]);
+        cadence_index++; //cadence_index = int(time / cadence)
     }
 
     #ifdef TEXT_DEBUG

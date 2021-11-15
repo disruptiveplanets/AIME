@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import scipy.linalg
 
 def vadd(a, b):
     return [a[i] + b[i] for i in range(len(a))]
@@ -15,98 +16,66 @@ def vnorm(a):
     return np.sqrt(np.sum([ai * ai for ai in a]))
 
 # Make an un_uniform randomizer
-def randomize_rotate_uniform_err(theta, phi, sigma):
-    return np.sqrt(np.array([
-            1/2 * np.sinh(sigma**2) * (np.cos(theta)**2 * np.cos(phi)**2 + np.sin(phi)**2) + (np.cosh(sigma**2) - 1) * np.cos(phi)**2 * np.sin(theta)**2,
-            1/2 * np.sinh(sigma**2) * (np.cos(theta)**2 * np.sin(phi)**2 + np.cos(phi)**2) + (np.cosh(sigma**2) - 1) * np.sin(phi)**2 * np.sin(theta)**2,
-            1/2 * np.sinh(sigma**2) * np.sin(theta)**2 + (np.cosh(sigma**2) - 1) * np.cos(theta)**2]))
+def randomize_rotate_uniform_err(spin, sigma):
+    norm2 = spin[0]**2 + spin[1]**2 + spin[2]**2
+    return 0.25 * (1 - np.exp(-sigma**2)) * (1 - 3 * np.exp(-sigma**2)) * np.array([
+        [spin[0]**2, spin[0] * spin[1], spin[0] * spin[2]],
+        [spin[0] * spin[1], spin[1]**2, spin[1] * spin[2]],
+        [spin[0] * spin[2], spin[1] * spin[2], spin[2]**2]])\
+    + norm2 / 4 * (1 - np.exp(-2 * sigma**2)) * np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+
 
 # Do the sophisticated, turning error
-def randomize_rotate_uniform(y, sigma):
+def randomize_rotate_uniform(data, sigma):
     newy = []
-    yerr = []
-    assert(len(y) % 3 == 0)
-    for i in range(0, len(y), 3):
-        norm = np.sqrt(y[i]**2 + y[i+1]**2 + y[i+2]**2)
-        theta = np.arccos(y[i+2] / norm)
-        phi = np.arctan2(y[i+1], y[i])
+    ycovs = []
+    for x, y, z in data:
+        norm = np.sqrt(x**2 + y**2 + z**2)
+        theta = np.arccos(z / norm)
+        phi = np.arctan2(y, x)
         rot_mat = np.matmul(
             np.array([[np.cos(-theta), 0, np.sin(-theta)], [0, 1, 0], [-np.sin(-theta), 0, np.cos(-theta)]]),
             np.array([[np.cos(-phi), -np.sin(-phi), 0], [np.sin(-phi), np.cos(-phi), 0], [0, 0, 1]])
         )
-        tilt_phi = np.random.uniform() * 2 * np.pi
+        tilt_phi = np.random.uniform() * np.pi
         tilt_theta = np.random.randn() * sigma
         untilt_vec = [np.sin(tilt_theta) * np.cos(tilt_phi), np.sin(tilt_theta) * np.sin(tilt_phi), np.cos(tilt_theta)]
         newvec = np.matmul(rot_mat.transpose(), untilt_vec) * norm
-        errs = randomize_rotate_uniform_err(theta, phi, sigma)
-        yerr.append(errs[0] * abs(y[i]))
-        yerr.append(errs[1] * abs(y[i+1]))
-        yerr.append(errs[2] * abs(y[i+2]))
-        newy.append(newvec[0])
-        newy.append(newvec[1])
-        newy.append(newvec[2])
-    return np.asarray(newy), np.asarray(yerr)
-
-# Do the sophisticated, turning error
-def randomize_rotate_dist(y, sigma, alts, perigee):
-    # Problem; I set the scale factor for how sigma depends on distance equal to the perigee,
-    # and it might not be.
-
-    newy = []
-    yerr = []
-    assert(len(y) % 3 == 0)
-    for i in range(0, len(y), 3):
-        this_sigma = np.arctan(sigma * ((alts[i//3] / perigee)**2 - 1) + np.tan(sigma))
-        norm = np.sqrt(y[i]**2 + y[i+1]**2 + y[i+2]**2)
-        theta = np.arccos(y[i+2] / norm)
-        phi = np.arctan2(y[i+1], y[i])
-        rot_mat = np.matmul(
-            np.array([[np.cos(-theta), 0, np.sin(-theta)], [0, 1, 0], [-np.sin(-theta), 0, np.cos(-theta)]]),
-            np.array([[np.cos(-phi), -np.sin(-phi), 0], [np.sin(-phi), np.cos(-phi), 0], [0, 0, 1]])
-        )
-        tilt_phi = np.random.uniform() * 2 * np.pi
-        tilt_theta = np.random.randn() * this_sigma
-        untilt_vec = [np.sin(tilt_theta) * np.cos(tilt_phi), np.sin(tilt_theta) * np.sin(tilt_phi), np.cos(tilt_theta)]
-        newvec = np.matmul(rot_mat.transpose(), untilt_vec) * norm
-        errs = randomize_rotate_uniform_err(theta, phi, this_sigma)
-        yerr.append(errs[0] * abs(y[i]))
-        yerr.append(errs[1] * abs(y[i+1]))
-        yerr.append(errs[2] * abs(y[i+2]))
-        newy.append(newvec[0])
-        newy.append(newvec[1])
-        newy.append(newvec[2])
-    return np.asarray(newy), np.asarray(yerr)
+        covs = randomize_rotate_uniform_err(newvec, sigma)
+        newy.append(newvec)
+        #ycovs.append(covs)
+        ycovs.append(scipy.linalg.pinvh(covs))
+    return np.array(newy), np.array(ycovs)
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    spin = [1, -2, 3]
-    sigma = 1
+    spin = [[1, -2, 3]]
+    sigma = 0.1
     xs = []
     ys = []
     zs = []
     err = None
-    for i in range(100000):
-        newspin, err = randomize(spin, sigma)
-        xs.append(newspin[0])
-        ys.append(newspin[1])
-        zs.append(newspin[2])
+    for i in range(10000):
+        newspin, err = randomize_rotate_uniform(spin, sigma)
+        xs.append(newspin[0][0])
+        ys.append(newspin[0][1])
+        zs.append(newspin[0][2])
 
+    err_vec = (np.sum(err[0]**2, axis=0))**(1/4)
+
+    print(err)
+    print(np.cov([xs, ys, zs]))
     plt.hist(xs, label="x")
     plt.hist(ys, label="y")
     plt.hist(zs, label="z")
     plt.axvline(spin[0], color="k")
     plt.axvline(spin[1], color="k")
     plt.axvline(spin[2], color="k")
-    plt.axvline(spin[0] - err[0], color="k")
-    plt.axvline(spin[1] - err[1], color="k")
-    plt.axvline(spin[2] - err[2], color="k")
-    plt.axvline(spin[0] + err[0], color="k")
-    plt.axvline(spin[1] + err[1], color="k")
-    plt.axvline(spin[2] + err[2], color="k")
+    plt.axvline(spin[0] - err_vec[0], color="k")
+    plt.axvline(spin[1] - err_vec[1], color="k")
+    plt.axvline(spin[2] - err_vec[2], color="k")
+    plt.axvline(spin[0] + err_vec[0], color="k")
+    plt.axvline(spin[1] + err_vec[1], color="k")
+    plt.axvline(spin[2] + err_vec[2], color="k")
     plt.legend()
     plt.show()
-
-
-def randomize_flat(y, sigma):
-    yerr = np.ones_like(y) * sigma
-    return y + np.random.randn(len(y)) * sigma, yerr

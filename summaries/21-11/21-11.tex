@@ -111,12 +111,12 @@ This equation can be reversed for $\alpha$, $\beta$, $\gamma$ as follows:
 
 
 \subsection{Tidal Torque}
-We start by expressing the gravitational potential energy of the central body in its most general form:
+We start by expressing the gravitational potential energy field of the central body in its most general form:
 \begin{equation}
 V(\bm R') = -G\int_\mathcal{P} d^3 R \rho_M(\bm R) \frac{1}{|\bm{R}-\bm{R'}|}.
 \label{eqn:first-pe}
 \end{equation}
-This integral is computed in the inertial frame. We represent the central body density as $\rho_M$ and its volume as $\mathcal{P}$. To reduce equation \ref{eqn:first-pe}, we define the unnormalized spherical harmonics $Y_{\ell m}(\theta, \phi) = P_{\ell m}(\cos \theta)e^{im\phi}$, where $P_{\ell m}$ are the associated Legendre Polynomials without the Condon-Shortley phase. The regular and irregular spherical harmonics are then defined as
+This integral is computed in the inertial frame and has units of energy per unit mass. We represent the central body density as $\rho_M$ and its volume as $\mathcal{P}$. To reduce equation \ref{eqn:first-pe}, we define the unnormalized spherical harmonics $Y_{\ell m}(\theta, \phi) = P_{\ell m}(\cos \theta)e^{im\phi}$, where $P_{\ell m}$ are the associated Legendre Polynomials without the Condon-Shortley phase. The regular and irregular spherical harmonics are then defined as
 \begin{equation}
 S_{\ell m}(\bm r) = (-1)^m (\ell - m)! \frac{Y_{\ell m}(\unit r)}{r^{\ell+1}} \qquad R_{\ell m} (\bm r) = (-1)^m \frac{r^\ell}{(\ell + m)!} Y_{\ell m}(\unit r).
 \end{equation}
@@ -128,7 +128,7 @@ Assume that we can construct a sphere, centered at the center of mass of the cen
 \end{equation}
 where the sum is shorthand for $\sum_{\ell, m} = \sum_{\ell = 0}^\infty \sum_{m=-\ell}^\ell$.
 
-Suppose the vector $\bm{D}$ points from the center of mass of the central body to the center of mass of the asteroid, again in the inertial frame. Then we may write $ \bm R' = \bm D + \bm R$, and Ref.~\cite{Gelderen1998TheSO} gives
+Suppose the vector $\bm{D}$ points from the center of mass of the central body to the center of mass of the asteroid, again in the inertial frame. Then we may write $ \bm R' = \bm D + \bm U$, and Ref.~\cite{Gelderen1998TheSO} gives
 \begin{equation}
 S_{\ell m}(\bm R') = \sum_{\ell', m'} (-1)^{\ell'}R^*_{\ell' m'}(\bm U)S_{\ell+\ell', m + m'} (\bm D).
 \end{equation}
@@ -196,7 +196,7 @@ which was derived from Ref.~\cite{Gelderen1998TheSO}'s analysis of the angular m
 \end{equation}
 This equation contains complex values, but it was numerically confirmed that $\bm \tau$ is a real-valued vector.
 
-Note that each sum in this equation is weighted by a factor of $a_M^\ell a_m^{\ell'}/D^{\ell+\ell'}$. Since $D \gg a_M \gg a_m$ in general, the leading order torques come from low $\ell$ and $\ell'$. However, $\ell'$ contributes nothing because the inner bracketed term is zero, and $K_{\ell' = 1} = 0$ if we choose the origin of the body-fixed axes to be the center of mass of the asteroid. The leading order of equation \ref{eqn:tidal-torque} is therefore $1/D^3$ with $\ell = 0$ and $\ell' = 2$.
+Note that each sum in this equation is weighted by a factor of $a_M^\ell a_m^{\ell'}/D^{\ell+\ell'+1}$. Since $D \gg a_M \gg a_m$ in general, the leading order torques come from low $\ell$ and $\ell'$. However, $\ell'=0$ contributes nothing because the inner bracketed term is zero, and $K_{\ell' = 1} = 0$ if we choose the origin of the body-fixed axes to be the center of mass of the asteroid. The leading order of equation \ref{eqn:tidal-torque} is therefore $1/D^3$ with $\ell = 0$ and $\ell' = 2$.
 
 
 
@@ -269,7 +269,7 @@ By requiring that the $\unit x, \unit y, \unit z$ axes coincide with principal a
 
 As discussed before, the leading order of equation \ref{eqn:tidal-torque} is $\ell' = 2$. Therefore, the equation is proportional to $\mu_m a_m^2$. Factoring out this product results in an equation of motion independent of $\mu_m$, meaning that the asteroid dynamics are unaffected by the mass of the asteroid. This is expected, and it means that the density distribution of the asteroid can only be determined up to a scale factor.
 
-Since the coefficient of $J_{lm}K_{l'm'}$ is proportional to $a_M^\ell a_m^{\ell'} / D^{\ell+\ell'}$, to first order in the asteroid density distribution, the system is also independent of $a_m$. When $K_{\ell' > 2}$ terms are included, $a_m$ scales the size of the higher order terms.
+Since the coefficient of $J_{lm}K_{l'm'}$ is proportional to $a_M^\ell a_m^{\ell'} / D^{\ell+\ell'+1}$, to first order in the asteroid density distribution, the system is also independent of $a_m$. When $K_{\ell' > 2}$ terms are included, $a_m$ scales the size of the higher order terms.
 
 We require that the moment of inertia matrix be positive-definite, which bounds our asteroid parameters. Specifically, we have $K_{20} \leq \frac{1}{2}$, and $|K_{22}| \leq (K_{20}+1)/6$. We can also choose without loss of generality to let the maximum moment of inertia align with $\unit z$, so that $1-2K_{20}\geq K_{20}+1+6|K_{22}|.$ Finally, we wish to require that the density of the asteroid be everywhere positive. One consequence of this requirement is that the sum of any two distinct moments of inertia cannot be greater than the third, by the integral definition of moment of inertia in equation \ref{eqn:moi}. Three inequalities result from this, but only one is not covered by the above restrictions. Namely, $I_{xx} + I_{yy}\geq I_{zz} \implies K_{20} \geq -1/4$. The intersection of these requirements forces $K_{20}$ and $K_{22}$ to lie in the triangle defined by
 \begin{equation}
@@ -289,6 +289,15 @@ The orbital parameters we use to describe the orbit are the hyperbolic excess ve
 Once the inputs were specified, the moments of inertia were pre-computed from $K_{\ell m}$, as was the orbital path of the satellite as a function of time. Equations \ref{eqn:quat-eom} and \ref{eqn:omega-eom} were then integrated by the fourth order Runge-Kutta fourth order method with a time step of 100 seconds, with a custom implementation of the spherical harmonics and Wigner-D matrices to improve runtime. This time step was observed to produce equivalent spin data to data made by lower time step. At fixed time intervals, the rotational velocity in the body-fixed frame $\bm\omega_{xyz}$ was converted via equation \ref{eqn:quat-rot} to the inertial frame to produce synthetic data.
 
 Since the leading order of the equations of motion is $\ell' = 2, \ell = 0$, we begin our simulation at $D = D f^{-1/3}$, where $f$ is a manually set parameter to control the length of the simulation. For all simulations done here, $f = \SI{e-3}.$ We end the simulation also at $D f^{-1/3}$ on the other side of the orbit.
+
+Except when otherwise mentioned, we use the following fit parameters when running the simulation.
+\begin{enumerate}
+\item An orbit around Earth with $\SI{4}{\kilo\meter\per\second}$ excess velocity and perigee at 5 Earth radii
+\item An asteroid with radius $a_m = \SI{1}{\kilo\meter}$ and $K_{3m}=0$. For $K_{22}$ and $K_{20}$, we use two standard values. One with $(K_{22}, K_{20}) = (0.052, -0.202)$ and one with $(0, -0.097)$. Including the third point obtained by reflection $K_{22}\rightarrow -K_{22}$, these are the three points that minimize the mean distance between an arbitrary point in the allowed parameter space (equation \ref{eqn:parameter-bounds}) and the standard values
+\item An initial roll of $\alpha_m=\pi/8$
+\item A cadence of 2 minutes and observational uncertainty of $\sigma_\theta = 0.01$
+\item A rotational period of 5 hours, with spin axis pointing 45$^\circ$ below the orbital plane
+\end{enumerate}
 
 
 
@@ -333,11 +342,11 @@ where $\theta$ and $\phi$ are the spherical coordinates of the original velocity
 
 Equation \ref{eqn:rotate-uncertainty-matrix} is sufficient to randomize synthetic data, but an analytical expression for the coordinates of $\bm \omega$ is required to define the $\chi^2$ value used for fitting. We approximate the distribution of each spin coordinate as normal, with covariance given by the covariance of the true distribution. Based on equation \ref{eqn:rotate-uncertainty-matrix}, the covariance matrix is
 \begin{equation}
-\text{Cov}(\omega^*_i, \omega^*_j) = \frac{1}{4 \omega^2}\parens{1-e^{-\sigma_\theta^2}} \parens{1-3e^{-\sigma_\theta^2}}\parens{\begin{matrix}
+\text{Cov}(\omega^*_i, \omega^*_j) = \frac{1}{4}\parens{1-e^{-\sigma_\theta^2}} \parens{1-3e^{-\sigma_\theta^2}}\parens{\begin{matrix}
 \omega_x^2 & \omega_x \omega_y& \omega_x \omega_z\\
 \omega_x \omega_y & \omega_y^2 & \omega_y \omega_z\\
 \omega_x \omega_z & \omega_y \omega_z& \omega_z^2
-\end{matrix}} +  \frac{1}{4}\parens{1 - e^{-2\sigma_\theta^2}} \mathbb{1}.
+\end{matrix}} +  \frac{\omega^2}{4}\parens{1 - e^{-2\sigma_\theta^2}} \mathbb{1}.
 \label{eqn:rotate-uncertainty-var}
 \end{equation}
 
@@ -346,6 +355,15 @@ We then define the $\chi^2$ statistic to be
 \chi^2 = \sum_{i=0} (\bm \omega_i^* - \bm \omega_i)^T\text{Cov}^{-1}(\omega^*_i, \omega^*_j)(\bm \omega_i^* - \bm \omega_i)
 \end{equation}
 where $\bm \omega_i$ is the $i$th expected spin and $\bm \omega_i^*$ is the data.
+
+
+\subsubsection{Position dependent method}
+In practice, precision on the asteroid spin axis will increase with decreasing distance \jtd{Citation needed}. The nominal sensitivity model does not account for this; however, we can approximate this effect by choosing $\sigma_\theta$ from the nominal method to be position-dependent. Specifically, we choose
+\begin{equation}
+\sigma_\theta(D) = slb.
+\label{eqn:pos-dependent-sensitivity}
+\end{equation}
+We do not expect this change to differ qualitatively from the nominal method because resolution is most important near pericenter, where $D$ is stationary to first order.
 
 
 
@@ -401,6 +419,23 @@ If, contrary to the previous section, we want to fly by both the moon and the pl
 
 
 \section{Results}
+\subsection{Dependence on asteroid parameters}
+
+\subsection{Dependence on observational precision}
+
+\subsection{Dependence on orbital parameters}
+
+\subsection{Dependence on spin pole}
+
+\subsection{Exotic scenarios}
+
+\subsubsection{Oblate planet}
+
+\subsubsection{Distant moon}
+
+\subsubsection{Close moon}
+
+
 
 
 \section{Interpretation of the Fit Parameters}
