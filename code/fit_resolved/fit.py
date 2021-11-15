@@ -215,7 +215,7 @@ def minimize_log_prob(float_theta, fix_theta, simulate_func):
     theta = list(fix_theta) + list(float_theta)
     try:
         model = minimize_function(theta, simulate_func)
-    except RuntimeError:
+    except RuntimeError as e:
         return 1e10 # Zero likelihood
 
     # Flat priors
@@ -225,6 +225,19 @@ def minimize_log_prob(float_theta, fix_theta, simulate_func):
 
     # Return redchi
     return np.sum((y_min - model) ** 2 /  yerr_min ** 2)
+
+# Map params onto square layout for easier minimization
+def to_square(pt):
+    new = [f for f in pt]
+    if len(new) >= 3:
+        new[1] = (0.5 * new[2] - new[1]) / new[2]
+    return new
+
+def from_square(pt):
+    new = [f for f in pt]
+    if len(new) >= 3:
+        new[1] = (0.5 - new[1]) * new[2]
+    return new
 
 def get_minimum(arg):
     point, fix_theta, l, bounds = arg
@@ -242,26 +255,33 @@ def get_minimum(arg):
             simulate_func = asteroids_2_3.simulate
         elif ASTEROIDS_MAX_J == 3:
             simulate_func = asteroids_3_3.simulate
-    bfgs_min = optimize.minimize(minimize_log_prob, point, args=(fix_theta, simulate_func),
+
+    def minimize_square(coord, ft, sc):
+        return minimize_log_prob(from_square(coord), ft, sc)
+
+    bfgs_min = optimize.minimize(minimize_square, to_square(point), args=(fix_theta, simulate_func),
         method='L-BFGS-B', options={"eps": EPSILON}, bounds=bounds)
+
     if not bfgs_min.success:
         print("One of the minimum finding points failed.")
         #print(bfgs_min)
         return None, None, None, None
+
+    min_point = from_square(bfgs_min.x)
 
     if RECALC_HESS:
         def hess_func(min_coords):
             r = minimize_log_prob(min_coords, fix_theta, simulate_func)
             return r
 
-        grad = nd.Gradient(hess_func, step=EPSILON)(bfgs_min.x)
-        hess = nd.Hessian(hess_func, step=EPSILON)(bfgs_min.x)
+        grad = nd.Gradient(hess_func, step=EPSILON)(min_point)
+        hess = nd.Hessian(hess_func, step=EPSILON)(min_point)
 
         try:
             hess_inv = linalg.inv(hess)
             #print("Min hess:", bfgs_min.hess_inv.todense())
         except:
-            print("Singular matrix: {}".format(hess))
+            print("Singular matrix: {}, coords {}, start {}, grad {}".format(hess, min_point, point, grad))
             return None, None, None, None
     else:
         if is_identity(bfgs_min.hess_inv.todense()):
@@ -285,7 +305,7 @@ def get_minimum(arg):
         dtype=np.float64))
 
     # Return redchi, minimizing params, hessian
-    return bfgs_min.fun / len(y_min), bfgs_min.x, new_evals, new_evecs
+    return bfgs_min.fun / len(y_min), min_point, new_evals, new_evecs
 
 def minimize(l, num_return, fix_theta):
     assert l <= ASTEROIDS_MAX_K
@@ -314,6 +334,8 @@ def minimize(l, num_return, fix_theta):
 
     # Choose the seed parameters
     parameter_points = []
+    minimize_bounds = np.asarray([(theta_low[i], theta_high[i]) for i in theta_indices])
+    minimize_bounds[1] = [0.0001, 0.9999]
 
     while len(parameter_points) < NUM_MINIMIZE_POINTS:
         randoms = np.asarray([random.random() for i in theta_indices])
@@ -322,7 +344,7 @@ def minimize(l, num_return, fix_theta):
             model = minimize_function(point, simulate)
         except RuntimeError:
             continue
-        parameter_points.append((point, fix_theta, l, bounds))
+        parameter_points.append((point, fix_theta, l, minimize_bounds))
 
     # Perform the minimization
     with Pool() as pool:
