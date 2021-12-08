@@ -122,6 +122,8 @@ def covariance():
                 for file in os.listdir(names[index]):
                     if not file[-11:] == "samples.dat": continue
                     arrays = np.loadtxt("{}/{}".format(names[index], file))
+                    if arrays.shape == (0,):
+                        continue
                     mean = np.mean(arrays[MEAN_DETERMINE_AXIS])
                     if min_dist is None or min_dist > abs(mean - points[index][MEAN_DETERMINE_AXIS]):
                         min_file = file
@@ -148,8 +150,11 @@ def covariance():
         X.append(X_line)
         Y.append(Y_line)
 
+
     plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, cov_data)
+    c = plt.contourf(X, Y, cov_data, levels=np.linspace(np.nanpercentile(cov_data, 5),
+                                                        np.nanpercentile(cov_data, 95),
+                                                        15+1))
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Cov}(\\theta_2, \\theta_3)/\\hat\\sigma^2$")
     plt.xlim(-0.125, 0.125)
@@ -161,7 +166,9 @@ def covariance():
 
 
     plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, corr_data)
+    c = plt.contourf(X, Y, corr_data, levels=np.linspace(np.nanpercentile(corr_data, 5),
+                                                        np.nanpercentile(corr_data, 95),
+                                                        15+1))
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Corr}(\\theta_2, \\theta_3)$")
     plt.xlim(-0.125, 0.125)

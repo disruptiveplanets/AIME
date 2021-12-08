@@ -1,7 +1,7 @@
 import os
 from shutil import copyfile
 
-PATH = "probe"
+PATH = "probe-space-1"
 
 I_LIMIT = -1
 
@@ -17,5 +17,5 @@ for fname in os.listdir("../staged/"):
             break
         i += 1
 
-    #os.rename("../staged/{0}.txt".format(fname), "{1}/{0}/{0}.txt".format(fname, PATH))
+    os.rename("../staged/{0}.txt".format(fname), "{1}/{0}/{0}.txt".format(fname, PATH))
     print(fname)

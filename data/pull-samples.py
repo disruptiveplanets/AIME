@@ -1,7 +1,7 @@
 import os
 from shutil import copyfile
 
-PATH = "probe-sigma"
+PATH = "probe-space-1"
 
 I_LIMIT = -1
 

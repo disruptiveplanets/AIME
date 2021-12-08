@@ -31,7 +31,7 @@ INTEGRAL_LIMIT_FRAC = 1.0e-3
 EARTH_RADIUS = 6_370_000
 N_WALKERS = 32
 MAX_N_STEPS = 10_000
-NUM_MINIMIZE_POINTS = 48
+NUM_MINIMIZE_POINTS = 8#48
 EPSILON = 1e-10 # If ABNORMAL_TERMINATION_IN_LNSRCH occurs, EPSILON may be too large.
 MIN_SPREAD = 1e-4 ** 2
 
@@ -88,7 +88,7 @@ if len(sys.argv) == 3 and sys.argv[2] == "reload":
     reload = True
     REGENERATE_DATA = False
 
-def fit_function(theta):
+def fit_function(theta, target_length=None):
     if ASTEROIDS_MAX_K == 3:
         if ASTEROIDS_MAX_J == 0:
             resolved_data = asteroids_0_3.simulate(cadence, jlms, theta[1:], radius,
@@ -109,13 +109,18 @@ def fit_function(theta):
         elif ASTEROIDS_MAX_J == 3:
             resolved_data = asteroids_3_2.simulate(cadence, jlms, theta[1:], radius,
                 spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, -1)
+    if target_length is not None:
+        while len(resolved_data)//3 < target_length:
+            resolved_data.append(resolved_data[-3])
+            resolved_data.append(resolved_data[-3])
+            resolved_data.append(resolved_data[-3])
     return np.asarray(resolved_data).reshape(-1, 3)
 
 
 def log_likelihood(theta, y, y_inv_covs):
     # Normal likelihood
     try:
-        model = fit_function(theta)
+        model = fit_function(theta, len(y))
     except RuntimeError:
         return -np.inf # Zero likelihood
     # Return chisq
@@ -153,15 +158,15 @@ print("DOF:", len(y))
 if ASTEROIDS_MAX_J == 0:
     cadence_cut = len(asteroids_0_2.simulate(cadence, jlms, theta_true[1:], radius,
         spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
-        DISTANCE_RATIO_CUT))
+        DISTANCE_RATIO_CUT))//3
 elif ASTEROIDS_MAX_J == 2:
     cadence_cut = len(asteroids_2_2.simulate(cadence, jlms, theta_true[1:], radius,
         spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
-        DISTANCE_RATIO_CUT))
+        DISTANCE_RATIO_CUT))//3
 elif ASTEROIDS_MAX_J == 3:
     cadence_cut = len(asteroids_3_2.simulate(cadence, jlms, theta_true[1:], radius,
         spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
-        DISTANCE_RATIO_CUT))
+        DISTANCE_RATIO_CUT))//3
 
 plt.figure(figsize=(12, 4))
 x_display = np.arange(len(y))
@@ -198,6 +203,12 @@ y_inv_covs_min = y_inv_covs[:cadence_cut]
 def minimize_function(theta, simulate_func):
     resolved_data = simulate_func(cadence, jlms, theta[1:], radius,
         spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, DISTANCE_RATIO_CUT)
+   
+    while len(resolved_data)//3 < cadence_cut:
+        resolved_data.append(resolved_data[-3])
+        resolved_data.append(resolved_data[-3])
+        resolved_data.append(resolved_data[-3])
+
     return np.asarray(resolved_data).reshape(-1, 3)
 
 def minimize_log_prob(float_theta, fix_theta, simulate_func):
@@ -219,6 +230,8 @@ def minimize_log_prob(float_theta, fix_theta, simulate_func):
         chisq += np.matmul(y_min[i] - model[i], np.matmul(y_inv_covs_min[i], y_min[i] - model[i]))
     return chisq
 
+print("TRUE REDCHI:", minimize_log_prob(theta_true, [], asteroids_0_2.simulate) / len(y_min) / 3)
+
 def get_minimum(arg):
     point, fix_theta, l, bounds = arg
     if l == 2:
@@ -239,7 +252,7 @@ def get_minimum(arg):
         method='L-BFGS-B', options={"eps": EPSILON}, bounds=bounds)
     if not bfgs_min.success:
         print("One of the minimum finding points failed.")
-        #print(bfgs_min)
+        print(bfgs_min)
         return None, None, None, None
 
     if RECALC_HESS:
@@ -280,6 +293,21 @@ def get_minimum(arg):
 
     # Return redchi, minimizing params, hessian
     return bfgs_min.fun / len(y_min) / 3, bfgs_min.x, new_evals, new_evecs
+
+
+print(get_minimum((theta_true, [], 2, [[-0.785398163,  0.785398163],
+        [-0.12499,  0.12499],
+        [-0.24999, -1.0e-04]])))
+sys.exit()
+
+
+
+
+'''Problem: Minimization sometimes fails. This failure may be correlated with being near the true minimum, because the function does not find the redchi = 1 point. Also, why are the redchis non-one?'''
+
+
+
+
 
 def minimize(l, num_return, fix_theta):
     assert l <= ASTEROIDS_MAX_K

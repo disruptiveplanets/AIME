@@ -342,7 +342,7 @@ where $\theta$ and $\phi$ are the spherical coordinates of the original velocity
 
 Equation \ref{eqn:rotate-uncertainty-matrix} is sufficient to randomize synthetic data, but an analytical expression for the coordinates of $\bm \omega$ is required to define the $\chi^2$ value used for fitting. We approximate the distribution of each spin coordinate as normal, with covariance given by the covariance of the true distribution. Based on equation \ref{eqn:rotate-uncertainty-matrix}, the covariance matrix is
 \begin{equation}
-\text{Cov}(\omega^*_i, \omega^*_j) = \frac{1}{4}\parens{1-e^{-\sigma_\theta^2}} \parens{1-3e^{-\sigma_\theta^2}}\parens{\begin{matrix}
+\text{Cov}(\bm \omega) = \frac{1}{4}\parens{1-e^{-\sigma_\theta^2}} \parens{1-3e^{-\sigma_\theta^2}}\parens{\begin{matrix}
 \omega_x^2 & \omega_x \omega_y& \omega_x \omega_z\\
 \omega_x \omega_y & \omega_y^2 & \omega_y \omega_z\\
 \omega_x \omega_z & \omega_y \omega_z& \omega_z^2
@@ -352,15 +352,15 @@ Equation \ref{eqn:rotate-uncertainty-matrix} is sufficient to randomize syntheti
 
 We then define the $\chi^2$ statistic to be
 \begin{equation}
-\chi^2 = \sum_{i=0} (\bm \omega_i^* - \bm \omega_i)^T\text{Cov}^{-1}(\omega^*_i, \omega^*_j)(\bm \omega_i^* - \bm \omega_i)
+\chi^2 = \sum_{i=0} (\bm \omega_i^* - \bm \omega_i)^T\text{Cov}^{-1}(\bm\omega^*_i)(\bm \omega_i^* - \bm \omega_i)
 \end{equation}
-where $\bm \omega_i$ is the $i$th expected spin and $\bm \omega_i^*$ is the data.
+where $\bm \omega_i$ is the $i$th expected spin and $\bm \omega_i^*$ is the data. We also refer to the reduced chi squared, $\chi^2_r = \chi^2 / (3N)$, where $N$ is the number of $\bm \omega_i$ in the data set.
 
 
 \subsubsection{Position dependent method}
 In practice, precision on the asteroid spin axis will increase with decreasing distance \jtd{Citation needed}. The nominal sensitivity model does not account for this; however, we can approximate this effect by choosing $\sigma_\theta$ from the nominal method to be position-dependent. Specifically, we choose
 \begin{equation}
-\sigma_\theta(D) = slb.
+\sigma_\theta(D) = unimplemented.
 \label{eqn:pos-dependent-sensitivity}
 \end{equation}
 We do not expect this change to differ qualitatively from the nominal method because resolution is most important near pericenter, where $D$ is stationary to first order.

@@ -256,13 +256,6 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
         }
         frames++;
     }
-    while (int(expire_time / cadence) > cadence_index) {
-        Vector3 global_spin = quat.rotate(spin);
-        resolved_data.push_back(global_spin[0]);
-        resolved_data.push_back(global_spin[1]);
-        resolved_data.push_back(global_spin[2]);
-        cadence_index++; //cadence_index = int(time / cadence)
-    }
 
     #ifdef TEXT_DEBUG
     std::cout << "Simulation took " << time << " seconds." << std::endl;
