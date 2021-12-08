@@ -2,7 +2,7 @@ TEST = False
 
 import numpy as np
 import matplotlib.pyplot as plt
-import emcee, time, sys
+import emcee, time, sys, os
 if not TEST:
     import asteroids_0_2, asteroids_0_3, asteroids_2_2, asteroids_2_3, asteroids_3_2, asteroids_3_3
 if TEST:
@@ -26,7 +26,8 @@ EARTH_RADIUS = 6_370_000
 def terminal(output_name):
 
     f = open("../../staged/" + output_name+".txt", 'r')
-
+    f.readline()
+    num_trials = np.prod([int(i) for i in f.readline().split(', ')])
     cadence = int(f.readline())
     perigee = EARTH_RADIUS * float(f.readline())
     radius = float(f.readline())
@@ -51,12 +52,13 @@ def terminal(output_name):
 
     i = 0
     while True:
-        print("Showing i = {}".format(i))
         try:
             disp = display.Display("{0}".format(output_name), "{0}-{1}".format(output_name, i))
         except Exception as e:
             if i == 0:
-                raise e
+                print(f"Run {output_name} failed.")
+                return
+                #raise e
             break
         disp.show_redchi()
         disp.show_params()
@@ -73,7 +75,7 @@ def terminal(output_name):
     # Save samples
     ####################################################################
 
-    for index in range(len(kernel)):
+    for index in range(num_trials):
         reader = emcee.backends.HDFBackend(output_name+"-{}.h5".format(index), read_only=True)
 
         try:
@@ -100,4 +102,4 @@ if __name__ == "__main__":
 
     else:
         for name in os.listdir('../../staged'):
-            terminal(name)
+            terminal(name[:-4])

@@ -225,41 +225,41 @@ class Display:
             print(self.module)
             print("Coordinates are invalid ({})".format(theta))
             return None
-        return np.asarray(resolved_data)
+        return np.asarray(resolved_data).reshape(-1, 3)
 
     def show_compare(self):
         self.get_params()
         theta_results = [f[0] for f in self.get_results()]
         if self.true_results is None:
             self.true_results = self.run(self.theta_true)
-        _, true_error = random_vector.randomize_rotate(self.true_results, self.sigma)
+        _, true_error = random_vector.randomize_rotate_uniform(self.true_results, self.sigma)
         mean_res = self.run(theta_results)
 
         f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(12, 6), sharex=True)
 
         x_display = np.arange(len(self.true_results)) * self.cadence / 3600.0
-        ax1.plot(x_display, self.true_results[::3], label = 'true x', alpha=0.5, color='C0')
-        ax1.plot(x_display, self.true_results[1::3], label = 'true y', alpha=0.5, color='C1')
-        ax1.plot(x_display, self.true_results[2::3], label = 'true z', alpha=0.5, color='C2')
+        ax1.plot(x_display, self.true_results[:,0], label = 'true x', alpha=0.5, color='C0')
+        ax1.plot(x_display, self.true_results[:,1], label = 'true y', alpha=0.5, color='C1')
+        ax1.plot(x_display, self.true_results[:,2], label = 'true z', alpha=0.5, color='C2')
 
-        ax1.fill_between(x_display, self.true_results[::3] + true_error[::3],
-            self.true_results[::3] - true_error[::3], color="C0", alpha=0.2)
-        ax1.fill_between(x_display, self.true_results[1::3] + true_error[1::3],
-            self.true_results[1::3] - true_error[1::3], color="C1", alpha=0.2)
-        ax1.fill_between(x_display, self.true_results[2::3] + true_error[2::3],
-            self.true_results[2::3] - true_error[2::3], color="C2", alpha=0.2)
+        ax1.fill_between(x_display, self.true_results[:,0] + np.sqrt(true_error[:,0,0]),
+                self.true_results[:,0] - np.sqrt(true_error[:,0,0]), color="C0", alpha=0.2)
+        ax1.fill_between(x_display, self.true_results[:,1] + np.sqrt(true_error[:,1,1]),
+                self.true_results[:,1] - np.sqrt(true_error[:,1,1]), color="C1", alpha=0.2)
+        ax1.fill_between(x_display, self.true_results[:,2] + np.sqrt(true_error[:,2,2]),
+                self.true_results[:,2] - np.sqrt(true_error[:,2,2]), color="C2", alpha=0.2)
 
         if mean_res is not None:
-            ax1.plot(x_display, mean_res[::3], label = 'mean x', alpha=0.5, linestyle='dotted', color='C0')
-            ax1.plot(x_display, mean_res[1::3], label = 'mean y', alpha=0.5, linestyle='dotted', color='C1')
-            ax1.plot(x_display, mean_res[2::3], label = 'mean z', alpha=0.5, linestyle='dotted', color='C2')
+            ax1.plot(x_display, mean_res[:,0], label = 'mean x', alpha=0.5, linestyle='dotted', color='C0')
+            ax1.plot(x_display, mean_res[:,1], label = 'mean y', alpha=0.5, linestyle='dotted', color='C1')
+            ax1.plot(x_display, mean_res[:,2], label = 'mean z', alpha=0.5, linestyle='dotted', color='C2')
         ax1.set_ylabel("Spin (rad/s)")
         ax1.legend()
 
         if mean_res is not None:
-            ax2.plot(x_display, mean_res[::3] - self.true_results[::3], color='C0')
-            ax2.plot(x_display, mean_res[1::3] - self.true_results[1::3], color='C1')
-            ax2.plot(x_display, mean_res[2::3] - self.true_results[2::3], color='C2')
+            ax2.plot(x_display, mean_res[:,0] - self.true_results[:,0], color='C0')
+            ax2.plot(x_display, mean_res[:,1] - self.true_results[:,1], color='C1')
+            ax2.plot(x_display, mean_res[:,2] - self.true_results[:,2], color='C2')
 
         ax2.set_ylabel("Residuals (rad/s)")
         ax2.set_xlabel("Time (hours)")
