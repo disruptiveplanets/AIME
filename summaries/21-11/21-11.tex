@@ -439,24 +439,74 @@ If, contrary to the previous section, we want to fly by both the moon and the pl
 
 
 \section{Interpretation of the Fit Parameters}
-The physical parameters $K_{\ell m}$ resulting from a fit to flyby data, while physical, do not completely describe an asteroid. They can be converted into more concrete observables with the use of judicious assumptions.
-
-\subsection{Constant Density Ellipsoid}
-Suppose we assume that the density of the asteroid is constant and its shape is elliptical. Then the combination of $a_m$, $K_{20}$, and $K_{22}$ fix the asteroid's shape according to the relations
+The physical parameters $K_{\ell m}$ resulting from a fit to flyby data, while physical, do not completely describe an asteroid. Since the density distribution of the asteriod has many more degrees of freedom in general than the number of known $K_{\ell m}$, there are often many degenerate density distributions associated with one set of $K_{\ell m}$. As an example, consider a spherical asteroid of radius $A$ and density distribution of the form $\rho(\bm r) = \sum_{\ell m} f_{\ell m}(r) Y_{\ell m}^*(\unit r)$. Then we have
 \begin{equation}
-a = \sqrt{\frac{5}{3}}a_m\sqrt{1-2K_{20}+12K_{22}} \qquad b = \sqrt{\frac{5}{3}}a_m\sqrt{1-2K_{20}-12K_{22}} \qquad c = \sqrt{\frac{5}{3}}a_m\sqrt{1+4K_{20}}
+K_{\ell m} = N_{\ell m} \frac{(-1)^m}{(\ell + m)!(\mu_m a_m^\ell)}\int_0^A r^{2+\ell} dr f_{\ell m}(r)
+\end{equation}
+where $N_{\ell m}$ is given by equation \ref{eqn:nlm}. Thus, $K_{\ell m}$ constrains only the integrals of $f_{\ell m}$, not the functions themselves. By relaxing the assumption that the asteroid is a sphere, even more degeneracy is introduced.
+
+To avoid this degeneracy, we either (1) assume that the density is constant and solve for the asteroid surface (section \ref{sec:constant-density}), (2) assume that the surface of the asteroid is fixed and solve for $\rho(\bm r)$. In the latter case, we can avoid the above degeneracy either by assuming $\nabla^2 \rho = 0$ (section \ref{sec:laplace-rho}) or by using a numerical approach to find a more characteristic density distribution (section \ref{sec:numerical-density}).
+
+\jtd{Not all of these models will be in the paper. This is a list of all the models I've thought of. I'll give some examples of applying these models to ``realistic'' asteroid density profiles (uniform, regolith over rock, etc) and see what they get, using that filter to describe the best.}
+
+\subsection{Constant Density Asteroid Model}
+Suppose our asteroid has constant density $\rho_0$ and known parameters $K_{\ell m}$ and $a_m$. We do not expect to solve for $\rho_0$ or equivalently $\mu_m$ since the mass of the asteroid cannot be extracted from tidal torque. However, we can solve for the asteorid shape required to match the known $K_{\ell m}$. In this process, we ignore $a_m$ until the last step, when we rescale the asteorid shape model until the correct $a_m$ is yielded.
+
+Suppose the asteroid is ``star shaped'' in that every point on its surface maps to a unique set of spherical coordinates $\theta, \phi$, and $r(\theta, \phi)$. We use the helpful identity
+\begin{equation}
+  K_{\ell m} = \frac{\rho_m}{\mu_m a_m^\ell} \int_\mathcal{A} d^3 r R_{\ell m} (\bm r)
+   = \frac{\rho_m}{\mu_m a_m^\ell} \int_\mathcal{A} d^3 r \nabla \cdot \bm v (\bm r)
+    = \frac{\rho_m}{\mu_m a_m^\ell} \oint_{\partial \mathcal{A}} d^2 \bm r \cdot \bm v (\bm r)
+\end{equation}
+where $\bm v (\bm r) = \unit r R_{\ell m} (\bm r) r / (3+\ell) $. We know the area element satisfies $d^2 \bm r = \partial \bm r / \partial \theta \times \partial \bm r / \partial \phi$ in our coordinates, and when dotted with $\bm v \propto \unit r$, this gives
+\begin{equation}
+  K_{\ell m} = \frac{\rho_m}{\mu_m a_m^\ell(3 + \ell)} \int_0^\pi d\theta \sin \theta\int_0^{2\pi}d\phi r(\theta, \phi)^3 R_{\ell m}(r(\theta, \phi), \theta, \phi).
+  \label{eqn:constant-density-klm}
+\end{equation}
+The integrand of each $K_{\ell m}$ therefore is proportional to $r(\theta, \phi)^(3+\ell)$ times constants and a spherical harmonic. We can write $r(\theta \phi) = \sum_{\ell m} Y_{\ell m}^* C_{\ell m}$ without loss of generality, in which case equation \ref{eqn:constant-density-klm} becomes a polynomial of degree $3+\ell$ in terms of $C_{\ell' m'}$ and integrals of products of spherical harmonics. These integrals can be precomputed, since they are taken over the whole sphere $\theta \in (0, \pi)$ and $\phi \in (0, 2\pi)$. Equation \ref{eqn:constant-density-klm} can then be numerically solved to get $C_{\ell m}$. Specifically, the ratios of $K_{\ell m} / K_{\ell 0}$ can be solved for to eliminate the prefactor, then $\rho_m / \mu_m$ chosen such that $K_{00} = 1$. If $n$ values of $K_{\ell m}$ are known, then this method solves exactly for $n$ values of $C_{\ell m}$.
+\jtd{Implement this as a check.}
+
+
+\subsubsection{Special Case: Constant Density Ellipsoid}
+\label{sec:constant-density-ellipsoid}
+Suppose that only $K_{\ell = 2}$ are known. Then the above method is not necessary to compute the uniform density shape; we can assume the asteroid is an ellipsoid and solve for the axis lengths, which are
+\begin{equation}
+a = \sqrt{\frac{5}{3}}a_m\sqrt{1-2K_{20}+12K_{22}} \qquad b = \sqrt{\frac{5}{3}}a_m\sqrt{1-2K_{20}-12K_{22}} \qquad c = \sqrt{\frac{5}{3}}a_m\sqrt{1+4K_{20}}.
 \label{eqn:ellipsoid-klm}
 \end{equation}
-which arise out of computing the moments of inertia for a constant density ellipsoid and using equation \ref{eqn:moi} to relate the result to $K_{\ell m}$ and $a_m$. The values $a$, $b$, and $c$, represent semi-axes aligned with $\unit x$, $\unit y$, and $\unit z$ respectively.
+These arise out of computing the moments of inertia for a constant density ellipsoid and using equation \ref{eqn:moi} to relate the result to $K_{\ell m}$ and $a_m$. The values $a$, $b$, and $c$, represent semi-axes aligned with $\unit x$, $\unit y$, and $\unit z$ respectively.
 
-The density of this asteroid cannot be extracted because, as is a general principle of gravitational interactions, the mass of the asteroid does not affect its dynamics.
+Again, the density of this asteroid cannot be extracted because, as is a general principle of gravitational interactions, the mass of the asteroid does not affect its dynamics.
 
+\subsection{Fixed Surface $\nabla^2 \rho = 0$ model}
+Now suppose the shape of the asteroid is known, perhaps by a simplifying guess or perhaps by direct observation during a flyby. Then a density distribution $\rho(\bm r)$ can be solved for which is consistent with observed values of $K_{\ell m}$. Supposing $\nabla^2 \rho = 0$ and removing terms which are undefined at $r=0$, we write $\rho(\bm r) = \sum_{\ell m} C_{\ell m} R_{\ell m}^* a_m^\ell \mu_m$. Thus, $K_{\ell m} = \sum_{\ell' m'} C_{\ell' m'} B_{\ell \ell' m m'}$ where
+\begin{equation}
+  B_{\ell \ell' m m'} = \int_{\mathcal{A}}d^3 r R_{\ell m}(\bm r) R_{\ell' m')}(\bm r)
+  \label{eqn:blm}
+\end{equation}
+can be precomputeded due to the shape of $\mathcal{A}$ being known.
+If we write $K_{\ell m}$ as a vector $\bm K$ and similarly for $\bm C$, we can write $B_{\ell \ell' m m'}$ as a matrix $\hat B$, obtaining $\bm K = \hat B \bm C$. It follows that the density distribution coefficients are given by
+\begin{equation}
+\bm C = \hat B^{-1} \bm K.
+\end{equation}
+The scale parameter $a_m$ can be computed from the resulting values of $\bm C$ and the distance scale can be adjusted until $a_m$ matches the true value. As before, $\mu_m$ is a free parameter representing the impossibility of fitting for the mass of the asteroid. Since only a finite number of $K_{\ell m}$ are known, we can only solve for a finite number of $C_{\ell m}$ and neglect the higher order terms.
 
+Physically, there is no reason to expect $\nabla^2 \rho = 0$. However, the space of density distributions with $\nabla^2 \rho = 0$ is a useful proxy for the true density distribution, since this section demonstrates how the denisty distribution can be solved for within this subspace. Conceptually, the density distribution derived from the $C_{\ell m}$s can be viewed as a projection from the true density distribution into the closest density distribution with $\nabla^2 \rho = 0$ everywhere.
 
-\subsection{Ellipsoid of Varying Density}
+Note that if $\mathcal{A}$ is assumed to be a sphere, $B_{\ell \ell' m m'} \propto \delta_{\ell \ell'} \delta_{m m'}$ and $B_{\ell \ell m m}$ can be computed analytically. Thus, the matrix inversion step is not required in this case.
 
+\subsection{Fixed Surface Numerical Model}
+Now we approach the problem of solving for the density distribution of an asteroid from the $K_{\ell m}$ parameters with more general assumptions. Suppose the shape of the asteroid is known, where ``known'' in this case means that an indicator function $\mathbb{1}(\bm r)$ exists such that $\mathbb{1}(\bm r) = 1$  inside the asteroid and 0 elsewhere. Then we suggest a numerical algorithm to compute a representative distribution of the asteroid density distribution. Given $n$ known values of $K_{\ell m}$, the algorithm proceeds as follows.
+\begin{enumerate}
+\item Fill the asteroids with $n$ uniformly random ``seed points'' by distributing them inside a bounding box containing the asteroid and rejecting those with positions $\bm r_i$ such that $\mathbb{1}(\bm r_i) = 0.$
+\item Construct $n$ regions $\mathcal{R}_i$around each point such that the $i$th region is the set of all points inside the asteroid closest to the $i$th point. Suppose $R_i$ has uniform density $\rho_i$.
+\item For each region, compute $\overline K_{\ell m}^i = \frac{1}{\mu_m a_m^\ell}\int_{\mathcal{R}_i} d^3 r R_{\ell m}(\bm r)$. Once again, $\mu_m$ is a free parameter and units can be chosen such that $a_m=1$. Then %we can write $K_{\ell m} = \sum_i \rho_i \overline K_{\ell m}^i$.
+\item Write $\overline K_{\ell m}^i$ as a square matrix $\hat{\overline K}$ with columns indexed by $i$ and rows indexed by $\ell$ and $m$. Invert it to get $\bm \rho = \hat {\overline K}^{-1} \bm K$.
+\item Go back to step 1 and compute new density maps with new draws of seed points. Since $K_{\ell m}$ is linear in $\rho$, the average density distribution also satisfies the fitted $K_{\ell m}$. Use the average as the asteroid density distribution.
+\end{enumerate}
 
-\subsection{Body of Known Surface}
+\jtd{What does this give mathematically?}
+
 
 
 \section{Uncertainty Testing}
