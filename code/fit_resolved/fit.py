@@ -1,4 +1,4 @@
-TEST = False
+TEST = True
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -127,7 +127,7 @@ def log_likelihood(theta, y, y_inv_covs):
     chisq = 0
     for i in range(len(y)):
         chisq += np.matmul(y[i] - model[i], np.matmul(y_inv_covs[i], y[i] - model[i]))
-    return chisq
+    return -chisq
 
 def log_prior(theta):
     for i, param in enumerate(theta):
@@ -234,6 +234,7 @@ print("TRUE REDCHI:", minimize_log_prob(theta_true, [], asteroids_0_2.simulate) 
 
 def get_minimum(arg):
     point, fix_theta, l, bounds = arg
+
     if l == 2:
         if ASTEROIDS_MAX_J == 0:
             simulate_func = asteroids_0_2.simulate
@@ -249,7 +250,18 @@ def get_minimum(arg):
         elif ASTEROIDS_MAX_J == 3:
             simulate_func = asteroids_3_3.simulate
     bfgs_min = optimize.minimize(minimize_log_prob, point, args=(fix_theta, simulate_func),
-        method='L-BFGS-B', options={"eps": EPSILON}, bounds=bounds)
+        method='L-BFGS-B', bounds=bounds, 
+        options={'disp': None,
+            'maxls': 20,
+            'iprint': -1,
+            'gtol': 1e-05,
+            'eps': 1e-08,
+            'maxiter': 15000,
+            'ftol': 2.220446049250313e-09,
+            'maxcor': 10,
+            'maxfun': 15000})
+
+
     if not bfgs_min.success:
         print("One of the minimum finding points failed.")
         print(bfgs_min)
@@ -293,20 +305,6 @@ def get_minimum(arg):
 
     # Return redchi, minimizing params, hessian
     return bfgs_min.fun / len(y_min) / 3, bfgs_min.x, new_evals, new_evecs
-
-
-print(get_minimum((theta_true, [], 2, [[-0.785398163,  0.785398163],
-        [-0.12499,  0.12499],
-        [-0.24999, -1.0e-04]])))
-sys.exit()
-
-
-
-
-'''Problem: Minimization sometimes fails. This failure may be correlated with being near the true minimum, because the function does not find the redchi = 1 point. Also, why are the redchis non-one?'''
-
-
-
 
 
 def minimize(l, num_return, fix_theta):
@@ -438,22 +436,26 @@ def mcmc_fit(theta_start, evals, evecs, index):
         if reload:
             pos = sampler._previous_state
 
+        print(pos)
+
         for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
-            if sampler.iteration % 100 != 0:
-                continue
+            if sampler.iteration % 100 == 0:
+                # Compute the autocorrelation time so far
+                # Using tol=0 means that we'll always get an estimate even
+                # if it isn't trustworthy
+                tau = sampler.get_autocorr_time(tol=0)
 
-            # Compute the autocorrelation time so far
-            # Using tol=0 means that we'll always get an estimate even
-            # if it isn't trustworthy
-            tau = sampler.get_autocorr_time(tol=0)
+                # Check convergence
+                converged = np.all(tau * 100 < sampler.iteration)
+                converged &= np.all(np.abs(old_tau - tau) / tau < 0.01)
+                if converged:
+                    print("Converged")
+                    break
+                old_tau = tau
 
-            # Check convergence
-            converged = np.all(tau * 100 < sampler.iteration)
-            converged &= np.all(np.abs(old_tau - tau) / tau < 0.01)
-            if converged:
-                print("Converged")
-                break
-            old_tau = tau
+            if sampler.iteration % (MAX_N_STEPS//10) == 0:
+                redchis = sample.log_prob / len(y) / 3
+                print(f"Minimum redchi at {sampler.iteration/MAX_N_STEPS * 100}\%: {np.min(redchis)}")
         sampler._previous_state = sample
 
     if reload:

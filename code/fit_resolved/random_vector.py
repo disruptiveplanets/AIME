@@ -21,7 +21,7 @@ def randomize_rotate_uniform_err(spin, sigma):
     return 0.25 * (1 - np.exp(-sigma**2)) * (1 - 3 * np.exp(-sigma**2)) * np.array([
         [spin[0]**2, spin[0] * spin[1], spin[0] * spin[2]],
         [spin[0] * spin[1], spin[1]**2, spin[1] * spin[2]],
-        [spin[0] * spin[2], spin[1] * spin[2], spin[2]**2]])\
+        [spin[0] * spin[2], spin[1] * spin[2], spin[2]**2]]) \
     + norm2 / 4 * (1 - np.exp(-2 * sigma**2)) * np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
 
@@ -49,33 +49,16 @@ def randomize_rotate_uniform(data, sigma):
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    spin = [[1, -2, 3]]
+    spin = np.array([[1, -2, 3]]*100000)
     sigma = 0.1
-    xs = []
-    ys = []
-    zs = []
-    err = None
-    for i in range(10000):
-        newspin, err = randomize_rotate_uniform(spin, sigma)
-        xs.append(newspin[0][0])
-        ys.append(newspin[0][1])
-        zs.append(newspin[0][2])
+    newspin, err = randomize_rotate_uniform(spin, sigma)
 
     err_vec = (np.sum(err[0]**2, axis=0))**(1/4)
-
+    cov = np.cov(np.transpose(newspin))
+    err = scipy.linalg.pinvh(err[0])
+    print("Numerical uncertainty")
+    print(cov)
+    print("Analytical uncertainty")
     print(err)
-    print(np.cov([xs, ys, zs]))
-    plt.hist(xs, label="x")
-    plt.hist(ys, label="y")
-    plt.hist(zs, label="z")
-    plt.axvline(spin[0], color="k")
-    plt.axvline(spin[1], color="k")
-    plt.axvline(spin[2], color="k")
-    plt.axvline(spin[0] - err_vec[0], color="k")
-    plt.axvline(spin[1] - err_vec[1], color="k")
-    plt.axvline(spin[2] - err_vec[2], color="k")
-    plt.axvline(spin[0] + err_vec[0], color="k")
-    plt.axvline(spin[1] + err_vec[1], color="k")
-    plt.axvline(spin[2] + err_vec[2], color="k")
-    plt.legend()
-    plt.show()
+    print("Delta:")
+    print(cov - err)

@@ -13,6 +13,8 @@ else:
 import numpy as np
 import matplotlib.pyplot as plt
 import random_vector
+from scipy.linalg import pinvh
+
 
 EARTH_RADIUS = 6370000
 STANDARD_RESULTS_METHOD = False
@@ -163,7 +165,7 @@ class Display:
         self.theta_true = [float(x) for x in f.readline().split(',')]
         theta_high = np.asarray([float(x) for x in f.readline().split(',')])
         theta_low = np.asarray([float(x) for x in f.readline().split(',')])
-        self.sigma = float(f.readline()) * np.sqrt(self.spin[0]**2 + self.spin[1]**2 + self.spin[2]**2)
+        self.sigma = float(f.readline())
         f.close()
 
         if self.maxj == 0:
@@ -233,7 +235,17 @@ class Display:
         if self.true_results is None:
             self.true_results = self.run(self.theta_true)
         _, true_error = random_vector.randomize_rotate_uniform(self.true_results, self.sigma)
-        mean_res = self.run(theta_results)
+        mean_res = list(self.run(theta_results))
+        
+        while len(mean_res) > len(self.true_results):
+            del mean_res[-1]
+
+        while len(mean_res) < len(self.true_results):
+            mean_res.append(mean_res[-1])
+
+        mean_res = np.array(mean_res)
+
+        uncertainties = np.array([np.sqrt(np.diagonal(pinvh(te))) for te in true_error])
 
         f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(12, 6), sharex=True)
 
@@ -242,12 +254,12 @@ class Display:
         ax1.plot(x_display, self.true_results[:,1], label = 'true y', alpha=0.5, color='C1')
         ax1.plot(x_display, self.true_results[:,2], label = 'true z', alpha=0.5, color='C2')
 
-        ax1.fill_between(x_display, self.true_results[:,0] + np.sqrt(true_error[:,0,0]),
-                self.true_results[:,0] - np.sqrt(true_error[:,0,0]), color="C0", alpha=0.2)
-        ax1.fill_between(x_display, self.true_results[:,1] + np.sqrt(true_error[:,1,1]),
-                self.true_results[:,1] - np.sqrt(true_error[:,1,1]), color="C1", alpha=0.2)
-        ax1.fill_between(x_display, self.true_results[:,2] + np.sqrt(true_error[:,2,2]),
-                self.true_results[:,2] - np.sqrt(true_error[:,2,2]), color="C2", alpha=0.2)
+        ax1.fill_between(x_display, self.true_results[:,0] + uncertainties[:,0],
+                self.true_results[:,0] - uncertainties[:,0], color="C0", alpha=0.2)
+        ax1.fill_between(x_display, self.true_results[:,1] + uncertainties[:,1],
+                self.true_results[:,1] - uncertainties[:,1], color="C1", alpha=0.2)
+        ax1.fill_between(x_display, self.true_results[:,2] + uncertainties[:,2],
+                self.true_results[:,2] - uncertainties[:,2], color="C2", alpha=0.2)
 
         if mean_res is not None:
             ax1.plot(x_display, mean_res[:,0], label = 'mean x', alpha=0.5, linestyle='dotted', color='C0')
@@ -260,6 +272,9 @@ class Display:
             ax2.plot(x_display, mean_res[:,0] - self.true_results[:,0], color='C0')
             ax2.plot(x_display, mean_res[:,1] - self.true_results[:,1], color='C1')
             ax2.plot(x_display, mean_res[:,2] - self.true_results[:,2], color='C2')
+            ax2.fill_between(x_display, uncertainties[:,0], -uncertainties[:,0], color="C0", alpha=0.2)
+            ax2.fill_between(x_display, uncertainties[:,1], -uncertainties[:,1], color="C1", alpha=0.2)
+            ax2.fill_between(x_display, uncertainties[:,2], -uncertainties[:,2], color="C2", alpha=0.2)
 
         ax2.set_ylabel("Residuals (rad/s)")
         ax2.set_xlabel("Time (hours)")
