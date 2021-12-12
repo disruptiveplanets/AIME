@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import scipy.linalg
+import matplotlib.pyplot as plt
 
 def vadd(a, b):
     return [a[i] + b[i] for i in range(len(a))]
@@ -48,7 +49,8 @@ def randomize_rotate_uniform(data, sigma):
     return np.array(newy), np.array(ycovs)
 
 if __name__ == "__main__":
-    import matplotlib.pyplot as plt
+    pass
+    '''
     spin = np.array([[1, -2, 3]]*100000)
     sigma = 0.1
     newspin, err = randomize_rotate_uniform(spin, sigma)
@@ -61,4 +63,16 @@ if __name__ == "__main__":
     print("Analytical uncertainty")
     print(err)
     print("Delta:")
-    print(cov - err)
+    print(cov - err)'''
+
+    #map_chisq(1e3, 10, 1e6)
+
+'''def map_chisq(max_n, step_n, total_n):
+    ns = np.trunc(np.linalg(1, max_n, step_n))
+    redchi_bins = np.linspace(0.8, 1.2, step_n)
+    data = []
+    for n in ns:
+        data = [np.]
+        a, b = np.hist(bins=redchi_bins)
+        print(a)
+        #data.append()'''

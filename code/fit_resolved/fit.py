@@ -1,4 +1,4 @@
-TEST = True
+TEST = False
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -31,8 +31,8 @@ INTEGRAL_LIMIT_FRAC = 1.0e-3
 EARTH_RADIUS = 6_370_000
 N_WALKERS = 32
 MAX_N_STEPS = 10_000
-NUM_MINIMIZE_POINTS = 8#48
-EPSILON = 1e-10 # If ABNORMAL_TERMINATION_IN_LNSRCH occurs, EPSILON may be too large.
+NUM_MINIMIZE_POINTS = 48
+EPSILON = 1e-10
 MIN_SPREAD = 1e-4 ** 2
 
 DISTANCE_RATIO_CUT = 10
