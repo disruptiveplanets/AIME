@@ -113,6 +113,7 @@ public:
 
     Quaternion inverse() const;
     Vector3 rotate(const Vector3 v) const;
+    Matrix3 matrix() const;
     Vector3 vec() const;
     double mag();
     double mag2() const;

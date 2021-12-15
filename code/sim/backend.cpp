@@ -158,9 +158,18 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
     // Up until now, takes about 0.1 s, L=2
 
     for (int l = 0; l <= ASTEROIDS_MAX_J; l++) {
+
+        if (l != 0) continue;
+
         for (int m = -l; m <= l; m++) {
+        
+            if (m != 0) continue;
+
             cdouble prelm = pow(central_radius, l) * jlm(l, m);
             for (int lp = 2; lp <= ASTEROIDS_MAX_K; lp++) {
+        
+                if (lp != 2) continue;
+
                 for (int mp = -lp; mp <= lp; mp++) {
                     cdouble prelpmp = prelm * parity(lp) * pow(asteroid_radius, lp - 2)
                         * slm_c(l+lp, m+mp, pos_r, pos_ct, pos_p).conj();
@@ -181,12 +190,30 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
             }
         }
     }
-
     torque = Vector3({x_torque.r,
         y_torque.r,
         z_torque.r})
         * 0.5 * mu;
 
+
+    double alpha = 1;
+    double beta = acos(position[2] / position.mag());
+    double gamma = atan2(position[1], -position[0]);
+    Matrix3 r = quat.matrix();
+    Quaternion q = Quaternion(cos(alpha / 2), 0, 0, sin(alpha / 2))
+        * Quaternion(cos(beta / 2), 0, sin(beta / 2), 0)
+        * Quaternion(cos(gamma / 2), 0, 0, sin(gamma / 2));
+    Matrix3 b = q.matrix();
+    //std::cout << b.transpose() * position / position.mag() << std::endl;
+    Matrix3 diag_moi = Matrix3({moi[0], 0, 0, 0, moi[1], 0, 0, 0, moi[2]});
+
+    //std::cout << r.transpose() * diag_moi * r << std::endl;
+
+    Matrix3 moi_z_at_planet = b.transpose() * r * diag_moi * r.transpose() * b;
+    Vector3 torque2_z_at_planet = 3 * mu / pow(position.mag(), 3) * Vector3({-moi_z_at_planet(1, 2), moi_z_at_planet(0, 2), 0});
+    Vector3 torque2 = b * torque2_z_at_planet;
+
+    std::cout << torque2 << ' ' << torque << ' ' << torque2.mag() / torque.mag() << ' ' << std::endl;
 
     if (torque.is_nan()) {
         std::cout << "Torque was nan" << std::endl;

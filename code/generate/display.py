@@ -31,6 +31,15 @@ for line in f.readlines():
     ys.append(float(y))
     zs.append(float(z))
 
+while len(xs) < len(perfect_xs):
+    xs.append(xs[-1])
+    ys.append(ys[-1])
+    zs.append(zs[-1])
+while len(xs) > len(perfect_xs):
+    del xs[-1]
+    del ys[-1]
+    del zs[-1]
+
 time = np.arange(0, len(zs), 1) * 120/3600
 
 plt.plot(time, xs, label=f'x')

@@ -337,19 +337,14 @@ Matrix3 operator*(double d, Matrix3 const& m) {
 }
 
 
-
-/*Matrix3 Quaternion::matrix() {
-    if (invalid_mat) {
-        double s = 1/mag2();
-        mat = Matrix3({
-            1 - 2*s*(j_*j_ + k_*k_), 2*s*(i_*j_ - k_*r_), 2*s*(i_*k_ + j_*r_),
-            2*s*(i_*j_ + k_*r_), 1 - 2*s*(i_*i_ + k_*k_), 2*s*(j_*k_ - i_*r_),
-            2*s*(i_*k_ - j_*r_), 2*s*(j_*k_ + i_*r_), 1 - 2*s*(i_*i_ + j_*j_)
-        }).transpose();
-        invalid_mat = false;
-    }
-    return mat;
-}*/
+Matrix3 Quaternion::matrix() const {
+    double s = 1/mag2();
+    return Matrix3({
+        1 - 2*s*(j_*j_ + k_*k_), 2*s*(i_*j_ - k_*r_), 2*s*(i_*k_ + j_*r_),
+        2*s*(i_*j_ + k_*r_), 1 - 2*s*(i_*i_ + k_*k_), 2*s*(j_*k_ - i_*r_),
+        2*s*(i_*k_ - j_*r_), 2*s*(j_*k_ + i_*r_), 1 - 2*s*(i_*i_ + j_*j_)
+    }).transpose();
+}
 Vector3 Quaternion::rotate(const Vector3 v) const {
     const Quaternion q = Quaternion(0, v[0], v[1], v[2]);
     return (inverse() * q * *this).vec();

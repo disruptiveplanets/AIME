@@ -140,7 +140,7 @@ J_{\ell m} = \int_\mathcal{P} d^3 R \rho_M(\bm R) \frac{R_{\ell m}(\bm R)}{\mu_M
 K_{\ell m} = \int_\mathcal{A} d^3 r \rho_m(\bm r) \frac{R_{\ell m}(\bm r)}{\mu_m a_m^\ell}
 \label{eqn:jlm}
 \end{equation}
-where the integrals are taken in the inertial and the body-fixed frames respectively. Here, $\rho_m$ denotes the density of the asteroid and $\mathcal{A}$ denotes its volume. The symmetry relations of $R_{\ell m}$ guarantee $J_{\ell m} = (-1)^m J_{\ell, -m}$ and similarly for $K_{\ell m}$. We have chosen $\mu_M$, $\mu_m$ to be the masses of the central body and asteroid respectively, and $a_M$ and $a_m$ to be scale lengths of both bodies (defined more precisely later). Then we can express the potential as
+where the integrals are taken in the inertial and the body-fixed frames respectively. Here, $\rho_m$ denotes the density of the asteroid and $\mathcal{A}$ denotes its volume. The symmetry relations of $R_{\ell m}$ guarantee $J_{\ell m} = (-1)^m J_{\ell, -m}^*$ and similarly for $K_{\ell m}$. We have chosen $\mu_M$, $\mu_m$ to be the masses of the central body and asteroid respectively, and $a_M$ and $a_m$ to be scale lengths of both bodies (defined more precisely later). Then we can express the potential as
 \begin{equation}
 V(\bm U) = -G \brackets{\sum_{\ell, m} \mu_M a_M^\ell J_{\ell m} \sum_{\ell', m'} (-1)^{\ell'}R_{\ell' m'}(\bm U)S^*_{\ell+\ell', m + m'} (\bm D)}.
 \label{eqn:pe-unrotated}
@@ -211,8 +211,8 @@ y^2 + z^2 & -xy & -xz \\
 \end{matrix}}\\
 = &\frac{2}{3}\mu_m a_m^2\parens{\begin{matrix}
 K_{20}-3K_{2,-2}-3K_{22}+1 & 3i \parens{K_{22}-K_{2,-2}} & \frac{3}{2}\parens{K_{21}-K_{2,-1}}\\
-3i \parens{K_{22}-K_{2,-2}} & K_{20}+3K_{2,-2}+3K_{22}+1 & -\frac{3}{2}i\parens{K_{21}-K_{2,-1}}\\
-\frac{3}{2}\parens{K_{21}-K_{2,-1}} & -\frac{3}{2}i\parens{K_{21}-K_{2,-1}} & -2K_{20}+1\\
+3i \parens{K_{22}-K_{2,-2}} & K_{20}+3K_{2,-2}+3K_{22}+1 & -\frac{3}{2}i\parens{K_{21}+K_{2,-1}}\\
+\frac{3}{2}\parens{K_{21}-K_{2,-1}} & -\frac{3}{2}i\parens{K_{21}+K_{2,-1}} & -2K_{20}+1\\
 \end{matrix}}
 \end{aligned}
 \label{eqn:moi}
