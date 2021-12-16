@@ -20,7 +20,7 @@ plt.plot(time, perfect_xs, label=f'x perfect')
 plt.plot(time, perfect_ys, label=f'y perfect')
 plt.plot(time, perfect_zs, label=f'z perfect')
 
-f = open("2-params-resolved.dat", 'r')
+f = open("3-params-resolved.dat", 'r')
 xs = []
 ys = []
 zs = []

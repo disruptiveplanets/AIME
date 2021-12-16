@@ -23,6 +23,7 @@
 #define NUM_THREADS 4
     // Torque at closest approach divided by torque at start of sim.
 //#define TEXT_DEBUG
+//#define FIRST_ORDER
 
 class Asteroid {
 public:

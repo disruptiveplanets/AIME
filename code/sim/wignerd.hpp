@@ -1,7 +1,6 @@
 #pragma once
 
 #include <math.h>
-#include <map>
 #include <tuple>
 #include <iostream>
 
@@ -42,12 +41,11 @@ double gen_choose(double a, int b);
 class DMatGen {
 public:
     DMatGen(double alpha, double beta, double gamma);
-    cdouble operator()(int l, int m, int mp);
-
-    double wigner_small_d(int j, int mp, int m);
+    cdouble operator()(int l, int m, int mp) const;
 
 private:
-    std::map<std::tuple<int, int, int>, double> small_d_state;
+    double wigner_small_d(int j, int mp, int m) const;
+
     cdouble premul;
     double cs;// cos(beta / 2)
     double sn;// sin(beta / 2)

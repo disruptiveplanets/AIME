@@ -25,8 +25,3 @@ To generate data, run
 `./target/sim <ASTEROID PARAMETERS>`
 
 `ASTEROID PARAMETERS` should be a `.dat` file containing asteroid parameters in the format given above. If no file is provided, `params.dat` will be assumed.
-
-## Tests
-I confirmed that first order matches predictions, up to sign flips in local Ixz and Ixy. Why does this occur? I think it's a mistake in the equations for Ixz and Ixy, but it could be something else. However, this may not matter due to the fact that Ixy=Ixz=0.
-
-I'd like to find the source of the bug, then confirm that the code torque is the same as the mathematica torque. Those are the final two tests for torque.

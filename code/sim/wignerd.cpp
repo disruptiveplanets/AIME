@@ -34,17 +34,12 @@ DMatGen::DMatGen(double alpha, double beta, double gamma)
     cs = cos(beta/2);
 }
 
-cdouble DMatGen::operator()(int l, int mp, int m) {
-    auto d_pos = small_d_state.find({l, mp, m});
-    if (d_pos == small_d_state.end()) {
-        small_d_state.insert({{l, mp, m}, wigner_small_d(l, mp, m)});
-        d_pos = small_d_state.find({l, mp, m});
-    }
+cdouble DMatGen::operator()(int l, int mp, int m) const {
     return my_exp(-(double)mp * alpha) * my_exp(-(double)m * gamma)
-        * d_pos->second;
+        * wigner_small_d(l, mp, m);
 }
 
-double DMatGen::wigner_small_d(int j, int mp, int m) {
+double DMatGen::wigner_small_d(int j, int mp, int m) const {
     double pre = sqrt(fact(j+mp) * fact(j-mp) * fact(j+m) * fact(j-m));
     double sum = 0;
     for(int s = max_me(0, m-mp); s <= min_me(j+m, j-mp); s++) {
@@ -79,10 +74,18 @@ cdouble ylm_c(int l, int m, double costheta, double phi) {
     }
 }
 
-std::ostream& operator<<(std::ostream& os, const cdouble& c) {os << c.r << " + " << c.i << " i"; return os; }
+std::ostream& operator<<(std::ostream& os, const cdouble& c) {
+    if (c.i >= 0) {
+        os << c.r << " + " << c.i << " i";
+    }
+    else {
+        os << c.r << " - " << abs(c.i) << " i";
+    }
+    return os;
+}
 cdouble operator*(double d, cdouble c) { return cdouble(d * c.r, d * c.i); }
 cdouble operator/(double d, cdouble c) { return cdouble(d * c.r / c.norm2(), -d * c.i / c.norm2()); }
-cdouble my_exp(cdouble c) {return cdouble(cos(c.r), sin(c.i)); }
+cdouble my_exp(cdouble c) {return exp(c.r) * cdouble(cos(c.i), sin(c.i)); }
 cdouble my_sqrt(double d) {
     if (d < 0) {return cdouble (0, sqrt(-d));}
     return cdouble(sqrt(d), 0);

@@ -147,6 +147,8 @@ void Asteroid::calculate_moi(double initial_roll) {
 }
 
 void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, Vector3& dspin, Quaternion& dquat) {
+    
+    #ifndef FIRST_ORDER
     Vector3 angles = quat.euler_angles();
     DMatGen dgen = DMatGen(angles[0], angles[1], angles[2]);
     double pos_r = position.mag();
@@ -158,25 +160,15 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
     // Up until now, takes about 0.1 s, L=2
 
     for (int l = 0; l <= ASTEROIDS_MAX_J; l++) {
-
-        if (l != 0) continue;
-
         for (int m = -l; m <= l; m++) {
-        
-            if (m != 0) continue;
-
             cdouble prelm = pow(central_radius, l) * jlm(l, m);
             for (int lp = 2; lp <= ASTEROIDS_MAX_K; lp++) {
-        
-                if (lp != 2) continue;
-
                 for (int mp = -lp; mp <= lp; mp++) {
                     cdouble prelpmp = prelm * parity(lp) * pow(asteroid_radius, lp - 2)
                         * slm_c(l+lp, m+mp, pos_r, pos_ct, pos_p).conj();
 
                     for (int mpp = -lp; mpp <= (int)lp; mpp++) {
-                        cdouble mppfactor = prelpmp * dgen(lp, mp, mpp).conj()
-                            * sqrt(fact(lp - mpp) * fact(lp+mpp) / fact(lp-mp) / fact(lp+mp));
+                        cdouble mppfactor = dgen(lp, mp, mpp).conj() * prelpmp * sqrt(fact(lp - mpp) * fact(lp+mpp) / (double)(fact(lp-mp) * fact(lp+mp)));
 
                         x_torque += mppfactor * (cdouble(0, lp - mpp + 1) * klm(lp, mpp - 1)
                             + cdouble(0, lp + mpp + 1) * klm(lp, mpp + 1));
@@ -190,18 +182,14 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
             }
         }
     }
-    torque = Vector3({x_torque.r,
-        y_torque.r,
-        z_torque.r})
-        * 0.5 * mu;
+    torque = Vector3({x_torque.r, y_torque.r, z_torque.r}) * mu / 2.0;
+    
+    #else
 
-
-    double alpha = 1;
-    double beta = acos(position[2] / position.mag());
-    double gamma = atan2(position[1], -position[0]);
-    Matrix3 r = quat.matrix();
-    Quaternion q = Quaternion(cos(alpha / 2), 0, 0, sin(alpha / 2))
-        * Quaternion(cos(beta / 2), 0, sin(beta / 2), 0)
+    double beta = acos(-position[2] / position.mag());
+    double gamma = atan2(-position[1], position[0]);
+    Matrix3 r = quat.matrix().transpose();
+    Quaternion q = Quaternion(cos(beta / 2), 0, sin(beta / 2), 0)
         * Quaternion(cos(gamma / 2), 0, 0, sin(gamma / 2));
     Matrix3 b = q.matrix();
     //std::cout << b.transpose() * position / position.mag() << std::endl;
@@ -211,15 +199,14 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
 
     Matrix3 moi_z_at_planet = b.transpose() * r * diag_moi * r.transpose() * b;
     Vector3 torque2_z_at_planet = 3 * mu / pow(position.mag(), 3) * Vector3({-moi_z_at_planet(1, 2), moi_z_at_planet(0, 2), 0});
-    Vector3 torque2 = b * torque2_z_at_planet;
-
-    std::cout << torque2 << ' ' << torque << ' ' << torque2.mag() / torque.mag() << ' ' << std::endl;
+    Vector3 torque = r.transpose() * b * torque2_z_at_planet;
 
     if (torque.is_nan()) {
         std::cout << "Torque was nan" << std::endl;
         throw std::runtime_error("Torque was nan");
     }
     // This torque is really torque per radius^2 per M.
+    #endif
 
     dspin = Vector3({
         (torque[0] + (moi[1] - moi[2]) * spin[1] * spin[2]) * inv_moi[0],
