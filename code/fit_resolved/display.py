@@ -23,6 +23,7 @@ CENTRAL_RADIUS = EARTH_RADIUS
 CENTRAL_MU = 5.972e24 * 6.674e-11
 
 AUTO_BURNIN = 1000
+DEFAULT_THIN = 10
 
 class Display:
     def __init__(self, bare_name, h5_name):
@@ -49,11 +50,11 @@ class Display:
         try:
             tau = self.reader.get_autocorr_time()
             self.burnin = int(2 * np.max(tau))
-            self.thin = int(0.5 * np.min(tau))
+            self.thin = DEFAULT_THIN#int(0.5 * np.min(tau))
         except:
             print("Could not find autocorrelation time because the chain is too short.")
             self.burnin = AUTO_BURNIN
-            self.thin = 1
+            self.thin = DEFAULT_THIN#1
 
         self.samples = self.reader.get_chain(discard=self.burnin, thin=self.thin)
         self.log_prob_samples = self.reader.get_log_prob(discard=self.burnin, thin=self.thin)
@@ -290,7 +291,7 @@ class Display:
 
 if __name__ == "__main__":
     d = Display("minimizer/run-3.0/run-3.0")
-    d.thin = 1
+    d.thin = DEFAULT_THIN#1
     d.get_samples_burnin(4000)
     d.show_compare()
     plt.show()

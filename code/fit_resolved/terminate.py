@@ -23,6 +23,7 @@ import numdifftools as nd
 GM = 3.986004418e14
 EARTH_RADIUS = 6_370_000
 THRESHOLD_REDCHI = 2
+DEFAULT_THIN = 10
 
 def terminal(output_name, do_not_duplicate=True):
 
@@ -93,10 +94,10 @@ def terminal(output_name, do_not_duplicate=True):
         try:
             tau = reader.get_autocorr_time()
             burnin = int(2 * np.max(tau))
-            thin = int(0.5 * np.min(tau))
+            thin = DEFAULT_THIN#int(0.5 * np.min(tau))
         except:
             print("Could not find autocorrelation time because the chain is too short.")
-            thin = 1
+            thin = DEFAULT_THIN
             burnin = 1000
 
         samples = reader.get_chain(discard=burnin, thin=thin)
@@ -104,11 +105,12 @@ def terminal(output_name, do_not_duplicate=True):
         #log_prior_samples = reader.get_blobs(discard=burnin, thin=thin)
         redchis = np.nanmin(log_prob_samples, axis=0)
         
-        mask = np.where(redchis < THRESHOLD_REDCHI)
+        mask = np.where(redchis < THRESHOLD_REDCHI)[0]
 
-        print(f"Saving samples from {len(mask[0])}/{len(redchis)} walkers")
+        print(f"Saving samples from {len(mask)}/{len(redchis)} walkers")
 
-        np.save(output_name+"-{}-samples.dat".format(index), samples[:,mask,:])
+        with open(f"{output_name}-{index}-samples.dat", 'wb') as f:
+            np.save(f, samples[:,mask,:], allow_pickle=False)
 
     plt.cla()
     plt.clf()
