@@ -86,11 +86,12 @@ class Display:
 
         f = open(self.h5_name + '-redchis.txt', 'w')
         for i in range(self.log_prob_samples.shape[1]):
-            redchi = -self.log_prob_samples[:,i] / len(self.true_results)
-            if redchi [-1] < REDCHI_THRESHOLD:
-                f.write(str(redchi[-1]) + "\n")
+            redchi_list = -self.log_prob_samples[:,i] / len(self.true_results) / 3
+            redchi = np.nanmin(redchi_list)
+            if redchi < REDCHI_THRESHOLD:
+                f.write(str(redchi) + "\n")
                 num_converged += 1
-            this_min = np.nanmin(redchi) / self.log_prob_samples.shape[1]
+            this_min = redchi / self.log_prob_samples.shape[1]
             redchiminmean += this_min if np.isfinite(this_min) else 0
             plt.plot(redchi, c='k', alpha=0.25)
         f.close()
