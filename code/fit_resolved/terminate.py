@@ -109,7 +109,7 @@ def terminal(output_name, do_not_duplicate=True):
 
         print(f"Saving samples from {len(mask)}/{len(redchis)} walkers")
 
-        with open(f"{output_name}-{index}-samples.dat", 'wb') as f:
+        with open(f"{output_name}-{index}-samples.npy", 'wb') as f:
             np.save(f, samples[:,mask,:], allow_pickle=False)
 
     plt.cla()
