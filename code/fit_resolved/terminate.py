@@ -49,8 +49,7 @@ def terminal(output_name, do_not_duplicate=True):
     if do_not_duplicate:
         already_done = True
         for index in range(num_trials):
-            print(f'{output_name}-{index}-all.png')
-            if not os.path.exists(name[:-4]+'-all.png'):
+            if not os.path.exists(f'{output_name}-{index}-all.png'):
                 already_done = False
                 break
         if already_done:
@@ -87,8 +86,6 @@ def terminal(output_name, do_not_duplicate=True):
     ####################################################################
 
     for index in range(num_trials):
-
-        print(f'{output_name}-{index}-all.png')
         if os.path.exists(name[:-4]+'-all.png'):
             continue
 

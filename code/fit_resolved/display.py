@@ -89,8 +89,8 @@ class Display:
         for i in range(self.log_prob_samples.shape[1]):
             redchi_list = -self.log_prob_samples[:,i] / len(self.true_results) / 3
             redchi = np.nanmin(redchi_list)
+            f.write(str(redchi) + "\n")
             if redchi < REDCHI_THRESHOLD:
-                f.write(str(redchi) + "\n")
                 num_converged += 1
             this_min = redchi / self.log_prob_samples.shape[1]
             redchiminmean += this_min if np.isfinite(this_min) else 0
