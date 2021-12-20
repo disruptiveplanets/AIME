@@ -102,6 +102,7 @@ class Display:
         plt.text(0.5, 0.5, "{} / {} walkers converged".format(num_converged, self.log_prob_samples.shape[1]),
         horizontalalignment='center', verticalalignment='center', transform = plt.gca().transAxes)
         plt.savefig(self.h5_name+"-redchi.png")
+        fig.clf()
 
 
     def get_mask(self):
