@@ -96,14 +96,19 @@ def terminal(output_name):
 
         np.savetxt(output_name+"-{}-samples.dat".format(index), flat_samples)
 
+    plt.cla()
+    plt.clf()
+    plt.close('all')
+
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         output_name = sys.argv[1]
         terminal(output_name)
 
     else:
+        run_names = []
         for name in os.listdir('../../staged'):
-            terminal(name[:-4])
-            plt.close()
-            plt.cla() # Close the figure in multiple ways to prevent memory overflow
-            plt.clf()
+            run_names.append(name[:-4])
+
+        with Pool() as pool:
+            pool.map(terminal, run_names)
