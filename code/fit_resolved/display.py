@@ -72,6 +72,8 @@ class Display:
             #ax.yaxis.set_label_coords(-0.1, 0.5)
         axes[-1].set_xlabel("step number");
         plt.savefig(self.h5_name+"-params.png")
+        fig.cla()
+        fig.clf()
 
     def show_redchi(self):
         self.get_params()
@@ -102,7 +104,6 @@ class Display:
         plt.text(0.5, 0.5, "{} / {} walkers converged".format(num_converged, self.log_prob_samples.shape[1]),
         horizontalalignment='center', verticalalignment='center', transform = plt.gca().transAxes)
         plt.savefig(self.h5_name+"-redchi.png")
-        fig.close()
         fig.cla()
         fig.clf()
 
@@ -151,6 +152,8 @@ class Display:
         corner.overplot_lines(fig, transpose_res[0] - transpose_res[2], color='red', linestyle='dotted')
 
         plt.savefig(self.h5_name+"-corner.png")
+        fig.cla()
+        fig.clf()
 
     def get_params(self):
         if self.theta_true is not None:
@@ -251,7 +254,7 @@ class Display:
 
         uncertainties = np.array([np.sqrt(np.diagonal(pinvh(te))) for te in true_error])
 
-        f, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(12, 6), sharex=True)
+        fig, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(12, 6), sharex=True)
 
         x_display = np.arange(len(self.true_results)) * self.cadence / 3600.0
         ax1.plot(x_display, self.true_results[:,0], label = 'true x', alpha=0.5, color='C0')
@@ -284,6 +287,8 @@ class Display:
         ax2.set_xlabel("Time (hours)")
 
         plt.savefig(self.h5_name+"-compare.png")
+        fig.cla()
+        fig.clf()
 
 
 if __name__ == "__main__":
