@@ -104,5 +104,6 @@ if __name__ == "__main__":
     else:
         for name in os.listdir('../../staged'):
             terminal(name[:-4])
+            plt.close()
             plt.cla() # Close the figure in multiple ways to prevent memory overflow
             plt.clf()
