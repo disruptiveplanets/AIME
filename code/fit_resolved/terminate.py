@@ -22,6 +22,7 @@ import numdifftools as nd
 
 GM = 3.986004418e14
 EARTH_RADIUS = 6_370_000
+THRESHOLD_REDCHI = 2
 
 def terminal(output_name, do_not_duplicate=True):
 
@@ -72,7 +73,7 @@ def terminal(output_name, do_not_duplicate=True):
             break
         disp.show_redchi()
         disp.show_params()
-        disp.show_corner()
+        n_data = disp.show_corner()
         disp.show_compare()
         disp.show_results()
         plt.show()
@@ -86,8 +87,6 @@ def terminal(output_name, do_not_duplicate=True):
     ####################################################################
 
     for index in range(num_trials):
-        if os.path.exists(name[:-4]+'-all.png'):
-            continue
 
         reader = emcee.backends.HDFBackend(output_name+"-{}.h5".format(index), read_only=True)
 
@@ -101,16 +100,26 @@ def terminal(output_name, do_not_duplicate=True):
             burnin = 1000
 
         samples = reader.get_chain(discard=burnin, thin=thin)
-        #log_prob_samples = reader.get_log_prob(discard=burnin, thin=thin)
+        log_prob_samples = -reader.get_log_prob(discard=burnin, thin=thin) / 3 / n_data 
         #log_prior_samples = reader.get_blobs(discard=burnin, thin=thin)
+        redchis = np.nanmin(log_prob_samples, axis=0)
+        
+        mask = np.where(redchis < THRESHOLD_REDCHI)
 
-        flat_samples = np.array([samples[:,:,i].flatten() for i in range(len(theta_true))])
+        print(f"Saving samples from {len(mask[0])}/{len(redchis)} walkers")
 
-        np.savetxt(output_name+"-{}-samples.dat".format(index), flat_samples)
+        np.save(output_name+"-{}-samples.dat".format(index), samples[:,mask,:])
 
     plt.cla()
     plt.clf()
     plt.close('all')
+
+def wrap_terminal(name, b=True):
+    try:
+        return terminal(name, b)
+    except:
+        print("Terminal {} failed".format(name))
+        return None
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
@@ -120,7 +129,9 @@ if __name__ == "__main__":
     else:
         run_names = []
         for name in os.listdir('../../staged'):
+            if "ob" in name:
+                continue
             run_names.append(name[:-4])
 
         with Pool() as pool:
-            pool.map(terminal, run_names)
+            pool.map(wrap_terminal, run_names)

@@ -151,6 +151,7 @@ class Display:
 
         plt.savefig(self.h5_name+"-corner.png")
         fig.clear()
+        return len(self.true_results)
 
     def get_params(self):
         if self.theta_true is not None:
