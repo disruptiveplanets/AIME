@@ -23,7 +23,7 @@ import numdifftools as nd
 GM = 3.986004418e14
 EARTH_RADIUS = 6_370_000
 
-def terminal(output_name):
+def terminal(output_name, do_not_duplicate=True):
 
     f = open("../../staged/" + output_name+".txt", 'r')
     f.readline()
@@ -45,6 +45,16 @@ def terminal(output_name):
 
     N_DIM = len(theta_true)
 
+    # Make sure this file hasn't been done before
+    if do_not_duplicate:
+        already_done = True
+        for index in range(num_trials):
+            print(f'{output_name}-{index}-all.png')
+            if not os.path.exists(name[:-4]+'-all.png'):
+                already_done = False
+                break
+        if already_done:
+            return
     ####################################################################
     # Process data
     ####################################################################
@@ -77,6 +87,11 @@ def terminal(output_name):
     ####################################################################
 
     for index in range(num_trials):
+
+        print(f'{output_name}-{index}-all.png')
+        if os.path.exists(name[:-4]+'-all.png'):
+            continue
+
         reader = emcee.backends.HDFBackend(output_name+"-{}.h5".format(index), read_only=True)
 
         try:
@@ -103,7 +118,7 @@ def terminal(output_name):
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         output_name = sys.argv[1]
-        terminal(output_name)
+        terminal(output_name, False)
 
     else:
         run_names = []
