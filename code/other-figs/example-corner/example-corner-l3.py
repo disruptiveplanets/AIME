@@ -10,7 +10,7 @@ mpl.rcParams['xtick.labelsize'] = 12
 mpl.rcParams['ytick.labelsize'] = 12
 
 
-samples = np.loadtxt("small-sigma-3-0-samples.dat")
+samples = np.loadtxt("small-sigma-3-0-samples.npy")
 
 labels = ["$\phi_0$", "$K_{22}$", "$K_{20}$", "$\\mathrm{Re}K_{33}$", "$\\mathrm{Im}K_{33}$",
     "$\\mathrm{Re}K_{32}$", "$\\mathrm{Im}K_{32}$", "$\\mathrm{Re}K_{31}$", "$\\mathrm{Im}K_{31}$",

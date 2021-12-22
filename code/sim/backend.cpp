@@ -236,13 +236,14 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
         * Quaternion(cos(gamma / 2), 0, 0, sin(gamma / 2));
     Vector3 spin = Vector3::z() * initial_spin.mag();
 
+    const double expire_distance = distance_ratio_cut * distance_ratio_cut * pericenter_pos * pericenter_pos;
+
     double time;
     for (time = MIN_DT-expire_time; time+MIN_DT < expire_time; time += dt) {
         if (!extract_pos(time, position, velocity)) {
             throw std::runtime_error("Simulation ran out of bounds");
         }
-        if (distance_ratio_cut > 0 &&
-            position.mag2() > distance_ratio_cut * pericenter_pos &&
+        if (distance_ratio_cut > 0 && position.mag2() > expire_distance &&
             Vector3::dot(position, velocity) > 0) {
             break;
         }

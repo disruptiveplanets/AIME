@@ -17,7 +17,7 @@ bsquared = 0.9 * (Ixx + Izz - Iyy) / asquared
 csquared = 0.9 * (Ixx + Iyy - Izz) / asquared
 theta_true = (THETA_TRUE[0], np.sqrt(bsquared), np.sqrt(csquared))
 
-samples = np.loadtxt("param-scan-1.14-0-samples.dat")
+samples = np.loadtxt("param-scan-1.14-0-samples.npy")
 
 labels = ["$\phi_0$", "$b/a$", "$c/a$"]
 
