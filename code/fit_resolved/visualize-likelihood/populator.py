@@ -8,24 +8,27 @@ sys.path.insert(0, parentdir)
 
 import numpy as np
 import matplotlib.pyplot as plt
-import asteroids
+import asteroids_0_2 as asteroids
 from random_vector import *
 
 
 ASTEROIDS_MAX_K = 2 # Remember to change the counterpart in backend.hpp
 ASTEROIDS_MAX_J = 0 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6370000
+GM = 3.986004418e14
 
 THETA_X_INDEX = 1
 THETA_Y_INDEX = 2
 PLOT_SIZE = 100
 
-DISTANCE_RATIO_CUT = 2 # -1
+DISTANCE_RATIO_CUT = 2
 
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
 output_name = sys.argv[1]
-f = open("../../../staged/" + output_name+".dat", 'r')
+f = open("../../../staged/" + output_name+".txt", 'r')
+f.readline()
+f.readline()
 cadence = int(f.readline())
 impact_parameter = EARTH_RADIUS * int(f.readline())
 radius = float(f.readline())
@@ -36,7 +39,7 @@ theta_true = [float(x) for x in f.readline().split(',')]
 theta_high = np.asarray([float(x) for x in f.readline().split(',')])
 theta_low = np.asarray([float(x) for x in f.readline().split(',')])
 
-sigma = float(f.readline()) * np.sqrt(spin[0]**2 + spin[1]**2 + spin[2]**2)
+sigma = float(f.readline())
 while output_name[-1] == '\n':
     output_name = output_name[:-1]
 f.close()
@@ -55,34 +58,48 @@ print("Sigma", sigma)
 print("Name", output_name)
 N_DIM = len(theta_true)
 
-def fit_function(theta):
+def fit_function(theta, target_length=None):
     resolved_data = asteroids.simulate(cadence, jlms, theta[1:], radius,
-        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, DISTANCE_RATIO_CUT)
-    return np.asarray(resolved_data)
+        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, GM, EARTH_RADIUS, DISTANCE_RATIO_CUT)
+    if target_length is not None:
+        while len(resolved_data)//3 < target_length:
+            resolved_data.append(resolved_data[-3])
+            resolved_data.append(resolved_data[-3])
+            resolved_data.append(resolved_data[-3])
+    return np.asarray(resolved_data).reshape(-1, 3)
 
 def red_chi(theta, y, yerr):
     # Normal likelihood
     try:
-        model = fit_function(theta)
+        model = fit_function(theta, len(y))
     except RuntimeError:
         return np.inf # Zero likelihood
-    return np.sum((y - model) ** 2 /  yerr ** 2) / len(y)
+
+    chisq = 0
+    for i in range(len(y)):
+        chisq += np.matmul(y[i] - model[i], np.matmul(yerr[i], y[i] - model[i]))
+    return chisq / len(y) / 3
 
 
 start = time.time()
 y = fit_function(theta_true)
 print("Data generation took {} s".format(time.time() - start))
-y, yerr = randomize_rotate(y, sigma)
+y, yerr = randomize_rotate_uniform(y, sigma)
 
 plt.figure(figsize=(12, 4))
-x_display = np.arange(len(y) / 3)
-plt.errorbar(x_display, y[::3], yerr=yerr[::3], label = 'x', fmt='.')
-plt.errorbar(x_display, y[1::3], yerr=yerr[1::3], label = 'y', fmt='.')
-plt.errorbar(x_display, y[2::3], yerr=yerr[2::3], label = 'z', fmt='.')
+x_display = np.arange(len(y))
+plt.fill_between(x_display, y[:,0]+yerr[:,0,0]**(-0.5), y[:,0]-yerr[:,0,0]**(-0.5), alpha=0.5)
+plt.fill_between(x_display, y[:,1]+yerr[:,1,1]**(-0.5), y[:,1]-yerr[:,1,1]**(-0.5),alpha=0.5)
+plt.fill_between(x_display, y[:,2]+yerr[:,2,2]**(-0.5), y[:,2]-yerr[:,2,2]**(-0.5),  alpha=0.5)
+plt.plot(x_display, y[:,0], label='x')
+plt.plot(x_display, y[:,1], label='y')
+plt.plot(x_display, y[:,2], label='z')
 plt.xlabel("Time (Cadences)")
 plt.ylabel("Spin (rad/s)")
 plt.legend()
 plt.show()
+
+print("Unit red chi:", red_chi(theta_true, y, yerr))
 
 
 red_chis = []
@@ -104,7 +121,7 @@ def gen_line(theta_y):
         line.append(red_chi(theta, y, yerr))
     return line
 
-with Pool() as pool:
+with Pool(6) as pool:
     red_chis = pool.map(gen_line, ys)
 
 f = open("redchi-{}-{}{}-cut.dat".format(THETA_X_INDEX, THETA_Y_INDEX, "" if DISTANCE_RATIO_CUT > 0 else "-no"), 'w')
