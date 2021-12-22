@@ -12,4 +12,6 @@ I ran the previous test and it succeeded. I'm working on my compiling software n
 
 # Dec 22
 
-Having changed the minimization process so that the walkers more closely match the likelihood, I'm re-running the parameter search and oblateness test, with the hope that the minimization procedure will work.
+Having changed the minimization process so that the walkers more closely match the likelihood, I'm re-running the parameter search and oblateness test, with the hope that the minimization procedure will work. It works on the test and on some real parameters I tested locally.
+
+Next step is to fix any more minimization problems, update the paper, and work on the intro.

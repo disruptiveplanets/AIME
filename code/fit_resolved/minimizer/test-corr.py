@@ -3,11 +3,12 @@ from scipy import linalg
 from scipy import optimize
 import numpy as np
 from mpmath import mp
+import numdifftools as nd
 
 n = 2
 quantize_num = 100
 NUM_POINTS = 100000
-LIMIT = 2
+LIMIT = 1.8
 
 
 SIGMAS = [[10, 8], [8, 30]]
@@ -20,34 +21,50 @@ def minus_log_like(dxs, sigmas):
 
 bfgs_min = optimize.minimize(minus_log_like, [0.1, 0.1], args=(SIGMAS), method='L-BFGS-B')
 print(bfgs_min)
-hess_inv = bfgs_min.hess_inv.todense()
-print(linalg.inv(hess_inv))
+
+def hess_fn(x):
+    return minus_log_like(x, SIGMAS)
+hess = nd.Hessian(hess_fn)(bfgs_min.x)
 
 
 def populate(sigmas, count):
-    sigmas=np.asarray([np.asarray(s) for s in sigmas])
-    evals, diagonalizer = mp.eigsy(mp.matrix(sigmas))
-    diagonalizer = np.array(diagonalizer.tolist(),dtype=np.float32)
-    evals = np.asarray([float(e) for e in evals])
-    diagonal_points = 1/np.sqrt(np.abs(evals)) * (np.random.randn(count * n).reshape(count, n))
-    global_points = np.asarray([np.matmul(diagonalizer, d) for d in diagonal_points])
-    return global_points.transpose()
+    evals, evecs = mp.eigsy(mp.matrix(sigmas))
 
-def populate_inv(hess_inv, count):
-    evals, diagonalizer = mp.eigsy(mp.matrix(hess_inv))
-    diagonalizer = np.array(diagonalizer.tolist(),dtype=np.float32)
-    evals = np.asarray([float(e) for e in evals])
-    if np.any(evals < 0):
-        raise Exception("A hessian's evals were negative")
-    diagonal_points = np.sqrt(evals) * (np.random.randn(count * n).reshape(count, n))
-    global_points = np.asarray([np.matmul(diagonalizer, d) for d in diagonal_points])
-    return global_points.transpose()
+    new_evals = []
+    new_evecs = []
 
-def populate_ball(sigmas, count):
-    evals, diagonalizer = linalg.eigh(sigmas)
-    weights = [np.sum([diagonalizer[i][j] / evals[j] for j in range(n)]) for i in range(n)]
-    print(weights)
-    global_points = np.sqrt(np.abs(weights)) * (np.random.randn(count * n).reshape(count, n))
+    for e in evals:
+        ### Correct for non positive definite hessians
+        new_evals.append(float(e))
+    if np.any(np.asarray(new_evals) < 0):
+        print("One of the Hessians was not positive definite")
+        print(bfgs_min)
+        return None, None, None, None
+    print("Eigenvalues:", new_evals)
+    new_evals = np.abs(new_evals)
+
+    for k in range(int(len(evecs))):
+        new_evecs.append(np.array([evecs[j, k] for j in range(int(len(evecs)))],
+        dtype=np.float64))
+    new_evecs = np.array(new_evecs)
+
+
+
+
+    diagonalizer = new_evecs
+    evals = new_evals
+    N_DIM = len(evals)
+    start = np.zeros_like(evals)
+
+
+    spacing = 1 / np.sqrt(evals)
+    if np.any(spacing < 1e-5):
+        print("Sigmas were", spacing)
+        spacing = np.maximum(1e-5, spacing)
+    
+    diagonal_points = spacing * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
+    global_points = np.asarray([np.matmul(diagonalizer.transpose(), d) for d in diagonal_points]) + start
+
     return global_points.transpose()
 
 def make_x(xi, xj, ii, ij):
@@ -76,10 +93,8 @@ for i in range(n):
         plt.ylabel(str(j))
         plt.colorbar(c)
 
-        pts = populate_inv(hess_inv, NUM_POINTS)
+        pts = populate(hess, NUM_POINTS)
         plt.scatter(pts[i], pts[j], marker='.', alpha=0.5, s=10)
-        #pts = populate_ball(sigmas, 1000)
-        #plt.scatter(pts[i], pts[j], marker='.', alpha=0.5, s=10)
         plt.xlim(-LIMIT, LIMIT)
         plt.ylim(-LIMIT, LIMIT)
 

@@ -22,7 +22,7 @@ REDCHI_THRESHOLD = 2
 CENTRAL_RADIUS = EARTH_RADIUS
 CENTRAL_MU = 5.972e24 * 6.674e-11
 
-AUTO_BURNIN = 1000
+AUTO_BURNIN = 100
 DEFAULT_THIN = 10
 
 class Display:
@@ -73,7 +73,6 @@ class Display:
             #ax.yaxis.set_label_coords(-0.1, 0.5)
         axes[-1].set_xlabel("step number");
         plt.savefig(self.h5_name+"-params.png")
-        fig.clear()
 
     def show_redchi(self):
         self.get_params()
@@ -95,7 +94,7 @@ class Display:
                 num_converged += 1
             this_min = redchi / self.log_prob_samples.shape[1]
             redchiminmean += this_min if np.isfinite(this_min) else 0
-            plt.plot(redchi, c='k', alpha=0.25)
+            plt.plot(redchi_list, c='k', alpha=0.25)
         f.close()
 
         plt.ylabel("Reduced chi squared")
@@ -104,7 +103,6 @@ class Display:
         plt.text(0.5, 0.5, "{} / {} walkers converged".format(num_converged, self.log_prob_samples.shape[1]),
         horizontalalignment='center', verticalalignment='center', transform = plt.gca().transAxes)
         plt.savefig(self.h5_name+"-redchi.png")
-        fig.clear()
 
 
     def get_mask(self):
@@ -142,6 +140,10 @@ class Display:
         flat_samples = self.samples[:,self.mask,:].reshape(
             (self.samples.shape[0] * np.sum(self.mask), self.samples.shape[2]))
 
+        print(flat_samples.shape)
+        print(np.unique(flat_samples, axis=0).shape) # How many of these points are actually unique?
+        #flat_samples = np.unique(flat_samples, axis=0)
+
         fig = corner.corner(
             flat_samples, labels=self.theta_labels, truths=self.theta_true
         );
@@ -151,7 +153,6 @@ class Display:
         corner.overplot_lines(fig, transpose_res[0] - transpose_res[2], color='red', linestyle='dotted')
 
         plt.savefig(self.h5_name+"-corner.png")
-        fig.clear()
         return len(self.true_results)
 
     def get_params(self):

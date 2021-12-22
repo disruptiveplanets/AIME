@@ -15,3 +15,10 @@ I have four uncertainty models at the moment, increasing order of complexity.
 2. a constant factor increase to all components of spin vector
 3. a random rotation of each spin vector
 4. a random rotation of each spin vector by a distance-dependent angle. This option is unfinished because it has one additional parameter: how the angle depends on distance. I have not figured out how to fix this parameter.
+
+## To do
+
+The current challenge is that the minimizer no longer finds perfect redchis of 1.0 all the time. The MCMC does, but then it doesn't have enough time to make good probability distributions.
+* The algorithm should be tweaked to fix this, but not too much; it works for the test model.
+* The solution may be to adjust the distance ratio cut for the l=2 minimization
+* I might also use my own minimizer.

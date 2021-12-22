@@ -11,6 +11,9 @@ tf = open("template-submit", 'r')
 template_text = tf.read()[:-1].split('\n')
 tf.close()
 
+if os.path.exists("errors.dat"):
+    os.remove("errors.dat")
+
 if RELOAD:
     reload = " reload"
 else:

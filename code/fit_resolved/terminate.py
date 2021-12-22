@@ -51,7 +51,7 @@ def terminal(output_name, do_not_duplicate=True):
     if do_not_duplicate:
         already_done = True
         for index in range(num_trials):
-            if not os.path.exists(f'{output_name}-{index}-all.png'):
+            if not os.path.exists(f'{output_name}-{index}-samples.npy'):
                 already_done = False
                 break
         if already_done:
