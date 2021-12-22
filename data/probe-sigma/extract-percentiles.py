@@ -14,7 +14,7 @@ for bare in file_names:
     if not os.path.isdir(bare):
         continue
     for file in os.listdir(bare):
-        if not file[-11:] == "samples.dat": continue
+        if not file[-11:] == "samples.npy": continue
         array = np.loadtxt("{}/{}".format(bare, file))
         if len(array.shape) != 2: continue
         print(array.shape)

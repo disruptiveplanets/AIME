@@ -10,8 +10,8 @@ points = []
 file_names = os.listdir()
 file_names.sort()
 
-DIFF_THRESHOLD = [0.01, 0.01, 0.01]
-MEAN_DETERMINE_AXIS = 1 # Because it is affected by degeneracy
+DIFF_EXPECTED_FACTOR = [1e-2, 1e-5, 1e-4]
+END_LENGTH = 100
 
 # Fill points
 for bare in file_names:
@@ -40,7 +40,7 @@ plt.figure()
 for i, point in enumerate(points):
     success_count = 0
     for file in os.listdir(names[i]):
-        if file[-11:] == "samples.dat":
+        if file[-11:] == "samples.npy":
             success_count += 1
     plt.text(x=point[1], y=point[2], s=str(success_count))
 plt.title("Distribution of parameter points")
@@ -66,15 +66,16 @@ def plot_pdf(index):
             axs.append(ax)
 
             name_index = j + i * (i+1) // 2
-            min_dist = None
-            min_file = ""
+
+            data = []# file, means
             for file in os.listdir(names[name_index]):
-                if not file[-11:] == "samples.dat": continue
+                if not file[-11:] == "samples.npy": continue
                 array = np.loadtxt("{}/{}".format(names[name_index], file))[index]
-                mean = np.mean(array)
-                if min_dist is None or min_dist > abs(mean - points[name_index][index]):
-                    min_file = file
-                    min_dist = abs(mean - points[name_index][index])
+                means = np.mean(array)
+                data.append((file, means))
+
+            ### I took this apart
+            sys.exit()
 
             # plot the minimizing array
             if min_dist is None or min_dist > DIFF_THRESHOLD[index]:
@@ -117,29 +118,33 @@ def covariance():
                 cov = np.array([[np.nan, np.nan], [np.nan, np.nan]])
             else:
                 # Which data file is the given coords?
-                min_dist = None
-                min_file = ""
+                data = [] # file, diffs, covs
                 for file in os.listdir(names[index]):
-                    if not file[-11:] == "samples.dat": continue
-                    arrays = np.loadtxt("{}/{}".format(names[index], file))
-                    if arrays.shape == (0,):
-                        continue
-                    mean = np.mean(arrays[MEAN_DETERMINE_AXIS])
-                    if min_dist is None or min_dist > abs(mean - points[index][MEAN_DETERMINE_AXIS]):
-                        min_file = file
-                        min_dist = abs(mean - points[index][MEAN_DETERMINE_AXIS])
+                    if not file[-11:] == "samples.npy": continue
+                    with open(f"{names[index]}/{file}", 'rb') as f:
+                        arrays = np.load(f).transpose()[:,:,-END_LENGTH:]
+                        if arrays.shape[1] == 0:
+                            continue
+                        arrays = arrays.reshape(arrays.shape[0], arrays.shape[1] * arrays.shape[2])
+                        diffs = np.mean(arrays, axis=1) - points[index]
+                        cov = np.cov(arrays[1], arrays[2]) / SIGMA**2
+                    data.append((file, diffs, cov))
 
-                if min_dist is None:# or min_dist > DIFF_THRESHOLD[MEAN_DETERMINE_AXIS]:
-                    print(index, f"(i={i}, j={j})", min_dist, DIFF_THRESHOLD[MEAN_DETERMINE_AXIS])
+                weights = [np.sum((data_row[1] / DIFF_EXPECTED_FACTOR) ** 2 ) for data_row in data]
+                if len(weights) == 0:
                     cov = np.array([[np.nan, np.nan], [np.nan, np.nan]])
                 else:
-                    array = np.loadtxt("{}/{}".format(names[index], min_file))
-                    cov = np.cov(array[1], array[2]) / SIGMA**2
+                    min_index = np.argmin(weights)
+                    _, _, cov = data[min_index]
+                
             corr = cov[0][1] / np.sqrt(cov[0][0] * cov[1][1])
             cov_data_line.append(cov[0][1])
             corr_data_line.append(corr)
-            sigma1_data_line.append(cov[0][0])
-            sigma2_data_line.append(cov[1][1])
+            sigma1_data_line.append(np.sqrt(cov[0][0]))
+            sigma2_data_line.append(np.sqrt(cov[1][1]))
+
+            if not np.isnan(corr):
+                print(np.sqrt(cov[0][0]), names[index])
 
             X_line.append(x)
             Y_line.append(y)
@@ -152,11 +157,9 @@ def covariance():
 
 
     plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, cov_data, levels=np.linspace(np.nanpercentile(cov_data, 5),
-                                                        np.nanpercentile(cov_data, 95),
-                                                        15+1))
+    c = plt.contourf(X, Y, cov_data)
     axc = plt.colorbar(c)
-    axc.set_label("$\\textrm{Cov}(\\theta_2, \\theta_3)/\\hat\\sigma^2$")
+    axc.set_label("$\\textrm{Cov}(\\theta_2, \\theta_3)/\\sigma_\\theta^2$")
     plt.xlim(-0.125, 0.125)
     plt.ylim(-0.25, 0)
     plt.xlabel("$\\theta_2$")
@@ -166,9 +169,7 @@ def covariance():
 
 
     plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, corr_data, levels=np.linspace(np.nanpercentile(corr_data, 5),
-                                                        np.nanpercentile(corr_data, 95),
-                                                        15+1))
+    c = plt.contourf(X, Y, corr_data)
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Corr}(\\theta_2, \\theta_3)$")
     plt.xlim(-0.125, 0.125)
@@ -183,7 +184,7 @@ def covariance():
     axc = plt.colorbar(c)
     plt.xlim(-0.125, 0.125)
     plt.ylim(-0.25, 0)
-    axc.set_label("$\\textrm{Var}(\\theta_2)/\\hat\\sigma^2$")
+    axc.set_label("$\\sigma(\\theta_2)/\\sigma_\\theta$")
     plt.xlabel("$\\theta_2$")
     plt.ylabel("$\\theta_3$")
     plt.title("Variance of $\\theta_2$")
@@ -194,7 +195,7 @@ def covariance():
     axc = plt.colorbar(c)
     plt.xlim(-0.125, 0.125)
     plt.ylim(-0.25, 0)
-    axc.set_label("$\\textrm{Var}(\\theta_3)/\\hat\\sigma^2$")
+    axc.set_label("$\\sigma(\\theta_3)/\\sigma_\\theta$")
     plt.xlabel("$\\theta_2$")
     plt.ylabel("$\\theta_3$")
     plt.title("Variance of $\\theta_3$")

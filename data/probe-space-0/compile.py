@@ -40,7 +40,7 @@ plt.figure()
 for i, point in enumerate(points):
     success_count = 0
     for file in os.listdir(names[i]):
-        if file[-11:] == "samples.dat":
+        if file[-11:] == "samples.npy":
             success_count += 1
     plt.text(x=point[1], y=point[2], s=str(success_count))
 plt.title("Distribution of parameter points")
@@ -69,7 +69,7 @@ def plot_pdf(index):
             min_dist = None
             min_file = ""
             for file in os.listdir(names[name_index]):
-                if not file[-11:] == "samples.dat": continue
+                if not file[-11:] == "samples.npy": continue
                 array = np.loadtxt("{}/{}".format(names[name_index], file))[index]
                 mean = np.mean(array)
                 if min_dist is None or min_dist > abs(mean - points[name_index][index]):
@@ -120,7 +120,7 @@ def covariance():
                 min_dist = None
                 min_file = ""
                 for file in os.listdir(names[index]):
-                    if not file[-11:] == "samples.dat": continue
+                    if not file[-11:] == "samples.npy": continue
                     arrays = np.loadtxt("{}/{}".format(names[index], file))
                     mean = np.mean(arrays[MEAN_DETERMINE_AXIS])
                     if min_dist is None or min_dist > abs(mean - points[index][MEAN_DETERMINE_AXIS]):

@@ -81,10 +81,11 @@ class Display:
         redchiminmean = 0
         num_converged = 0
         for i in range(self.log_prob_samples.shape[1]):
-            redchi = -self.log_prob_samples[:,i] / len(self.true_results)
-            if redchi [-1] < REDCHI_THRESHOLD:
+            redchi_list = -self.log_prob_samples[:,i] / len(self.true_results) / 3
+            redchi = np.nanmin(redchi_list)
+            if redchi < REDCHI_THRESHOLD:
                 num_converged += 1
-            this_min = np.nanmin(redchi) / self.log_prob_samples.shape[1]
+            this_min = redchi / self.log_prob_samples.shape[1]
             redchiminmean += this_min if np.isfinite(this_min) else 0
             plt.plot(redchi, c='k', alpha=0.25)
         plt.ylabel("Reduced chi squared")
