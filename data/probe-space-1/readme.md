@@ -16,7 +16,7 @@ Having changed the minimization process so that the walkers more closely match t
 
 Next step is to fix any more minimization problems, update the paper, and work on the intro.
 
-# Dec 31
+# Jan 2
 
 The minimization process failed, partially because of a segfault in the sim, and partially because the minimization technique sometimes failed. I added another tier of minimization, switched to Nelder-Mead, and fixed the segfault. Of those fits that succeeded, the contours are better but still not perfect.
 

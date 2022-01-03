@@ -23,6 +23,7 @@
 #define NUM_THREADS 4
     // Torque at closest approach divided by torque at start of sim.
 //#define TEXT_DEBUG
+#define SEGFAULT_DEBUG
 //#define FIRST_ORDER
 
 class Asteroid {
@@ -67,5 +68,4 @@ private:
     double initial_roll;
 
     //double max_quat_mag;
-    /// Throws a segfault when this is not present.
 };

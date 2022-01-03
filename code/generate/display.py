@@ -16,9 +16,9 @@ for line in f.readlines():
 
 time = np.arange(0, len(perfect_xs), 1) * 120/3600
 
-plt.plot(time, perfect_xs, label=f'x perfect')
-plt.plot(time, perfect_ys, label=f'y perfect')
-plt.plot(time, perfect_zs, label=f'z perfect')
+#plt.plot(time, perfect_xs, label=f'x perfect')
+#plt.plot(time, perfect_ys, label=f'y perfect')
+#plt.plot(time, perfect_zs, label=f'z perfect')
 
 f = open("3-params-resolved.dat", 'r')
 xs = []

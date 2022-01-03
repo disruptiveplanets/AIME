@@ -2,7 +2,7 @@ TEST = False
 
 import numpy as np
 import matplotlib.pyplot as plt
-import emcee, time, sys
+import emcee, time, sys, logging
 if not TEST:
     import asteroids_0_2, asteroids_0_3, asteroids_2_2, asteroids_2_3, asteroids_3_2, asteroids_3_3
 if TEST:
@@ -12,32 +12,41 @@ if TEST:
     import test_0_2 as asteroids_2_3
 from multiprocessing import Pool
 import random_vector, random
-from scipy import optimize, linalg
+from scipy import optimize
+from scipy.linalg import pinvh
 from mpmath import mp
 import plotille
 import display, collect
 
 import numdifftools as nd
+
+try:
+    import coloredlogs
+    coloredlogs.install()
+except:
+    pass
+
 #import derivatives
 
+logging.basicConfig(level=logging.INFO)
 
-REPORT_INITIAL = True
+
 PLOT_POSES = True
-GM = 3.986004418e14
-UNCERTAINTY_MODEL = 1
-MIN_SPACING = 1.0e-15
+NUM_MINIMIZE_POINTS = 48
+DISTANCE_RATIO_CUTS = [2.0]
 
+GM = 3.986004418e14
+EARTH_RADIUS = 6_370_000
+UNCERTAINTY_MODEL = 1
 INTEGRAL_LIMIT_FRAC = 1.0e-3
 
-EARTH_RADIUS = 6_370_000
 N_WALKERS = 32
 MAX_N_STEPS = 10_000
-NUM_MINIMIZE_POINTS = 48
-MIN_SPREAD = 1e-4 ** 2
-
-DISTANCE_RATIO_CUT = 2.0
 MIN_THETA_DIST = 0.01
 LARGE_NUMBER = 1e100
+MIN_SPACING = 1.0e-6
+MAX_SPACING = 0.0003
+DEFAULT_THIN = 10
 
 if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
@@ -71,16 +80,15 @@ assert(np.all(theta_high > theta_low))
 
 NUM_FITS = NUM_FITS[:ASTEROIDS_MAX_K-1]
 
-if REPORT_INITIAL:
-    print("Cadence {}, perigee {}, speed {}".format(cadence, perigee, speed))
-    print("Spin", spin)
-    print("Jlms", jlms)
-    print("Radius", radius)
-    print("Theta true", theta_true)
-    print("Theta high", theta_high)
-    print("Theta low", theta_low)
-    print("Sigma", sigma)
-    print("Name", output_name)
+logging.info("Cadence {}, perigee {}, speed {}".format(cadence, perigee, speed))
+logging.info("Spin {}".format(spin))
+logging.info("Jlms {}".format(jlms))
+logging.info("Radius {}".format(radius))
+logging.info("Theta true {}".format(theta_true))
+logging.info("Theta high {}".format(theta_high))
+logging.info("Theta low {}".format(theta_low))
+logging.info("Sigma {}".format(sigma))
+logging.info("Name {}".format(output_name))
 N_DIM = len(theta_true)
 
 reload = False
@@ -147,38 +155,47 @@ def log_probability(theta, y, y_inv_covs):
 ####################################################################
 start = time.time()
 y = fit_function(theta_true)
-print("Data generation took {} s".format(time.time() - start))
+logging.info("Data generation took {} s".format(time.time() - start))
 if UNCERTAINTY_MODEL == 1:
     y, y_inv_covs = random_vector.randomize_rotate_uniform(y, sigma)
 if UNCERTAINTY_MODEL == 2:
     raise Exception("Unimplemented")
 
-print("DOF:", len(y))
+np.save(f"{output_name}-data.npy", y)
+np.save(f"{output_name}-unc.npy", y_inv_covs)
 
-if ASTEROIDS_MAX_J == 0:
-    cadence_cut = len(asteroids_0_2.simulate(cadence, jlms, theta_true[1:], radius,
-        spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
-        DISTANCE_RATIO_CUT))//3
-elif ASTEROIDS_MAX_J == 2:
-    cadence_cut = len(asteroids_2_2.simulate(cadence, jlms, theta_true[1:], radius,
-        spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
-        DISTANCE_RATIO_CUT))//3
-elif ASTEROIDS_MAX_J == 3:
-    cadence_cut = len(asteroids_3_2.simulate(cadence, jlms, theta_true[1:], radius,
-        spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
-        DISTANCE_RATIO_CUT))//3
+logging.info(f"DOF: {len(y)}")
+
+def get_data_cut(drc):
+    if ASTEROIDS_MAX_J == 0:
+        return len(asteroids_0_2.simulate(cadence, jlms, theta_true[1:], radius,
+            spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
+            drc))//3
+    elif ASTEROIDS_MAX_J == 2:
+        return len(asteroids_2_2.simulate(cadence, jlms, theta_true[1:], radius,
+            spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
+            drc))//3
+    elif ASTEROIDS_MAX_J == 3:
+        return len(asteroids_3_2.simulate(cadence, jlms, theta_true[1:], radius,
+            spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
+            drc))//3
+    raise Exception("Cannot handle this J.")
+
+data_cuts = [get_data_cut(drc) for drc in DISTANCE_RATIO_CUTS]
 
 plt.figure(figsize=(12, 4))
 x_display = np.arange(len(y))
-plt.fill_between(x_display, y[:,0]+y_inv_covs[:,0,0]**(-0.5), y[:,0]-y_inv_covs[:,0,0]**(-0.5), alpha=0.5)
-plt.fill_between(x_display, y[:,1]+y_inv_covs[:,1,1]**(-0.5), y[:,1]-y_inv_covs[:,1,1]**(-0.5),alpha=0.5)
-plt.fill_between(x_display, y[:,2]+y_inv_covs[:,2,2]**(-0.5), y[:,2]-y_inv_covs[:,2,2]**(-0.5),  alpha=0.5)
-plt.plot(x_display, y[:,0], label='x')
-plt.plot(x_display, y[:,1], label='y')
-plt.plot(x_display, y[:,2], label='z')
+uncs = np.array([2 * np.sqrt(np.diagonal(pinvh(a))) for a in y_inv_covs])
+plt.fill_between(x_display, y[:,0]+uncs[:,0], y[:,0]-uncs[:,0], alpha=0.5, color="C0")
+plt.fill_between(x_display, y[:,1]+uncs[:,1], y[:,1]-uncs[:,1],alpha=0.5, color="C1")
+plt.fill_between(x_display, y[:,2]+uncs[:,2], y[:,2]-uncs[:,2],  alpha=0.5, color="C2")
+plt.scatter(x_display, y[:,0], label='x', s=1, color="C0")
+plt.scatter(x_display, y[:,1], label='y', s=1, color="C1")
+plt.scatter(x_display, y[:,2], label='z', s=1, color="C2")
 plt.xlabel("Time (Cadences)")
 plt.ylabel("Spin (rad/s)")
-plt.axvline(x=cadence_cut, color='k')
+for data_cut in data_cuts:
+    plt.axvline(x=data_cut, color='k')
 plt.legend()
 plt.show()
 
@@ -186,14 +203,16 @@ plt.show()
 ####################################################################
 # Minimize likelihood
 ####################################################################
-print()
 
-def minimize_function(theta, simulate_func, cut):
-    drc = DISTANCE_RATIO_CUT if cut else -1
+def minimize_function(theta, simulate_func, cut_index):
+    if cut_index is not None:
+        drc = DISTANCE_RATIO_CUTS[cut_index]
+    else:
+        drc = -1
     resolved_data = simulate_func(cadence, jlms, theta[1:], radius,
         spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, drc)
     
-    want_length = cadence_cut if cut else len(y)
+    want_length = data_cuts[cut_index] if cut_index is not None else len(y)
     while len(resolved_data)//3 < want_length:
         resolved_data.append(resolved_data[-3])
         resolved_data.append(resolved_data[-3])
@@ -206,11 +225,11 @@ def minimize_function(theta, simulate_func, cut):
 
     return np.asarray(resolved_data).reshape(-1, 3)
 
-def minimize_log_prob(float_theta, fix_theta, simulate_func, cut=False):
+def minimize_log_prob(float_theta, fix_theta, simulate_func, cut_index=None):
     # Normal likelihood
     theta = list(fix_theta) + list(float_theta)
     try:
-        model = minimize_function(theta, simulate_func, cut)
+        model = minimize_function(theta, simulate_func, cut_index)
     except RuntimeError as e:
         return LARGE_NUMBER # Zero likelihood
 
@@ -222,15 +241,17 @@ def minimize_log_prob(float_theta, fix_theta, simulate_func, cut=False):
     # Return chisq
 
     chisq = 0
-    want_length = cadence_cut if cut else len(y)
+    want_length = data_cuts[cut_index] if cut_index is not None else len(y)
     for i in range(want_length):
         chisq += np.matmul(y[i] - model[i], np.matmul(y_inv_covs[i], y[i] - model[i]))
     return chisq
 
-print("TRUE REDCHI:", minimize_log_prob(theta_true, [], asteroids_0_2.simulate) / len(y) / 3)
+logging.info("TRUE REDCHI: {}".format(minimize_log_prob(theta_true, [], asteroids_0_2.simulate) / len(y) / 3))
 
 def get_minimum(arg):
     point, fix_theta, l, bounds = arg
+
+    redchi_record = []
 
     if l == 2:
         if ASTEROIDS_MAX_J == 0:
@@ -249,40 +270,48 @@ def get_minimum(arg):
 
     if l == 2:
         # Do an initial fit with cut data
-        def minimize_log_prob_cut(x):
-            return minimize_log_prob(x, fix_theta, simulate_func, cut=True)
+        for cut_index in range(len(DISTANCE_RATIO_CUTS)):
+            def minimize_log_prob_cut(x):
+                return minimize_log_prob(x, fix_theta, simulate_func, cut_index=cut_index)
 
-        #print("Start redchi (cut):", minimize_log_prob_cut(point) / cadence_cut / 3)
+            start_redchi = minimize_log_prob_cut(point) / data_cuts[cut_index] / 3
 
-        '''bfgs_min = optimize.minimize(minimize_log_prob_cut, point,
-        method='L-BFGS-B', bounds=bounds, 
-        options={'disp': None,
-            'maxls': 20,
-            'iprint': -1,
-            'gtol': 1e-05,
-            'eps': 1e-8,
-            'maxiter': 15000,
-            'ftol': 2.220446049250313e-09,
-            'maxcor': 10,
-            'maxfun': 15000})'''
-        bfgs_min = optimize.minimize(minimize_log_prob_cut, point, method="L-BFGS-B", bounds=bounds)
-        point = bfgs_min.x
+            '''bfgs_min = optimize.minimize(minimize_log_prob_cut, point,
+                method='L-BFGS-B', bounds=bounds, 
+                options={'disp': None,
+                    'maxls': 20,
+                    'iprint': -1,
+                    'gtol': 1e-05,
+                    'eps': 1e-8,
+                    'maxiter': 15000,
+                    'ftol': 2.220446049250313e-09,
+                    'maxcor': 10,
+                    'maxfun': 15000})'''
 
-        if not bfgs_min.success:
-            print("One of the minimum finding points failed.")
-            print("Cut redchi:", bfgs_min.fun / cadence_cut / 3)
-            print(bfgs_min)
-            return None, None, None, None
+            bfgs_min = optimize.minimize(minimize_log_prob_cut, point, method='Nelder-Mead')
 
-        #print("End redchi (cut):", bfgs_min.fun / cadence_cut / 3)
-        
+            point = bfgs_min.x
+
+            if not bfgs_min.success:
+                logging.warning(f"One of the minimum finding points failed at cut index {cut_index} and redchi {bfgs_min.fun / data_cuts[cut_index] / 3}.")
+                #logging.debug(bfgs_min)
+                return None, None, None, None
+
+            end_redchi = bfgs_min.fun / data_cuts[cut_index] / 3
+            if abs(start_redchi - end_redchi) < 1e-3 and start_redchi > 2:
+                logging.warning(f"At cut index {cut_index}, the redchi {start_redchi} was unchanged by the fit.")
+                logging.debug(bfgs_min)
+            else:
+                logging.info(f"Minimization index {cut_index} passed successfully (redchi {start_redchi} -> {end_redchi})")
+
+            redchi_record.append((start_redchi, bfgs_min.fun / data_cuts[cut_index] / 3))
 
     # Now do fit on full data
 
-    def minimize_log_prob_full(x):
-        return minimize_log_prob(x, fix_theta, simulate_func, cut=False)
+    def minimize_log_prob_uncut(x):
+        return minimize_log_prob(x, fix_theta, simulate_func, cut_index=None)
 
-    #print("Start redchi (uncut):", minimize_log_prob_full(point) / len(y) / 3)
+    start_redchi = minimize_log_prob_uncut(point) / len(y) / 3
 
     '''bfgs_min = optimize.minimize(minimize_log_prob_full, point,
         method='L-BFGS-B', bounds=bounds, 
@@ -295,34 +324,37 @@ def get_minimum(arg):
             'ftol': 2.220446049250313e-09,
             'maxcor': 10,
             'maxfun': 15000})'''
-    bfgs_min = optimize.minimize(minimize_log_prob_full, point, method="Nelder-Mead")
+    bfgs_min = optimize.minimize(minimize_log_prob_uncut, point, method="Nelder-Mead")
 
     if not bfgs_min.success:
-        print("One of the minimum finding points failed.")
-        print("Red chi:", bfgs_min.fun / len(y) / 3)
-        print(bfgs_min)
+        logging.warning(f"One of the minimum finding points failed in the uncut case with redchi {bfgs_min.fun / len(y) / 3}")
+        logging.debug(bfgs_min)
         return None, None, None, None
 
     result = bfgs_min.x
     
     # Now that an answer has been achieved, find the hessian
 
-    #grad = nd.Gradient(minimize_log_prob_full, step=1e-10)(result)
-    hess = nd.Hessian(minimize_log_prob_full)(result)
+    grad = nd.Gradient(minimize_log_prob_uncut)(result)
+    hess = nd.Hessian(minimize_log_prob_uncut)(result)
     minimizing_likelihood = bfgs_min.fun
     #grad = derivatives.Gradient(hess_func, step=1e-10)(result)
     #hess = derivatives.Hessian(hess_func, step=1e-10)(result)
 
-    '''print("End redchi (uncut)", minimizing_likelihood / len(y) / 3)
-    print(minimize_log_prob_full(result+np.array([1.0e-10, 0, 0]))-minimizing_likelihood)
-    print(minimize_log_prob_full(result-np.array([1.0e-10, 0, 0]))-minimizing_likelihood)
-    print(minimize_log_prob_full(result+np.array([0, 1.0e-10, 0]))-minimizing_likelihood)
-    print(minimize_log_prob_full(result-np.array([0, 1.0e-10, 0]))-minimizing_likelihood)
-    print(minimize_log_prob_full(result+np.array([0, 0, 1.0e-10]))-minimizing_likelihood)
-    print(minimize_log_prob_full(result-np.array([0, 0, 1.0e-10]))-minimizing_likelihood)
+    redchi_record.append((start_redchi, minimizing_likelihood / len(y) / 3))
+    
+    logging.info(minimize_log_prob_uncut(result+np.array([1.0e-8, 0, 0]))-minimizing_likelihood)
+    logging.info(minimize_log_prob_uncut(result-np.array([1.0e-8, 0, 0]))-minimizing_likelihood)
+    logging.info(minimize_log_prob_uncut(result+np.array([0, 1.0e-8, 0]))-minimizing_likelihood)
+    logging.info(minimize_log_prob_uncut(result-np.array([0, 1.0e-8, 0]))-minimizing_likelihood)
+    logging.info(minimize_log_prob_uncut(result+np.array([0, 0, 1.0e-8]))-minimizing_likelihood)
+    logging.info(minimize_log_prob_uncut(result-np.array([0, 0, 1.0e-8]))-minimizing_likelihood)
 
-    print("Gradient:", grad)
-    print("Hessian:", hess)'''
+    logging.info("Hessian: {}".format(hess))
+
+    logging.info(f"REDCHI RECORD: {redchi_record}")
+    logging.info(f"GRADIENT: {grad}")
+    logging.info(f"THETA: {result}")
 
     new_evals = []
     new_evecs = []
@@ -330,11 +362,11 @@ def get_minimum(arg):
     for e in evals:
         ### Correct for non positive definite hessians
         new_evals.append(float(e))
-    if np.any(np.asarray(new_evals) < 0):
-        print("One of the Hessians was not positive definite")
-        print(bfgs_min)
+    if np.any(np.asarray(new_evals) < 0.0):
+        logging.warning(f"The Hessian was not positive definite. Eigenvalues {new_evals}")
+        #logging.debug(bfgs_min)
         return None, None, None, None
-    #print("Eigenvalues:", new_evals)
+    logging.info(f"Eigenvalues: {new_evals}")
     new_evals = np.abs(new_evals)
 
     for k in range(int(len(evecs))):
@@ -342,7 +374,7 @@ def get_minimum(arg):
         dtype=np.float64))
     new_evecs = np.array(new_evecs)
 
-    #print("Reconstructed Hessian:", np.matmul(new_evecs.transpose(), np.matmul(np.diag(new_evals), new_evecs)))
+    #logging.info("Reconstructed Hessian:", np.matmul(new_evecs.transpose(), np.matmul(np.diag(new_evals), new_evecs)))
 
     # Return redchi, minimizing params, hessian
     return minimizing_likelihood / len(y) / 3, result, new_evals, new_evecs
@@ -380,13 +412,13 @@ def minimize(l, num_return, fix_theta):
         randoms = np.asarray([random.random() for i in theta_indices])
         point = np.asarray(theta_low)[theta_indices] + bound_widths * randoms
         try:
-            model = minimize_function(point, simulate, 2) # Terminate the run early with drc=2 because I just want the runtime error
+            model = minimize_function(point, simulate, 0) # Terminate the run early with drc=2 because I just want the runtime error
         except RuntimeError:
             continue
         parameter_points.append([point, fix_theta, l, bounds])
 
     #parameter_points[0][0] = np.array(theta_true) + np.random.randn(3)*0.001
-   
+
     # Perform the minimization
     with Pool() as pool:
         results = pool.map(get_minimum, parameter_points)
@@ -417,7 +449,7 @@ for i, num_fits in enumerate(NUM_FITS):
     for fix_theta, evals, evecs, _ in queue:
         tier_results = minimize(i+2, num_fits, fix_theta)
         for result_theta, result_evals, result_evecs, result_redchi in tier_results:
-            print("Deg {} redchi: {}".format(i, result_redchi))
+            logging.info("Deg {} redchi: {}".format(i, result_redchi))
             new_queue.append((fix_theta + list(result_theta), evals + list(result_evals),
                 evecs + list(result_evecs), result_redchi))
     queue = new_queue
@@ -436,36 +468,40 @@ for theta, evals, evecs, redchi in queue:
         evec = [0] * start_index + list(e) + [0] * (max_len - start_index - len(e))
         resized_evecs.append(np.array(evec))
     if redchi > 2:
-        print(f"The point with theta {theta} and redchi {redchi} was excluded from the kernel")
+        logging.warning(f"The point with theta {theta} and redchi {redchi} was excluded from the kernel")
         continue
-    print("The kernel includes a point with theta {}, redchi {}".format(theta, redchi))
+    logging.info("The kernel includes a point with theta {}, redchi {}".format(theta, redchi))
     kernel.append((theta, evals, np.array(resized_evecs)))
 
-print("There are {} MCMC starting points, and there should be {}".format(len(kernel), np.prod(NUM_FITS)))
+logging.info("There are {} MCMC starting points, and there should be {}".format(len(kernel), np.prod(NUM_FITS)))
 
 if len(kernel) == 0:
     f = open("errors.dat", 'a')
     f.write(output_name+": kernel is empty\n")
     f.close()
-    print("Kernel is empty")
+    logging.critical("Kernel is empty")
     sys.exit()
 
 ####################################################################
 # Run MCMC
 ####################################################################
-print()
 
 def populate(evals, diagonalizer, count, start):
     spacing = 1 / np.sqrt(evals)
     if np.any(spacing < MIN_SPACING):
-        print("Had to widen some sigmas. Sigmas were", spacing)
+        logging.error(f"Had to widen some sigmas. Sigmas were {spacing}")
         spacing = np.maximum(MIN_SPACING, spacing)
+        logging.info(f"New sigmas: {spacing}")
+    if not np.all(np.isfinite(spacing)):
+        logging.error(f"Some sigmas were inf. Sigmas were {spacing}")
+        spacing[~np.isfinite(spacing)] = MAX_SPACING
+        logging.info(f"New sigmas: {spacing}")
 
     diagonal_points = spacing * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
     global_points = np.asarray([np.matmul(diagonalizer.transpose(), d) for d in diagonal_points]) + start
 
     for point in global_points:
-        print(point, log_probability(point, y, y_inv_covs) / len(y) / 3)
+        logging.info("{}, {}".format(point, log_probability(point, y, y_inv_covs) / len(y) / 3))
 
     return global_points
 
@@ -490,7 +526,7 @@ def mcmc_fit(theta_start, evals, evecs, index):
         backend.reset(N_WALKERS, N_DIM)
     else:
         pos=None
-        print("Initial size: {}".format(backend.iteration))
+        logging.info("Initial size: {}".format(backend.iteration))
 
     old_tau = np.inf
     with Pool() as pool:
@@ -504,7 +540,7 @@ def mcmc_fit(theta_start, evals, evecs, index):
             f = open("errors.dat", 'a')
             f.write(output_name + f": walkers weren't independent (eigenvalues {evals})\n")
             f.close()
-            print(f"Walkers weren't independent. Eigenvalues {evals}")
+            logging.warning(f"Walkers weren't independent. Eigenvalues {evals}")
             sys.exit()
 
         for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
@@ -518,19 +554,19 @@ def mcmc_fit(theta_start, evals, evecs, index):
                 converged = np.all(tau * 100 < sampler.iteration)
                 converged &= np.all(np.abs(old_tau - tau) / tau < 0.01)
                 if converged:
-                    print("Converged")
+                    logging.info("Converged")
                     break
                 old_tau = tau
 
             if sampler.iteration % (MAX_N_STEPS//10) == 0:
                 redchis = sample.log_prob / len(y) / 3
-                print(f"Minimum redchi at {sampler.iteration/MAX_N_STEPS * 100}\%: {np.min(redchis)}")
+                logging.info(f"Minimum redchi at {sampler.iteration/MAX_N_STEPS * 100}\%: {np.min(redchis)}")
         sampler._previous_state = sample
 
     if reload:
-        print("New size: {}".format(backend.iteration))
+        logging.info("New size: {}".format(backend.iteration))
     else:
-        print("Done")
+        logging.info("Done")
 
 for i, (theta, evals, evecs) in enumerate(kernel):
     mcmc_fit(theta, evals, evecs, i)
@@ -539,11 +575,10 @@ for i, (theta, evals, evecs) in enumerate(kernel):
 ####################################################################
 # Process data
 ####################################################################
-print()
 
 i = 0
 while True:
-    print("Showing i = {}".format(i))
+    logging.info("Showing i = {}".format(i))
     try:
         disp = display.Display("{0}".format(output_name), "{0}-{1}".format(output_name, i))
     except Exception as e:
@@ -573,8 +608,8 @@ for index in range(len(kernel)):
         burnin = int(2 * np.max(tau))
         thin = int(0.5 * np.min(tau))
     except:
-        print("Could not find autocorrelation time because the chain is too short.")
-        thin = 1
+        logging.warning("Could not find autocorrelation time because the chain is too short.")
+        thin = DEFAULT_THIN
         burnin = 1000
 
     samples = reader.get_chain(discard=burnin, thin=thin)

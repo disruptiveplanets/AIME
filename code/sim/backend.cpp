@@ -19,7 +19,7 @@ Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms, double asteroid_rad
     calculate_moi(initial_roll);
     calculate_poses();
 
-    #ifdef TEXT_DEBUG
+    /*#ifdef TEXT_DEBUG
     std::cout<< "Klms: " << std::endl;
     for (int l = 0; l <= ASTEROIDS_MAX_K; l++){
         for (int m = -l; m<= l; m++) {
@@ -35,11 +35,11 @@ Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms, double asteroid_rad
 
     std::cout << "MOI (local): " << moi << std::endl;
     std::cout << std::endl;
-    #endif
+    #endif*/
 }
 
 cdouble Asteroid::jlm(int l, int m) const {
-    #ifdef TEXT_DEBUG
+    #ifdef SEGFAULT_DEBUG
     if (l * l + l + m < 0 || l * l + l + m > max_j) {
         std::cout << "Jlm array exceeded" << std::endl;
         throw std::runtime_error("Jlm array exceeded.");
@@ -50,7 +50,7 @@ cdouble Asteroid::jlm(int l, int m) const {
 
 cdouble Asteroid::klm(int l, int m) const {
     if (abs(m) > l) {return 0;}
-    #ifdef TEXT_DEBUG
+    #ifdef SEGFAULT_DEBUG
     if (l * l + l + m < 0 || l * l + l + m > max_k) {
         std::cout << "Klm array exceeded" << std::endl;
         throw std::runtime_error("Klm array exceeded.");
@@ -61,7 +61,7 @@ cdouble Asteroid::klm(int l, int m) const {
 
 cdouble Asteroid::klmc(int l, int m) const {
     if (abs(m) > l) {return 0;}
-    #ifdef TEXT_DEBUG
+    #ifdef SEGFAULT_DEBUG
     if (l * l + l + m < 0 || l * l + l + m > max_k) {
         std::cout << "Klmc array exceeded" << std::endl;
         throw std::runtime_error("Klm array exceeded.");
@@ -72,11 +72,12 @@ cdouble Asteroid::klmc(int l, int m) const {
 
 void Asteroid::calculate_poses() {
     #ifdef TEXT_DEBUG
-    //auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
     #endif
 
     double pericenter_vel = sqrt(excess_vel * excess_vel + 2 * mu / pericenter_pos);
-    const double cutoff_dist_squared = pericenter_pos * pericenter_pos * pow(INTEGRAL_LIMIT_FRAC, -2/3.0);
+    const double cutoff_dist_squared = pericenter_pos * pericenter_pos
+        * pow(INTEGRAL_LIMIT_FRAC, -2/3.0);// Go a little over for safety
     #ifdef TEXT_DEBUG
     std::cout << "cutoff distance: " << sqrt(cutoff_dist_squared) << std::endl;
     std::cout << "periapsis: " << pericenter_pos << std::endl;
@@ -85,13 +86,22 @@ void Asteroid::calculate_poses() {
     Vector3 position = Vector3({pericenter_pos, 0, 0});
 
     double time;
-    for (time = 0; position.mag2() < cutoff_dist_squared; time += POSITION_DT) {
+    for (time = 0; position.mag2() <= cutoff_dist_squared; time += POSITION_DT) {
         Vector3 accel = -mu / position.mag2() * position / position.mag();
         velocity += POSITION_DT * accel;
         position += POSITION_DT * velocity;
         positions.push_back(position);
         velocities.push_back(velocity);
     }
+    
+    // Add one extra position data point for the sake of interpolation
+    Vector3 accel = -mu / position.mag2() * position / position.mag();
+    velocity += POSITION_DT * accel;
+    position += POSITION_DT * velocity;
+    positions.push_back(position);
+    velocities.push_back(velocity);
+
+
     expire_time = time;
 
     #ifdef TEXT_DEBUG
@@ -113,8 +123,15 @@ bool Asteroid::extract_pos(double time, Vector3& position, Vector3& velocity) {
         return false;
     }
     double mixer = (time - time_index * POSITION_DT) / POSITION_DT;
-    position = positions[time_index] * mixer + positions[time_index] * (1 - mixer);
-    velocity = velocities[time_index] * mixer + velocities[time_index] * (1 - mixer);
+
+    #ifdef SEGFAULT_DEBUG
+    if (time_index + 1 >= (int)positions.size()) {
+        std::cout << "Position array length exceeded: " << time_index << ' ' << positions.size() << "; " << time << ' ' << expire_time << std::endl;
+    }
+    #endif
+
+    position = positions[time_index + 1] * mixer + positions[time_index] * (1 - mixer);
+    velocity = velocities[time_index + 1] * mixer + velocities[time_index] * (1 - mixer);
     if (flip) {
         position = Vector3({position[0], -position[1], 0});
         velocity = Vector3({-velocity[0], velocity[1], 0});
@@ -274,7 +291,6 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
 
     #ifdef TEXT_DEBUG
     std::cout << "Simulation took " << time << " seconds." << std::endl;
-    std::cout << "Maximum dquaternion magnitude (want 0) " << max_quat_mag << std::endl;
     #endif
 
     return frames;
