@@ -44,6 +44,12 @@ class Display:
             raise Exception("Could not find the file {}.".format(self.h5_name+".h5"))
         self.theta_labels = list(map(r"$\theta_{{{0}}}$".format, range(1, self.ndim + 1)))
 
+    def get_true_results(self):
+        if self.true_results is not None:
+            return
+        self.true_results = np.load(f"{self.bare_name}-data.npy")
+        self.true_uncs = np.load(f"{self.bare_name}-unc.npy")
+
     def get_samples(self):
         if self.samples is not None:
             return
@@ -78,9 +84,7 @@ class Display:
         self.get_params()
         self.get_samples()
         if self.true_results is None:
-            self.true_results = self.run(self.theta_true)
-        if self.true_results is None:
-            return
+            self.get_true_results()
         fig = plt.figure(figsize=(6.6, 4.6))
         redchiminmean = 0
         num_converged = 0
@@ -116,9 +120,7 @@ class Display:
             # Only allow walkers which have converged. Definition of convergence: redchi
             self.get_params()
             if self.true_results is None:
-                self.true_results = self.run(self.theta_true)
-            if self.true_results is None:
-                raise Exception("No true results were generated. {}".format(self.theta_true))
+                self.get_true_results()
 
             redchi = -self.log_prob_samples[-1,:] / len(self.true_results)
             mask = redchi < REDCHI_THRESHOLD
@@ -240,8 +242,7 @@ class Display:
         self.get_params()
         theta_results = [f[0] for f in self.get_results()]
         if self.true_results is None:
-            self.true_results = self.run(self.theta_true)
-        _, true_error = random_vector.randomize_rotate_uniform(self.true_results, self.sigma)
+            self.true_results = self.get_true_results()
         mean_res = list(self.run(theta_results))
         
         while len(mean_res) > len(self.true_results):
@@ -251,15 +252,15 @@ class Display:
             mean_res.append(mean_res[-1])
 
         mean_res = np.array(mean_res)
-
-        uncertainties = np.array([np.sqrt(np.diagonal(pinvh(te))) for te in true_error])
+        uncertainties = np.array([2 * np.sqrt(np.diagonal(pinvh(a))) for a in self.true_uncs])
+        print(uncertainties)
 
         fig, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(12, 6), sharex=True)
 
         x_display = np.arange(len(self.true_results)) * self.cadence / 3600.0
-        ax1.plot(x_display, self.true_results[:,0], label = 'true x', alpha=0.5, color='C0')
-        ax1.plot(x_display, self.true_results[:,1], label = 'true y', alpha=0.5, color='C1')
-        ax1.plot(x_display, self.true_results[:,2], label = 'true z', alpha=0.5, color='C2')
+        ax1.scatter(x_display, self.true_results[:,0], label = 'true x', alpha=0.5, color='C0', s=1)
+        ax1.scatter(x_display, self.true_results[:,1], label = 'true y', alpha=0.5, color='C1', s=1)
+        ax1.scatter(x_display, self.true_results[:,2], label = 'true z', alpha=0.5, color='C2', s=1)
 
         ax1.fill_between(x_display, self.true_results[:,0] + uncertainties[:,0],
                 self.true_results[:,0] - uncertainties[:,0], color="C0", alpha=0.2)
@@ -269,16 +270,16 @@ class Display:
                 self.true_results[:,2] - uncertainties[:,2], color="C2", alpha=0.2)
 
         if mean_res is not None:
-            ax1.plot(x_display, mean_res[:,0], label = 'mean x', alpha=0.5, linestyle='dotted', color='C0')
-            ax1.plot(x_display, mean_res[:,1], label = 'mean y', alpha=0.5, linestyle='dotted', color='C1')
-            ax1.plot(x_display, mean_res[:,2], label = 'mean z', alpha=0.5, linestyle='dotted', color='C2')
+            ax1.plot(x_display, mean_res[:,0], label = 'mean x', color='C0')
+            ax1.plot(x_display, mean_res[:,1], label = 'mean y', color='C1')
+            ax1.plot(x_display, mean_res[:,2], label = 'mean z', color='C2')
         ax1.set_ylabel("Spin (rad/s)")
         ax1.legend()
 
         if mean_res is not None:
-            ax2.plot(x_display, mean_res[:,0] - self.true_results[:,0], color='C0')
-            ax2.plot(x_display, mean_res[:,1] - self.true_results[:,1], color='C1')
-            ax2.plot(x_display, mean_res[:,2] - self.true_results[:,2], color='C2')
+            ax2.scatter(x_display, mean_res[:,0] - self.true_results[:,0], color='C0', s=1)
+            ax2.scatter(x_display, mean_res[:,1] - self.true_results[:,1], color='C1', s=1)
+            ax2.scatter(x_display, mean_res[:,2] - self.true_results[:,2], color='C2', s=1)
             ax2.fill_between(x_display, uncertainties[:,0], -uncertainties[:,0], color="C0", alpha=0.2)
             ax2.fill_between(x_display, uncertainties[:,1], -uncertainties[:,1], color="C1", alpha=0.2)
             ax2.fill_between(x_display, uncertainties[:,2], -uncertainties[:,2], color="C2", alpha=0.2)
@@ -287,12 +288,11 @@ class Display:
         ax2.set_xlabel("Time (hours)")
 
         plt.savefig(self.h5_name+"-compare.png")
-        fig.clear()
 
 
 if __name__ == "__main__":
     d = Display("minimizer/run-3.0/run-3.0")
-    d.thin = DEFAULT_THIN#1
+    d.thin = DEFAULT_THIN
     d.get_samples_burnin(4000)
     d.show_compare()
     plt.show()

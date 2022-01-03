@@ -38,7 +38,7 @@ def randomize_rotate_uniform(data, sigma):
             np.array([[np.cos(-theta), 0, np.sin(-theta)], [0, 1, 0], [-np.sin(-theta), 0, np.cos(-theta)]]),
             np.array([[np.cos(-phi), -np.sin(-phi), 0], [np.sin(-phi), np.cos(-phi), 0], [0, 0, 1]])
         )
-        tilt_phi = np.random.uniform() * np.pi
+        tilt_phi = np.random.random() * np.pi
         tilt_theta = np.random.randn() * sigma
         untilt_vec = [np.sin(tilt_theta) * np.cos(tilt_phi), np.sin(tilt_theta) * np.sin(tilt_phi), np.cos(tilt_theta)]
         newvec = np.matmul(rot_mat.transpose(), untilt_vec) * norm
@@ -50,8 +50,7 @@ def randomize_rotate_uniform(data, sigma):
 
 if __name__ == "__main__":
     pass
-    '''
-    spin = np.array([[1, -2, 3]]*100000)
+    spin = np.array([[1, -2, 3]]*10000)
     sigma = 0.1
     newspin, err = randomize_rotate_uniform(spin, sigma)
 
@@ -63,7 +62,7 @@ if __name__ == "__main__":
     print("Analytical uncertainty")
     print(err)
     print("Delta:")
-    print(cov - err)'''
+    print(cov - err)
 
     #map_chisq(1e3, 10, 1e6)
 
