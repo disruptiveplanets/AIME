@@ -57,6 +57,9 @@ def terminal(output_name, do_not_duplicate=True):
                     already_done = False
                     break
         if already_done:
+            plt.cla()
+            plt.clf()
+            plt.close('all')
             return
     ####################################################################
     # Process data
@@ -71,6 +74,9 @@ def terminal(output_name, do_not_duplicate=True):
         except Exception as e:
             if i == 0:
                 print(f"Run {output_name} failed.")
+                plt.cla()
+                plt.clf()
+                plt.close('all')
                 return
                 #raise e
             break

@@ -122,7 +122,8 @@ def covariance():
                 for file in os.listdir(names[index]):
                     if not file[-11:] == "samples.npy": continue
                     with open(f"{names[index]}/{file}", 'rb') as f:
-                        arrays = np.load(f).transpose()[:,:,-END_LENGTH:]
+                        #print(f"{names[index]}/{file}")
+                        arrays = np.load(f).transpose()#[:,:,-END_LENGTH:]
                         if arrays.shape[1] == 0:
                             continue
                         arrays = arrays.reshape(arrays.shape[0], arrays.shape[1] * arrays.shape[2])
