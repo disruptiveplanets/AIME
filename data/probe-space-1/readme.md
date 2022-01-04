@@ -23,3 +23,9 @@ The minimization process failed, partially because of a segfault in the sim, and
 But now that I look at the data properly, the fits that succeeded actually did quite well! The contours are OK!
 
 I also changed the plotting software to save the original data and plot against that. Residuals are now more reliable.
+
+# Jan 4
+
+Today I pulled the data, and things worked. I believe my code runs successfully. However, I didn't get convergence because I hadn't run the MCMC for long enough. I extended the number of iterations from 10,000 to 100,000 and also sped up the model.
+
+I sped up the model by precomputing more of the torque equation and by changing the delta t formula based on a more principled method for how much deviation from the true integral is too much. (I said if the fractional difference between the data for a point and some point displaced by a typical width of sigma from it is more than 1%, that's unacceptable. Differences of about 1% in overall accuracy is also ok.)

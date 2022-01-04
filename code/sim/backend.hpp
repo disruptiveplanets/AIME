@@ -22,7 +22,7 @@
 #define NUM_THREADS 4
 
 //#define TEXT_DEBUG
-//#define SEGFAULT_DEBUG
+#define SEGFAULT_DEBUG
 //#define FIRST_ORDER
 
 
@@ -31,6 +31,7 @@
 #define SPACE_LP (SPACE_MP * (2 * (ASTEROIDS_MAX_K + 1) + 1))
 #define SPACE_M (SPACE_LP * (ASTEROIDS_MAX_K + 1))
 #define SPACE_L (SPACE_M * (ASTEROIDS_MAX_J + 1))
+#define COEFF_LENGTH (SPACE_L * (ASTEROIDS_MAX_J + 1))
 
 class Asteroid {
 public:
@@ -63,9 +64,9 @@ private:
     double asteroid_radius;
     double distance_ratio_cut;
 
-    cdouble coeffs_x[SPACE_L * (ASTEROIDS_MAX_J + 1)];
-    cdouble coeffs_y[SPACE_L * (ASTEROIDS_MAX_J + 1)];
-    cdouble coeffs_z[SPACE_L * (ASTEROIDS_MAX_J + 1)];
+    cdouble coeffs_x[COEFF_LENGTH];
+    cdouble coeffs_y[COEFF_LENGTH];
+    cdouble coeffs_z[COEFF_LENGTH];
 
     Vector3 moi, inv_moi;
     Vector3 torque;

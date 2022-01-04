@@ -363,7 +363,7 @@ def get_minimum(arg):
         ### Correct for non positive definite hessians
         new_evals.append(float(e))
     if np.any(np.asarray(new_evals) < 0.0):
-        logging.warning(f"The Hessian was not positive definite. Eigenvalues {new_evals}")
+        logging.warning(f"The Hessian was not positive definite. \nRedchi {minimizing_likelihood / len(y) / 3}, \nTheta {result}, \nEigenvalues {new_evals}, \Gradient {grad}")
         #logging.debug(bfgs_min)
         return None, None, None, None
     logging.debug(f"Eigenvalues: {new_evals}")

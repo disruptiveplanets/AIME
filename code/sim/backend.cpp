@@ -111,6 +111,12 @@ void Asteroid::get_coefficients(int l, int m, int lp, int mp, int mpp, cdouble m
         cdouble& torque_x, cdouble& torque_y, cdouble& torque_z) const {
     const int index = l * SPACE_L + (m + ASTEROIDS_MAX_J) * SPACE_M + lp * SPACE_LP +
         (mp + ASTEROIDS_MAX_K) * SPACE_MP + (mpp + ASTEROIDS_MAX_K) * SPACE_MPP;
+    #ifdef SEGFAULT_DEBUG
+    if (index >= COEFF_LENGTH) {
+        std::cout << "Coeff array exceeded" << std::endl;
+        throw std::runtime_error("Coeff array exceeded.");
+    }
+    #endif
     torque_x += mul * coeffs_x[index];
     torque_y += mul * coeffs_y[index];
     torque_z += mul * coeffs_z[index];
