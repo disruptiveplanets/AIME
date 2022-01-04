@@ -625,4 +625,4 @@ for index in range(len(kernel)):
 
     flat_samples = np.array([samples[:,:,i].flatten() for i in range(len(theta_true))])
 
-    np.savetxt(output_name+"-{}-samples.npy".format(index), flat_samples)
+    np.save(output_name+"-{}-samples.npy".format(index), flat_samples)

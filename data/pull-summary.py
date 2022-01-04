@@ -1,12 +1,30 @@
-import os
+import os, sys
 from shutil import copyfile
 
 PATH = "probe-space-1"
+FORBIDDEN_NAMES = ["ob"]
 
 I_LIMIT = -1
 
+MOVE = False
+if len(sys.argv) == 2:
+    if sys.argv[-1] == 'move':
+        MOVE = True
+    else:
+        raise Exception("Second argument must be `move`")
+
 for fname in os.listdir("../staged/"):
     fname = os.path.splitext(fname)[0]
+
+    forbidden = False
+    for n in FORBIDDEN_NAMES:
+        if n in fname:
+            forbidden = True
+            break
+    
+    if forbidden:
+        continue
+
     if not os.path.isdir("{1}/{0}".format(fname, PATH)):
         os.mkdir("{1}/{0}".format(fname, PATH))
     i = 0
@@ -17,5 +35,6 @@ for fname in os.listdir("../staged/"):
             break
         i += 1
 
-    os.rename("../staged/{0}.txt".format(fname), "{1}/{0}/{0}.txt".format(fname, PATH))
+    if MOVE:
+        os.rename("../staged/{0}.txt".format(fname), "{1}/{0}/{0}.txt".format(fname, PATH))
     print(fname)

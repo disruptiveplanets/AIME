@@ -52,8 +52,10 @@ def terminal(output_name, do_not_duplicate=True):
         already_done = True
         for index in range(num_trials):
             if not os.path.exists(f'{output_name}-{index}-samples.npy'):
-                already_done = False
-                break
+                if os.path.exists(f'{output_name}-{index}.h5'):
+                    # H5 exists, but samples does not exist
+                    already_done = False
+                    break
         if already_done:
             return
     ####################################################################
@@ -116,7 +118,7 @@ def terminal(output_name, do_not_duplicate=True):
     plt.clf()
     plt.close('all')
 
-def wrap_terminal(name, b=True):
+def wrap_terminal(name, b=True): # False if you want to run over all files
     try:
         return terminal(name, b)
     except:

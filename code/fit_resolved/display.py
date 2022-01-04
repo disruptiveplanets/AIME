@@ -142,8 +142,6 @@ class Display:
         flat_samples = self.samples[:,self.mask,:].reshape(
             (self.samples.shape[0] * np.sum(self.mask), self.samples.shape[2]))
 
-        print(flat_samples.shape)
-        print(np.unique(flat_samples, axis=0).shape) # How many of these points are actually unique?
         #flat_samples = np.unique(flat_samples, axis=0)
 
         fig = corner.corner(
@@ -233,7 +231,6 @@ class Display:
                 self.radius, self.spin[0], self.spin[1], self.spin[2], theta[0],
                 self.impact_parameter, self.speed, CENTRAL_MU, CENTRAL_RADIUS, -1)
         except:
-            print(self.module)
             print("Coordinates are invalid ({})".format(theta))
             return None
         return np.asarray(resolved_data).reshape(-1, 3)
@@ -253,7 +250,6 @@ class Display:
 
         mean_res = np.array(mean_res)
         uncertainties = np.array([2 * np.sqrt(np.diagonal(pinvh(a))) for a in self.true_uncs])
-        print(uncertainties)
 
         fig, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(12, 6), sharex=True)
 
