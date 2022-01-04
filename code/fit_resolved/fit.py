@@ -302,7 +302,7 @@ def get_minimum(arg):
                 logging.warning(f"At cut index {cut_index}, the redchi {start_redchi} was unchanged by the fit.")
                 logging.debug(bfgs_min)
             else:
-                logging.info(f"Minimization index {cut_index} passed successfully (redchi {start_redchi} -> {end_redchi})")
+                logging.debug(f"Minimization index {cut_index} passed successfully (redchi {start_redchi} -> {end_redchi})")
 
             redchi_record.append((start_redchi, bfgs_min.fun / data_cuts[cut_index] / 3))
 
@@ -350,11 +350,11 @@ def get_minimum(arg):
     logging.debug(minimize_log_prob_uncut(result+np.array([0, 0, 1.0e-8]))-minimizing_likelihood)
     logging.debug(minimize_log_prob_uncut(result-np.array([0, 0, 1.0e-8]))-minimizing_likelihood)
 
-    logging.info("Hessian: {}".format(hess))
+    logging.debug("Hessian: {}".format(hess))
 
-    logging.info(f"REDCHI RECORD: {redchi_record}")
-    logging.info(f"GRADIENT: {grad}")
-    logging.info(f"THETA: {result}")
+    logging.debug(f"REDCHI RECORD: {redchi_record}")
+    logging.debug(f"GRADIENT: {grad}")
+    logging.debug(f"THETA: {result}")
 
     new_evals = []
     new_evecs = []
@@ -366,7 +366,7 @@ def get_minimum(arg):
         logging.warning(f"The Hessian was not positive definite. Eigenvalues {new_evals}")
         #logging.debug(bfgs_min)
         return None, None, None, None
-    logging.info(f"Eigenvalues: {new_evals}")
+    logging.debug(f"Eigenvalues: {new_evals}")
     new_evals = np.abs(new_evals)
 
     for k in range(int(len(evecs))):
