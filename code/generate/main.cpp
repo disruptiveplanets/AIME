@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <chrono>
+#include <iomanip>
 
 #include "../sim/backend.hpp"
 #include "../sim/algebra.hpp"
@@ -160,9 +161,9 @@ int main(int argc, char* argv[]) {
     std::ofstream resolved_file;
     resolved_file.open(bare + "-resolved.dat");
     for (uint i = 0; i < resolved_data.size(); i+=3) {
-        resolved_file << resolved_data[i] << ' ';
-        resolved_file << resolved_data[i + 1] << ' ';
-        resolved_file << resolved_data[i + 2] << std::endl;
+        resolved_file << std::setprecision(17) << resolved_data[i] << ' ';
+        resolved_file << std::setprecision(17) << resolved_data[i + 1] << ' ';
+        resolved_file << std::setprecision(17) << resolved_data[i + 2] << std::endl;
     }
 
     return 1;

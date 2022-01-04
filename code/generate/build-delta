@@ -1,5 +1,7 @@
 g++ -DASTEROIDS_MAX_J=0 -DASTEROIDS_MAX_K=2 -Wall -std=c++17 ../sim/*.cpp main.cpp -o "bin/generate" -O3
 
 ./bin/generate
+./bin/generate 2-params-off2.dat
+./bin/generate 2-params-off3.dat
 
-python3 display.py
+python3 display-delta.py

@@ -36,6 +36,8 @@ Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms, double asteroid_rad
     std::cout << "MOI (local): " << moi << std::endl;
     std::cout << std::endl;
     #endif*/
+
+    make_coefficients();
 }
 
 cdouble Asteroid::jlm(int l, int m) const {
@@ -68,6 +70,50 @@ cdouble Asteroid::klmc(int l, int m) const {
     }
     #endif
     return klmcs[l * l + l + m];
+}
+
+void Asteroid::compute_coefficient(int l, int m, int lp, int mp, int mpp, 
+    cdouble& coeff_x, cdouble& coeff_y, cdouble& coeff_z) const {
+
+    cdouble prelm = pow(central_radius, l) * jlm(l, m) * mu / 2.0;
+    cdouble prelpmp = prelm * parity(lp) * pow(asteroid_radius, lp - 2);
+    cdouble mppfactor = prelpmp * sqrt(fact(lp - mpp) * fact(lp+mpp) / (double)(fact(lp-mp) * fact(lp+mp)));
+
+    coeff_x = mppfactor * (cdouble(0, lp - mpp + 1) * klm(lp, mpp - 1)
+        + cdouble(0, lp + mpp + 1) * klm(lp, mpp + 1));
+
+    coeff_y = mppfactor * (-(lp - mpp + 1) * klm(lp, mpp - 1)
+        + (lp + mpp + 1) * klm(lp, mpp + 1));
+
+    coeff_z = mppfactor * cdouble(0, 2) * mpp * klm(lp, mpp);
+}
+
+void Asteroid::make_coefficients() {
+    for (int l = 0; l <= ASTEROIDS_MAX_J; l++) {
+        for (int m = -l; m <= l; m++) {
+            for (int lp = 2; lp <= ASTEROIDS_MAX_K; lp++) {
+                for (int mp = -lp; mp <= lp; mp++) {
+                    for (int mpp = -lp; mpp <= (int)lp; mpp++) {
+                        const int index = l * SPACE_L + (m + ASTEROIDS_MAX_J) * SPACE_M + lp * SPACE_LP +
+                            (mp + ASTEROIDS_MAX_K) * SPACE_MP + (mpp + ASTEROIDS_MAX_K) * SPACE_MPP;
+                        compute_coefficient(l, m, lp, mp, mpp, 
+                            coeffs_x[index],
+                            coeffs_y[index],
+                            coeffs_z[index]);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Asteroid::get_coefficients(int l, int m, int lp, int mp, int mpp, cdouble mul,
+        cdouble& torque_x, cdouble& torque_y, cdouble& torque_z) const {
+    const int index = l * SPACE_L + (m + ASTEROIDS_MAX_J) * SPACE_M + lp * SPACE_LP +
+        (mp + ASTEROIDS_MAX_K) * SPACE_MP + (mpp + ASTEROIDS_MAX_K) * SPACE_MPP;
+    torque_x += mul * coeffs_x[index];
+    torque_y += mul * coeffs_y[index];
+    torque_z += mul * coeffs_z[index];
 }
 
 void Asteroid::calculate_poses() {
@@ -176,7 +222,7 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
     cdouble z_torque = 0;
     // Up until now, takes about 0.1 s, L=2
 
-    for (int l = 0; l <= ASTEROIDS_MAX_J; l++) {
+    /*for (int l = 0; l <= ASTEROIDS_MAX_J; l++) {
         for (int m = -l; m <= l; m++) {
             cdouble prelm = pow(central_radius, l) * jlm(l, m);
             for (int lp = 2; lp <= ASTEROIDS_MAX_K; lp++) {
@@ -199,7 +245,22 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
             }
         }
     }
-    torque = Vector3({x_torque.r, y_torque.r, z_torque.r}) * mu / 2.0;
+    torque = Vector3({x_torque.r, y_torque.r, z_torque.r}) * mu / 2.0;*/
+
+    for (int l = 0; l <= ASTEROIDS_MAX_J; l++) {
+        for (int m = -l; m <= l; m++) {
+            for (int lp = 2; lp <= ASTEROIDS_MAX_K; lp++) {
+                for (int mp = -lp; mp <= lp; mp++) {
+                    cdouble prelpmp = slm_c(l+lp, m+mp, pos_r, pos_ct, pos_p).conj();
+                    for (int mpp = -lp; mpp <= (int)lp; mpp++) {
+                        cdouble mppfactor = dgen(lp, mp, mpp).conj() * prelpmp;
+                        get_coefficients(l, m, lp, mp, mpp, mppfactor, x_torque, y_torque, z_torque);
+                    }
+                }
+            }
+        }
+    }
+    torque = Vector3({x_torque.r, y_torque.r, z_torque.r});
     
     #else
 
@@ -266,7 +327,8 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
         }
 
         get_derivatives(position, spin, quat, dspin1, dquat1);
-        dt = my_min(MAX_DT, (avg_moi * spin.mag()) / torque.mag() * 1e-5);
+        const double scale = (pow(position.mag2() / (pericenter_pos * pericenter_pos), 3.0 / 2) - 1.0) * INTEGRAL_LIMIT_FRAC;
+        dt = MIN_DT + (MAX_DT - MIN_DT) * scale;
 
         extract_pos(time+dt/2, position, velocity);
         get_derivatives(position, spin + dt / 2 * dspin1, quat + dt / 2 * dquat1, dspin2, dquat2);
