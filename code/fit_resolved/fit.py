@@ -369,7 +369,7 @@ def get_minimum(arg):
         if np.any(np.asarray(new_evals) < 0.0):
             return None, None, None, None
         else:
-            np.warning("Allowing the Hessian to pass with reversed first eigenvalue.")
+            logging.warning("Allowing the Hessian to pass with reversed first eigenvalue.")
     logging.debug(f"Eigenvalues: {new_evals}")
 
     for k in range(int(len(evecs))):
@@ -501,11 +501,10 @@ def populate(evals, diagonalizer, count, start):
     if np.any(spacing < MIN_SPACING):
         logging.error(f"Had to widen some sigmas. Sigmas were {spacing}")
         spacing = np.maximum(MIN_SPACING, spacing)
-        logging.info(f"New sigmas: {spacing}")
     if not np.all(np.isfinite(spacing)):
         logging.error(f"Some sigmas were inf. Sigmas were {spacing}")
         spacing[~np.isfinite(spacing)] = MAX_SPACING
-        logging.info(f"New sigmas: {spacing}")
+    loging.info(f"Sigmas: {spacing}")
 
     diagonal_points = spacing * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
     global_points = np.asarray([np.matmul(diagonalizer.transpose(), d) for d in diagonal_points]) + start
