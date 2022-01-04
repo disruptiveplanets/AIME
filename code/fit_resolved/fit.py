@@ -343,12 +343,12 @@ def get_minimum(arg):
 
     redchi_record.append((start_redchi, minimizing_likelihood / len(y) / 3))
     
-    logging.info(minimize_log_prob_uncut(result+np.array([1.0e-8, 0, 0]))-minimizing_likelihood)
-    logging.info(minimize_log_prob_uncut(result-np.array([1.0e-8, 0, 0]))-minimizing_likelihood)
-    logging.info(minimize_log_prob_uncut(result+np.array([0, 1.0e-8, 0]))-minimizing_likelihood)
-    logging.info(minimize_log_prob_uncut(result-np.array([0, 1.0e-8, 0]))-minimizing_likelihood)
-    logging.info(minimize_log_prob_uncut(result+np.array([0, 0, 1.0e-8]))-minimizing_likelihood)
-    logging.info(minimize_log_prob_uncut(result-np.array([0, 0, 1.0e-8]))-minimizing_likelihood)
+    logging.debug(minimize_log_prob_uncut(result+np.array([1.0e-8, 0, 0]))-minimizing_likelihood)
+    logging.debug(minimize_log_prob_uncut(result-np.array([1.0e-8, 0, 0]))-minimizing_likelihood)
+    logging.debug(minimize_log_prob_uncut(result+np.array([0, 1.0e-8, 0]))-minimizing_likelihood)
+    logging.debug(minimize_log_prob_uncut(result-np.array([0, 1.0e-8, 0]))-minimizing_likelihood)
+    logging.debug(minimize_log_prob_uncut(result+np.array([0, 0, 1.0e-8]))-minimizing_likelihood)
+    logging.debug(minimize_log_prob_uncut(result-np.array([0, 0, 1.0e-8]))-minimizing_likelihood)
 
     logging.info("Hessian: {}".format(hess))
 
@@ -422,6 +422,13 @@ def minimize(l, num_return, fix_theta):
     # Perform the minimization
     with Pool() as pool:
         results = pool.map(get_minimum, parameter_points)
+
+    num_succeeded = 0
+    for a, _, _, _ in results:
+        if a is not None:
+            num_succeeded += 1
+
+    logging.info(f">>>>>>>>> Of {NUM_MINIMIZE_POINTS} minimizations run, {num_succeeded} succeeded. <<<<<<<<<<")
 
     # Extract the lowest redchis
     sorted_results = sorted(results, key=
