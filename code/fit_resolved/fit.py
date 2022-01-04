@@ -363,11 +363,14 @@ def get_minimum(arg):
         ### Correct for non positive definite hessians
         new_evals.append(float(e))
     if np.any(np.asarray(new_evals) < 0.0):
-        logging.warning(f"The Hessian was not positive definite. \nRedchi {minimizing_likelihood / len(y) / 3}, \nTheta {result}, \nEigenvalues {new_evals}, \Gradient {grad}")
+        logging.warning(f"The Hessian was not positive definite. \nHessian {hess}\nRedchi {minimizing_likelihood / len(y) / 3}, \nTheta {result}, \nEigenvalues {new_evals}, \nGradient {grad}")
         #logging.debug(bfgs_min)
-        return None, None, None, None
+        new_evals[0] = -new_evals[0]
+        if np.any(np.asarray(new_evals) < 0.0):
+            return None, None, None, None
+        else:
+            np.warning("Allowing the Hessian to pass with reversed first eigenvalue.")
     logging.debug(f"Eigenvalues: {new_evals}")
-    new_evals = np.abs(new_evals)
 
     for k in range(int(len(evecs))):
         new_evecs.append(np.array([evecs[j, k] for j in range(int(len(evecs)))],
