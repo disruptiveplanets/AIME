@@ -47,10 +47,10 @@ Much later:
 The intent is to start writing the paper for this project by the end of the summer of 2021, the summer between Jack's junior and senior years.
 
 ## End data products
-* What data range is the best to minimize over? Defined by the maximum radius achieved by the satellite? The period of the satellite?
-* What is the effect of sigma?
+* What is the effect of sigma? (`probe-sigma`)
 * What does a moon add?
-* What is the effect of J2?
+* What is the effect of J2? (`oblateness`)
 * What is the effect of radius?
-* Are parts of the parameter space more sensitive than others?
+* Are parts of the parameter space more sensitive than others? (`probe-space`)
 * Which l can you resolve?
+* How important is observations during the flyby; what can you find from before and after?
