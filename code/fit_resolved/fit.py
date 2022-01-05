@@ -504,7 +504,7 @@ def populate(evals, diagonalizer, count, start):
     if not np.all(np.isfinite(spacing)):
         logging.error(f"Some sigmas were inf. Sigmas were {spacing}")
         spacing[~np.isfinite(spacing)] = MAX_SPACING
-    loging.info(f"Sigmas: {spacing}")
+    logging.info(f"Sigmas: {spacing}")
 
     diagonal_points = spacing * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
     global_points = np.asarray([np.matmul(diagonalizer.transpose(), d) for d in diagonal_points]) + start
