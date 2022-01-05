@@ -29,3 +29,15 @@ I also changed the plotting software to save the original data and plot against 
 Today I pulled the data, and things worked. I believe my code runs successfully. However, I didn't get convergence because I hadn't run the MCMC for long enough. I extended the number of iterations from 10,000 to 100,000 and also sped up the model.
 
 I sped up the model by precomputing more of the torque equation and by changing the delta t formula based on a more principled method for how much deviation from the true integral is too much. (I said if the fractional difference between the data for a point and some point displaced by a typical width of sigma from it is more than 1%, that's unacceptable. Differences of about 1% in overall accuracy is also ok.)
+
+# Jan 5
+
+The MCMC now converges after a few thousand iterations; it only took a few hours! I ran the code; it all looks great. Everything converged with no problems at all. Correct plots for corr and cov found, as well as plots for the varaince of sigma.
+
+![Correlation between parameters](corr.png)
+
+![Theta 2 sigma](theta-2-sigma.png)
+
+![Theta 3 sigma](theta-3-sigma.png)
+
+The next step should be to make these plots again for a, b, and c, then a sigma scan.

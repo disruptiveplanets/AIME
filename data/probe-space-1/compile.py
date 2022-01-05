@@ -144,8 +144,8 @@ def covariance():
             sigma1_data_line.append(np.sqrt(cov[0][0]))
             sigma2_data_line.append(np.sqrt(cov[1][1]))
 
-            if not np.isnan(corr):
-                print(np.sqrt(cov[0][0]), names[index])
+            #if not np.isnan(corr):
+            #    print(np.sqrt(cov[0][0]), names[index])
 
             X_line.append(x)
             Y_line.append(y)
