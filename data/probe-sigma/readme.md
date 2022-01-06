@@ -1,11 +1,9 @@
-## October 26
+## Jan 5
 
-I'm starting a sigma scan at the two characteristic values I've determined, spread evenly over log space.
-
-However, the scan is only as informative as my sigma model, because the definition of the sigma input depends strongly on the model. So I will need to do much more literature searching to find a very good sigma model I can justify, or try multiple models.
-
-## Nov 11
-Today, I worked on the Hamiltonian formalism. But it didn't work because it's too complicated. Instead, I wrote up what I've done so far, revised the error model, and began official tests.
-
-## Nov 12
-I finished extracting the data today. There are some holes, but it's generally pretty good! The initial angle one is not well fixed and that does not depend on sigma. But the other ones depend strongly on sigma.
+I restarted this folder pursuant to the param search completing successfully. The first task is to adapt the code so that it works for l=3 and for sigma other than 0.01.
+- I fixed bugs that prevented the tiered minimization working
+- I need to find the scaling pattern between data sigma and result sigma by running the test code and finding how the Hessian eigenvalues scale with data sigma. (I confirmed that the data sigmas do appear to be similar between the test and the true function)
+- Things take forever to converge. Should I be worried?
+    - No, I don't think so. This convergence takes forever with sigma=0.01, and I don't expect good convergence here because the parameters are so badly known.
+- After finding the scaling, I need to confirm it with the true likelihood function
+- Then can I just run the fit, I think. Let's start with the smallest sigma.

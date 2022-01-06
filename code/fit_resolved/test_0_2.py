@@ -6,7 +6,7 @@ EARTH_RADIUS = 6_370_000
 x = np.linspace(0, 12 * np.pi, DATA_WIDTH)
 
 def simulate(cadence, jlms, theta, radius, spinx, spiny, spinz, initial_roll, impact_parameter,
-    speed, mu, central_radius, cut=None):
+    speed, mu, central_radius, cut=-1):
 
     consider_x = x[:int(DATA_WIDTH / 2 * (1 + cut / 10)) - 1] if cut >= 0 else x
 
@@ -32,3 +32,9 @@ def simulate(cadence, jlms, theta, radius, spinx, spiny, spinz, initial_roll, im
         y.append(y3[i])
 
     return y
+
+if __name__ == "__main__":
+    import time
+    start = time.time()
+    simulate(120, [1.0], [0.39269908169, 0, -0.09766608], 1000, 0.00024682682, 0, -0.00024682682, 0.39269908169, 31850000, 4000, 3.986004418e14, 6370000)
+    print(f"Test time: {time.time() - start} s")

@@ -1,4 +1,4 @@
-TEST = False
+TEST = True
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,6 +10,8 @@ if TEST:
     import test_0_2 as asteroids_0_3
     import test_0_2 as asteroids_2_2
     import test_0_2 as asteroids_2_3
+    import test_0_2 as asteroids_3_2
+    import test_0_2 as asteroids_3_3
 from multiprocessing import Pool
 import random_vector, random
 from scipy import optimize
@@ -30,9 +32,8 @@ except:
 
 logging.basicConfig(level=logging.INFO)
 
-
 PLOT_POSES = True
-NUM_MINIMIZE_POINTS = 48
+NUM_MINIMIZE_POINTS = 8#48
 DISTANCE_RATIO_CUTS = [2.0]
 
 GM = 3.986004418e14
@@ -44,8 +45,10 @@ N_WALKERS = 32
 MAX_N_STEPS = 100_000
 MIN_THETA_DIST = 0.01
 LARGE_NUMBER = 1e100
-MIN_SPACING = 1.0e-6
-MAX_SPACING = 0.0003
+MIN_SPACING = np.array([1.0e-6, 1.0e-6, 1.0e-6,
+    0, 0, 0, 0, 0, 0, 0])
+MAX_SPACING = np.array([0.0003, 0.0003, 0.0003,
+    LARGE_NUMBER, LARGE_NUMBER, LARGE_NUMBER, LARGE_NUMBER, LARGE_NUMBER, LARGE_NUMBER, LARGE_NUMBER])
 DEFAULT_THIN = 10
 
 if len(sys.argv) not in [2, 3]:
@@ -77,6 +80,8 @@ assert(len(theta_true) == len(theta_high) == len(theta_low))
 assert(len(theta_true) == (ASTEROIDS_MAX_K + 1)**2 - 6)
 assert(len(jlms) == (ASTEROIDS_MAX_J + 1)**2)
 assert(np.all(theta_high > theta_low))
+
+SIGMA_FACTOR = sigma / 0.01# Assume that spacing is proportional to sigma.
 
 NUM_FITS = NUM_FITS[:ASTEROIDS_MAX_K-1]
 
@@ -343,12 +348,13 @@ def get_minimum(arg):
 
     redchi_record.append((start_redchi, minimizing_likelihood / len(y) / 3))
     
-    logging.debug(minimize_log_prob_uncut(result+np.array([1.0e-8, 0, 0]))-minimizing_likelihood)
-    logging.debug(minimize_log_prob_uncut(result-np.array([1.0e-8, 0, 0]))-minimizing_likelihood)
-    logging.debug(minimize_log_prob_uncut(result+np.array([0, 1.0e-8, 0]))-minimizing_likelihood)
-    logging.debug(minimize_log_prob_uncut(result-np.array([0, 1.0e-8, 0]))-minimizing_likelihood)
-    logging.debug(minimize_log_prob_uncut(result+np.array([0, 0, 1.0e-8]))-minimizing_likelihood)
-    logging.debug(minimize_log_prob_uncut(result-np.array([0, 0, 1.0e-8]))-minimizing_likelihood)
+    if l == 2:
+        logging.debug(minimize_log_prob_uncut(result+np.array([1.0e-8, 0, 0]))-minimizing_likelihood)
+        logging.debug(minimize_log_prob_uncut(result-np.array([1.0e-8, 0, 0]))-minimizing_likelihood)
+        logging.debug(minimize_log_prob_uncut(result+np.array([0, 1.0e-8, 0]))-minimizing_likelihood)
+        logging.debug(minimize_log_prob_uncut(result-np.array([0, 1.0e-8, 0]))-minimizing_likelihood)
+        logging.debug(minimize_log_prob_uncut(result+np.array([0, 0, 1.0e-8]))-minimizing_likelihood)
+        logging.debug(minimize_log_prob_uncut(result-np.array([0, 0, 1.0e-8]))-minimizing_likelihood)
 
     logging.debug("Hessian: {}".format(hess))
 
@@ -362,14 +368,29 @@ def get_minimum(arg):
     for e in evals:
         ### Correct for non positive definite hessians
         new_evals.append(float(e))
+    new_evals = np.array(new_evals)
+    
     if np.any(np.asarray(new_evals) < 0.0):
         logging.warning(f"The Hessian was not positive definite. \nHessian {hess}\nRedchi {minimizing_likelihood / len(y) / 3}, \nTheta {result}, \nEigenvalues {new_evals}, \nGradient {grad}")
         #logging.debug(bfgs_min)
-        new_evals[0] = -new_evals[0]
-        if np.any(np.asarray(new_evals) < 0.0):
-            return None, None, None, None
-        else:
-            logging.warning("Allowing the Hessian to pass with reversed first eigenvalue.")
+        if l == 2:
+            new_evals[0] = -new_evals[0]
+            if np.any(np.asarray(new_evals) < 0.0):
+                return None, None, None, None
+            else:
+                logging.warning("Allowing the Hessian to pass with reversed first eigenvalue.")
+
+        if l == 3:
+            ###############
+            ## Want to ultimately figure out the dependence of data sigma on hess sigma so that I can accurately set the max and min values.
+            ###############
+            new_evals[3:] = 1 / LARGE_NUMBER
+            logging.warning("Allowing the Hessian to pass with maxed eigenvalues for l=3 components.")
+            
+
+
+            
+            
     logging.debug(f"Eigenvalues: {new_evals}")
 
     for k in range(int(len(evecs))):
@@ -496,14 +517,19 @@ if len(kernel) == 0:
 # Run MCMC
 ####################################################################
 
+# Old sigmas: 6.62540362e-04 2.43756485e-06 4.33391169e-07 6.75305954e-01  6.70141655e-01 5.58199672e-01 5.45043393e-01 4.60189682e-01  4.07491528e-01 3.37137117e-01
+
 def populate(evals, diagonalizer, count, start):
     spacing = 1 / np.sqrt(evals)
     if np.any(spacing < MIN_SPACING):
         logging.error(f"Had to widen some sigmas. Sigmas were {spacing}")
-        spacing = np.maximum(MIN_SPACING, spacing)
+        spacing = np.maximum(MIN_SPACING * SIGMA_FACTOR, spacing)
     if not np.all(np.isfinite(spacing)):
         logging.error(f"Some sigmas were inf. Sigmas were {spacing}")
-        spacing[~np.isfinite(spacing)] = MAX_SPACING
+        spacing[~np.isfinite(spacing)] = MAX_SPACING * SIGMA_FACTOR
+    if np.any(spacing > 1):
+        logging.error(f"Some sigmas were greater than one. Sigmas were {spacing}")
+        spacing[spacing > 1] = 1.0
     logging.info(f"Sigmas: {spacing}")
 
     diagonal_points = spacing * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
