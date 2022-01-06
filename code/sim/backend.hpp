@@ -37,7 +37,7 @@ class Asteroid {
 public:
     Asteroid(const cdouble* jlms, const cdouble* klms, const double asteroid_radius,
         Vector3 spin, double initial_roll, double perigee, double speed,
-        double central_mu, double central_radius, double distance_ratio_cut);
+        double central_mu, double central_radius, double distance_ratio_cut, bool enforce_drc);
 
     int simulate(double cadence, std::vector<double>& resolved_data);
 
@@ -63,6 +63,7 @@ private:
     cdouble klmcs[(ASTEROIDS_MAX_K + 1) * (ASTEROIDS_MAX_K + 1)];
     double asteroid_radius;
     double distance_ratio_cut;
+    bool enforce_drc;
 
     cdouble coeffs_x[COEFF_LENGTH];
     cdouble coeffs_y[COEFF_LENGTH];

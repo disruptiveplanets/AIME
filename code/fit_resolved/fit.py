@@ -35,8 +35,8 @@ logging.basicConfig(level=logging.INFO)
 PLOT_POSES = True
 NUM_MINIMIZE_POINTS = 8#48
 DISTANCE_RATIO_CUTS = [
-    [2.0, -1.0],
-    [2.0, -1.0]
+    [2.0, None],
+    [1.01, None]
 ]
 
 GM = 3.986004418e14
@@ -117,23 +117,23 @@ def fit_function(theta, target_length=None):
     if ASTEROIDS_MAX_K == 3:
         if ASTEROIDS_MAX_J == 0:
             resolved_data = asteroids_0_3.simulate(cadence, jlms, theta[1:], radius,
-                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, -1)
+                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, 0, False)
         elif ASTEROIDS_MAX_J == 2:
             resolved_data = asteroids_2_3.simulate(cadence, jlms, theta[1:], radius,
-                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, -1)
+                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, 0, False)
         elif ASTEROIDS_MAX_J == 3:
             resolved_data = asteroids_3_3.simulate(cadence, jlms, theta[1:], radius,
-                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, -1)
+                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, 0, False)
     elif ASTEROIDS_MAX_K == 2:
         if ASTEROIDS_MAX_J == 0:
             resolved_data = asteroids_0_2.simulate(cadence, jlms, theta[1:], radius,
-                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, -1)
+                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, 0, False)
         elif ASTEROIDS_MAX_J == 2:
             resolved_data = asteroids_2_2.simulate(cadence, jlms, theta[1:], radius,
-                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, -1)
+                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, 0, False)
         elif ASTEROIDS_MAX_J == 3:
             resolved_data = asteroids_3_2.simulate(cadence, jlms, theta[1:], radius,
-                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, -1)
+                spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, 0, False)
     if target_length is not None:
         while len(resolved_data)//3 < target_length:
             resolved_data.append(resolved_data[-3])
@@ -184,18 +184,20 @@ np.save(f"{output_name}-unc.npy", y_inv_covs)
 logging.info(f"DOF: {len(y)}")
 
 def get_data_cut(drc):
+    enforce_drc = False if drc is None else True
+    drc = 0 if drc is None else drc
     if ASTEROIDS_MAX_J == 0:
         return len(asteroids_0_2.simulate(cadence, jlms, theta_true[1:], radius,
             spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
-            drc))//3
+            drc, enforce_drc))//3
     elif ASTEROIDS_MAX_J == 2:
         return len(asteroids_2_2.simulate(cadence, jlms, theta_true[1:], radius,
             spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
-            drc))//3
+            drc, enforce_drc))//3
     elif ASTEROIDS_MAX_J == 3:
         return len(asteroids_3_2.simulate(cadence, jlms, theta_true[1:], radius,
             spin[0], spin[1], spin[2], theta_true[0], perigee, speed, GM, EARTH_RADIUS,
-            drc))//3
+            drc, enforce_drc))//3
     raise Exception("Cannot handle this J.")
 
 data_cuts = [[get_data_cut(drc) for drc in tier] for tier in DISTANCE_RATIO_CUTS]
@@ -224,8 +226,11 @@ plt.show()
 
 def minimize_function(theta, simulate_func, l_index, cut_index):
     drc = DISTANCE_RATIO_CUTS[l_index][cut_index]
+    enforce_drc = False if drc is None else True
+
+    drc = 0 if drc is None else drc
     resolved_data = simulate_func(cadence, jlms, theta[1:], radius,
-        spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, drc)
+        spin[0], spin[1], spin[2], theta[0], perigee, speed, GM, EARTH_RADIUS, drc, enforce_drc)
     
     want_length = data_cuts[l_index][cut_index]
     while len(resolved_data)//3 < want_length:
@@ -258,9 +263,28 @@ def minimize_log_prob(float_theta, fix_theta, simulate_func, l_index, cut_index)
     want_length = data_cuts[l_index][cut_index]
     for i in range(want_length):
         chisq += np.matmul(y[i] - model[i], np.matmul(y_inv_covs[i], y[i] - model[i]))
+
     return chisq
 
-logging.info("TRUE REDCHI: {}".format(minimize_log_prob(theta_true, [], asteroids_0_2.simulate, 0, -1) / len(y) / 3))
+
+if ASTEROIDS_MAX_K == 3:
+    if ASTEROIDS_MAX_J == 0:
+        real_sim_func = asteroids_0_3.simulate
+    elif ASTEROIDS_MAX_J == 2:
+        real_sim_func = asteroids_2_3.simulate
+    elif ASTEROIDS_MAX_J == 3:
+        real_sim_func = asteroids_3_3.simulate
+elif ASTEROIDS_MAX_K == 2:
+    if ASTEROIDS_MAX_J == 0:
+        real_sim_func = asteroids_0_2.simulate
+    elif ASTEROIDS_MAX_J == 2:
+        real_sim_func = asteroids_2_2.simulate
+    elif ASTEROIDS_MAX_J == 3:
+        real_sim_func = asteroids_3_2.simulate
+
+
+logging.info("TRUE REDCHI: {}".format(minimize_log_prob(theta_true, [], real_sim_func, -1, -1) / len(y) / 3))
+
 
 def get_minimum(arg):
     point, fix_theta, l, bounds = arg
@@ -301,7 +325,9 @@ def get_minimum(arg):
                 'maxcor': 10,
                 'maxfun': 15000})'''
 
-        bfgs_min = optimize.minimize(minimize_log_prob_cut, point, method='Nelder-Mead')
+        bfgs_min = optimize.minimize(minimize_log_prob_cut, point, method='Nelder-Mead', options={
+            'maxiter': 200 * len(point),
+        })
 
         point = bfgs_min.x
 
@@ -459,7 +485,7 @@ for i, num_fits in enumerate(NUM_FITS):
     for fix_theta, evals, evecs, _ in queue:
         tier_results = minimize(i+2, num_fits, fix_theta)
         for result_theta, result_evals, result_evecs, result_redchi in tier_results:
-            logging.info("Deg {} redchi: {}".format(i, result_redchi))
+            logging.info("Deg {} redchi: {}. Theta: {}".format(i, result_redchi, result_theta))
             new_queue.append((fix_theta + list(result_theta), evals + list(result_evals),
                 evecs + list(result_evecs), result_redchi))
     queue = new_queue
@@ -621,7 +647,7 @@ for index in range(len(kernel)):
         burnin = int(2 * np.max(tau))
         thin = int(0.5 * np.min(tau))
     except:
-        logging.warning("Could not find autocorrelation time because the chain is too short.")
+        logging.warning("MCMC did not converge")
         thin = DEFAULT_THIN
         burnin = 1000
 
