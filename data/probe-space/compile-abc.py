@@ -12,6 +12,24 @@ file_names.sort()
 DIFF_EXPECTED_FACTOR = [1e-2, 1e-5, 1e-4]
 END_LENGTH = 100
 
+def get_ratios(k22, k20):
+    Ixx = 2/3.0 * k20 - 4 * k22 + 2/3.0
+    Iyy = 2/3.0 * k20 + 4 * k22 + 2/3.0
+    Izz = -4/3.0 * k20 + 2/3.0
+    asquared = 0.9 * (Iyy + Izz - Ixx)
+    bsquared = 0.9 * (Ixx + Izz - Iyy) / asquared
+    csquared = 0.9 * (Ixx + Iyy - Izz) / asquared
+    a_per_c = 1 / np.sqrt(csquared)
+    b_per_c = a_per_c * np.sqrt(bsquared)
+    return a_per_c, b_per_c
+
+def convert(thetas):
+    out = []
+    for entry in thetas:
+        ac, bc = get_ratios(entry[1], entry[2])
+        out.append([entry[0], ac, bc])
+    return np.array(out)
+
 # Fill points
 for bare in file_names:
     if not os.path.isdir(bare):
@@ -28,7 +46,7 @@ for bare in file_names:
     speed = float(f.readline())
     spin = [float(x) for x in f.readline().split(',')]
     jlms = [float(x) for x in f.readline().split(',')]
-    theta_true = [float(x) for x in f.readline().split(',')]
+    theta_true = convert([[float(x) for x in f.readline().split(',')]])
     theta_high = [float(x) for x in f.readline().split(',')]
     theta_low = [float(x) for x in f.readline().split(',')]
     SIGMA = float(f.readline())
@@ -37,83 +55,19 @@ for bare in file_names:
     points.append(theta_true)
 points = np.array(points)
 
-'''plt.figure()
-for i, point in enumerate(points):
-    success_count = 0
-    for file in os.listdir(names[i]):
-        if file[-11:] == "samples.npy":
-            success_count += 1
-    plt.text(x=point[1], y=point[2], s=str(success_count))
-plt.title("Distribution of parameter points")
-plt.xlim(-0.15, 0.15)
-plt.ylim(-0.28, 0.03)
-plt.show()'''
-
-# Plot pdfs
-def plot_pdf(index):
-    side_length = int(-0.5 + np.sqrt(1 + 8 * len(names)) / 2)
-    fig = plt.figure(constrained_layout=True, figsize=(10, 7))
-    gs = fig.add_gridspec(side_length, 2 * side_length)
-    ax_min = 0
-    ax_max = 0
-    axs = []
-    for i in range(side_length):
-        for j in range(side_length):
-            if i < j:
-                continue
-            ax = fig.add_subplot(gs[i, (side_length-i)+2*j-1:(side_length-i)+2*j+1])
-            ax.set_axis_off()
-            #ax.set_yticklabels([])
-            axs.append(ax)
-
-            name_index = j + i * (i+1) // 2
-
-            data = []# file, means
-            for file in os.listdir(names[name_index]):
-                if not file[-11:] == "samples.npy": continue
-                array = np.loadtxt("{}/{}".format(names[name_index], file))[index]
-                means = np.mean(array)
-                data.append((file, means))
-
-            ### I took this apart
-            sys.exit()
-
-            # plot the minimizing array
-            if min_dist is None or min_dist > DIFF_THRESHOLD[index]:
-                continue
-            array = np.loadtxt("{}/{}".format(names[name_index], min_file))[index] - points[name_index][index]
-            _, bins, _ = ax.hist(array, bins=12, fill=False, density=True)
-            ax_min = min(ax_min, np.min(bins))
-            ax_max = max(ax_max, np.max(bins))
-            ax.text(x=0.05, y=0.9, s="{}".format(name_index), transform=ax.transAxes)
-            ax.axvline(x=0, color='b')
-
-    for i, ax in enumerate(axs):
-        ax.set_xlim(ax_min, ax_max)
-        #if i < len(names) - side_length:
-        #    ax.set_xticklabels([])
-
-    fig.savefig("theta-{}-hists.png".format(index))
-
 def covariance():
     side_length = int(-0.5 + np.sqrt(1 + 8 * len(names)) / 2)
     X = []
     Y = []
-    cov12_data = []
     corr12_data = []
-    cov01_data = []
     corr01_data = []
-    cov02_data = []
     corr02_data = []
     sigma0_data = []
     sigma1_data = []
     sigma2_data = []
-    for i, y in enumerate(np.linspace(0, -0.25, side_length)):
-        cov12_data_line = []
+    for i, k20 in enumerate(np.linspace(0, -0.25, side_length)):
         corr12_data_line = []
-        cov01_data_line = []
         corr01_data_line = []
-        cov02_data_line = []
         corr02_data_line = []
         sigma0_data_line = []
         sigma1_data_line = []
@@ -121,7 +75,7 @@ def covariance():
         X_line = []
         Y_line = []
         delta = 0.25 / side_length / 2 * (side_length - i - 1)
-        for j, x in enumerate(np.linspace(-0.125+delta, 0.125+delta, side_length)):
+        for j, k22 in enumerate(np.linspace(-0.125+delta, 0.125+delta, side_length)):
             index = i * (i + 1) // 2 + j
             if i < j:
                 cov = np.array([[np.nan, np.nan, np.nan], [np.nan, np.nan, np.nan], [np.nan, np.nan, np.nan]])
@@ -138,6 +92,8 @@ def covariance():
                         if arrays.shape[1] == 0:
                             continue
                         arrays = arrays.reshape(arrays.shape[0], arrays.shape[1] * arrays.shape[2])
+                        
+                        arrays = convert(arrays.transpose()).transpose()
 
                         diffs = np.mean(arrays, axis=1) - points[index]
                         cov = np.cov(arrays) / SIGMA**2
@@ -149,109 +105,106 @@ def covariance():
                 else:
                     min_index = np.argmin(weights)
                     _, _, cov = data[min_index]
+            
+            x, y = get_ratios(k22, k20)
+            if np.isnan(x) or not np.isfinite(x):
+                x = 0
+            if np.isnan(y) or not np.isfinite(y):
+                y = 0
                 
             corr12 = cov[1][2] / np.sqrt(cov[1][1] * cov[2][2])
             corr01 = cov[0][1] / np.sqrt(cov[0][0] * cov[1][1])
             corr02 = cov[0][2] / np.sqrt(cov[0][0] * cov[2][2])
-            cov12_data_line.append(cov[1][2])
             corr12_data_line.append(corr12)
-            cov01_data_line.append(cov[0][1])
             corr01_data_line.append(corr01)
-            cov02_data_line.append(cov[0][2])
             corr02_data_line.append(corr02)
             sigma0_data_line.append(np.sqrt(cov[0][0]))
             sigma1_data_line.append(np.sqrt(cov[1][1]))
             sigma2_data_line.append(np.sqrt(cov[2][2]))
 
-            #if not np.isnan(corr):
-            #    print(np.sqrt(cov[0][0]), names[index])
-
             X_line.append(x)
             Y_line.append(y)
-        cov12_data.append(cov12_data_line)
+
         corr12_data.append(corr12_data_line)
-        cov01_data.append(cov01_data_line)
         corr01_data.append(corr01_data_line)
-        cov02_data.append(cov02_data_line)
         corr02_data.append(corr02_data_line)
         sigma0_data.append(sigma0_data_line)
         sigma1_data.append(sigma1_data_line)
         sigma2_data.append(sigma2_data_line)
+
+        X_line = np.array(X_line)
+        Y_line = np.array(Y_line)
+
         X.append(X_line)
         Y.append(Y_line)
-
 
     plt.figure(figsize=(8, 6))
     c = plt.contourf(X, Y, corr12_data, levels=20)
     axc = plt.colorbar(c)
-    axc.set_label("$\\textrm{Corr}(\\theta_2, \\theta_3)$")
-    plt.xlim(-0.11, 0.11)
-    plt.ylim(-0.24, -0.03)
-    plt.xlabel("$\\theta_2$")
-    plt.ylabel("$\\theta_3$")
+    axc.set_label("$\\textrm{Corr}(a/c, b/c)$")
+    plt.xlabel("$a/c$")
+    plt.ylabel("$b/c$")
+    plt.xlim(1, 6.7)
+    plt.ylim(1, 6.7)
     plt.tight_layout()
-    plt.savefig("compile-figs/corr23.png")
+    plt.savefig("compile-figs/corrab.png")
 
     plt.figure(figsize=(8, 6))
     c = plt.contourf(X, Y, corr01_data, levels=20)
     axc = plt.colorbar(c)
-    axc.set_label("$\\textrm{Corr}(\\theta_1, \\theta_3)$")
-    plt.xlim(-0.11, 0.11)
-    plt.ylim(-0.24, -0.03)
-    plt.xlabel("$\\theta_2$")
-    plt.ylabel("$\\theta_3$")
+    axc.set_label("$\\textrm{Corr}(\\theta_1 ,a/c)$")
+    plt.xlabel("$a/c$")
+    plt.ylabel("$b/c$")
+    plt.xlim(1, 6.7)
+    plt.ylim(1, 6.7)
     plt.tight_layout()
-    plt.savefig("compile-figs/corr12.png")
+    plt.savefig("compile-figs/corr1a.png")
 
     plt.figure(figsize=(8, 6))
     c = plt.contourf(X, Y, corr02_data, levels=20)
     axc = plt.colorbar(c)
-    axc.set_label("$\\textrm{Corr}(\\theta_1, \\theta_3)$")
-    plt.xlim(-0.11, 0.11)
-    plt.ylim(-0.24, -0.03)
-    plt.xlabel("$\\theta_2$")
-    plt.ylabel("$\\theta_3$")
+    axc.set_label("$\\textrm{Corr}(\\theta_1, b/c)$")
+    plt.xlabel("$a/c$")
+    plt.ylabel("$b/c$")
+    plt.xlim(1, 6.7)
+    plt.ylim(1, 6.7)
     plt.tight_layout()
-    plt.savefig("compile-figs/corr13.png")
+    plt.savefig("compile-figs/corr1b.png")
 
     plt.figure(figsize=(8, 6))
     c = plt.contourf(X, Y, sigma0_data, levels=20)
     axc = plt.colorbar(c)
-    plt.xlim(-0.11, 0.11)
-    plt.ylim(-0.24, -0.03)
     axc.set_label("$\\sigma(\\theta_1)/\\sigma_\\theta$")
-    plt.xlabel("$\\theta_2$")
-    plt.ylabel("$\\theta_3$")
+    plt.xlabel("$a/c$")
+    plt.ylabel("$b/c$")
+    plt.xlim(1, 6.7)
+    plt.ylim(1, 6.7)
     plt.tight_layout()
-    plt.savefig("compile-figs/theta-1-sigma.png")
+    plt.savefig("compile-figs/theta-1-ab-sigma.png")
 
     plt.figure(figsize=(8, 6))
     c = plt.contourf(X, Y, sigma1_data, levels=20)
     axc = plt.colorbar(c)
-    plt.xlim(-0.11, 0.11)
-    plt.ylim(-0.24, -0.03)
-    axc.set_label("$\\sigma(\\theta_2)/\\sigma_\\theta$")
-    plt.xlabel("$\\theta_2$")
-    plt.ylabel("$\\theta_3$")
+    axc.set_label("$\\sigma(a/c)/\\sigma_\\theta$")
+    plt.xlabel("$a/c$")
+    plt.ylabel("$b/c$")
+    plt.xlim(1, 6.7)
+    plt.ylim(1, 6.7)
     plt.tight_layout()
-    plt.savefig("compile-figs/theta-2-sigma.png")
+    plt.savefig("compile-figs/theta-a-sigma.png")
 
     plt.figure(figsize=(8, 6))
     c = plt.contourf(X, Y, sigma2_data, levels=20)
     axc = plt.colorbar(c)
-    plt.xlim(-0.11, 0.11)
-    plt.ylim(-0.24, -0.03)
-    axc.set_label("$\\sigma(\\theta_3)/\\sigma_\\theta$")
-    plt.xlabel("$\\theta_2$")
-    plt.ylabel("$\\theta_3$")
+    axc.set_label("$\\sigma(b/c)/\\sigma_\\theta$")
+    plt.xlabel("$a/c$")
+    plt.ylabel("$b/c$")
+    plt.xlim(1, 6.7)
+    plt.ylim(1, 6.7)
     plt.tight_layout()
-    plt.savefig("compile-figs/theta-3-sigma.png")
+    plt.savefig("compile-figs/theta-b-sigma.png")
 
 
 if __name__ == "__main__":
     covariance()
     plt.show()
-    #plot_pdf(1)
-    #plt.show()
-    #plot_pdf(2)
-    #plt.show()
