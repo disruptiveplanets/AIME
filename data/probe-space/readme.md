@@ -41,3 +41,7 @@ The MCMC now converges after a few thousand iterations; it only took a few hours
 ![Theta 3 sigma](theta-3-sigma.png)
 
 The next step should be to make these plots again for a, b, and c, then a sigma scan.
+
+# Jan 7
+
+Reran the code to make the likelihood half the chi squared. The above plots are still correct.

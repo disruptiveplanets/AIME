@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "probe-space-1"
+PATH = "probe-space"
 FORBIDDEN_NAMES = ["ob"]
 
 I_LIMIT = -1
