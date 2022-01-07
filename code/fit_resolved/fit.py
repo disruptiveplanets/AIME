@@ -1,4 +1,4 @@
-TEST = False
+TEST = True
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -152,7 +152,7 @@ def log_likelihood(theta, y, y_inv_covs):
     chisq = 0
     for i in range(len(y)):
         chisq += np.matmul(y[i] - model[i], np.matmul(y_inv_covs[i], y[i] - model[i]))
-    return -chisq
+    return -chisq / 2.0
 
 def log_prior(theta):
     for i, param in enumerate(theta):
@@ -264,7 +264,7 @@ def minimize_log_prob(float_theta, fix_theta, simulate_func, l_index, cut_index)
     for i in range(want_length):
         chisq += np.matmul(y[i] - model[i], np.matmul(y_inv_covs[i], y[i] - model[i]))
 
-    return chisq
+    return chisq / 2.0
 
 
 if ASTEROIDS_MAX_K == 3:
