@@ -1,4 +1,4 @@
-TEST = False
+TEST = True
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -49,7 +49,7 @@ MAX_N_STEPS = 100_000
 MIN_THETA_DIST = 0.01
 LARGE_NUMBER = 1e100
 MIN_SPACING = np.array([1.0e-6, 1.0e-6, 1.0e-6,
-    0, 0, 0, 0, 0, 0, 0])
+    1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1])# Comes in blocks corresponding to the block diagonals
 MAX_SPACING = np.array([0.0003, 0.0003, 0.0003,
     LARGE_NUMBER, LARGE_NUMBER, LARGE_NUMBER, LARGE_NUMBER, LARGE_NUMBER, LARGE_NUMBER, LARGE_NUMBER])
 DEFAULT_THIN = 10
@@ -84,7 +84,7 @@ assert(len(theta_true) == (ASTEROIDS_MAX_K + 1)**2 - 6)
 assert(len(jlms) == (ASTEROIDS_MAX_J + 1)**2)
 assert(np.all(theta_high > theta_low))
 
-SIGMA_FACTOR = sigma / 0.01# Assume that spacing is proportional to sigma.
+SIGMA_FACTOR = (sigma / 0.01)**2
 
 NUM_FITS = NUM_FITS[:ASTEROIDS_MAX_K-1]
 
@@ -539,8 +539,14 @@ def populate(evals, diagonalizer, count, start):
     diagonal_points = spacing * (np.random.randn(count * N_DIM).reshape(count, N_DIM))
     global_points = np.asarray([np.matmul(diagonalizer.transpose(), d) for d in diagonal_points]) + start
 
-    for point in global_points:
-        logging.info("{}, {}".format(point, log_probability(point, y, y_inv_covs) / len(y) / 3))
+    for i, point in enumerate(global_points):
+        while True:
+            logprob = log_probability(point, y, y_inv_covs)
+            if np.isfinite(logprob):
+                break
+            point = np.matmul(diagonalizer.transpose(), spacing * np.random.randn(N_DIM)) + start
+            global_points[i] = point
+        logging.info("{}, {}".format(point, logprob / len(y) / 3))
 
     return global_points
 
