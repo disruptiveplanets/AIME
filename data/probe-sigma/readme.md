@@ -1,4 +1,4 @@
-## Jan 5
+## Jan 5 & 6
 
 I restarted this folder pursuant to the param search completing successfully. The first task is to adapt the code so that it works for l=3 and for sigma other than 0.01.
 - I fixed bugs that prevented the tiered minimization working
@@ -15,3 +15,5 @@ I restarted this folder pursuant to the param search completing successfully. Th
 - Things take forever to converge. Should I be worried?
     - No, I don't think so. This convergence takes forever with sigma=0.01, and I don't expect good convergence here because the parameters are so badly known.
 - Then can I just run the fit, I think. Let's start with the smallest sigma.
+
+I learned that in order to minimize for very low data sigma over l=3, I need to add in another minimization tier. After some experimenting, I found that a tier at drc ___ was sufficient.

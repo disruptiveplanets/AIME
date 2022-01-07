@@ -4,12 +4,12 @@ import sys, corner, emcee, os
 if not TEST:
     import asteroids_0_3, asteroids_0_2, asteroids_2_3, asteroids_2_2, asteroids_3_3, asteroids_3_2
 else:
-    import test_0_2 as asteroids_0_2
-    import test_0_2 as asteroids_0_3
-    import test_0_2 as asteroids_2_2
-    import test_0_2 as asteroids_2_3
-    import test_0_2 as asteroids_3_2
-    import test_0_2 as asteroids_3_3
+    import test_loglike as asteroids_0_2
+    import test_loglike as asteroids_0_3
+    import test_loglike as asteroids_2_2
+    import test_loglike as asteroids_2_3
+    import test_loglike as asteroids_3_2
+    import test_loglike as asteroids_3_3
 import numpy as np
 import matplotlib.pyplot as plt
 import random_vector
@@ -229,7 +229,7 @@ class Display:
         try:
             resolved_data = self.module.simulate(self.cadence, self.jlms, theta[1:],
                 self.radius, self.spin[0], self.spin[1], self.spin[2], theta[0],
-                self.impact_parameter, self.speed, CENTRAL_MU, CENTRAL_RADIUS, -1)
+                self.impact_parameter, self.speed, CENTRAL_MU, CENTRAL_RADIUS, 0, False)
         except:
             print("Coordinates are invalid ({})".format(theta))
             return None

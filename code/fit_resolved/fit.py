@@ -6,12 +6,12 @@ import emcee, time, sys, logging
 if not TEST:
     import asteroids_0_2, asteroids_0_3, asteroids_2_2, asteroids_2_3, asteroids_3_2, asteroids_3_3
 if TEST:
-    import test_0_2 as asteroids_0_2
-    import test_0_2 as asteroids_0_3
-    import test_0_2 as asteroids_2_2
-    import test_0_2 as asteroids_2_3
-    import test_0_2 as asteroids_3_2
-    import test_0_2 as asteroids_3_3
+    import test_loglike as asteroids_0_2
+    import test_loglike as asteroids_0_3
+    import test_loglike as asteroids_2_2
+    import test_loglike as asteroids_2_3
+    import test_loglike as asteroids_3_2
+    import test_loglike as asteroids_3_3
 from multiprocessing import Pool
 import random_vector, random
 from scipy import optimize
@@ -33,10 +33,10 @@ except:
 logging.basicConfig(level=logging.INFO)
 
 PLOT_POSES = True
-NUM_MINIMIZE_POINTS = 8#48
+NUM_MINIMIZE_POINTS = 48
 DISTANCE_RATIO_CUTS = [
     [2.0, None],
-    [1.01, None]
+    [-2.0, None]
 ]
 
 GM = 3.986004418e14
