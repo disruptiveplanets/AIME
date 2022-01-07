@@ -1,4 +1,4 @@
-TEST = True
+TEST = False
 
 import numpy as np
 import matplotlib.pyplot as plt
