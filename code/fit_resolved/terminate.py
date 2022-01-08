@@ -96,8 +96,8 @@ def terminal(output_name, do_not_duplicate=True):
     ####################################################################
 
     for index in range(num_trials):
-
         reader = emcee.backends.HDFBackend(output_name+"-{}.h5".format(index), read_only=True)
+
 
         try:
             tau = reader.get_autocorr_time()
@@ -107,8 +107,12 @@ def terminal(output_name, do_not_duplicate=True):
             print("Could not find autocorrelation time because the chain is too short.")
             thin = DEFAULT_THIN
             burnin = 1000
+        try:
+            samples = reader.get_chain(discard=burnin, thin=thin)
+        except Exception:
+            print(f"There was no index {index}")
+            continue
 
-        samples = reader.get_chain(discard=burnin, thin=thin)
         log_prob_samples = -reader.get_log_prob(discard=burnin, thin=thin) / 3 / n_data 
         #log_prior_samples = reader.get_blobs(discard=burnin, thin=thin)
         redchis = np.nanmin(log_prob_samples, axis=0)

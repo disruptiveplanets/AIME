@@ -15,6 +15,15 @@ import matplotlib.pyplot as plt
 import random_vector
 from scipy.linalg import pinvh
 
+import matplotlib as mpl
+mpl.rcParams["text.usetex"] = True
+mpl.rcParams["font.family"] = "serif"
+mpl.rcParams["legend.framealpha"] = 0.5
+mpl.rcParams["lines.linewidth"] = 2
+mpl.rcParams["lines.markersize"] = 4
+mpl.rcParams["font.size"] = 16
+mpl.rcParams["legend.fontsize"] = 10
+
 
 EARTH_RADIUS = 6370000
 STANDARD_RESULTS_METHOD = False
@@ -42,7 +51,13 @@ class Display:
             self.chain_length, self.nwalkers, self.ndim = self.reader.get_chain().shape
         except AttributeError:
             raise Exception("Could not find the file {}.".format(self.h5_name+".h5"))
-        self.theta_labels = list(map(r"$\theta_{{{0}}}$".format, range(1, self.ndim + 1)))
+        #self.theta_labels = list(map(r"$\Delta\theta_{{{0}}}$".format, range(1, self.ndim + 1)))
+        self.theta_labels = ["$\Delta\\alpha$", "$\Delta K_{22}$", "$\Delta K_{20}$"]
+        if self.ndim >= 10:
+            self.theta_labels += ["$\Re\Delta K_{33}$", "$\Im\Delta K_{33}$",
+                                  "$\Re\Delta K_{32}$", "$\Im\Delta K_{32}$",
+                                  "$\Re\Delta K_{31}$", "$\Im\Delta K_{31}$",
+                                  "$\Delta K_{30}$"]
 
     def get_true_results(self):
         if self.true_results is not None:
@@ -70,7 +85,7 @@ class Display:
 
     def show_params(self):
         self.get_samples()
-        fig, axes = plt.subplots(self.ndim, figsize=(6.6, 4.6), sharex=True)
+        fig, axes = plt.subplots(self.ndim, figsize=(6.6, 6.6), sharex=True)
         for i in range(self.ndim):
             ax = axes[i]
             ax.plot(self.samples[:, :, i], "k", alpha=0.3)
@@ -78,6 +93,7 @@ class Display:
             ax.set_ylabel(self.theta_labels[i])
             #ax.yaxis.set_label_coords(-0.1, 0.5)
         axes[-1].set_xlabel("step number");
+        
         plt.savefig(self.h5_name+"-params.png")
 
     def show_redchi(self):
@@ -91,7 +107,7 @@ class Display:
 
         f = open(self.h5_name + '-redchis.txt', 'w')
         for i in range(self.log_prob_samples.shape[1]):
-            redchi_list = -self.log_prob_samples[:,i] / len(self.true_results) / 3
+            redchi_list = -self.log_prob_samples[:,i] / len(self.true_results) / 3 * 2
             redchi = np.nanmin(redchi_list)
             f.write(str(redchi) + "\n")
             if redchi < REDCHI_THRESHOLD:
@@ -106,6 +122,7 @@ class Display:
         plt.ylim(0, max(2, 2 * redchiminmean))
         plt.text(0.5, 0.5, "{} / {} walkers converged".format(num_converged, self.log_prob_samples.shape[1]),
         horizontalalignment='center', verticalalignment='center', transform = plt.gca().transAxes)
+        plt.tight_layout()
         plt.savefig(self.h5_name+"-redchi.png")
 
 
@@ -122,7 +139,7 @@ class Display:
             if self.true_results is None:
                 self.get_true_results()
 
-            redchi = -self.log_prob_samples[-1,:] / len(self.true_results)
+            redchi = -self.log_prob_samples[-1,:] / len(self.true_results) * 2
             mask = redchi < REDCHI_THRESHOLD
             if np.sum(mask) == 0:
                 mask = np.ones(self.log_prob_samples.shape[1], dtype=bool)
@@ -137,20 +154,25 @@ class Display:
         self.get_mask()
 
         res = self.get_results()
-        transpose_res = [np.asarray([l[i] for l in res]) for i in range(3)]
+        transpose_res = np.array([np.asarray([l[i] for l in res]) for i in range(3)]) - np.array(self.theta_true)
 
         flat_samples = self.samples[:,self.mask,:].reshape(
-            (self.samples.shape[0] * np.sum(self.mask), self.samples.shape[2]))
+            (self.samples.shape[0] * np.sum(self.mask), self.samples.shape[2])) - np.array(self.theta_true)
 
         #flat_samples = np.unique(flat_samples, axis=0)
 
+        param_exps = np.ceil(-np.log10(np.maximum(np.abs(np.max(flat_samples, axis=0)), np.max(flat_samples, axis=0))))
+        exp_labels = []
+        for l, e in zip(self.theta_labels, param_exps):
+            exp_labels.append(l + " ($\\times 10^{"+str(int(-e))+"}$)")
+
         fig = corner.corner(
-            flat_samples, labels=self.theta_labels, truths=self.theta_true
+            flat_samples * 10**param_exps, labels=exp_labels, truths=np.zeros_like(self.theta_true)
         );
 
-        corner.overplot_lines(fig, transpose_res[0], color='red')
-        corner.overplot_lines(fig, transpose_res[0] + transpose_res[1], color='red', linestyle='dotted')
-        corner.overplot_lines(fig, transpose_res[0] - transpose_res[2], color='red', linestyle='dotted')
+        #corner.overplot_lines(fig, (transpose_res[0]) * 10**param_exps, color='C1', linestyle='dashed')
+        #corner.overplot_lines(fig, (transpose_res[0] + transpose_res[1]) * 10**param_exps, color='C1', linestyle='dotted')
+        #corner.overplot_lines(fig, (transpose_res[0] - transpose_res[2]) * 10**param_exps, color='C1', linestyle='dotted')
 
         plt.savefig(self.h5_name+"-corner.png")
         return len(self.true_results)
@@ -254,34 +276,35 @@ class Display:
         fig, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(12, 6), sharex=True)
 
         x_display = np.arange(len(self.true_results)) * self.cadence / 3600.0
-        ax1.scatter(x_display, self.true_results[:,0], label = 'true x', alpha=0.5, color='C0', s=1)
-        ax1.scatter(x_display, self.true_results[:,1], label = 'true y', alpha=0.5, color='C1', s=1)
-        ax1.scatter(x_display, self.true_results[:,2], label = 'true z', alpha=0.5, color='C2', s=1)
+        ax1.scatter(x_display, self.true_results[:,0] * 3600, label = 'true x', alpha=0.5, color='C0', s=1)
+        ax1.scatter(x_display, self.true_results[:,1] * 3600, label = 'true y', alpha=0.5, color='C1', s=1)
+        ax1.scatter(x_display, self.true_results[:,2] * 3600, label = 'true z', alpha=0.5, color='C2', s=1)
 
-        ax1.fill_between(x_display, self.true_results[:,0] + uncertainties[:,0],
-                self.true_results[:,0] - uncertainties[:,0], color="C0", alpha=0.2)
-        ax1.fill_between(x_display, self.true_results[:,1] + uncertainties[:,1],
-                self.true_results[:,1] - uncertainties[:,1], color="C1", alpha=0.2)
-        ax1.fill_between(x_display, self.true_results[:,2] + uncertainties[:,2],
-                self.true_results[:,2] - uncertainties[:,2], color="C2", alpha=0.2)
+        ax1.fill_between(x_display, self.true_results[:,0] * 3600 + uncertainties[:,0] * 3600,
+                self.true_results[:,0] * 3600 - uncertainties[:,0] * 3600, color="C0", alpha=0.2)
+        ax1.fill_between(x_display, self.true_results[:,1] * 3600 + uncertainties[:,1] * 3600,
+                self.true_results[:,1] * 3600 - uncertainties[:,1], color="C1", alpha=0.2)
+        ax1.fill_between(x_display, self.true_results[:,2] * 3600 + uncertainties[:,2] * 3600,
+                self.true_results[:,2] * 3600 - uncertainties[:,2] * 3600, color="C2", alpha=0.2)
 
         if mean_res is not None:
-            ax1.plot(x_display, mean_res[:,0], label = 'mean x', color='C0')
-            ax1.plot(x_display, mean_res[:,1], label = 'mean y', color='C1')
-            ax1.plot(x_display, mean_res[:,2], label = 'mean z', color='C2')
-        ax1.set_ylabel("Spin (rad/s)")
+            ax1.plot(x_display, mean_res[:,0] * 3600, label = 'mean x', color='C0')
+            ax1.plot(x_display, mean_res[:,1] * 3600, label = 'mean y', color='C1')
+            ax1.plot(x_display, mean_res[:,2] * 3600, label = 'mean z', color='C2')
+        ax1.set_ylabel("Spin (rad/hr)")
         ax1.legend()
 
         if mean_res is not None:
-            ax2.scatter(x_display, mean_res[:,0] - self.true_results[:,0], color='C0', s=1)
-            ax2.scatter(x_display, mean_res[:,1] - self.true_results[:,1], color='C1', s=1)
-            ax2.scatter(x_display, mean_res[:,2] - self.true_results[:,2], color='C2', s=1)
-            ax2.fill_between(x_display, uncertainties[:,0], -uncertainties[:,0], color="C0", alpha=0.2)
-            ax2.fill_between(x_display, uncertainties[:,1], -uncertainties[:,1], color="C1", alpha=0.2)
-            ax2.fill_between(x_display, uncertainties[:,2], -uncertainties[:,2], color="C2", alpha=0.2)
+            ax2.scatter(x_display, mean_res[:,0] * 3600 - self.true_results[:,0] * 3600, color='C0', s=1)
+            ax2.scatter(x_display, mean_res[:,1] * 3600 - self.true_results[:,1] * 3600, color='C1', s=1)
+            ax2.scatter(x_display, mean_res[:,2] * 3600 - self.true_results[:,2] * 3600, color='C2', s=1)
+            ax2.fill_between(x_display, uncertainties[:,0] * 3600, -uncertainties[:,0] * 3600, color="C0", alpha=0.2)
+            ax2.fill_between(x_display, uncertainties[:,1] * 3600, -uncertainties[:,1] * 3600, color="C1", alpha=0.2)
+            ax2.fill_between(x_display, uncertainties[:,2] * 3600, -uncertainties[:,2] * 3600, color="C2", alpha=0.2)
 
-        ax2.set_ylabel("Residuals (rad/s)")
+        ax2.set_ylabel("Residuals (rad/hr)")
         ax2.set_xlabel("Time (hours)")
+        plt.tight_layout()
 
         plt.savefig(self.h5_name+"-compare.png")
 
