@@ -30,8 +30,9 @@ if __name__ == "__main__":
             fname = os.path.splitext(fname)[0]
             submit(fname)
 
-    elif len(sys.argv) == 2:
-        submit(sys.argv[-1])
+    elif len(sys.argv) >= 2:
+        for fname in sys.argv[1:]:
+            submit(fname)
         #if sys.argv[1] == "reload":
         #    reload = ' reaload'
         #else:

@@ -376,7 +376,11 @@ def get_minimum(arg):
 
     new_evals = []
     new_evecs = []
-    evals, evecs = mp.eigsy(mp.matrix(hess))
+    try:
+        evals, evecs = mp.eigsy(mp.matrix(hess))
+    except Exception:
+        logging.error(f"Could not find eigenvectors of the Hessian {hess}")
+        return None, None, None, None
     for e in evals:
         ### Correct for non positive definite hessians
         new_evals.append(float(e))
