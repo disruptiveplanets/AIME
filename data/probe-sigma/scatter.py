@@ -2,7 +2,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-LOW_ORDER_INDEX = 0
+LOW_ORDER_INDEX = 1
 BASE_NAME = f"sigma-0-{LOW_ORDER_INDEX}"
 LOW_LOG_SIGMA = -5
 HIGH_LOG_SIGMA = 0
