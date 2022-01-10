@@ -1,4 +1,5 @@
 # Goal: spawn a bunch of runs that cover the parameter space.
+from re import S
 from matplotlib import pyplot as plt
 import numpy as np
 import os
@@ -11,6 +12,15 @@ file_names.sort()
 
 DIFF_EXPECTED_FACTOR = [1e-2, 1e-5, 1e-4]
 END_LENGTH = 100
+KEY_INDICES = [24, 94, 101]
+
+
+FIG_SIZE = (5.333, 4)
+
+def plot_pt():
+    plt.scatter([0], [-0.09766608], color='k', marker='o')
+    plt.scatter([0.05200629], [-0.2021978], color='k', marker='s')
+    plt.scatter([-0.05200629], [-0.2021978], color='k', marker='s')
 
 # Fill points
 for bare in file_names:
@@ -93,7 +103,7 @@ def plot_pdf(index):
         #if i < len(names) - side_length:
         #    ax.set_xticklabels([])
 
-    fig.savefig("theta-{}-hists.png".format(index))
+    fig.savefig("theta-{}-hists.pdf".format(index))
 
 def covariance():
     side_length = int(-0.5 + np.sqrt(1 + 8 * len(names)) / 2)
@@ -163,6 +173,9 @@ def covariance():
             sigma1_data_line.append(np.sqrt(cov[1][1]))
             sigma2_data_line.append(np.sqrt(cov[2][2]))
 
+            if index in KEY_INDICES:
+                print(f"{names[index]}: sigmas: {np.sqrt(cov[0][0])}, {np.sqrt(cov[1][1])}, {np.sqrt(cov[2][2])}. Corrs: {corr01}, {corr02}, {corr12}")
+
             #if not np.isnan(corr):
             #    print(np.sqrt(cov[0][0]), names[index])
 
@@ -181,71 +194,77 @@ def covariance():
         Y.append(Y_line)
 
 
-    plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, corr12_data, levels=20)
+    plt.figure(figsize=FIG_SIZE)
+    c = plt.contourf(X, Y, corr12_data, levels=20, cmap='Oranges_r')
     axc = plt.colorbar(c)
-    axc.set_label("$\\textrm{Corr}(\\theta_2, \\theta_3)$")
+    axc.set_label("$\\textrm{Corr}(K_{22}, K_{20})$")
+    plot_pt()
     plt.xlim(-0.11, 0.11)
     plt.ylim(-0.24, -0.03)
-    plt.xlabel("$\\theta_2$")
-    plt.ylabel("$\\theta_3$")
+    plt.xlabel("$K_{22}$")
+    plt.ylabel("$K_{20}$")
     plt.tight_layout()
-    plt.savefig("compile-figs/corr23.png")
+    plt.savefig("compile-figs/corr23.pdf")
 
-    plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, corr01_data, levels=20)
+    plt.figure(figsize=FIG_SIZE)
+    c = plt.contourf(X, Y, np.array(corr01_data), levels=20, cmap='Oranges_r')
     axc = plt.colorbar(c)
-    axc.set_label("$\\textrm{Corr}(\\theta_1, \\theta_3)$")
+    axc.set_label("$\\textrm{Corr}(\\alpha, K_{22})$")
+    plot_pt()
     plt.xlim(-0.11, 0.11)
     plt.ylim(-0.24, -0.03)
-    plt.xlabel("$\\theta_2$")
-    plt.ylabel("$\\theta_3$")
+    plt.xlabel("$K_{22}$")
+    plt.ylabel("$K_{20}$")
     plt.tight_layout()
-    plt.savefig("compile-figs/corr12.png")
+    plt.savefig("compile-figs/corr12.pdf")
 
-    plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, corr02_data, levels=20)
+    plt.figure(figsize=FIG_SIZE)
+    c = plt.contourf(X, Y, np.array(corr02_data), levels=20, cmap='Oranges_r')
     axc = plt.colorbar(c)
-    axc.set_label("$\\textrm{Corr}(\\theta_1, \\theta_3)$")
+    axc.set_label("$\\textrm{Corr}(\\alpha, K_{20})$")
+    plot_pt()
     plt.xlim(-0.11, 0.11)
     plt.ylim(-0.24, -0.03)
-    plt.xlabel("$\\theta_2$")
-    plt.ylabel("$\\theta_3$")
+    plt.xlabel("$K_{22}$")
+    plt.ylabel("$K_{20}$")
     plt.tight_layout()
-    plt.savefig("compile-figs/corr13.png")
+    plt.savefig("compile-figs/corr13.pdf")
 
-    plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, sigma0_data, levels=20)
+    plt.figure(figsize=FIG_SIZE)
+    c = plt.contourf(X, Y, sigma0_data, levels=20, cmap='Purples_r')
     axc = plt.colorbar(c)
     plt.xlim(-0.11, 0.11)
+    plot_pt()
     plt.ylim(-0.24, -0.03)
-    axc.set_label("$\\sigma(\\theta_1)/\\sigma_\\theta$")
-    plt.xlabel("$\\theta_2$")
-    plt.ylabel("$\\theta_3$")
+    axc.set_label("$\\sigma(\\alpha)/\\sigma_\\theta$")
+    plt.xlabel("$K_{22}$")
+    plt.ylabel("$K_{20}$")
     plt.tight_layout()
-    plt.savefig("compile-figs/theta-1-sigma.png")
+    plt.savefig("compile-figs/theta-1-sigma.pdf")
 
-    plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, sigma1_data, levels=20)
+    plt.figure(figsize=FIG_SIZE)
+    c = plt.contourf(X, Y, np.array(sigma1_data) * 10**4, levels=20, cmap='Purples_r')
     axc = plt.colorbar(c)
     plt.xlim(-0.11, 0.11)
+    plot_pt()
     plt.ylim(-0.24, -0.03)
-    axc.set_label("$\\sigma(\\theta_2)/\\sigma_\\theta$")
-    plt.xlabel("$\\theta_2$")
-    plt.ylabel("$\\theta_3$")
+    axc.set_label("$\\sigma(K_{22})/\\sigma_\\theta$ ($\\times 10^{-4}$)")
+    plt.xlabel("$K_{22}$")
+    plt.ylabel("$K_{20}$")
     plt.tight_layout()
-    plt.savefig("compile-figs/theta-2-sigma.png")
+    plt.savefig("compile-figs/theta-2-sigma.pdf")
 
-    plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, sigma2_data, levels=20)
+    plt.figure(figsize=FIG_SIZE)
+    c = plt.contourf(X, Y, sigma2_data, levels=20, cmap='Purples_r')
     axc = plt.colorbar(c)
     plt.xlim(-0.11, 0.11)
+    plot_pt()
     plt.ylim(-0.24, -0.03)
-    axc.set_label("$\\sigma(\\theta_3)/\\sigma_\\theta$")
-    plt.xlabel("$\\theta_2$")
-    plt.ylabel("$\\theta_3$")
+    axc.set_label("$\\sigma(K_{20})/\\sigma_\\theta$")
+    plt.xlabel("$K_{22}$")
+    plt.ylabel("$K_{20}$")
     plt.tight_layout()
-    plt.savefig("compile-figs/theta-3-sigma.png")
+    plt.savefig("compile-figs/theta-3-sigma.pdf")
 
 
 if __name__ == "__main__":

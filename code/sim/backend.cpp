@@ -130,6 +130,7 @@ void Asteroid::calculate_poses() {
     double pericenter_vel = sqrt(excess_vel * excess_vel + 2 * mu / pericenter_pos);
     const double cutoff_dist_squared = pericenter_pos * pericenter_pos
         * pow(INTEGRAL_LIMIT_FRAC, -2/3.0);// Go a little over for safety
+
     #ifdef TEXT_DEBUG
     std::cout << "cutoff distance: " << sqrt(cutoff_dist_squared) << std::endl;
     std::cout << "periapsis: " << pericenter_pos << std::endl;

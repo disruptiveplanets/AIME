@@ -1,0 +1,47 @@
+This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: 21-11.aux
+The style file: aasjournal.bst
+Database file #1: asteroids.bib
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+You've used 4 entries,
+            3168 wiz_defined-function locations,
+            680 strings with 5237 characters,
+and the built_in function-call counts, 1656 in all, are:
+= -- 141
+> -- 84
+< -- 3
++ -- 28
+- -- 28
+* -- 120
+:= -- 290
+add.period$ -- 5
+call.type$ -- 4
+change.case$ -- 20
+chr.to.int$ -- 4
+cite$ -- 4
+duplicate$ -- 66
+empty$ -- 129
+format.name$ -- 34
+if$ -- 348
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 3
+newline$ -- 21
+num.names$ -- 16
+pop$ -- 27
+preamble$ -- 1
+purify$ -- 20
+quote$ -- 0
+skip$ -- 67
+stack$ -- 0
+substring$ -- 94
+swap$ -- 0
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 36
+warning$ -- 0
+while$ -- 15
+width$ -- 0
+write$ -- 47

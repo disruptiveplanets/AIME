@@ -1,0 +1,24 @@
+\begin{thebibliography}{}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\providecommand{\url}[1]{\href{#1}{#1}}
+\providecommand{\dodoi}[1]{doi:~\href{http://doi.org/#1}{\nolinkurl{#1}}}
+\providecommand{\doeprint}[1]{\href{http://ascl.net/#1}{\nolinkurl{http://ascl.net/#1}}}
+\providecommand{\doarXiv}[1]{\href{https://arxiv.org/abs/#1}{\nolinkurl{https://arxiv.org/abs/#1}}}
+
+\bibitem[{Foreman-Mackey {et~al.}(2013)Foreman-Mackey, Hogg, Lang, \&
+  Goodman}]{ForemanMackey2013emceeTM}
+Foreman-Mackey, D., Hogg, D.~W., Lang, D., \& Goodman, J.~B. 2013, Publications
+  of the Astronomical Society of the Pacific, 125, 306
+
+\bibitem[{Gao \& Han(2012)}]{NelderMead}
+Gao, F., \& Han, L. 2012, Computational Optimization and Applications, 51, 259
+
+\bibitem[{{Graf}(2008)}]{2008arXiv0811.2889G}
+{Graf}, B. 2008, arXiv e-prints, arXiv:0811.2889.
+\newblock \doarXiv{0811.2889}
+
+\bibitem[{van Gelderen(1998)}]{Gelderen1998TheSO}
+van Gelderen, M. 1998, in The shift operators and translations of spherical
+  harmonics
+
+\end{thebibliography}

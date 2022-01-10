@@ -11,6 +11,9 @@ file_names.sort()
 
 DIFF_EXPECTED_FACTOR = [1e-2, 1e-5, 1e-4]
 END_LENGTH = 100
+FIG_SIZE = (5.333, 4)
+KEY_INDICES = [24, 94, 101]
+
 
 def get_ratios(k22, k20):
     Ixx = 2/3.0 * k20 - 4 * k22 + 2/3.0
@@ -30,6 +33,13 @@ def convert(thetas):
         out.append([entry[0], ac, bc])
     return np.array(out)
 
+def plot_pt():
+    sym = get_ratios(0, -0.09766608)
+    asym1 = get_ratios(0.05200629, -0.2021978)
+    asym2 = get_ratios(-0.05200629, -0.2021978)
+    plt.scatter([sym[0]], [sym[1]], color='k', marker='o')
+    plt.scatter([asym1[0]], [asym1[1]], color='k', marker='s')
+    plt.scatter([asym2[0]], [asym2[1]], color='k', marker='s')
 # Fill points
 for bare in file_names:
     if not os.path.isdir(bare):
@@ -122,6 +132,9 @@ def covariance():
             sigma1_data_line.append(np.sqrt(cov[1][1]))
             sigma2_data_line.append(np.sqrt(cov[2][2]))
 
+            if index in KEY_INDICES:
+                print(f"{names[index]}: sigmas: {np.sqrt(cov[0][0])}, {np.sqrt(cov[1][1])}, {np.sqrt(cov[2][2])}. Corrs: {corr01}, {corr02}, {corr12}")
+
             X_line.append(x)
             Y_line.append(y)
 
@@ -138,71 +151,77 @@ def covariance():
         X.append(X_line)
         Y.append(Y_line)
 
-    plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, corr12_data, levels=20)
+    plt.figure(figsize=FIG_SIZE)
+    c = plt.contourf(X, Y, corr12_data, levels=20, cmap="Oranges_r")
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Corr}(a/c, b/c)$")
+    plot_pt()
     plt.xlabel("$a/c$")
     plt.ylabel("$b/c$")
     plt.xlim(1, 6.7)
     plt.ylim(1, 6.7)
     plt.tight_layout()
-    plt.savefig("compile-figs/corrab.png")
+    plt.savefig("compile-figs/corrab.pdf")
 
-    plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, corr01_data, levels=20)
+    plt.figure(figsize=FIG_SIZE)
+    c = plt.contourf(X, Y, corr01_data, levels=20, cmap="Oranges_r")
     axc = plt.colorbar(c)
-    axc.set_label("$\\textrm{Corr}(\\theta_1 ,a/c)$")
+    axc.set_label("$\\textrm{Corr}(\\alpha ,a/c)$")
+    plot_pt()
     plt.xlabel("$a/c$")
     plt.ylabel("$b/c$")
     plt.xlim(1, 6.7)
     plt.ylim(1, 6.7)
     plt.tight_layout()
-    plt.savefig("compile-figs/corr1a.png")
+    plt.savefig("compile-figs/corr1a.pdf")
 
-    plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, corr02_data, levels=20)
+    plt.figure(figsize=FIG_SIZE)
+    c = plt.contourf(X, Y, corr02_data, levels=20, cmap="Oranges_r")
     axc = plt.colorbar(c)
-    axc.set_label("$\\textrm{Corr}(\\theta_1, b/c)$")
+    axc.set_label("$\\textrm{Corr}(\\alpha, b/c)$")
+    plot_pt()
     plt.xlabel("$a/c$")
     plt.ylabel("$b/c$")
     plt.xlim(1, 6.7)
     plt.ylim(1, 6.7)
     plt.tight_layout()
-    plt.savefig("compile-figs/corr1b.png")
+    plt.savefig("compile-figs/corr1b.pdf")
 
-    plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, sigma0_data, levels=20)
+    plt.figure(figsize=FIG_SIZE)
+    c = plt.contourf(X, Y, sigma0_data, levels=20, cmap="Purples_r")
     axc = plt.colorbar(c)
-    axc.set_label("$\\sigma(\\theta_1)/\\sigma_\\theta$")
+    axc.set_label("$\\sigma(\\alpha)/\\sigma_\\theta$")
+    plot_pt()
     plt.xlabel("$a/c$")
     plt.ylabel("$b/c$")
     plt.xlim(1, 6.7)
     plt.ylim(1, 6.7)
     plt.tight_layout()
-    plt.savefig("compile-figs/theta-1-ab-sigma.png")
+    plt.savefig("compile-figs/theta-1-ab-sigma.pdf")
 
-    plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, sigma1_data, levels=20)
+    plt.figure(figsize=FIG_SIZE)
+    c = plt.contourf(X, Y, sigma1_data, levels=20, cmap="Purples_r")
     axc = plt.colorbar(c)
     axc.set_label("$\\sigma(a/c)/\\sigma_\\theta$")
+    plot_pt()
     plt.xlabel("$a/c$")
     plt.ylabel("$b/c$")
     plt.xlim(1, 6.7)
     plt.ylim(1, 6.7)
     plt.tight_layout()
-    plt.savefig("compile-figs/theta-a-sigma.png")
+    plt.savefig("compile-figs/theta-a-sigma.pdf")
 
-    plt.figure(figsize=(8, 6))
-    c = plt.contourf(X, Y, sigma2_data, levels=20)
+    plt.figure(figsize=FIG_SIZE)
+    c = plt.contourf(X, Y, sigma2_data, levels=20, cmap="Purples_r")
     axc = plt.colorbar(c)
     axc.set_label("$\\sigma(b/c)/\\sigma_\\theta$")
+    plot_pt()
     plt.xlabel("$a/c$")
     plt.ylabel("$b/c$")
     plt.xlim(1, 6.7)
     plt.ylim(1, 6.7)
     plt.tight_layout()
-    plt.savefig("compile-figs/theta-b-sigma.png")
+    plt.savefig("compile-figs/theta-b-sigma.pdf")
 
 
 if __name__ == "__main__":

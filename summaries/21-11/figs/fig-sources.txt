@@ -1,0 +1,19 @@
+probe-space-theta-1-sigma.pdf data/probe-space/compile-figs/theta-1-sigma.pdf
+probe-space-theta-2-sigma.pdf data/probe-space/compile-figs/theta-2-sigma.pdf
+probe-space-theta-3-sigma.pdf data/probe-space/compile-figs/theta-3-sigma.pdf
+probe-space-corr12.pdf data/probe-space/compile-figs/corr12.pdf
+probe-space-corr13.pdf data/probe-space/compile-figs/corr13.pdf
+probe-space-corr23.pdf data/probe-space/compile-figs/corr23.pdf
+
+probe-space-ab-1-sigma.pdf data/probe-space/compile-figs/theta-1-ab-sigma.pdf
+probe-space-ab-a-sigma.pdf data/probe-space/compile-figs/theta-a-sigma.pdf
+probe-space-ab-b-sigma.pdf data/probe-space/compile-figs/theta-b-sigma.pdf
+probe-space-ab-1a.pdf data/probe-space/compile-figs/corr1a.pdf
+probe-space-ab-1b.pdf data/probe-space/compile-figs/corr1b.pdf
+probe-space-ab-ab.pdf data/probe-space/compile-figs/corrab.pdf
+
+nominal-data-sym.pdf code/other-figs/model-spread/spin-chaos-sym.pdf
+nominal-data-asym.pdf code/other-figs/model-spread/spin-chaos-asym.pdf
+
+example-residuals.pdf code/other-figs/example-corner/sigma-0-0-00-0-compare.pdf
+example-corner.pdf code/other-figs/example-corner/sigma-0-0-00-0-corner.pdf

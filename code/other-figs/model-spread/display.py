@@ -1,46 +1,66 @@
-import os
+import sys
 import matplotlib.pyplot as plt
 from shutil import copyfile
 import numpy as np
-#copyfile("../code/fit_resolved/asteroids_0_3.cpython-38-x86_64-linux-gnu.so", "asteroids_0_3.cpython-38-x86_64-linux-gnu.so")
-copyfile("../../fit_resolved/asteroids_0_2.cpython-38-x86_64-linux-gnu.so", "asteroids_0_2.cpython-38-x86_64-linux-gnu.so")
+from numdifftools import Hessian
+sys.path.append("../../fit_resolved")
 import asteroids_0_2 as asteroids
+import random_vector
+
 
 plt.style.use("jcap")
 
-SYMMETRIC = True
+SYMMETRIC = False
+
 if SYMMETRIC:
     TRUE_PARAMS = np.array([0.39269908169, 0, -0.09766608])
-    HESSIAN = np.array([[2.60361420e-09, 2.21682029e-07, 6.09318859e-07],
-         [2.21682029e-07, 2.26708735e-05, 2.82386209e-05],
-         [6.09318859e-07, 2.82386209e-05, 1.14802820e-04]])
-    AMPLIFY = 200
+    SIGMA = 0.2
+
 else:
     TRUE_PARAMS = np.array([0.39269908169, 0.05200629, -0.2021978])
-    HESSIAN = [[1.99820051e-06, 4.53753565e-05, 9.72731650e-05],
-        [4.53753565e-05, 1.86458748e-03, 4.16673837e-03],
-        [9.72731650e-05, 4.16673837e-03, 9.43248482e-03]]
-    AMPLIFY = 5
+    SIGMA = 0.2
+
 
 NUM_TRIALS = 1000
 SPIN_RESOLUTION = 20
 
-SPIN = [0.0001, 0.0002, 0.0003]
-IMPACT_PARAMETER = 5 * 6_378_000
-SPEED = 6000
+SPIN = [0.00024682682, 0, -0.00024682682]
+EARTH_RADIUS = 6_378_000
+GM = 3.986004418e14
+IMPACT_PARAMETER = 5 * EARTH_RADIUS
+SPEED = 4000
 RADIUS = 1000
 JLMS = [1]
 CADENCE = 120
-MIN_SPREAD = 1e-4 ** 2
+
+data = np.array(asteroids.simulate(CADENCE, JLMS, TRUE_PARAMS[1:], RADIUS, SPIN[0], SPIN[1], SPIN[2],
+    TRUE_PARAMS[0], IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)).reshape(-1, 3)
+_, y_inv_covs = random_vector.randomize_rotate_uniform(data, SIGMA)
+
+def hess_func(theta):
+    try:
+        model = np.array(asteroids.simulate(CADENCE, JLMS, theta[1:], RADIUS, SPIN[0], SPIN[1], SPIN[2],
+            theta[0], IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)).reshape(-1, 3)
+    except Exception:
+        return np.inf
+    chisq = 0
+    for i in range(len(data)):
+        chisq += np.matmul(data[i] - model[i], np.matmul(y_inv_covs[i], data[i] - model[i]))
+    return -chisq / 2.0
+    
+HESSIAN = -Hessian(hess_func)(TRUE_PARAMS)
+print("Hessian", HESSIAN)
 
 def populate(evals, diagonalizer, count):
-    diagonal_points = np.sqrt(np.maximum(MIN_SPREAD, evals))\
-        * (np.random.randn(count * len(TRUE_PARAMS)).reshape(count, len(TRUE_PARAMS))) * AMPLIFY
-    global_points = np.asarray([np.matmul(diagonalizer, d) for d in diagonal_points])
+    spacing = 1 / np.sqrt(evals)
+    diagonal_points = spacing * (np.random.randn(count * len(TRUE_PARAMS)).reshape(count, len(TRUE_PARAMS)))
+    global_points = np.asarray([np.matmul(diagonalizer.transpose(), d) for d in diagonal_points])
     return global_points
 
 def gen_data():
     evals, diagonalizer = np.linalg.eig(HESSIAN)
+    if np.any(evals < 0):
+        raise Exception(f"Some eigenvalues were negative ({evals})")
     results = []
     trial = 0
     while trial < NUM_TRIALS:
@@ -50,20 +70,23 @@ def gen_data():
         else:
             theta = TRUE_PARAMS + populate(evals, diagonalizer, 1)[0][0]
         try:
-            resolved_data = asteroids.simulate(CADENCE, JLMS, theta[1:], RADIUS,
-                SPIN[0], SPIN[1], SPIN[2], theta[0], IMPACT_PARAMETER, SPEED, -1)
+            resolved_data = asteroids.simulate(CADENCE, JLMS, theta[1:], RADIUS, SPIN[0], SPIN[1],
+                SPIN[2], theta[0], IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)
         except:
             continue
         results.append(resolved_data) # x1, y1, z1, x2, y2, z2, ...
         trial += 1
 
     if SYMMETRIC:
-        np.savetxt("data_runs-sym.dat", results)
+        with open("data_runs-sym.npy", 'wb') as f:
+            np.save(f, results)
     else:
-        np.savetxt("data_runs-asym.dat", results)
+        with open("data_runs-asym.npy", 'wb') as f:
+            np.save(f, results)
 
 def plot_data():
-    runs = np.loadtxt("data_runs.dat")
+    with open("data_runs.npy", 'rb') as f:
+        runs = np.load(f)
     time = np.arange(0, len(runs[0])//3) *  CADENCE / 3600.0
     time -= time[-1] / 2
     spins = np.linspace(np.min(runs), np.max(runs), SPIN_RESOLUTION + 1)
@@ -97,15 +120,17 @@ def plot_data():
     plt.ylabel("Angular velocity (rad / s)")
     plt.tight_layout()
     if SYMMETRIC:
-        plt.savefig("spin-chaos-sym.png")
+        plt.savefig("spin-chaos-sym.pdf")
     else:
-        plt.savefig("spin-chaos-asym.png")
+        plt.savefig("spin-chaos-asym.pdf")
 
 def plot_sigma():
     if SYMMETRIC:
-        runs = np.loadtxt("data_runs-sym.dat") * 3600
+        with open("data_runs-sym.npy", 'rb') as f:
+            runs = np.load(f)
     else:
-        runs = np.loadtxt("data_runs-asym.dat") * 3600
+        with open("data_runs-asym.npy", 'rb') as f:
+            runs = np.load(f)
     time = np.arange(0, len(runs[0])//3) *  CADENCE / 3600.0
     time -= time[-1] / 2
     spins = np.linspace(np.min(runs), np.max(runs), SPIN_RESOLUTION + 1)
@@ -146,20 +171,20 @@ def plot_sigma():
         lows_3.append((low_x_3, low_y_3, low_z_3))
         highs_3.append((high_x_3, high_y_3, high_z_3))
 
-    lows_1 = np.transpose(lows_1)
-    highs_1 = np.transpose(highs_1)
-    lows_2 = np.transpose(lows_2)
-    highs_2 = np.transpose(highs_2)
-    lows_3 = np.transpose(lows_3)
-    highs_3 = np.transpose(highs_3)
+    lows_1 = np.transpose(lows_1) * 3600
+    highs_1 = np.transpose(highs_1) * 3600
+    lows_2 = np.transpose(lows_2) * 3600
+    highs_2 = np.transpose(highs_2) * 3600
+    lows_3 = np.transpose(lows_3) * 3600
+    highs_3 = np.transpose(highs_3) * 3600
 
     plt.figure(figsize=(10, 4))
-    plt.plot(time, runs[0, ::3], color="black")
-    plt.plot(time, runs[0, 1::3], color="black")
-    plt.plot(time, runs[0, 2::3], color="black")
-    plt.plot([], [], label="$\omega_z$", color="C2")
-    plt.plot([], [], label="$\omega_y$", color="C1")
+    plt.plot(time, runs[0, ::3] * 3600, color="black")
+    plt.plot(time, runs[0, 1::3] * 3600, color="black")
+    plt.plot(time, runs[0, 2::3] * 3600, color="black")
     plt.plot([], [], label="$\omega_x$", color="C0")
+    plt.plot([], [], label="$\omega_y$", color="C1")
+    plt.plot([], [], label="$\omega_z$", color="C2")
 
     #reds = np.array([[1, 0, 0, a] for a in np.linspace(0, 1, 4)])
     #greens = np.array([[0, 1, 0, a] for a in np.linspace(0, 1, 4)])
@@ -186,9 +211,9 @@ def plot_sigma():
     plt.xlim(-5, np.max(time))
     plt.tight_layout()
     if SYMMETRIC:
-        plt.savefig("spin-chaos-sym.png")
+        plt.savefig("spin-chaos-sym.pdf")
     else:
-        plt.savefig("spin-chaos-asym.png")
+        plt.savefig("spin-chaos-asym.pdf")
 
 #gen_data()
 #plot_data()
