@@ -10,7 +10,7 @@ import random_vector
 
 plt.style.use("jcap")
 
-SYMMETRIC = False
+SYMMETRIC = True
 
 if SYMMETRIC:
     TRUE_PARAMS = np.array([0.39269908169, 0, -0.09766608])
