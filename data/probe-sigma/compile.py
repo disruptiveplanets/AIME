@@ -14,7 +14,7 @@ file_names.sort()
 true_center = None
 true_edge = None
 
-param_names = ["$\alpha", "$K_{20}$", "$K_{22}$", "Re$K_{33}$", "Im$K_{33}$", "Re$K_{32}$", "Im$K_{32}$", "Re$K_{31}$", "Im$K_{31}$", "$K_{30}$"]
+param_names = ["\\gamma_0", "$K_{20}$", "$K_{22}$", "$\Re K_{33}$", "$\Im K_{33}$", "$\Re K_{32}$", "$\Im K_{32}$", "$\Re K_{31}$", "$\Im K_{31}$", "$K_{30}$"]
 
 DIFF_THRESHOLD = [0.01, 0.01, 0.01]
 SELECT_INDEX = 1
@@ -87,8 +87,6 @@ def plot_sigmas(names, sigmas, data, label_name, plot_index, color):
     very_low = [np.nan] * len(names)
     for i, name in enumerate(names):
         if data[i] is None: continue
-        min_dist = None
-        min_file = None
         very_high[i] = data[i][plot_index][1]
         high[i] = data[i][plot_index][2]
         med[i] = data[i][plot_index][3]

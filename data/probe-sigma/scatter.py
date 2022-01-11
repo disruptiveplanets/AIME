@@ -2,7 +2,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-LOW_ORDER_INDEX = 1
+LOW_ORDER_INDEX = 0
 BASE_NAME = f"sigma-0-{LOW_ORDER_INDEX}"
 LOW_LOG_SIGMA = -5
 HIGH_LOG_SIGMA = 0
@@ -16,8 +16,8 @@ def get_text(sigma):
 120
 5
 1000
-4000
-0.00024682682, 0, -0.00024682682
+6000
+0.00013712601, 0, -0.00013712601
 1.0
 {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
 0.78539816339, 0.125, 0, 1, 1, 1, 1, 1, 1, 1

@@ -15,12 +15,13 @@ for bare in file_names:
         continue
     for file in os.listdir(bare):
         if not file[-11:] == "samples.npy": continue
-        array = np.loadtxt("{}/{}".format(bare, file))
+        with open("{}/{}".format(bare, file), 'wb') as f:
+            array = np.load(f)
         if len(array.shape) != 2: continue
         print(array.shape)
         data = []
         for i in range(array.shape[0]):
-            data.append( ", ".join([
+            data.append(", ".join([
                 str(np.mean(array[i])),
                 str(np.percentile(array[i], 95.45)),
                 str(np.percentile(array[i], 68.27)),

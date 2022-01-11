@@ -45,3 +45,7 @@ The next step should be to make these plots again for a, b, and c, then a sigma 
 # Jan 7
 
 Reran the code to make the likelihood half the chi squared. The above plots are still correct.
+
+# Jan 11
+
+Today I realized while making a plot of angular momentum that I flipped some inversions in the code. Reran the fits, also changing the escape velocity from 4 kps to 6 kps.
