@@ -19,12 +19,10 @@
 #define POSITION_DT 1.0
 
 #define INTEGRAL_LIMIT_FRAC 1.0e-3// 5e-6
-#define NUM_THREADS 4
 
 //#define TEXT_DEBUG
 #define SEGFAULT_DEBUG
 //#define FIRST_ORDER
-
 
 #define SPACE_MPP (1)
 #define SPACE_MP (SPACE_MPP * (2 * (ASTEROIDS_MAX_K + 1) + 1))

@@ -11,36 +11,37 @@ import random_vector
 plt.style.use("jcap")
 
 SYMMETRIC = True
+GAMMA_0 = 0.39269908169
 
 if SYMMETRIC:
-    TRUE_PARAMS = np.array([0.39269908169, 0, -0.09766608])
-    SIGMA = 0.2
+    TRUE_PARAMS = np.array([0, -0.09766608])
+    SIGMA = 0.1
 
 else:
-    TRUE_PARAMS = np.array([0.39269908169, 0.05200629, -0.2021978])
-    SIGMA = 0.2
+    TRUE_PARAMS = np.array([0.05200629, -0.2021978])
+    SIGMA = 0.1
 
 
 NUM_TRIALS = 1000
 SPIN_RESOLUTION = 20
 
-SPIN = [0.00024682682, 0, -0.00024682682]
+SPIN = [0.00013712601, 0, -0.00013712601]
 EARTH_RADIUS = 6_378_000
 GM = 3.986004418e14
 IMPACT_PARAMETER = 5 * EARTH_RADIUS
-SPEED = 4000
+SPEED = 6000
 RADIUS = 1000
 JLMS = [1]
 CADENCE = 120
 
-data = np.array(asteroids.simulate(CADENCE, JLMS, TRUE_PARAMS[1:], RADIUS, SPIN[0], SPIN[1], SPIN[2],
-    TRUE_PARAMS[0], IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)).reshape(-1, 3)
-_, y_inv_covs = random_vector.randomize_rotate_uniform(data, SIGMA)
+data = np.array(asteroids.simulate(CADENCE, JLMS, TRUE_PARAMS, RADIUS, SPIN[0], SPIN[1], SPIN[2],
+    GAMMA_0, IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)).reshape(-1, 3)
+err_y, y_inv_covs = random_vector.randomize_rotate_uniform(data, SIGMA)
 
 def hess_func(theta):
     try:
-        model = np.array(asteroids.simulate(CADENCE, JLMS, theta[1:], RADIUS, SPIN[0], SPIN[1], SPIN[2],
-            theta[0], IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)).reshape(-1, 3)
+        model = np.array(asteroids.simulate(CADENCE, JLMS, theta, RADIUS, SPIN[0], SPIN[1], SPIN[2],
+            GAMMA_0, IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)).reshape(-1, 3)
     except Exception:
         return np.inf
     chisq = 0
@@ -48,17 +49,20 @@ def hess_func(theta):
         chisq += np.matmul(data[i] - model[i], np.matmul(y_inv_covs[i], data[i] - model[i]))
     return -chisq / 2.0
     
-HESSIAN = -Hessian(hess_func)(TRUE_PARAMS)
-print("Hessian", HESSIAN)
 
 def populate(evals, diagonalizer, count):
-    spacing = 1 / np.sqrt(evals)
+    spacing = 20 / np.sqrt(evals)
     diagonal_points = spacing * (np.random.randn(count * len(TRUE_PARAMS)).reshape(count, len(TRUE_PARAMS)))
     global_points = np.asarray([np.matmul(diagonalizer.transpose(), d) for d in diagonal_points])
     return global_points
 
 def gen_data():
-    evals, diagonalizer = np.linalg.eig(HESSIAN)
+    HESSIAN = -Hessian(hess_func)(TRUE_PARAMS)
+    print("Hessian", HESSIAN)
+
+    evals, diagonalizer = np.linalg.eigh(HESSIAN)
+    print(diagonalizer)
+    print("Evals", evals)
     if np.any(evals < 0):
         raise Exception(f"Some eigenvalues were negative ({evals})")
     results = []
@@ -68,11 +72,11 @@ def gen_data():
         if trial == 0:
             theta = TRUE_PARAMS
         else:
-            theta = TRUE_PARAMS + populate(evals, diagonalizer, 1)[0][0]
+            theta = TRUE_PARAMS + populate(evals, diagonalizer, 1)[0]
         try:
-            resolved_data = asteroids.simulate(CADENCE, JLMS, theta[1:], RADIUS, SPIN[0], SPIN[1],
-                SPIN[2], theta[0], IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)
-        except:
+            resolved_data = asteroids.simulate(CADENCE, JLMS, theta, RADIUS, SPIN[0], SPIN[1],
+                SPIN[2], GAMMA_0, IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)
+        except Exception:
             continue
         results.append(resolved_data) # x1, y1, z1, x2, y2, z2, ...
         trial += 1
@@ -182,6 +186,9 @@ def plot_sigma():
     plt.plot(time, runs[0, ::3] * 3600, color="black")
     plt.plot(time, runs[0, 1::3] * 3600, color="black")
     plt.plot(time, runs[0, 2::3] * 3600, color="black")
+    #plt.scatter(time, err_y[:,0] * 3600, color="black")
+    #plt.scatter(time, err_y[:,1] * 3600, color="black")
+    #plt.scatter(time, err_y[:,2] * 3600, color="black")
     plt.plot([], [], label="$\omega_x$", color="C0")
     plt.plot([], [], label="$\omega_y$", color="C1")
     plt.plot([], [], label="$\omega_z$", color="C2")
@@ -212,10 +219,12 @@ def plot_sigma():
     plt.tight_layout()
     if SYMMETRIC:
         plt.savefig("spin-chaos-sym.pdf")
+        plt.savefig("spin-chaos-sym.png")
     else:
         plt.savefig("spin-chaos-asym.pdf")
+        plt.savefig("spin-chaos-asym.png")
 
-#gen_data()
+gen_data()
 #plot_data()
 plot_sigma()
 plt.show()

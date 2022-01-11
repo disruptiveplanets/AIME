@@ -52,7 +52,7 @@ class Display:
         except AttributeError:
             raise Exception("Could not find the file {}.".format(self.h5_name+".h5"))
         #self.theta_labels = list(map(r"$\Delta\theta_{{{0}}}$".format, range(1, self.ndim + 1)))
-        self.theta_labels = ["$\Delta\\alpha$", "$\Delta K_{22}$", "$\Delta K_{20}$"]
+        self.theta_labels = ["$\Delta\\gamma_0$", "$\Delta K_{22}$", "$\Delta K_{20}$"]
         if self.ndim >= 10:
             self.theta_labels += ["$\Re\Delta K_{33}$", "$\Im\Delta K_{33}$",
                                   "$\Re\Delta K_{32}$", "$\Im\Delta K_{32}$",

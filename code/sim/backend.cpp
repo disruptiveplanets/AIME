@@ -227,33 +227,8 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
     cdouble x_torque = 0;
     cdouble y_torque = 0;
     cdouble z_torque = 0;
-    // Up until now, takes about 0.1 s, L=2
 
-    /*for (int l = 0; l <= ASTEROIDS_MAX_J; l++) {
-        for (int m = -l; m <= l; m++) {
-            cdouble prelm = pow(central_radius, l) * jlm(l, m);
-            for (int lp = 2; lp <= ASTEROIDS_MAX_K; lp++) {
-                for (int mp = -lp; mp <= lp; mp++) {
-                    cdouble prelpmp = prelm * parity(lp) * pow(asteroid_radius, lp - 2)
-                        * slm_c(l+lp, m+mp, pos_r, pos_ct, pos_p).conj();
-
-                    for (int mpp = -lp; mpp <= (int)lp; mpp++) {
-                        cdouble mppfactor = dgen(lp, mp, mpp).conj() * prelpmp * sqrt(fact(lp - mpp) * fact(lp+mpp) / (double)(fact(lp-mp) * fact(lp+mp)));
-
-                        x_torque += mppfactor * (cdouble(0, lp - mpp + 1) * klm(lp, mpp - 1)
-                            + cdouble(0, lp + mpp + 1) * klm(lp, mpp + 1));
-
-                        y_torque += mppfactor * (-(lp - mpp + 1) * klm(lp, mpp - 1)
-                            + (lp + mpp + 1) * klm(lp, mpp + 1));
-
-                        z_torque += mppfactor * cdouble(0, 2) * mpp * klm(lp, mpp);
-                    }
-                }
-            }
-        }
-    }
-    torque = Vector3({x_torque.r, y_torque.r, z_torque.r}) * mu / 2.0;*/
-
+    // Correct 1-10-22
     for (int l = 0; l <= ASTEROIDS_MAX_J; l++) {
         for (int m = -l; m <= l; m++) {
             for (int lp = 2; lp <= ASTEROIDS_MAX_K; lp++) {
@@ -300,7 +275,7 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
     });
 
 
-    dquat = 0.5 * Quaternion(0, spin[0], spin[1], spin[2]) * quat;
+    dquat = 0.5 * quat * Quaternion(0, spin[0], spin[1], spin[2]);
 }
 
 
@@ -312,10 +287,11 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
     Vector3 dspin1, dspin2, dspin3, dspin4, position, velocity;
 
 
-    double alpha = initial_roll;
+    double alpha = atan2(initial_spin[1], initial_spin[0]);
     double beta = acos(initial_spin[2] / initial_spin.mag());
-    double gamma = atan2(initial_spin[1], -initial_spin[0]);
+    double gamma = initial_roll;
 
+    // Correct 1-10-22
     Quaternion quat = Quaternion(cos(alpha / 2), 0, 0, sin(alpha / 2))
         * Quaternion(cos(beta / 2), 0, sin(beta / 2), 0)
         * Quaternion(cos(gamma / 2), 0, 0, sin(gamma / 2));
@@ -337,10 +313,10 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
             }
         }
 
+        // Correct 1-10-22
         get_derivatives(position, spin, quat, dspin1, dquat1);
         const double scale = (pow(position.mag2() / (pericenter_pos * pericenter_pos), 3.0 / 2) - 1.0) * INTEGRAL_LIMIT_FRAC;
         dt = MIN_DT + (MAX_DT - MIN_DT) * scale;
-
         extract_pos(time+dt/2, position, velocity);
         get_derivatives(position, spin + dt / 2 * dspin1, quat + dt / 2 * dquat1, dspin2, dquat2);
         get_derivatives(position, spin + dt / 2 * dspin2, quat + dt / 2 * dquat2, dspin3, dquat3);
@@ -357,7 +333,13 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
             resolved_data.push_back(global_spin[0]);
             resolved_data.push_back(global_spin[1]);
             resolved_data.push_back(global_spin[2]);
-            cadence_index++; //cadence_index = int(time / cadence)
+            #ifdef PRINT_MOMENTUM_ENERGY
+            Vector3 local_momentum = Matrix3({moi[0], 0, 0, 0, moi[1], 0, 0, 0, moi[2]}) * spin;
+            Vector3 global_momentum = quat.rotate(local_momentum);
+            double energy = 0.5 * Vector3::dot(global_spin, global_momentum);
+            std::cout << global_momentum[0] << ' ' << global_momentum[1] << ' ' << global_momentum[2] << ' ' << energy << ' ' << std::endl;
+            #endif
+            cadence_index++;
         }
         frames++;
     }

@@ -347,7 +347,8 @@ Matrix3 Quaternion::matrix() const {
 }
 Vector3 Quaternion::rotate(const Vector3 v) const {
     const Quaternion q = Quaternion(0, v[0], v[1], v[2]);
-    return (inverse() * q * *this).vec();
+    //return (inverse() * q * *this).vec();
+    return (*this * q * inverse()).vec();
 }
 Quaternion Quaternion::inverse() const {
     return conjugate() / mag2();
@@ -422,6 +423,7 @@ Quaternion operator*(double d, Quaternion const& q) {
 
 std::array<double, 3> Quaternion::euler_angles() const {
     // z-y-z
+    // Correct 1-10-22
     return {atan2(j_*k_ - i_*r_, i_*k_ + j_*r_),
         acos(1 - 2*(i_*i_ + j_*j_)/mag2()),
         atan2(j_*k_ + i_*r_, -(i_*k_ - j_*r_))};

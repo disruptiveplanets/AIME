@@ -73,13 +73,13 @@ where $R_i(\theta)$ is a rotation around the $i$th unit vector by $\theta$ (figu
     \draw[-{Latex[length=3mm]}] (0, 0) -- (0, 4) node[anchor=south] {$\unit z$};
     \draw[dashed, -{Latex[length=3mm]}] (0, 0) -- (3.7, -2) node[anchor=north] {$\unit n$};
     \draw[thick,-{Latex[length=3mm]}] (0, 0) -- (-0.5, -3) node[anchor=north] {$\unit X$};
-    \draw[thick,-{Latex[length=3mm]}] (0, 0) -- (4, 0.5) node[anchor=south] {$\unit Y$};
-    \draw[thick,-{Latex[length=3mm]}] (0, 0) -- (-2, 3) node[anchor=south] {$\unit Z$};
-    \draw (0.5, -0.75) arc (290:302:2.5);
+    \draw[thick,-{Latex[length=3mm]}] (0, 0) -- (4, 1) node[anchor=south] {$\unit Y$};
+    \draw[thick,-{Latex[length=3mm]}] (0, 0) -- (-1.6, 2.7) node[anchor=south] {$\unit Z$};
+    \draw[->] (0.5, -0.75) arc (290:302:2.5);
     \draw (0.9, -0.9) node[anchor=center] {$\alpha$};
-    \draw (0, 1) arc (90:123.7:1);
-    \draw (-0.4, 1.2) node[anchor=center] {$\beta$};
-    \draw (0.97, -0.52) arc (330:360:1.3);
+    \draw[->] (0, 1.2) arc (130:161:1.3);
+    \draw (-0.3, 1.3) node[anchor=center] {$\beta$};
+    \draw[->] (0.97, -0.52) arc (330:368:1.3);
     \draw (1.4, -0.25) node[anchor=center] {$\gamma$};
     %\draw[-{Latex[length=3mm]}] (0, 0) -- (0, 4) node[anchor=south] {$\unit Z$};
     %\draw[-{Latex[length=3mm]}] (0, 0) -- (4, 0) node[anchor=west] {$\unit Y$};
@@ -93,7 +93,7 @@ We use the quaternion $\quat q$ as our dynamical variable because Euler angles s
 
 Normalized quaternions express rotations of an angle $\theta$ by $\quat q = \cos\frac{\theta}{2} + \sin\frac{\theta}{2}\quat n$ where $\quat n = 0 + n_x \mathbf i + n_y \mathbf j + n_z\mathbf k$. This rotation may be applied to any vector $\mathbf r$ by
 \begin{equation}
-\mathbf R = \Im \brackets{\quat q^{-1} \quat r\quat q }.
+\mathbf R = \Im \brackets{\quat q \quat r\quat q^{-1} }.
 \label{eqn:quat-rot}
 \end{equation}
 Due to the real part of $\quat q$ which does not vanish for $\theta \rightarrow 0$, quaternions do not suffer from gimbal lock. Using the above notation, we can give the full equation of quaternion multiplication:
@@ -237,19 +237,19 @@ As a simplifying assumption, we will not model the effect of the central body's 
 \end{equation}
 The position variables will no longer be discussed.
 
-Let $\mathbf\omega$ be the rotational velocity of the asteroid in the body-fixed frame. We have two equations of motion for our system; one governs the evolution of $\mathbf \omega$ and the other governs the evolution of $\mathbf q$. Starting with the latter, consider a fixed point $\mathbf r$ in the body-fixed frame on a rotating asteroid. The corresponding point $\mathbf R$ in the inertial frame satisfies $\dot{\mathbf R} = \Im[\quat q^{-1}(\mathbf \omega \times \mathbf r )\quat q]$. Furthermore, we can demand that $\mathbf \omega \perp \mathbf r$ such that $\mathbf \omega \times \mathbf r = \Im[\quat \omega \quat r]$ Plugging this into equation \ref{eqn:quat-rot}, we have
+Let $\mathbf\omega$ be the rotational velocity of the asteroid in the body-fixed frame. We have two equations of motion for our system; one governs the evolution of $\mathbf \omega$ and the other governs the evolution of $\mathbf q$. Starting with the latter, consider a fixed point $\mathbf r$ in the body-fixed frame on a rotating asteroid. The corresponding point $\mathbf R=\Im[\quat q \mathbf r \quat q^{-1}]$ in the inertial frame satisfies $\dot{\mathbf R} = \Im[\quat q(\mathbf \omega \times \mathbf r )\quat q^{-1}]$. Furthermore, we can demand that $\mathbf \omega \perp \mathbf r$ so that $\mathbf \omega \times \mathbf r = \Im[\quat \omega \quat r]$. We obtain another equation for $\dot{\mathbf R}$ by differentiating equation \ref{eqn:quat-rot} with $\dot{\mathbf r} = 0$. Setting these equal,
 \begin{equation}
-\dot{\quat q^{-1}} \quat r \quat q + \quat q^{-1} \quat r \dot{\quat q} = \quat q^{-1}\quat \omega \quat r \quat q.
+\dot{\quat q} \quat r \quat q^{-1} + \quat q \quat r \dot{\quat q}^{-1} = \quat q\quat \omega \quat r \quat q^{-1}.
 \nonumber
 \end{equation}
-Substituting $\mathbf r \rightarrow \mathbf R$ and acknowledging that $\Re[\dot{\quat q} \quat q^{-1}]$,
+Substituting $\mathbf r \rightarrow \quat q^{-1}\mathbf R \quat q$ and acknowledging that $\Re[\dot{\quat q} \quat q^{-1}] = 0$,
 \begin{equation}
-2\dot{\quat q^{-1}}\quat q\quat R = \quat q^{-1}\quat \omega \quat q \quat R.
+  \dot{\quat q} \quat q^{-1}\mathbf R + \mathbf R \quat q \dot{\quat q}^{-1} = 2\dot{\quat q}\quat q^{-1}\quat R = \quat q\quat \omega \quat q^{-1}\mathbf R.
 \nonumber
 \end{equation}
 Since $\mathbf R$ is arbitrary, this simplifies to
 \begin{equation}
-\dot{\quat q} = \frac{1}{2}\quat \omega\quat q.
+  2\dot{\quat q}\quat q^{-1} =  \quat q\quat \omega \quat q^{-1} \Rightarrow \dot{\quat q} = \frac{1}{2}\quat q\quat \omega.
 \label{eqn:quat-eom}
 \end{equation}
 
@@ -264,7 +264,7 @@ The components of $\mathbf \tau$ are given by equation \ref{eqn:tidal-torque}, w
 
 
 \subsection{Initial Values}
-We assume that the asteroid begins the simulation in its minimum energy configuration; that is, with $\mathbf \omega \parallel \unit z$. The initial conditions are therefore that $\mathbf \omega = \omega \unit z$, and the quaternion is fixed to rotate $\hat z$ to $\mathbf \Omega$ in the inertial frame, which fixes Euler angles $\beta$ and $\gamma$. The third Euler angle $\alpha$ represents the initial roll of the asteroid, and therefore cannot be determined from physical data. However, it is an initial condition of the simulation. Once the Euler angles are known, the quaternion is computed via equation \ref{eqn:euler-to-quat}.
+We assume that the asteroid begins the simulation in its minimum energy configuration; that is, with $\mathbf \omega \parallel \unit z$. The initial conditions are therefore that $\mathbf \omega = \omega \unit z$, and the quaternion is fixed to rotate $\hat z$ to $\mathbf \Omega$ in the inertial frame, which fixes Euler angles $\beta$ and $\alpha$. The third Euler angle $\gamma$ represents the initial roll of the asteroid, and therefore cannot be determined from physical data. However, it is an initial condition of the simulation. Once the Euler angles are known, the quaternion is computed via equation \ref{eqn:euler-to-quat}.
 
 
 \subsection{Fit Parameters}
@@ -281,12 +281,12 @@ We require that the moment of inertia matrix be positive-definite, which bounds 
 \end{equation}
 
 
-We have one additional fit parameter, which is the only initial condition not fixed by the problem setup or observations. Namely, the initial value of the first Euler angle $\alpha_0$. Due to the fact that the principal axes $\unit x$ and $\unit y$ are orthogonal, Increments of $\alpha_0$ by $\pi/2$ correspond to flipping the body-fixed axes so that no physical change in the asteroid model occurs. We must therefore limit the range of $\alpha_0$ to width $\pi/2$. Arbitrarily, we choose $\alpha_0 \in [-\pi/4, \pi/4)$
+We have one additional fit parameter, which is the only initial condition not fixed by the problem setup or observations. Namely, the initial value of the first Euler angle $\alpha_0$. Due to the fact that the principal axes $\unit x$ and $\unit y$ are orthogonal, Increments of $\gamma_0$ by $\pi/2$ correspond to flipping the body-fixed axes so that no physical change in the asteroid model occurs. We must therefore limit the range of $\gamma_0$ to width $\pi/2$. Arbitrarily, we choose $\gamma_0 \in [-\pi/4, \pi/4)$
 
 \section{Experiment Design}
 \subsection{Simulation Design}
 \label{sec:simulation}
-Given the observed orbit of an asteroid and observational data of its resolved spin over time, we built a simulation that would integrate equations \ref{eqn:quat-eom} and \ref{eqn:omega-eom} to generate synthetic data. Inputs to the simulation were (1) the $\ell$ and $\ell'$ values at which to truncate the potential energy sum in equation \ref{eqn:tidal-torque}, (2) the cadence of observations, (3) the $J_{\ell m}$ parameters and mass and radius of the central body, (4) trial asteroid parameters $K_{\ell m}$, $\alpha_0$ and $a_m$, (5) the initial rotational velocity of the asteroid in the inertial frame, and (6) the asteroid's orbital parameters.
+Given the observed orbit of an asteroid and observational data of its resolved spin over time, we built a simulation that would integrate equations \ref{eqn:quat-eom} and \ref{eqn:omega-eom} to generate synthetic data. Inputs to the simulation were (1) the $\ell$ and $\ell'$ values at which to truncate the potential energy sum in equation \ref{eqn:tidal-torque}, (2) the cadence of observations, (3) the $J_{\ell m}$ parameters and mass and radius of the central body, (4) trial asteroid parameters $K_{\ell m}$, $\gamma_0$ and $a_m$, (5) the initial rotational velocity of the asteroid in the inertial frame, and (6) the asteroid's orbital parameters.
 
 The orbital parameters we use to describe the orbit are the hyperbolic excess velocity $v_\infty$ and the pericenter altitude $r_p$. The orbit orientation is fixed to lie in the $\unit X-\unit Y$ plane, with pericenter lying on $\hat X$. The position of the satellite as a function of time is therefore generated by numerically integrating the Newtonian equation of motion (equation \ref{eqn:translaton-eom}) from initial values $\mathbf r(t=0) = r_p \unit X$ and $\mathbf v(t=0)=\unit Y \sqrt{v_\infty^2 + 2G\mu_M / r_p}$
 
@@ -299,9 +299,9 @@ We begin our simulation at $D = 10 r_p$. Since the leading order of the equation
 \label{sec:fitting-method}
 To analyze the degree to which asteroid density distributions can be determined from flyby rotational velocity data, we use the forward model defined in section \ref{sec:simulation} to generate synthetic data, randomize the data according to one of the observational uncertainty model defined in section \ref{sec:uncertainty-models}, then use the same forward model to fit to the data and recover parameters.
 
-After randomizing the data, we isolate a set of parameters which are likely to provide good fits. To do this, we minimize the $\chi^2$ value of the data given the model using the Nelder-Mead algorithm, implemented in \texttt{scipy} \cite{NelderMead}. Our starting points for the minimization are spaced uniformly randomly across the allowed parameter space, which is the set of parameters with the triangle described by equation \ref{eqn:parameter-bounds}. The other parameter bounds are $\alpha_0 \in [-\pi/4, \pi/4)$, $|\Re K_{l>2}| \leq 1$, and $|\Im K_{l>2}| \leq  1$.
+After randomizing the data, we isolate a set of parameters which are likely to provide good fits. To do this, we minimize the $\chi^2$ value of the data given the model using the Nelder-Mead algorithm, implemented in \texttt{scipy} \cite{NelderMead}. Our starting points for the minimization are spaced uniformly randomly across the allowed parameter space, which is the set of parameters with the triangle described by equation \ref{eqn:parameter-bounds}. The other parameter bounds are $\gamma_0 \in [-\pi/4, \pi/4)$, $|\Re K_{l>2}| \leq 1$, and $|\Im K_{l>2}| \leq  1$.
 
-If the minimization is conducted over too many parameter dimensions, convergence can be slow or can fail. However, the parameters $K_{\ell m}$ are naturally separated into groups by order of $\ell$, since the torque applied by successive increment to $\ell$ is suppressed by $a_m/D$. Thus, we fit the $\ell=2$ and $\alpha_0$ parameters first, then lock them in place and fit the $\ell=3$ parameters, etc. The result is a set of points in parameter space which minimize the $\chi^2$.
+If the minimization is conducted over too many parameter dimensions, convergence can be slow or can fail. However, the parameters $K_{\ell m}$ are naturally separated into groups by order of $\ell$, since the torque applied by successive increment to $\ell$ is suppressed by $a_m/D$. Thus, we fit the $\ell=2$ and $\gamma_0$ parameters first, then lock them in place and fit the $\ell=3$ parameters, etc. The result is a set of points in parameter space which minimize the $\chi^2$.
 
 Even with this ordering of parameters, the system's strong dependence on asteroid shape makes convergence rare. The data is therefore truncated at distance $D = f r_p$, where $f$ is a manually-set fraction. Once minimization is conducted for the truncated data, the resulting parameters are used as the initial point for a minimization over the entire data set. Experimentation revealed that $f=2$ was appropriate, where the cut is performed after the perigee for the $\ell = 2$ parameters and before the perigee for the $\ell = 3$ parameters.
 
@@ -356,13 +356,13 @@ We then define the $\chi^2$ statistic to be
 \end{equation}
 where $\mathbf \omega_i$ is the $i$th expected spin and $\mathbf \omega_i^*$ is the data. We also refer to the reduced chi squared, $\chi^2_r = \chi^2 / (3N)$, where $N$ is the number of $\mathbf \omega_i$ in the data set.
 
-In figure \ref{fig:example-data} we present example data for this asteroid using the two reference asteroid and orbit parameters described in appendix \ref{app:reference-config}. Additionally, one thousand simulations are also run with asteroid parameters $\alpha$, $K_{20}$, and $K_{22}$ changed slightly, distributed according to the likelihood defined by equation \ref{eqn:likelihood} with this nominal uncertainty method and $\sigma_\theta = 0.2$. The method for distributing these shape parameters is the same as the method for distributing the MCMC initial walker positions, described in section \ref{sec:fitting-method}. Bands containing 68.3\%, 95.5\%, and 99.7\% of these additional simulations are also plotted in figure \ref{fig:example-data}.
+In figure \ref{fig:example-data} we present example data for this asteroid using the two reference asteroid and orbit parameters described in appendix \ref{app:reference-config}. Additionally, one thousand simulations are also run with asteroid parameters $\gamma_0$, $K_{20}$, and $K_{22}$ changed slightly, distributed according to the likelihood defined by equation \ref{eqn:likelihood} with this nominal uncertainty method and $\sigma_\theta = 0.2$. The method for distributing these shape parameters is the same as the method for distributing the MCMC initial walker positions, described in section \ref{sec:fitting-method}. Bands containing 68.3\%, 95.5\%, and 99.7\% of these additional simulations are also plotted in figure \ref{fig:example-data}.
 
 \begin{figure}
   \centering
   \includegraphics[width=0.7\textwidth]{nominal-data-sym.pdf}
   \includegraphics[width=0.7\textwidth]{nominal-data-asym.pdf}
-  \caption{Angular velocity data simulated for the symmetric and asymmetric reference asteroid densities and the reference orbit (black lines). Also plotted is the deviation of the data for likelihood-distributed changes to the asteroid shape (bands) using the nominal uncertainty method. Bands contain 68.3\%, 95.5\%, and 99.7\% of the 1000 simulations run.}
+  \caption{Angular velocity data simulated for the symmetric (above) and asymmetric (below) reference asteroid densities and the reference orbit (black lines). Also plotted is the deviation of the data for likelihood-distributed changes to the asteroid shape (bands) using the nominal uncertainty method. Bands contain 68.3\%, 95.5\%, and 99.7\% of the 1000 simulations run.}
   \label{fig:example-data}
 \end{figure}
 
@@ -434,38 +434,38 @@ To interpret the capacity of this tidal torque technique to constrain the densit
 The distributions are nearly Gaussian in most cases (see appendix \ref{app:gaussian-posteriors}) and all fits are run until convergence.
 
 \subsection{Dependence on asteroid parameters}
-Of first importance is the dependence of parameter uncertainties on the true parameter values. To measure this, we run 120 fits, all for the two $K_{\ell = 2}$ parameters and $\alpha$ with the standard orbit (appendix \ref{app:standard}) and experimental uncertainty $\sigma_\theta = 0.01$ with the nominal uncertainty model(section \ref{sec:uncertainty-models}). Each fit is run for $\alpha=\pi/8$ and $K_{20}, K_{22}$ distributed in a triangular lattice with 17 layers, spanning the parameter space. The 33 cases with extremal values of $K_{22}$ are not fitted as being too close to the edge of the parameter space.
+Of first importance is the dependence of parameter uncertainties on the true parameter values. To measure this, we run 120 fits, all for the two $K_{\ell = 2}$ parameters and $\gamma_0$ with the standard orbit (appendix \ref{app:standard}) and experimental uncertainty $\sigma_\theta = 0.01$ with the nominal uncertainty model(section \ref{sec:uncertainty-models}). Each fit is run for $\gamma_0=\pi/8$ and $K_{20}, K_{22}$ distributed in a triangular lattice with 17 layers, spanning the parameter space. The 33 cases with extremal values of $K_{22}$ are not fitted as being too close to the edge of the parameter space.
 
-The parameters $K_{22}$ and $K_{20}$ are then converted to the more physical parameters $a/c$ and $b/c$ under the assumption of an elliptical asteroid of uniform density with minor axes $a, b, c$ (section \ref{sec:constant-density-ellipsoid}). Uncertainties on $\alpha$ and the two shape parameters are given in figure \ref{fig:probe-space-sigma}, and correlations between pairs of parameters ($\mathrm{Corr}(X, Y) = \mathrm{Var}(X, Y) / (\sigma_X \sigma_Y)$ are given in figure \ref{fig:probe-space-corr}. 
+The parameters $K_{22}$ and $K_{20}$ are then converted to the more physical parameters $a/c$ and $b/c$ under the assumption of an elliptical asteroid of uniform density with minor axes $a, b, c$ (section \ref{sec:constant-density-ellipsoid}). Uncertainties on $\gamma_0$ and the two shape parameters are given in figure \ref{fig:probe-space-sigma}, and correlations between pairs of parameters ($\mathrm{Corr}(X, Y) = \mathrm{Var}(X, Y) / (\sigma_X \sigma_Y)$ are given in figure \ref{fig:probe-space-corr}. 
 \begin{figure}
-  \includegraphics[width=0.3\textwidth]{probe-space-theta-1-sigma.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{probe-space-theta-2-sigma.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{probe-space-theta-3-sigma.pdf}
+  \includegraphics[width=0.33\textwidth]{probe-space-theta-1-sigma.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{probe-space-theta-2-sigma.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{probe-space-theta-3-sigma.pdf}
 
-  \includegraphics[width=0.3\textwidth]{probe-space-ab-1-sigma.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{probe-space-ab-a-sigma.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{probe-space-ab-b-sigma.pdf}
+  \includegraphics[width=0.33\textwidth]{probe-space-ab-1-sigma.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{probe-space-ab-a-sigma.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{probe-space-ab-b-sigma.pdf}
 
-  \caption{Ratios of fit uncertainties (the standard deviations of parameter posterior distributions) to experimental uncertainty ($\sigma_\theta$) for fit parameters $\alpha$, $K_{22}$, and $K_{20}$ (top row) and $\alpha$, $a/c$, and $b/c$ (bottom row). Also shown are the reference asteroid shapes used elsewhere in this paper (appendix \ref{app:reference-config}); the symmetric case is marked with a circle and the asymmetric with a square.}
+  \caption{Ratios of fit uncertainties (the standard deviations of parameter posterior distributions) to experimental uncertainty ($\sigma_\theta$) for fit parameters $\gamma_0$, $K_{22}$, and $K_{20}$ (top row) and $\gamma_0$, $a/c$, and $b/c$ (bottom row). Also shown are the reference asteroid shapes used elsewhere in this paper (appendix \ref{app:reference-config}); the symmetric case is marked with a circle and the asymmetric with a square.}
   \label{fig:probe-space-sigma}
 \end{figure}
 
 \begin{figure}
-  \includegraphics[width=0.3\textwidth]{probe-space-corr12.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{probe-space-corr13.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{probe-space-corr23.pdf}
-
-  \includegraphics[width=0.3\textwidth]{probe-space-ab-1a.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{probe-space-ab-1b.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{probe-space-ab-ab.pdf}
+  \includegraphics[width=0.33\textwidth]{probe-space-corr12.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{probe-space-corr13.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{probe-space-corr23.pdf}
   
-  \caption{Correlations between fit uncertainties and experimental uncertainty ($\sigma_\theta$) for fit parameters $\alpha$, $K_{22}$, and $K_{20}$ (top row) and $\alpha$, $a/c$, and $b/c$ (bottom row). Also shown are the reference asteroid shapes used elsewhere in this paper (appendix \ref{app:reference-config}); the symmetric case is marked with a circle and the asymmetric with a square.}
+  \includegraphics[width=0.33\textwidth]{probe-space-ab-1b.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{probe-space-ab-1a.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{probe-space-ab-ab.pdf}
+  
+  \caption{Correlations between fit uncertainties and experimental uncertainty ($\sigma_\theta$) for fit parameters $\gamma_0$, $K_{22}$, and $K_{20}$ (top row) and $\gamma_0$, $a/c$, and $b/c$ (bottom row). Also shown are the reference asteroid shapes used elsewhere in this paper (appendix \ref{app:reference-config}); the symmetric case is marked with a circle and the asymmetric with a square.}
   \label{fig:probe-space-corr}
 \end{figure}
 
-These figures demonstrate several key properties. Figure \ref{fig:probe-space-sigma} demonstrates that fit uncertainties for all three parameters are generally for asteroids with an axis of rotational symmetry --- i.e. $a=b$ or $K_{22} = 0$. This is likely due to the fact that the local axes, which are required to define the parameters, are set such that they align with the asteroid principal axes, and therefore are degenerate in the case of a symmetrical asteroid. For similar reasons, uncertainty in $\alpha$ especially is large for $a \approx b \approx c$, which is the spherical case in which no tidal torque is generated. Beyond these two trends, uncertainty in $a/c$ and $b/c$ appear to scale linearly with these ratios. 
+These figures demonstrate several key properties. Figure \ref{fig:probe-space-sigma} demonstrates that fit uncertainties for all three parameters are generally for asteroids with an axis of rotational symmetry --- i.e. $a=b$ or $K_{22} = 0$. This is likely due to the fact that the local axes, which are required to define the parameters, are set such that they align with the asteroid principal axes, and therefore are degenerate in the case of a symmetrical asteroid. For similar reasons, uncertainty in $\gamma_0$ especially is large for $a \approx b \approx c$, which is the spherical case in which no tidal torque is generated. Beyond these two trends, uncertainty in $a/c$ and $b/c$ appear to scale linearly with these ratios. 
 
-Figure \ref{fig:probe-space-corr} demonstrates that the parameters are generally correlated. Specficically, $\alpha$ and $|K_{22}|$ are strongly correlated for large $|K_{22}|$ which corresponds to highly asymmetric asteroids. Likewise, for the correlation of $a/c$ and $b/c$ with $\alpha$. $\mathrm{Corr}(\alpha, K_{20})$ shows slightly different behavior, since they are still correlated for asteroids with $a=b$. However, the correlation still increases for highly asymmetric asteroids. The correlation between shape parameters $K_{20}$ and $K_{22}$ is often near zero except in highly asymmetric asteroids, but the correlation between $a/c$ and $b/c$ is rarely zero; these correlate for $a\approx b$ and anti-correlate for $a \not \approx b$. The $K_{\ell m}$ coordinates may therefore be a better lens through which to view asteroid shape, due to their low correlation.
+Figure \ref{fig:probe-space-corr} demonstrates that the parameters are generally correlated. Specficically, $\gamma_0$ and $|K_{22}|$ are strongly correlated for large $|K_{22}|$ which corresponds to highly asymmetric asteroids. Likewise, for the correlation of $a/c$ and $b/c$ with $\gamma_0$. $\mathrm{Corr}(\v, K_{20})$ shows slightly different behavior, since they are still correlated for asteroids with $a=b$. However, the correlation still increases for highly asymmetric asteroids. The correlation between shape parameters $K_{20}$ and $K_{22}$ is often near zero except in highly asymmetric asteroids, but the correlation between $a/c$ and $b/c$ is rarely zero; these correlate for $a\approx b$ and anti-correlate for $a \not \approx b$. The $K_{\ell m}$ coordinates may therefore be a better lens through which to view asteroid shape, due to their low correlation.
 
 Also shown in figures \ref{fig:probe-space-sigma} and \ref{fig:probe-space-corr} are the reference asteroid configurations which we study when fixing the asteroid shape and varying other parameters. We note that these reference configurations capture the above trends in variance and correlation, so that they can be viewed as representative of all but the most extreme asteroid configurations. The measured values of variance and covariance are displayed in table \ref{tab:probe-space-refernece-var-covar}.
 
@@ -473,7 +473,7 @@ Also shown in figures \ref{fig:probe-space-sigma} and \ref{fig:probe-space-corr}
   \centering
   \begin{tabular}{c c c c c c c}
     \hline \hline
-    Reference point & $\sigma(\alpha)$ / $\sigma_\theta$ & $\sigma(K_{22}\ [a/c])$ / $\sigma_\theta$ & $\sigma(K_{20}\ [b/c])$ / $\sigma_\theta$ & $\mathrm{Corr(\alpha, K_{22})}$ & $\mathrm{Corr(\alpha, K_{20})}$ & $\mathrm{Corr(K_{22}, K_{20})}$ \\ \hline
+    Reference point & $\sigma(\gamma_0)$ / $\sigma_\theta$ & $\sigma(K_{22}\ [a/c])$ / $\sigma_\theta$ & $\sigma(K_{20}\ [b/c])$ / $\sigma_\theta$ & $\mathrm{Corr(\gamma_0, K_{22})}$ & $\mathrm{Corr(\gamma_0, K_{20})}$ & $\mathrm{Corr(K_{22}, K_{20})}$ \\ \hline
     Symmetric: $a=b$ & 0.190 & 0.000763 & 0.00726 & 0.707 & 0.508 & -0.205\\
     & & 0.0412 & 0.0390 & -0.400 & -0.614 & 0.966\\
     Asymmetric: $a<b$ & 0.0148 & 0.000410 & 0.000505 & -0.553 & -0.0716 & -0.356\\
@@ -481,7 +481,7 @@ Also shown in figures \ref{fig:probe-space-sigma} and \ref{fig:probe-space-corr}
     Asymmetric: $a>b$ & 0.0110 & 0.000582 & 0.000651 & 0.913 & -0.138 & -0.432\\ 
     & & 0.0238 & 0.0128 & 0.328 & -0.485 & 0.636\\ \hline
   \end{tabular}
-  \caption{Values for the standard deviation and correlation of $\alpha$, $K_{22}$, and $K_{20}$ (top entry of each row) or $\alpha$, $a/c$, and $b/c$ respectively (bottom entry of each row) for the symmetric and asymmetric reference points.}
+  \caption{Values for the standard deviation and correlation of $\gamma_0$, $K_{22}$, and $K_{20}$ (top entry of each row) or $\gamma_0$, $a/c$, and $b/c$ respectively (bottom entry of each row) for the symmetric and asymmetric reference points.}
   \label{tab:probe-space-refernece-var-covar}
 \end{table}
 
@@ -586,8 +586,6 @@ Now we approach the problem of solving for the density distribution of an astero
 
 \jtd{Talk about the walker spacing: the clamps, the scale with sigma, and the block diagonal hermitian matrices}
 
-\jtd{Talk about the breaking up of the likelihood function during minimization}
-
 \jtd{Talk about first order torque}
 
 \jtd{Talk about how numerical accuracy was chosen}
@@ -595,8 +593,6 @@ Now we approach the problem of solving for the density distribution of an astero
 \jtd{Show plot of likelihood? (May not be necessary, since the corner plots are also shown)}
 
 \jtd{Move up error bar section so that plots can be explained?}
-
-\jtd{Show corner plot}
 
 \jtd{Compare the results to gaussians (they are not gaussian near the edges). Could do moment testing, or the Shapiro-Wilk test, which is frequentist so I don't want to do it.}
 
@@ -619,7 +615,7 @@ Now we approach the problem of solving for the density distribution of an astero
 Except when otherwise mentioned, we use the following fit parameters when running the simulation. Many of the parameter choices are made to maximize the quality of observations (a close orbit, large asteroid, etc.) This is so that if it is desired to test the dependence of fit results on perigee distance, for instance, the other parameters will not be fixed at values that are so unfavorable to observations that good fits are already excluded. Otherwise, the fit results for all perigee distances would always be poor and the dependence on perigee would be difficult to measure.
 \begin{enumerate}
   \item An orbit around Earth with $4\siunit{km}\per{s}$ excess velocity and perigee at 5 Earth radii.
-  \item An initial roll of $\alpha_0=\pi/8$.
+  \item An initial roll of $\gamma_0=\pi/8$.
   \item A cadence of 2 minutes and observational uncertainty of $\sigma_\theta = 0.01$.
   \item A rotational period of 5 hours, with spin axis pointing 45$^\circ$ below the orbital plane, toward the pericenter.
   \item An asteroid with radius $a_m = 1\siunit{km}$ and $K_{3m}=0$. For $K_{22}$ and $K_{20}$, we use two standard values. One with $(K_{22}, K_{20}) = (0, -0.097)$ and one with $(0.052, -0.202)$. Including the third point obtained by reflection $K_{22}\rightarrow -K_{22}$, these are the three points that minimize the mean distance between an arbitrary point in the allowed parameter space (equation \ref{eqn:parameter-bounds}) and these reference values. The first point is called the symmetric case because the corresponding uniform-density-ellipsoid model is rotationally symmetric around $\unit z$. The second case and its reflection are called the asymmetric cases. Values of $(0.052, -0.202)$ have $a < b$ in the ellipsoid model, and the reflected value has $a > b$. If not specified, we use the $a < b$ case. 
@@ -648,7 +644,7 @@ Figure \ref{fig:example-corner} shows a corner plot of the ten fitted parameters
   \label{fig:example-corner}
 \end{figure}
 
-Figure \ref{fig:example-residuals} demonstrates that a good fit to data was achieved, despite the small error bars and strong dependence of the model on initial conditions. Figure \ref{fig:example-corner} shows that the posterior distributions are largely Gaussian-distributed, with several of the parameters strongly correlated. The true values lie within $2\sigma$ contours in most cases, as expected. Parameters are computed to very high accuracy --- $O(10^{-7})$ for $\alpha_0$ and $O(10^{-9})$ for $K_{2m}$ (the first tier of parameters as ordered by the sensitivity of the asteroid system to their values), and $O(10^{-4})-O(10^{-6})$ for $K_{3m}$. These ranges should be compared to the width of the prior distributions for these parameters, which is $O(1)$ for all. The success of this fit demonstrates that these higher order parameters can be fitted to data as long as good enough precision on the data is achieved.
+Figure \ref{fig:example-residuals} demonstrates that a good fit to data was achieved, despite the small error bars and strong dependence of the model on initial conditions. Figure \ref{fig:example-corner} shows that the posterior distributions are largely Gaussian-distributed, with several of the parameters strongly correlated. The true values lie within $2\sigma$ contours in most cases, as expected. Parameters are computed to very high accuracy --- $O(10^{-7})$ for $\gamma_0$ and $O(10^{-9})$ for $K_{2m}$ (the first tier of parameters as ordered by the sensitivity of the asteroid system to their values), and $O(10^{-4})-O(10^{-6})$ for $K_{3m}$. These ranges should be compared to the width of the prior distributions for these parameters, which is $O(1)$ for all. The success of this fit demonstrates that these higher order parameters can be fitted to data as long as good enough precision on the data is achieved.
 
 
 

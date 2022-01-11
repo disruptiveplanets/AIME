@@ -1,0 +1,5 @@
+g++ -DASTEROIDS_MAX_J=0 -DASTEROIDS_MAX_K=2 -DPRINT_MOMENTUM_ENERGY -Wall -std=c++17 ../sim/*.cpp main.cpp -o "bin/generate" -O3
+
+./bin/generate > momentum-energy.dat
+
+python3 display-le.py
