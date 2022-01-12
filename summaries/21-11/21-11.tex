@@ -45,6 +45,12 @@ Abstract.
 
 \section{Introduction}
 
+\begin{itemize}
+\item Asteroids simulated in binaries \cite{Naidu_2015}
+\item Previous work on the math of asteroid rotations \cite{ashenberg07, paul88}
+\item CNEOS: 4 asteroids $D > 100 m$ are coming to within 1 LD of Earth in the next 10 years, 29 with $D > 10 m$.
+\end{itemize}
+
 
 \section{Asteroid Model}
 In an effort to make a general asteroid model, we will consider the entire effect of the tidal torque applied to an asteroid from a planet, rather than solving for the first order perturbation. To better understand the effect, we will not model perturbing effects from other bodies such as the Sun or other planets. However, nearby bodies, such as moons or rings, are considered in a later section. We will also model the asteroid as a rigid body, whose density distribution is fixed throughout the flyby.
@@ -321,11 +327,15 @@ With the initial walkers distributed, we compute the posterior probability distr
 We model uncertainties in experimental data according to several methods, comparing them to determine the dependence of our conclusions on the sensitivity model used. In every case, the sensitivity model is used both to add randomness to the data set after it is generated, and to weight the $\chi^2$ statistic.
 
 \subsubsection{Nominal Method}
-The most detailed uncertainty model we use, and the one we use most often, is called the ``nominal method.'' It rotates each angular velocity vector by some angle $\Theta$ drawn from a normal distribution centered on $\Theta=0$ with standard deviation $\sigma_\theta$. The period is assumed to be known to arbitrary precision at each cadence. The direction in which the velocity is rotated is chosen from a uniformly random distribution. $\sigma_\theta$ is a general parameter which can be tweaked to model resolution of the spin axis direction.
-
-Practically, the randomization of the data is done by creating a rotation matrix $M$ that rotates $\unit Z$ to the true rotational velocity vector $\mathbf \omega$. This same rotation matrix is then used to rotate the random vector $\mathbf \Omega = \sin \Theta \cos\Phi \unit X + \sin \Theta \sin \Phi\unit Y + \cos \Theta\unit Z$ to the randomized velocity vector. Here, $\Phi$ is a uniformly random variable in the range $[0, \pi)$. Specifically, we write this rotation matrix as
+The most detailed uncertainty model we use, and the one we use most often, is called the ``nominal method.'' It rotates each angular velocity vector $\omega$ by some angle $\Theta$ drawn from a normal distribution centered on $\Theta=0$ with standard deviation $\sigma_\theta$. The rotation is done around an arbitrary axis perpendicular to $\omega$. We also allow the length of $\omega$ to change by a fraction $\rho$ drawn from a log-normal distribution
 \begin{equation}
-M = \parens{\begin{array}{ccc}
+  P(\rho) = \frac{1}{\rho\sqrt{2\pi \sigma_\rho^2}} \mathrm{\exp}\parens{-\frac{\ln^2\rho}{2\sigma_\rho^2}}
+\end{equation}
+so that $\mathrm{ln} \rho$ is normally distributed with mean zero (no change in the length of $\omega$). Both uncertainties $\sigma_\theta$ and $\sigma_\rho$ are general parameters that can be tweaked to model uncertainty in spin axis direction and period. In our case, we often set $\sigma_\rho = 0$ for simplicity. \jtd{Explain why with evidence}.
+
+Practically, the randomization of the data is done by creating a rotation matrix $M$ that rotates $\unit Z$ to the true rotational velocity vector $\mathbf \omega$. This same rotation matrix is then used to rotate the random vector $\mathbf \Omega = \rho \omega (\sin \Theta \cos\Phi \unit X + \sin \Theta \sin \Phi\unit Y + \cos \Theta\unit Z)$ to the randomized velocity vector. Here, $\Phi$ is a uniformly random variable in the range $[0, \pi)$. Specifically, we write this matrix as
+\begin{equation}
+M = \rho\parens{\begin{array}{ccc}
 \cos \phi & -\sin \phi & 0\\
 \sin \phi & \cos \phi & 0\\
 0 & 0 & 1
@@ -341,13 +351,20 @@ where $\theta$ and $\phi$ are the spherical coordinates of the original velocity
 
 Equation \ref{eqn:rotate-uncertainty-matrix} is sufficient to randomize synthetic data, but an analytical expression for the coordinates of $\mathbf \omega$ is required to define the $\chi^2$ value used for fitting. We approximate the distribution of each spin coordinate as normal, with covariance given by the covariance of the true distribution. Based on equation \ref{eqn:rotate-uncertainty-matrix}, the covariance matrix is
 \begin{equation}
-\text{Cov}(\mathbf \omega) = \frac{1}{4}\parens{1-e^{-\sigma_\theta^2}} \parens{1-3e^{-\sigma_\theta^2}}\parens{\begin{array}{ccc}
+\text{Cov}(\mathbf \omega) = \frac{1}{2}e^{-\sigma_\theta^2 + 2 \sigma_\rho^2}\brackets{\parens{e^{-\sigma_\theta^2}-2e^{-\sigma_\rho^2}+\textrm{cosh}(\sigma_\theta^2)} \parens{\begin{array}{ccc}
 \omega_x^2 & \omega_x \omega_y& \omega_x \omega_z\\
 \omega_x \omega_y & \omega_y^2 & \omega_y \omega_z\\
 \omega_x \omega_z & \omega_y \omega_z& \omega_z^2
-\end{array}} +  \frac{\omega^2}{4}\parens{1 - e^{-2\sigma_\theta^2}} \mathds{1}.
+\end{array}} +  \mathrm{sinh}(\sigma_\theta^2) \mathds{1}}.
 \label{eqn:rotate-uncertainty-var}
 \end{equation}
+The difference between this Gaussian approximation and the true distribution are shown in figure \ref{fig:nominal-spin-distro}, which shows the distribution of $10^5$ angular velocity vectors randomly generated for a true velocity vector given by the reference value (appendix \ref{app:reference-config}), both using the true uncertainty method and the Gaussian approximation. The true distribution is more likely to yield results close to the true value than the Gaussian approximation. Agreement also worsens in the case where one of the components of $\omega$ nears zero. This may have the result of our likelihood not perfectly representing our system, and the fit probabilities will be slightly inaccurate.
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{nominal-covariance.pdf}
+  \caption{The distributions of $10^5$ spin vectors generated via the nominal uncertainty method from a true vector given in appendix \ref{app:reference-config}. The true distribution (blue) and the Gaussian approximation (orange) are compared.}
+  \label{fig:nominal-spin-distro}
+\end{figure}
 
 We then define the $\chi^2$ statistic to be
 \begin{equation}
@@ -434,6 +451,7 @@ To interpret the capacity of this tidal torque technique to constrain the densit
 The distributions are nearly Gaussian in most cases (see appendix \ref{app:gaussian-posteriors}) and all fits are run until convergence.
 
 \subsection{Dependence on asteroid parameters}
+\label{sec:probe-space}
 Of first importance is the dependence of parameter uncertainties on the true parameter values. To measure this, we run 120 fits, all for the two $K_{\ell = 2}$ parameters and $\gamma_0$ with the standard orbit (appendix \ref{app:standard}) and experimental uncertainty $\sigma_\theta = 0.01$ with the nominal uncertainty model(section \ref{sec:uncertainty-models}). Each fit is run for $\gamma_0=\pi/8$ and $K_{20}, K_{22}$ distributed in a triangular lattice with 17 layers, spanning the parameter space. The 33 cases with extremal values of $K_{22}$ are not fitted as being too close to the edge of the parameter space.
 
 The parameters $K_{22}$ and $K_{20}$ are then converted to the more physical parameters $a/c$ and $b/c$ under the assumption of an elliptical asteroid of uniform density with minor axes $a, b, c$ (section \ref{sec:constant-density-ellipsoid}). Uncertainties on $\gamma_0$ and the two shape parameters are given in figure \ref{fig:probe-space-sigma}, and correlations between pairs of parameters ($\mathrm{Corr}(X, Y) = \mathrm{Var}(X, Y) / (\sigma_X \sigma_Y)$ are given in figure \ref{fig:probe-space-corr}. 
@@ -474,12 +492,12 @@ Also shown in figures \ref{fig:probe-space-sigma} and \ref{fig:probe-space-corr}
   \begin{tabular}{c c c c c c c}
     \hline \hline
     Reference point & $\sigma(\gamma_0)$ / $\sigma_\theta$ & $\sigma(K_{22}\ [a/c])$ / $\sigma_\theta$ & $\sigma(K_{20}\ [b/c])$ / $\sigma_\theta$ & $\mathrm{Corr(\gamma_0, K_{22})}$ & $\mathrm{Corr(\gamma_0, K_{20})}$ & $\mathrm{Corr(K_{22}, K_{20})}$ \\ \hline
-    Symmetric: $a=b$ & 0.190 & 0.000763 & 0.00726 & 0.707 & 0.508 & -0.205\\
-    & & 0.0412 & 0.0390 & -0.400 & -0.614 & 0.966\\
-    Asymmetric: $a<b$ & 0.0148 & 0.000410 & 0.000505 & -0.553 & -0.0716 & -0.356\\
-    & & 0.0142 & 0.0153 & -0.190 & 0.213 & 0.791\\
-    Asymmetric: $a>b$ & 0.0110 & 0.000582 & 0.000651 & 0.913 & -0.138 & -0.432\\ 
-    & & 0.0238 & 0.0128 & 0.328 & -0.485 & 0.636\\ \hline
+    Symmetric: $a=b$ &  &  &  &  &  & \\
+    &  &  &  &  &  & \\
+    Asymmetric: $a<b$ &  &  &  &  &  & \\
+    &  &  &  &  &  & \\
+    Asymmetric: $a>b$  &  &  &  &  &  & \\
+    &  &  &  &  &  & \\
   \end{tabular}
   \caption{Values for the standard deviation and correlation of $\gamma_0$, $K_{22}$, and $K_{20}$ (top entry of each row) or $\gamma_0$, $a/c$, and $b/c$ respectively (bottom entry of each row) for the symmetric and asymmetric reference points.}
   \label{tab:probe-space-refernece-var-covar}
@@ -487,14 +505,25 @@ Also shown in figures \ref{fig:probe-space-sigma} and \ref{fig:probe-space-corr}
 
 
 \subsection{Dependence on observational precision}
+\label{sec:probe-sigma}
+
+\jtd{Running Jan 11?}
 
 \subsection{Dependence on orbital parameters}
 
+\jtd{Do v and rp separately? Perhaps do not map}
+
 \subsection{Dependence on spin pole}
+
+\jtd{The period is also important, but probably depends too much on the start of the simulation. I'm more interested in the spin pole.}
 
 \subsection{Dependence on cadence}
 
 \subsection{Dependence on blocking out perigee}
+\label{sec:block-perigee}
+Much of the data available concerning an asteroid's rotational velocity is captured much before or much after the flyby perigee, where tidal torque is low. The angular velocity evolution here is dominated by torque-free precession dictated by the moment of inertia components, so that zero-torque data can still be used to fix $K_{20}$ and $K_{22}$. However, $K_{3m}$ are not extractable from precession data alone. We are therefore curious how much of the sensitivity of the system to $K_{3m}$ components is due only data taken during the encounter perigee.
+
+To test this, we mask the perigee of the counter by removing data from the period when $D < f_\textrm{mask} r_p$, where $f_\textrm{mask}>1$ is a unit-less fraction. We also allow the simulation to continue beyond the standard $f = 10$, so that the actual length of the data set is unaffected by the mask and induces no lack of precision on the fit of $K_{3m}$. We then fit to synthetic data for each mask and plot the standard deviations of the parameter posterior PDFs for (1) $\gamma_0$ and $K_{2m}$ as a control, and (2) $K_{3m}$, to test whether they can still be fitted for without data concerning the perigee. To maximize the changes in posterior PDF, we use an experimental error of $\sigma_\theta = 10^{-5}$, the lowest we test in this study.
 
 \subsection{Exotic scenarios}
 
@@ -519,6 +548,7 @@ To avoid this degeneracy, we either (1) assume that the density is constant and 
 \jtd{Not all of these models will be in the paper. This is a list of all the models I've thought of. I'll give some examples of applying these models to ``realistic'' asteroid density profiles (uniform, regolith over rock, etc) and see what they get, using that filter to describe the best.}
 
 \subsection{Constant Density Asteroid Model}
+\label{sec:constant-density}
 Suppose our asteroid has constant density $\rho_0$ and known parameters $K_{\ell m}$ and $a_m$. We do not expect to solve for $\rho_0$ or equivalently $\mu_m$ since the mass of the asteroid cannot be extracted from tidal torque. However, we can solve for the asteroid shape required to match the known $K_{\ell m}$. In this process, we ignore $a_m$ until the last step, when we rescale the asteroid shape model until the correct $a_m$ is yielded.
 
 Suppose the asteroid is ``star shaped'' in that every point on its surface maps to a unique set of spherical coordinates $\theta, \phi$, and $r(\theta, \phi)$. We use the helpful identity
@@ -547,7 +577,9 @@ These arise out of computing the moments of inertia for a constant density ellip
 
 Again, the density of this asteroid cannot be extracted because, as is a general principle of gravitational interactions, the mass of the asteroid does not affect its dynamics. If $a_m$ is unknown, the ratios $a/c$ and $b/c$ can be computed instead. Since $I_{zz}$, is the greatest of the moments of inertia, we expect $a/c > 1$ and $b/c > 1$. 
 
+
 \subsection{Fixed Surface $\nabla^2 \rho = 0$ model}
+\label{sec:laplace-rho}
 Now suppose the shape of the asteroid is known, perhaps by a simplifying guess or perhaps by direct observation during a flyby. Then a density distribution $\rho(\mathbf r)$ can be solved for which is consistent with observed values of $K_{\ell m}$. Supposing $\nabla^2 \rho = 0$ and removing terms which are undefined at $r=0$, we write $\rho(\mathbf r) = \sum_{\ell m} C_{\ell m} R_{\ell m}^* a_m^\ell \mu_m$. Thus, $K_{\ell m} = \sum_{\ell' m'} C_{\ell' m'} B_{\ell \ell' m m'}$ where
 \begin{equation}
   B_{\ell \ell' m m'} = \int_{\mathcal{A}}d^3 r R_{\ell m}(\mathbf r) R_{\ell' m')}(\mathbf r)
@@ -565,6 +597,7 @@ Physically, there is no reason to expect $\nabla^2 \rho = 0$. However, the space
 Note that if $\mathcal{A}$ is assumed to be a sphere, $B_{\ell \ell' m m'} \propto \delta_{\ell \ell'} \delta_{m m'}$ and $B_{\ell \ell m m}$ can be computed analytically. Thus, the matrix inversion step is not required in this case.
 
 \subsection{Fixed Surface Numerical Model}
+\label{sec:numerical-density}
 Now we approach the problem of solving for the density distribution of an asteroid from the $K_{\ell m}$ parameters with more general assumptions. Suppose the shape of the asteroid is known, where ``known'' in this case means that an indicator function $\mathds{1}(\mathbf r)$ exists such that $\mathds{1}(\mathbf r) = 1$  inside the asteroid and 0 elsewhere. Then we suggest a numerical algorithm to compute a representative distribution of the asteroid density distribution. Given $n$ known values of $K_{\ell m}$, the algorithm proceeds as follows.
 \begin{enumerate}
 \item Fill the asteroids with $n$ uniformly random ``seed points'' by distributing them inside a bounding box containing the asteroid and rejecting those with positions $\mathbf r_i$ such that $\mathds{1}(\mathbf r_i) = 0.$
@@ -597,6 +630,7 @@ Now we approach the problem of solving for the density distribution of an astero
 \jtd{Compare the results to gaussians (they are not gaussian near the edges). Could do moment testing, or the Shapiro-Wilk test, which is frequentist so I don't want to do it.}
 
 \jtd{Question: How to express non-gaussianity of distro?}
+\jtd{Question: How important is it that the true value is not reproduced by the fit? Should I try to fix this? It's caused by the Gaussian approximation of the likelihood being incorrectm and by the fact that the data is not quite drawn from the distributions we model in the likeihood (it's drawn from the distribution of the true spin, not the data spin).}
 
 \vspace{5mm}
 \facilities{MIT Supercloud}
@@ -614,10 +648,10 @@ Now we approach the problem of solving for the density distribution of an astero
 \label{app:reference-config}
 Except when otherwise mentioned, we use the following fit parameters when running the simulation. Many of the parameter choices are made to maximize the quality of observations (a close orbit, large asteroid, etc.) This is so that if it is desired to test the dependence of fit results on perigee distance, for instance, the other parameters will not be fixed at values that are so unfavorable to observations that good fits are already excluded. Otherwise, the fit results for all perigee distances would always be poor and the dependence on perigee would be difficult to measure.
 \begin{enumerate}
-  \item An orbit around Earth with $4\siunit{km}\per{s}$ excess velocity and perigee at 5 Earth radii.
+  \item An orbit around Earth with $6\siunit{km}\per{s}$ excess velocity and perigee at 5 Earth radii. \jtd{Cite Apophis close approach}
   \item An initial roll of $\gamma_0=\pi/8$.
-  \item A cadence of 2 minutes and observational uncertainty of $\sigma_\theta = 0.01$.
-  \item A rotational period of 5 hours, with spin axis pointing 45$^\circ$ below the orbital plane, toward the pericenter.
+  \item A cadence of 2 minutes and observational uncertainty of $\sigma_\theta = 0.01$ and $\sigma_\rho$ = 0.
+  \item A rotational period of 9 hours, with the rotational velocity vector distributed between the $\unit X$, $\unit Y$, and $\unit Z$ axes in a 1:2:$-2$ ratio.
   \item An asteroid with radius $a_m = 1\siunit{km}$ and $K_{3m}=0$. For $K_{22}$ and $K_{20}$, we use two standard values. One with $(K_{22}, K_{20}) = (0, -0.097)$ and one with $(0.052, -0.202)$. Including the third point obtained by reflection $K_{22}\rightarrow -K_{22}$, these are the three points that minimize the mean distance between an arbitrary point in the allowed parameter space (equation \ref{eqn:parameter-bounds}) and these reference values. The first point is called the symmetric case because the corresponding uniform-density-ellipsoid model is rotationally symmetric around $\unit z$. The second case and its reflection are called the asymmetric cases. Values of $(0.052, -0.202)$ have $a < b$ in the ellipsoid model, and the reflected value has $a > b$. If not specified, we use the $a < b$ case. 
 \end{enumerate}
 
