@@ -1,6 +1,6 @@
 TEST = False
 
-import sys, corner, emcee, os
+import corner, emcee
 if not TEST:
     import asteroids_0_3, asteroids_0_2, asteroids_2_3, asteroids_2_2, asteroids_3_3, asteroids_3_2
 else:
@@ -12,7 +12,6 @@ else:
     import test_loglike as asteroids_3_3
 import numpy as np
 import matplotlib.pyplot as plt
-import random_vector
 from scipy.linalg import pinvh
 
 import matplotlib as mpl
@@ -75,7 +74,7 @@ class Display:
         except:
             print("Could not find autocorrelation time because the chain is too short.")
             self.burnin = AUTO_BURNIN
-            self.thin = DEFAULT_THIN#1
+            self.thin = DEFAULT_THIN
 
         self.samples = self.reader.get_chain(discard=self.burnin, thin=self.thin)
         self.log_prob_samples = self.reader.get_log_prob(discard=self.burnin, thin=self.thin)
@@ -88,7 +87,7 @@ class Display:
         fig, axes = plt.subplots(self.ndim, figsize=(6.6, 6.6), sharex=True)
         for i in range(self.ndim):
             ax = axes[i]
-            ax.plot(self.samples[:, :, i], "k", alpha=0.3)
+            ax.plot(self.samples[:, :, i] - self.theta_true[i], "k", alpha=0.3)
             ax.set_xlim(0, len(self.samples))
             ax.set_ylabel(self.theta_labels[i])
             #ax.yaxis.set_label_coords(-0.1, 0.5)
@@ -153,20 +152,18 @@ class Display:
         self.get_params()
         self.get_mask()
 
-        res = self.get_results()
-        transpose_res = np.array([np.asarray([l[i] for l in res]) for i in range(3)]) - np.array(self.theta_true)
-
         flat_samples = self.samples[:,self.mask,:].reshape(
-            (self.samples.shape[0] * np.sum(self.mask), self.samples.shape[2])) - np.array(self.theta_true)
+            (-1, self.samples.shape[2])) - np.array(self.theta_true)
 
-        #flat_samples = np.unique(flat_samples, axis=0)
-
-        param_exps = np.ceil(-np.log10(np.maximum(np.abs(np.max(flat_samples, axis=0)), np.max(flat_samples, axis=0))))
+        for i in range(3):
+            print([np.percentile(flat_samples[:,i], p) for p in np.arange(0, 110, 10)])
+        
+        param_exps = np.ceil(-np.log10(np.maximum(np.abs(np.min(flat_samples, axis=0)), np.max(flat_samples, axis=0))))
         exp_labels = []
         for l, e in zip(self.theta_labels, param_exps):
             exp_labels.append(l + " ($\\times 10^{"+str(int(-e))+"}$)")
 
-        fig = corner.corner(
+        corner.corner(
             flat_samples * 10**param_exps, labels=exp_labels, truths=np.zeros_like(self.theta_true)
         );
 
@@ -182,7 +179,6 @@ class Display:
             return
         f = open("../../staged/" + self.bare_name + ".txt", 'r')
         asteroids_max_j, asteroids_max_k = f.readline().split(', ')
-        accept_nums = [int(i) for i in f.readline().split(', ')]
         self.maxj = int(asteroids_max_j)
         self.maxk = int(asteroids_max_k)
         self.cadence = int(f.readline())
@@ -194,7 +190,7 @@ class Display:
         self.theta_true = [float(x) for x in f.readline().split(',')]
         theta_high = np.asarray([float(x) for x in f.readline().split(',')])
         theta_low = np.asarray([float(x) for x in f.readline().split(',')])
-        self.sigma = float(f.readline())
+        self.sigma = [float(d) for d in f.readline().split(',')]
         f.close()
 
         if self.maxj == 0:
@@ -249,8 +245,8 @@ class Display:
     def run(self, theta):
         self.get_params()
         try:
-            resolved_data = self.module.simulate(self.cadence, self.jlms, theta[1:],
-                self.radius, self.spin[0], self.spin[1], self.spin[2], theta[0],
+            resolved_data = self.module.simulate(self.cadence, self.jlms, theta,
+                self.radius, self.spin[0], self.spin[1], self.spin[2],
                 self.impact_parameter, self.speed, CENTRAL_MU, CENTRAL_RADIUS, 0, False)
         except:
             print("Coordinates are invalid ({})".format(theta))

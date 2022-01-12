@@ -49,3 +49,11 @@ Reran the code to make the likelihood half the chi squared. The above plots are 
 # Jan 11
 
 Today I realized while making a plot of angular momentum that I flipped some inversions in the code. Reran the fits, also changing the escape velocity from 4 kps to 6 kps.
+
+The problem in my code occurred when I fixed the likelihood. Now, the fact that the spin offsets are not truly Gaussian distributed is showing. The true point does not always occur in the 2 sigma radius; in fact, it sometimes occurs much farther away. I changed sigma to make the fit to the Gaussian case better, and nothing much happened.
+- I confirmed that uncorrelated random offsets produce correct contours.
+- I confirmed that simple correlations produce correct contours, but not the current ones.
+
+# Jan 12
+
+Today I learned that the difficulty with the fitting is that the uncertainty on the data is not the same as the uncertainty from which they are drawn, because the data moves and the uncertainty is recalculated. That's what's causing the fit issues. But I'd like to talk to Julien about this. Now I'm pushing for another fit with sigma_rho = 0.

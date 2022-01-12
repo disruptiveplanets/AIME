@@ -1,20 +1,7 @@
-TEST = False
-
 import numpy as np
 import matplotlib.pyplot as plt
-import emcee, time, sys, os
-if not TEST:
-    import asteroids_0_2, asteroids_0_3, asteroids_2_2, asteroids_2_3, asteroids_3_2, asteroids_3_3
-if TEST:
-    import test_0_2 as asteroids_0_2
-    import test_0_2 as asteroids_0_3
-    import test_0_2 as asteroids_2_2
-    import test_0_2 as asteroids_2_3
+import emcee, sys, os
 from multiprocessing import Pool
-import random_vector, random
-from scipy import optimize, linalg
-from mpmath import mp
-import plotille
 import display, collect
 
 import numdifftools as nd
@@ -29,7 +16,6 @@ def terminal(output_name, do_not_duplicate=True):
 
     f = open("../../staged/" + output_name+".txt", 'r')
     f.readline()
-    num_trials = np.prod([int(i) for i in f.readline().split(', ')])
     cadence = int(f.readline())
     perigee = EARTH_RADIUS * float(f.readline())
     radius = float(f.readline())
@@ -40,7 +26,7 @@ def terminal(output_name, do_not_duplicate=True):
     theta_high = np.asarray([float(x) for x in f.readline().split(',')])
     theta_low = np.asarray([float(x) for x in f.readline().split(',')])
 
-    sigma = float(f.readline())
+    sigma = [float(d) for d in f.readline().split(',')]
     while output_name[-1] == '\n':
         output_name = output_name[:-1]
     f.close()
@@ -95,7 +81,7 @@ def terminal(output_name, do_not_duplicate=True):
     # Save samples
     ####################################################################
 
-    for index in range(num_trials):
+    for index in range(1000):
         reader = emcee.backends.HDFBackend(output_name+"-{}.h5".format(index), read_only=True)
 
 
@@ -110,12 +96,11 @@ def terminal(output_name, do_not_duplicate=True):
         try:
             samples = reader.get_chain(discard=burnin, thin=thin)
         except Exception:
-            print(f"There was no index {index}")
-            continue
+            break
 
-        log_prob_samples = -reader.get_log_prob(discard=burnin, thin=thin) / 3 / n_data 
+        log_prob_samples = reader.get_log_prob(discard=burnin, thin=thin) / 3 / n_data 
         #log_prior_samples = reader.get_blobs(discard=burnin, thin=thin)
-        redchis = np.nanmin(log_prob_samples, axis=0)
+        redchis = -2 * np.nanmin(log_prob_samples, axis=0)
         
         mask = np.where(redchis < THRESHOLD_REDCHI)[0]
 

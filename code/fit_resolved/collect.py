@@ -39,7 +39,6 @@ def collect(d, bare):
     f = open("../../staged/"+bare+".txt", 'r')
     max_j, max_l = f.readline().split(", ")
     max_j, max_l = (int(max_j), int(max_l))
-    num_fits = [int(i) for i in f.readline().split(', ')]
     cadence = int(f.readline())
     impact_parameter = int(f.readline())
     radius = float(f.readline())
@@ -49,7 +48,7 @@ def collect(d, bare):
     theta_true = [float(x) for x in f.readline().split(',')]
     theta_high = [float(x) for x in f.readline().split(',')]
     theta_low = [float(x) for x in f.readline().split(',')]
-    sigma = float(f.readline())
+    sigma = [float(d) for d in f.readline().split(',')]
     f.close()
 
     f = open(d+"-results.txt", 'r')
@@ -60,7 +59,7 @@ def collect(d, bare):
     for line in f.readlines():
         if line == "": continue
         median, plus, minus, _ = line.split(": ")[1].split(' ')
-        theta_median.append('%s' % float('%.4g' % float(median)))
+        theta_median.append('%s' % float('%g' % float(median)))
         theta_plus.append('%s' % float('%.4g' % float(plus[:-1]))) # Remove the terminal comma
         theta_minus.append('%s' % float('%.4g' % -float(minus[:-1])))
     f.close()

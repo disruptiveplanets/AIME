@@ -1,4 +1,3 @@
-from scipy.optimize import minimize
 import time, sys, os, inspect
 from multiprocessing import Pool
 
@@ -17,8 +16,8 @@ ASTEROIDS_MAX_J = 0 # Remember to change the counterpart in backend.hpp
 EARTH_RADIUS = 6370000
 GM = 3.986004418e14
 
-THETA_X_INDEX = 1
-THETA_Y_INDEX = 2
+THETA_X_INDEX = 0
+THETA_Y_INDEX = 1
 PLOT_SIZE = 100
 
 DISTANCE_RATIO_CUT = 2
@@ -27,7 +26,6 @@ if len(sys.argv) not in [2, 3]:
     raise Exception("Please pass a file to describe the fit")
 output_name = sys.argv[1]
 f = open("../../../staged/" + output_name+".txt", 'r')
-f.readline()
 f.readline()
 cadence = int(f.readline())
 impact_parameter = EARTH_RADIUS * int(f.readline())
@@ -60,7 +58,7 @@ N_DIM = len(theta_true)
 
 def fit_function(theta, target_length=None):
     resolved_data = asteroids.simulate(cadence, jlms, theta[1:], radius,
-        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, GM, EARTH_RADIUS, DISTANCE_RATIO_CUT)
+        spin[0], spin[1], spin[2], theta[0], impact_parameter, speed, GM, EARTH_RADIUS, DISTANCE_RATIO_CUT, True)
     if target_length is not None:
         while len(resolved_data)//3 < target_length:
             resolved_data.append(resolved_data[-3])

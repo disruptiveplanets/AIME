@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 LOW_ORDER_INDEX = 0
-BASE_NAME = f"sigma-0-{LOW_ORDER_INDEX}"
+BASE_NAME = f"sigma-{LOW_ORDER_INDEX}"
 LOW_LOG_SIGMA = -5
 HIGH_LOG_SIGMA = 0
 NUM_SIGMA_DIVISIONS = 48 # Run with 12 cores per process.
@@ -12,12 +12,11 @@ HIGH_ORDER = [0, 0, 0, 0, 0, 0, 0]
 
 def get_text(sigma):
     return """0, 3
-3, 1
 120
 5
 1000
 6000
-0.00013712601, 0, -0.00013712601
+0.00006464182, 0.00012928364, -0.00012928364
 1.0
 {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
 0.78539816339, 0.125, 0, 1, 1, 1, 1, 1, 1, 1

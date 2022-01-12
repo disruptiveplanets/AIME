@@ -11,21 +11,20 @@ import random_vector
 plt.style.use("jcap")
 
 SYMMETRIC = True
-GAMMA_0 = 0.39269908169
 
 if SYMMETRIC:
-    TRUE_PARAMS = np.array([0, -0.09766608])
+    TRUE_PARAMS = np.array([0.39269908169, 0, -0.09766608])
     SIGMA = 0.1
 
 else:
-    TRUE_PARAMS = np.array([0.05200629, -0.2021978])
+    TRUE_PARAMS = np.array([0.39269908169, 0.05200629, -0.2021978])
     SIGMA = 0.1
 
 
 NUM_TRIALS = 1000
 SPIN_RESOLUTION = 20
 
-SPIN = [0.00013712601, 0, -0.00013712601]
+SPIN = [0.00006464182, 0.00012928364, -0.00012928364]
 EARTH_RADIUS = 6_378_000
 GM = 3.986004418e14
 IMPACT_PARAMETER = 5 * EARTH_RADIUS
@@ -35,13 +34,13 @@ JLMS = [1]
 CADENCE = 120
 
 data = np.array(asteroids.simulate(CADENCE, JLMS, TRUE_PARAMS, RADIUS, SPIN[0], SPIN[1], SPIN[2],
-    GAMMA_0, IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)).reshape(-1, 3)
+    IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)).reshape(-1, 3)
 err_y, y_inv_covs = random_vector.randomize_rotate_uniform(data, SIGMA)
 
 def hess_func(theta):
     try:
         model = np.array(asteroids.simulate(CADENCE, JLMS, theta, RADIUS, SPIN[0], SPIN[1], SPIN[2],
-            GAMMA_0, IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)).reshape(-1, 3)
+            IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)).reshape(-1, 3)
     except Exception:
         return np.inf
     chisq = 0
@@ -53,7 +52,7 @@ def hess_func(theta):
 def populate(evals, diagonalizer, count):
     spacing = 20 / np.sqrt(evals)
     diagonal_points = spacing * (np.random.randn(count * len(TRUE_PARAMS)).reshape(count, len(TRUE_PARAMS)))
-    global_points = np.asarray([np.matmul(diagonalizer.transpose(), d) for d in diagonal_points])
+    global_points = np.asarray([np.matmul(diagonalizer, d) for d in diagonal_points])
     return global_points
 
 def gen_data():
@@ -63,6 +62,8 @@ def gen_data():
     evals, diagonalizer = np.linalg.eigh(HESSIAN)
     print(diagonalizer)
     print("Evals", evals)
+    if SYMMETRIC:
+        evals[0] = 10e10
     if np.any(evals < 0):
         raise Exception(f"Some eigenvalues were negative ({evals})")
     results = []
@@ -75,7 +76,7 @@ def gen_data():
             theta = TRUE_PARAMS + populate(evals, diagonalizer, 1)[0]
         try:
             resolved_data = asteroids.simulate(CADENCE, JLMS, theta, RADIUS, SPIN[0], SPIN[1],
-                SPIN[2], GAMMA_0, IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)
+                SPIN[2], IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)
         except Exception:
             continue
         results.append(resolved_data) # x1, y1, z1, x2, y2, z2, ...

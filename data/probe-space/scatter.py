@@ -2,7 +2,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-BASE_NAME = "param-1."
+BASE_NAME = "param-"
 SIGMA = 0.01
 NUM_SUBDIVISIONS = 16 # run with 24?
 TRIANGLE_BASE = 0.24448
@@ -12,17 +12,16 @@ SPECIALS = [(0, -0.09766608), (0.05200629 , -0.2021978), (-0.05200629 , -0.20219
 
 def get_text(params):
     return """0, 2
-3, 1
 120
 5
 1000
 6000
-0.00013712601, 0, -0.00013712601
+0.00006464182, 0.00012928364, -0.00012928364
 1.0
 {}, {}, {}
 0.78539816339, 0.12499, -0.0001
 -0.78539816339, -0.12499, -0.24999
-{}""".format(INITIAL_ANGLE, params[0], params[1], SIGMA)
+{}, 0""".format(INITIAL_ANGLE, params[0], params[1], SIGMA)
 
 tot_index = 0
 l2zs = []
