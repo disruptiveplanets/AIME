@@ -47,7 +47,7 @@ INTEGRAL_LIMIT_FRAC = 1.0e-3
 
 N_WALKERS = 32
 MAX_N_STEPS = 100_000
-MIN_THETA_DIST = 1e-8
+MIN_THETA_DIST = 1e-5
 LARGE_NUMBER = 1e100
 MIN_SPACING = np.array([1.0e-6, 1.0e-6, 1.0e-6,
     1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1])# Comes in blocks corresponding to the block diagonals
@@ -382,13 +382,13 @@ def get_minimum(arg):
         logging.warning(f"The Hessian was not positive definite. \nHessian {hess}\nRedchi {minimizing_likelihood / len(y) / 3}, \nTheta {result}, \nEigenvalues {new_evals}, \nGradient {grad}")
         #logging.debug(bfgs_min)
         if l == 2:
-            return None, None, None, None
-            #new_evals[0] = -new_evals[0]
-            #if np.any(np.asarray(new_evals) < 0.0):
-            #    return None, None, None, None
-            #else:
-            #    print(l)
-            #    logging.warning("Allowing the Hessian to pass with reversed first eigenvalue.")
+            #return None, None, None, None
+            new_evals[0] = -new_evals[0]
+            if np.any(np.asarray(new_evals) < 0.0):
+                return None, None, None, None
+            else:
+                print(l)
+                logging.warning("Allowing the Hessian to pass with reversed first eigenvalue.")
 
         if l == 3:
             new_evals[3:] = 1 / LARGE_NUMBER
