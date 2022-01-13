@@ -56,4 +56,6 @@ The problem in my code occurred when I fixed the likelihood. Now, the fact that 
 
 # Jan 12
 
-Today I learned that the difficulty with the fitting is that the uncertainty on the data is not the same as the uncertainty from which they are drawn, because the data moves and the uncertainty is recalculated. That's what's causing the fit issues. But I'd like to talk to Julien about this. Now I'm pushing for another fit with sigma_rho = 0.
+Today I learned that the difficulty with the fitting is that the uncertainty on the data is not the same as the uncertainty from which they are drawn. The covariance contains information about how one spin coordinate affects another, but no information about how two affect the third. For a fixed length spin, two actually determine the third (up to a sign) so that they are extremely correlated. That is not captured in the covariance matrix.
+
+You can prove this by allowing the spin to change length. If you introduce a reasonable sigma, the redchi collapses to 1 pretty quickly and the fit values are 2 sigma from the true values.

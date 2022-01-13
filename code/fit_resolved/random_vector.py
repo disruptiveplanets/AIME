@@ -38,12 +38,6 @@ def randomize_rotate_uniform_err(spin, sigma):
     sigma_theta, ratio = sigma
     norm2 = spin[0]**2 + spin[1]**2 + spin[2]**2
 
-    '''return 0.25 * (1 - np.exp(-sigma**2)) * (1 - 3 * np.exp(-sigma**2)) * np.array([
-        [spin[0]**2, spin[0] * spin[1], spin[0] * spin[2]],
-        [spin[0] * spin[1], spin[1]**2, spin[1] * spin[2]],
-        [spin[0] * spin[2], spin[1] * spin[2], spin[2]**2]
-    ]) + norm2 / 4 * (1 - np.exp(-2 * sigma**2)) * np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])'''
-
     return 0.5 * np.exp(sigma_theta**2 * (-1+ 2 * ratio**2)) * (
         (np.exp(-sigma_theta**2) - 2 * np.exp(-sigma_theta**2 * ratio**2) + np.cosh(sigma_theta**2)) * np.array([
         [spin[0]**2, spin[0] * spin[1], spin[0] * spin[2]],
@@ -60,7 +54,7 @@ def randomize_rotate_uniform(data, sigma):
 
     for x, y, z in data:
         norm = np.sqrt(x**2 + y**2 + z**2)
-        new_norm = norm * (1 + np.random.randn(1) * ratio * sigma_theta)
+        new_norm = norm * np.random.lognormal(sigma=sigma_theta * ratio)
         theta = np.arccos(z / norm)
         phi = np.arctan2(y, x)
         rot_mat = np.matmul(
@@ -74,6 +68,7 @@ def randomize_rotate_uniform(data, sigma):
         covs = randomize_rotate_uniform_err(newvec, sigma)
         newy.append(newvec)
         ycovs.append(scipy.linalg.pinvh(covs))
+
     return np.array(newy), np.array(ycovs)
 
 def randomize_rotate_gauss(data, sigma):
@@ -119,6 +114,19 @@ if __name__ == "__main__":
 
     plt.savefig("random-figs/random-vector-unc.pdf")
     plt.savefig("random-figs/random-vector-unc.png")
+
+    plt.figure()
+    true_norms = np.linalg.norm(newspin, axis=1)
+    gauss_norms = np.linalg.norm(gauss_spin, axis=1)
+    bins=np.linspace(np.min(gauss_norms), np.max(gauss_norms), 20)
+    plt.hist(true_norms, bins=bins, color="C0", density=True, histtype="step", fill=False, label="True")
+    plt.hist(gauss_norms, bins=bins, color="C1", density=True, histtype="step", fill=False, label="Gaussian")
+    plt.xlabel("$\omega$ (rad / hr)")
+    plt.ylabel("PDF (hr / rad)")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig("random-figs/random-vector-norm.pdf")
+    plt.savefig("random-figs/random-vector-norm.png")
     plt.show()
 
     err_vec = (np.sum(err[0]**2, axis=0))**(1/4)

@@ -19,3 +19,4 @@ example-residuals.pdf code/other-figs/example-corner/sigma-0-0-00-0-compare.pdf
 example-corner.pdf code/other-figs/example-corner/sigma-0-0-00-0-corner.pdf
 
 nominal-covariance.pdf code/fit_resolved/random-figs/random-vector-unc.pdf
+nominal-norm.pdf code/fit_resolved/random-figs/random-vector-norm.pdf

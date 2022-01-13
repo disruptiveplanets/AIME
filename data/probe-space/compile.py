@@ -158,7 +158,8 @@ def covariance():
                     cov = np.array([[np.nan, np.nan, np.nan], [np.nan, np.nan, np.nan], [np.nan, np.nan, np.nan]])
                 else:
                     min_index = np.argmin(weights)
-                    _, _, cov = data[min_index]
+                    min_file, min_diffs, cov = data[min_index]
+                    print(f"Min file: {min_file}; Min diffs: {min_diffs}")
                 
             corr12 = cov[1][2] / np.sqrt(cov[1][1] * cov[2][2])
             corr01 = cov[0][1] / np.sqrt(cov[0][0] * cov[1][1])

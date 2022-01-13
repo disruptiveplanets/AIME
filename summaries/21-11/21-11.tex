@@ -1,4 +1,4 @@
-\documentclass[linenumbers]{aastex631}
+\documentclass{aastex631}
 
 % Documentation: https://www.overleaf.com/project/61d88bb8ee06e1e18cf4ea76
 
@@ -47,7 +47,7 @@ Abstract.
 
 \begin{itemize}
 \item Asteroids simulated in binaries \cite{Naidu_2015}
-\item Previous work on the math of asteroid rotations \cite{ashenberg07, paul88}
+\item Previous work on the math of asteroid rotations %\cite{ashenberg07, paul88}
 \item CNEOS: 4 asteroids $D > 100 m$ are coming to within 1 LD of Earth in the next 10 years, 29 with $D > 10 m$.
 \end{itemize}
 
@@ -358,15 +358,24 @@ Equation \ref{eqn:rotate-uncertainty-matrix} is sufficient to randomize syntheti
 \end{array}} +  \mathrm{sinh}(\sigma_\theta^2) \mathds{1}}.
 \label{eqn:rotate-uncertainty-var}
 \end{equation}
-The difference between this Gaussian approximation and the true distribution are shown in figure \ref{fig:nominal-spin-distro}, which shows the distribution of $10^5$ angular velocity vectors randomly generated for a true velocity vector given by the reference value (appendix \ref{app:reference-config}), both using the true uncertainty method and the Gaussian approximation. The true distribution is more likely to yield results close to the true value than the Gaussian approximation. Agreement also worsens in the case where one of the components of $\omega$ nears zero. This may have the result of our likelihood not perfectly representing our system, and the fit probabilities will be slightly inaccurate.
+The difference between this Gaussian approximation and the true distribution are shown in figure \ref{fig:nominal-spin-distro} (a), which shows the distribution of the components of $10^5$ angular velocity vectors and their correlations, randomly generated for a true velocity vector given by the reference value (appendix \ref{app:reference-config}), both using the true uncertainty method and the Gaussian approximation. The true distribution is more likely to yield results close to the true value than the Gaussian approximation. Agreement also worsens in the case where one of the components of $\omega$ nears zero (not shown). This may have the result of our likelihood not perfectly representing our system, and the fit probabilities will be slightly inaccurate.
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{nominal-covariance.pdf}
-  \caption{The distributions of $10^5$ spin vectors generated via the nominal uncertainty method from a true vector given in appendix \ref{app:reference-config}. The true distribution (blue) and the Gaussian approximation (orange) are compared.}
+  \gridline{
+    \fig{nominal-covariance.pdf}{0.5\textwidth}{
+        (a) Pairwise-distributions of components of $\mathbf \omega$ show good agreement between the true distribution and the Gaussian approximation.
+      }
+      \fig{nominal-norm.pdf}{0.45\textwidth}{
+        (b) The norm of $\omega$ (a function of all three coordinates) differs between the approximation and true distribution.
+      }
+    }
+  \caption{The true distribution (blue) and the Gaussian approximation (orange) with the same covariance (orange)  for the components of angular velocity $\mathbf \omega$ under the nominal uncertainty method.}
   \label{fig:nominal-spin-distro}
 \end{figure}
 
-We then define the $\chi^2$ statistic to be
+A larger source of disagreement between the Gaussian approximated likelihood and the true distribution is the correlation between all three components of $\omega$. If two components of $\omega$, the third component is known up to its sign except when $\sigma_\rho \neq 0$. However, the covariance matrix of $\mathbf \omega$ does not capture this, nor do the distributions displayed in figure \ref{fig:nominal-spin-distro} (a). Therefore, when $\sigma_\rho \simeq 0$, the Gaussian likelihood function may poorly represent the model. To demonstrate this, we show a histogram of the norm of $\omega$ for the Gaussian approximated distribution and the true distribution in figure  \ref{fig:nominal-spin-distro} (b), which demonstrates that statistics involving all three components of $\mathbf \omega$ can differ highly between the approximation and the true distribution.
+
+Aware of the failings of the Gaussian likelihood assumption, we then define the $\chi^2$ statistic to be
 \begin{equation}
 \chi^2 = \sum_{i=0} (\mathbf \omega_i^* - \mathbf \omega_i)^T\text{Cov}^{-1}(\mathbf\omega^*_i)(\mathbf \omega_i^* - \mathbf \omega_i)
 \label{eqn:chisq-nominal}
