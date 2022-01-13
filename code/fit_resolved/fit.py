@@ -1,4 +1,4 @@
-TEST = c
+TEST = False
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -30,8 +30,6 @@ try:
 except:
     pass
 
-#import derivatives
-
 logging.basicConfig(level=logging.INFO)
 
 PLOT_POSES = True
@@ -49,7 +47,7 @@ INTEGRAL_LIMIT_FRAC = 1.0e-3
 
 N_WALKERS = 32
 MAX_N_STEPS = 100_000
-MIN_THETA_DIST = 3 # Exclude to 3 sigma
+MIN_THETA_DIST = 1e-4
 LARGE_NUMBER = 1e100
 MIN_SPACING = np.array([1.0e-6, 1.0e-6, 1.0e-6,
     1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1])# Comes in blocks corresponding to the block diagonals
@@ -468,9 +466,7 @@ def minimize(l, fix_theta):
             continue
         choose = True
         for distinct_theta, _, _, _ in distinct_results:
-            fake_hess = np.matmul(evecs.transpose(), np.matmul(np.diag(evals), evecs))
-            dist = np.sum((theta - distinct_theta) * np.matmul(fake_hess, theta - distinct_theta))
-            if dist < MIN_THETA_DIST:
+            if np.all((np.abs(distinct_theta - theta) < MIN_THETA_DIST)[1:]):
                 choose = False
                 break
         if choose:
