@@ -7,6 +7,7 @@ from matplotlib.lines import Line2D
 TILT_UNIFORM_TRUE = 0
 TILT_UNIFORM_GAUSS = 1
 UNCORR_SCALE = 2
+EPSILON = 1e-10
 
 def randomize(model, y, sigma):
     if model == TILT_UNIFORM_TRUE:
@@ -17,6 +18,31 @@ def randomize(model, y, sigma):
         return randomize_uncorr_scale(y, sigma)
     else:
         raise Exception(f"Model {model} not implemented")
+
+def log_likelihood(model, y, true, length, sigma):
+    if model == TILT_UNIFORM_TRUE:
+        return like_rotate_uniform(y, true, length, sigma)
+    elif model == TILT_UNIFORM_GAUSS or model == UNCORR_SCALE:
+        return  like_cov(y, true, length, sigma)
+    else:
+        raise Exception(f"Model {model} not implemented")
+
+
+def like_rotate_uniform(y, model, length, sigma):
+    sigma_theta, ratio = sigma
+    trimmed_y = y[:length]
+    trimmed_model = model[:length]
+    rhos = scipy.linalg.norm(trimmed_y, axis=1) / scipy.linalg.norm(trimmed_model, axis=1)
+    thetas = np.arccos(np.sum(trimmed_y * trimmed_model, axis=1) / np.sum(trimmed_y**2, axis=1) * rhos)
+    prob_theta = -0.5 * thetas**2 / sigma_theta**2
+    prob_rho = -0.5 * np.log(rhos)**2 / (ratio * sigma_theta)**2 - np.log(rhos)
+    return np.sum(prob_theta + prob_rho)
+
+def like_cov(y, model, length, y_inv_covs):
+    log_like = 0
+    for i in range(length):
+        log_like += np.sum((y[i] - model[i]) * np.matmul(y_inv_covs[i], y[i] - model[i]))
+    return -0.5 * log_like
 
 
 

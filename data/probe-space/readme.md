@@ -59,3 +59,6 @@ The problem in my code occurred when I fixed the likelihood. Now, the fact that 
 Today I learned that the difficulty with the fitting is that the uncertainty on the data is not the same as the uncertainty from which they are drawn. The covariance contains information about how one spin coordinate affects another, but no information about how two affect the third. For a fixed length spin, two actually determine the third (up to a sign) so that they are extremely correlated. That is not captured in the covariance matrix.
 
 You can prove this by allowing the spin to change length. If you introduce a reasonable sigma, the redchi collapses to 1 pretty quickly and the fit values are 2 sigma from the true values.
+
+# Jan 13
+I decided to no longer use the Gaussian approximation, writing a true likelihood instead. I implemented this, and the distance determination between minimization points. It appears to work. However, I had to switch to including sigma_rho or else the likelihood is too badly behaved. I will have to go back later to come up with reasonable estimates for these values.

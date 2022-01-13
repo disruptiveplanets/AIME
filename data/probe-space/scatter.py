@@ -21,7 +21,7 @@ def get_text(params):
 {}, {}, {}
 0.78539816339, 0.12499, -0.0001
 -0.78539816339, -0.12499, -0.24999
-{}, 0""".format(INITIAL_ANGLE, params[0], params[1], SIGMA)
+{}, 1e-5""".format(INITIAL_ANGLE, params[0], params[1], SIGMA)
 
 tot_index = 0
 l2zs = []

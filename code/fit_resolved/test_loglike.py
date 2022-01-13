@@ -17,9 +17,9 @@ def simulate(cadence, jlms, theta, radius, spinx, spiny, spinz, impact_parameter
         mul = 1
         if n >= 3:
             mul = 0.000001
-        y1 += mul * p**2 * np.sin(consider_x * n)
-        y2 += mul * p**2 * np.cos(consider_x * n)
-        y3 += mul * p**2 * np.cos(consider_x * (n+1))
+        y1 += mul * p**3 * np.sin(consider_x * n)
+        y2 += mul * p**3 * np.cos(consider_x * n)
+        y3 += mul * p**3 * np.cos(consider_x * (n+1))
 
     y = []
     for i in range(consider_x.shape[0]):

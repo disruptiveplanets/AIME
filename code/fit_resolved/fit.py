@@ -1,4 +1,4 @@
-TEST = False
+TEST = c
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -22,6 +22,8 @@ import display, collect
 
 import numdifftools as nd
 
+np.random.seed(4567)
+
 try:
     import coloredlogs
     coloredlogs.install()
@@ -33,12 +35,12 @@ except:
 logging.basicConfig(level=logging.INFO)
 
 PLOT_POSES = True
-NUM_MINIMIZE_POINTS_PER = 24
+NUM_MINIMIZE_POINTS_PER = 8
 DISTANCE_RATIO_CUTS = [
     [2.0, None],
     [-2.0, None]
 ]
-THRESHOLD_REDCHI = 2
+THRESHOLD_LIKE_RAT = 2
 
 GM = 3.986004418e14
 EARTH_RADIUS = 6_370_000
@@ -47,7 +49,7 @@ INTEGRAL_LIMIT_FRAC = 1.0e-3
 
 N_WALKERS = 32
 MAX_N_STEPS = 100_000
-MIN_THETA_DIST = 1e-5
+MIN_THETA_DIST = 3 # Exclude to 3 sigma
 LARGE_NUMBER = 1e100
 MIN_SPACING = np.array([1.0e-6, 1.0e-6, 1.0e-6,
     1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1])# Comes in blocks corresponding to the block diagonals
@@ -136,18 +138,14 @@ def fit_function(theta, target_length=None):
             resolved_data.append(resolved_data[-3])
     return np.asarray(resolved_data).reshape(-1, 3)
 
-
 def log_likelihood(theta, y, y_inv_covs):
     # Normal likelihood
     try:
         model = fit_function(theta, len(y))
     except RuntimeError:
         return -np.inf # Zero likelihood
-    # Return chisq
-    chisq = 0
-    for i in range(len(y)):
-        chisq += np.matmul(y[i] - model[i], np.matmul(y_inv_covs[i], y[i] - model[i]))
-    return -chisq / 2.0
+   
+    return random_vector.log_likelihood(UNCERTAINTY_MODEL, y, model, len(y), UNCERTAINTY_ARGUMENT)
 
 def log_prior(theta):
     for i, param in enumerate(theta):
@@ -169,6 +167,10 @@ start = time.time()
 y = fit_function(theta_true)
 logging.info("Data generation took {} s".format(time.time() - start))
 y, y_inv_covs = random_vector.randomize(UNCERTAINTY_MODEL, y, sigma)
+if UNCERTAINTY_MODEL == random_vector.TILT_UNIFORM_TRUE:
+    UNCERTAINTY_ARGUMENT = sigma
+else:
+    UNCERTAINTY_ARGUMENT = y_inv_covs
 
 np.save(f"{output_name}-data.npy", y)
 np.save(f"{output_name}-unc.npy", y_inv_covs)
@@ -253,10 +255,7 @@ def minimize_log_prob(float_theta, fix_theta, simulate_func, l_index, cut_index)
     # Return chisq
     chisq = 0
     want_length = data_cuts[l_index][cut_index]
-    for i in range(want_length):
-        chisq += np.matmul(y[i] - model[i], np.matmul(y_inv_covs[i], y[i] - model[i]))
-
-    return chisq / 2.0
+    return -random_vector.log_likelihood(UNCERTAINTY_MODEL, y, model, want_length, UNCERTAINTY_ARGUMENT)
 
 
 if ASTEROIDS_MAX_K == 3:
@@ -275,8 +274,8 @@ elif ASTEROIDS_MAX_K == 2:
         real_sim_func = asteroids_3_2.simulate
 
 
-logging.info("TRUE REDCHI: {}".format(minimize_log_prob(theta_true, [], real_sim_func, 0, -1) / len(y) / 3))
-
+true_redchi = 2 * minimize_log_prob(theta_true, [], real_sim_func, 0, -1) / len(y) / 3
+logging.info("TRUE REDCHI: {}".format(true_redchi))
 
 def get_minimum(arg):
     point, fix_theta, l, bounds = arg
@@ -303,7 +302,7 @@ def get_minimum(arg):
         def minimize_log_prob_cut(x):
             return minimize_log_prob(x, fix_theta, simulate_func, l - 2, cut_index)
 
-        start_redchi = minimize_log_prob_cut(point) / data_cuts[l-2][cut_index] / 3
+        start_redchi = 2 *  minimize_log_prob_cut(point) / data_cuts[l-2][cut_index] / 3
 
         '''bfgs_min = optimize.minimize(minimize_log_prob_cut, point,
             method='L-BFGS-B', bounds=bounds, 
@@ -328,14 +327,14 @@ def get_minimum(arg):
             logging.error(bfgs_min)
             return None, None, None, None
 
-        end_redchi = bfgs_min.fun / data_cuts[l-2][cut_index] / 3
-        if abs(start_redchi - end_redchi) < 1e-3 and start_redchi > 2:
+        end_redchi = 2 * bfgs_min.fun / data_cuts[l-2][cut_index] / 3
+        if abs(start_redchi - end_redchi) < 1e-3 and start_redchi / true_redchi > THRESHOLD_LIKE_RAT:
             logging.warning(f"At cut index {cut_index}, the redchi {start_redchi} was unchanged by the fit.")
             logging.debug(bfgs_min)
         else:
-            logging.debug(f"Minimization index {cut_index} passed successfully (redchi {start_redchi} -> {end_redchi})")
+            logging.debug(f"Minimization index {cut_index} passed successfully (redchi {start_redchi} -> {-end_redchi})")
 
-        redchi_record.append((start_redchi, bfgs_min.fun / data_cuts[l-2][cut_index] / 3))
+        redchi_record.append((start_redchi, end_redchi))
 
     # Now do fit on full data
 
@@ -362,7 +361,7 @@ def get_minimum(arg):
 
     logging.debug("Hessian: {}".format(hess))
 
-    logging.info(f"REDCHI RECORD: {redchi_record}")
+    logging.info(f"REDCHI RECORD: {redchi_record}, THETA: {result}")
     logging.debug(f"GRADIENT: {grad}")
     logging.debug(f"THETA: {result}")
 
@@ -379,7 +378,7 @@ def get_minimum(arg):
     new_evals = np.array(new_evals)
     
     if np.any(np.asarray(new_evals) < 0.0):
-        logging.warning(f"The Hessian was not positive definite. \nHessian {hess}\nRedchi {minimizing_likelihood / len(y) / 3}, \nTheta {result}, \nEigenvalues {new_evals}, \nGradient {grad}")
+        logging.warning(f"The Hessian was not positive definite. \nHessian {hess}\nRedchi {2 * minimizing_likelihood / len(y) / 3}, \nTheta {result}, \nEigenvalues {new_evals}, \nGradient {grad}")
         #logging.debug(bfgs_min)
         if l == 2:
             #return None, None, None, None
@@ -404,7 +403,7 @@ def get_minimum(arg):
     #logging.info("Reconstructed Hessian:", np.matmul(new_evecs.transpose(), np.matmul(np.diag(new_evals), new_evecs)))
 
     # Return redchi, minimizing params, hessian
-    return minimizing_likelihood / len(y) / 3, result, new_evals, new_evecs
+    return 2 * minimizing_likelihood / len(y) / 3, result, new_evals, new_evecs
 
 
 def minimize(l, fix_theta):
@@ -465,17 +464,13 @@ def minimize(l, fix_theta):
     for redchi, theta, evals, evecs in sorted_results:
         if redchi is None:
             continue
-        if redchi > THRESHOLD_REDCHI / 2: # divide by 2 because redchi is actually 0.5 of true redchi.
+        if redchi / true_redchi > THRESHOLD_LIKE_RAT: # divide by 2 because redchi is actually 0.5 of true redchi.
             continue
         choose = True
         for distinct_theta, _, _, _ in distinct_results:
-            if np.any(np.abs(np.array(theta) - np.array(distinct_theta)) < MIN_THETA_DIST):
-                # A poor man's way of finding whether two points are distinct. In reality, you'd want 
-                # to check whether all coordinates are close, not just one. However, for degenerate
-                # parts of the space (symmetric asteroids) you expect theta0 to vary widely, and 
-                # many minimizations will result in different values of theta0 which will count as
-                # different points unless you write a fancy algorithm that uses the Hessian as a 
-                # metric.... For now I did np.any.
+            fake_hess = np.matmul(evecs.transpose(), np.matmul(np.diag(evals), evecs))
+            dist = np.sum((theta - distinct_theta) * np.matmul(fake_hess, theta - distinct_theta))
+            if dist < MIN_THETA_DIST:
                 choose = False
                 break
         if choose:
@@ -507,7 +502,7 @@ for theta, evals, evecs, redchi in queue:
             start_index = 0
         evec = [0] * start_index + list(e) + [0] * (max_len - start_index - len(e))
         resized_evecs.append(np.array(evec))
-    if redchi > 2:
+    if redchi / true_redchi > THRESHOLD_LIKE_RAT:
         logging.warning(f"The point with theta {theta} and redchi {redchi} was excluded from the kernel")
         continue
     logging.info("The kernel includes a point with theta {}, redchi {}".format(theta, redchi))
@@ -609,7 +604,7 @@ def mcmc_fit(theta_start, evals, evecs, index):
                 old_tau = tau
 
             if sampler.iteration % (MAX_N_STEPS//10) == 0:
-                redchis = sample.log_prob / len(y) / 3
+                redchis = -2 * sample.log_prob / len(y) / 3
                 logging.info(f"Minimum redchi at {sampler.iteration/MAX_N_STEPS * 100}\%: {np.min(redchis)}")
         sampler._previous_state = sample
 
