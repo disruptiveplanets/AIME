@@ -47,7 +47,7 @@ INTEGRAL_LIMIT_FRAC = 1.0e-3
 
 N_WALKERS = 32
 MAX_N_STEPS = 100_000
-MIN_THETA_DIST = 1e-5
+MIN_THETA_DIST = 1e-4
 LARGE_NUMBER = 1e100
 MIN_SPACING = np.array([1.0e-6, 1.0e-6, 1.0e-6,
     1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1])# Comes in blocks corresponding to the block diagonals
@@ -469,7 +469,7 @@ def minimize(l, fix_theta):
             continue
         choose = True
         for distinct_theta, _, _, _ in distinct_results:
-            if np.any(np.array(theta) - np.array(distinct_theta) < MIN_THETA_DIST):
+            if np.all(np.abs(np.array(theta) - np.array(distinct_theta)) < MIN_THETA_DIST):
                 choose = False
                 break
         if choose:
