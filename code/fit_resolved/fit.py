@@ -47,7 +47,7 @@ INTEGRAL_LIMIT_FRAC = 1.0e-3
 
 N_WALKERS = 32
 MAX_N_STEPS = 100_000
-MIN_THETA_DIST = 1e-4
+MIN_THETA_DIST = 1e-5
 LARGE_NUMBER = 1e100
 MIN_SPACING = np.array([1.0e-6, 1.0e-6, 1.0e-6,
     1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1])# Comes in blocks corresponding to the block diagonals
@@ -469,7 +469,13 @@ def minimize(l, fix_theta):
             continue
         choose = True
         for distinct_theta, _, _, _ in distinct_results:
-            if np.all(np.abs(np.array(theta) - np.array(distinct_theta)) < MIN_THETA_DIST):
+            if np.any(np.abs(np.array(theta) - np.array(distinct_theta)) < MIN_THETA_DIST):
+                # A poor man's way of finding whether two points are distinct. In reality, you'd want 
+                # to check whether all coordinates are close, not just one. However, for degenerate
+                # parts of the space (symmetric asteroids) you expect theta0 to vary widely, and 
+                # many minimizations will result in different values of theta0 which will count as
+                # different points unless you write a fancy algorithm that uses the Hessian as a 
+                # metric.... For now I did np.any.
                 choose = False
                 break
         if choose:
