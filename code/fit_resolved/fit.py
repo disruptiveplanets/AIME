@@ -33,7 +33,7 @@ except:
 logging.basicConfig(level=logging.INFO)
 
 PLOT_POSES = True
-NUM_MINIMIZE_POINTS_PER = 16
+NUM_MINIMIZE_POINTS_PER = 24
 DISTANCE_RATIO_CUTS = [
     [2.0, None],
     [-2.0, None]
