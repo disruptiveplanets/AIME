@@ -155,9 +155,6 @@ class Display:
         flat_samples = self.samples[:,self.mask,:].reshape(
             (-1, self.samples.shape[2])) - np.array(self.theta_true)
 
-        for i in range(3):
-            print([np.percentile(flat_samples[:,i], p) for p in np.arange(0, 110, 10)])
-        
         param_exps = np.ceil(-np.log10(np.maximum(np.abs(np.min(flat_samples, axis=0)), np.max(flat_samples, axis=0))))
         exp_labels = []
         for l, e in zip(self.theta_labels, param_exps):

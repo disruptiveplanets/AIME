@@ -22,8 +22,6 @@ import display, collect
 
 import numdifftools as nd
 
-np.random.seed(4567)
-
 try:
     import coloredlogs
     coloredlogs.install()
@@ -274,6 +272,7 @@ elif ASTEROIDS_MAX_K == 2:
 
 true_redchi = 2 * minimize_log_prob(theta_true, [], real_sim_func, 0, -1) / len(y) / 3
 logging.info("TRUE REDCHI: {}".format(true_redchi))
+
 
 def get_minimum(arg):
     point, fix_theta, l, bounds = arg

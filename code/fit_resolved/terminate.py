@@ -36,11 +36,14 @@ def terminal(output_name, do_not_duplicate=True):
     # Make sure this file hasn't been done before
     if do_not_duplicate:
         already_done = True
-        for index in range(num_trials):
+        for index in range(10000):
             if not os.path.exists(f'{output_name}-{index}-samples.npy'):
                 if os.path.exists(f'{output_name}-{index}.h5'):
                     # H5 exists, but samples does not exist
                     already_done = False
+                    break
+                else:
+                    # Neither exists, so this index was not reached.
                     break
         if already_done:
             plt.cla()
@@ -116,8 +119,8 @@ def terminal(output_name, do_not_duplicate=True):
 def wrap_terminal(name, b=True): # False if you want to run over all files
     try:
         return terminal(name, b)
-    except:
-        print("Terminal {} failed".format(name))
+    except Exception as e:
+        print("Terminal {} failed: {}".format(name, e))
         return None
 
 if __name__ == "__main__":
