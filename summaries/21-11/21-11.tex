@@ -4,12 +4,13 @@
 
 \usepackage{tikz}
 \usepackage{dsfont}
+\usepackage{bm}
 
-\newcommand{\unit}[1]{\hat{\mathbf{#1}}}
+\newcommand{\unit}[1]{\hat{\bm{#1}}}
 \newcommand{\parens}[1]{\left( #1 \right)}
 \newcommand{\brackets}[1]{\left[ #1 \right]}
 \newcommand{\jtd}[1]{{\color{red}\textit{#1}}}
-\newcommand{\quat}[1]{\widetilde{\mathbf{#1}}}
+\newcommand{\quat}[1]{\widetilde{\bm{#1}}}
 \newcommand{\siunit}[1]{\ \textrm{#1}}
 \newcommand{\per}[1]{\ \textrm{#1}^{-1}}
 \usetikzlibrary{arrows.meta}
@@ -47,7 +48,7 @@ Abstract.
 
 \begin{itemize}
 \item Asteroids simulated in binaries \cite{Naidu_2015}
-\item Previous work on the math of asteroid rotations %\cite{ashenberg07, paul88}
+\item Previous work on the math of asteroid rotations \cite{ashenberg07, paul88}
 \item CNEOS: 4 asteroids $D > 100 m$ are coming to within 1 LD of Earth in the next 10 years, 29 with $D > 10 m$.
 \end{itemize}
 
@@ -63,7 +64,7 @@ We will make use of two frames of reference to model this system. One is the ``i
 
 Our second frame is the ``body-fixed'' frame, denoted by $\unit{x}, \unit{y}, \unit{z}$. This frame is fixed with respect to the body's principle axes and rotates with the body, with its origin at the body's center of mass. We will solve for the asteroid's mass distribution with reference to the body-fixed frame. For definiteness, we define $\unit{z}$ to be the principal axis with maximal MOI, and $\unit{x}$ to have minimal MOI.
 
-We define a rotation matrix $M$ such that $M\mathbf{r} = \mathbf{R}$, where $\mathbf{r}$ is in the body-fixed frame and $\mathbf{R}$ is in the inertial frame. It will be useful for us to represent this matrix in two different ways; one is with a normalized quaternion $\quat q$, and the other is with $z-y-z$ Euler angles named $\alpha$, $\beta$, and $\gamma$. In particular, we define
+We define a rotation matrix $M$ such that $M\bm{r} = \bm{R}$, where $\bm{r}$ is in the body-fixed frame and $\bm{R}$ is in the inertial frame. It will be useful for us to represent this matrix in two different ways; one is with a normalized quaternion $\quat q$, and the other is with $z-y-z$ Euler angles named $\alpha$, $\beta$, and $\gamma$. In particular, we define
 \begin{equation}
 M = R_z(\alpha) R_y(\beta) R_z(\gamma)
 \label{eqn:euler-angles}
@@ -95,16 +96,16 @@ where $R_i(\theta)$ is a rotation around the $i$th unit vector by $\theta$ (figu
     \label{fig:euler-angles}
 \end{figure}
 
-We use the quaternion $\quat q$ as our dynamical variable because Euler angles suffer from gimbal lock. For the sake of this paper, we write quaternions as $\quat q = r + i \mathbf i + j \mathbf j + k \mathbf k$, with the complex conjugate written as $\quat q^* = r - i \mathbf i - j \mathbf j - k \mathbf k$. The inverse is then $\quat q^{-1} = \quat q^* / (\quat q \quat q^*)$, and we define real and imaginary parts as $\Re \quat q = r$; $\Im \quat q = i \unit x + j \unit y + k \unit z$. See a description of quaternions in Ref.~\cite{2008arXiv0811.2889G}
+We use the quaternion $\quat q$ as our dynamical variable because Euler angles suffer from gimbal lock. For the sake of this paper, we write quaternions as $\quat q = r + i \bm i + j \bm j + k \bm k$, with the complex conjugate written as $\quat q^* = r - i \bm i - j \bm j - k \bm k$. The inverse is then $\quat q^{-1} = \quat q^* / (\quat q \quat q^*)$, and we define real and imaginary parts as $\Re \quat q = r$; $\Im \quat q = i \unit x + j \unit y + k \unit z$. See a description of quaternions in Ref.~\cite{2008arXiv0811.2889G}
 
-Normalized quaternions express rotations of an angle $\theta$ by $\quat q = \cos\frac{\theta}{2} + \sin\frac{\theta}{2}\quat n$ where $\quat n = 0 + n_x \mathbf i + n_y \mathbf j + n_z\mathbf k$. This rotation may be applied to any vector $\mathbf r$ by
+Normalized quaternions express rotations of an angle $\theta$ by $\quat q = \cos\frac{\theta}{2} + \sin\frac{\theta}{2}\quat n$ where $\quat n = 0 + n_x \bm i + n_y \bm j + n_z\bm k$. This rotation may be applied to any vector $\bm r$ by
 \begin{equation}
-\mathbf R = \Im \brackets{\quat q \quat r\quat q^{-1} }.
+\bm R = \Im \brackets{\quat q \quat r\quat q^{-1} }.
 \label{eqn:quat-rot}
 \end{equation}
 Due to the real part of $\quat q$ which does not vanish for $\theta \rightarrow 0$, quaternions do not suffer from gimbal lock. Using the above notation, we can give the full equation of quaternion multiplication:
 \begin{equation}
-(q_0 + \quat q) (p_0 + \quat p) = q_0 p_0 - \mathbf p \cdot \mathbf q + p_0 \mathbf q + q_0 \mathbf p + \mathbf q \times \mathbf p.
+(q_0 + \quat q) (p_0 + \quat p) = q_0 p_0 - \bm p \cdot \bm q + p_0 \bm q + q_0 \bm p + \bm q \times \bm p.
 \label{eqn:quat-mult}
 \end{equation}
 Note that quaternion multiplication is not commutative.
@@ -133,45 +134,45 @@ This equation can be reversed for $\alpha$, $\beta$, $\gamma$ as follows:
 \subsection{Tidal Torque}
 We start by expressing the gravitational potential energy field of the central body in its most general form:
 \begin{equation}
-V(\mathbf R') = -G\int_\mathcal{P} d^3 R \rho_M(\mathbf R) \frac{1}{|\mathbf{R}-\mathbf{R'}|}.
+V(\bm R') = -G\int_\mathcal{P} d^3 R \rho_M(\bm R) \frac{1}{|\bm{R}-\bm{R'}|}.
 \label{eqn:first-pe}
 \end{equation}
 This integral is computed in the inertial frame and has units of energy per unit mass. We represent the central body density as $\rho_M$ and its volume as $\mathcal{P}$. To reduce equation \ref{eqn:first-pe}, we define the unnormalized spherical harmonics $Y_{\ell m}(\theta, \phi) = P_{\ell m}(\cos \theta)e^{im\phi}$, where $P_{\ell m}$ are the associated Legendre Polynomials without the Condon-Shortley phase. The regular and irregular spherical harmonics are then defined as
 \begin{equation}
-S_{\ell m}(\mathbf r) = (-1)^m (\ell - m)! \frac{Y_{\ell m}(\unit r)}{r^{\ell+1}} \qquad R_{\ell m} (\mathbf r) = (-1)^m \frac{r^\ell}{(\ell + m)!} Y_{\ell m}(\unit r).
+S_{\ell m}(\bm r) = (-1)^m (\ell - m)! \frac{Y_{\ell m}(\unit r)}{r^{\ell+1}} \qquad R_{\ell m} (\bm r) = (-1)^m \frac{r^\ell}{(\ell + m)!} Y_{\ell m}(\unit r).
 \end{equation}
 
 Assume that we can construct a sphere, centered at the center of mass of the central body, so that $\rho_M = 0$ outside the sphere and $\rho_m = 0$ inside the sphere. Then $R' > R$ in equation \ref{eqn:first-pe}, and Ref.~\cite{Gelderen1998TheSO} gives the identity
 \begin{equation}
-\frac{1}{|\mathbf R - \mathbf R'|} = \sum_{\ell, m} R_{\ell m}(\mathbf R) S_{\ell m}^*(\mathbf R'),
+\frac{1}{|\bm R - \bm R'|} = \sum_{\ell, m} R_{\ell m}(\bm R) S_{\ell m}^*(\bm R'),
 \label{eqn:1-over-r-expansion}
 \end{equation}
 where the sum is shorthand for $\sum_{\ell, m} = \sum_{\ell = 0}^\infty \sum_{m=-\ell}^\ell$.
 
-Suppose the vector $\mathbf{D}$ points from the center of mass of the central body to the center of mass of the asteroid, again in the inertial frame. Then we may write $ \mathbf R' = \mathbf D + \mathbf U$, and Ref.~\cite{Gelderen1998TheSO} gives
+Suppose the vector $\bm{D}$ points from the center of mass of the central body to the center of mass of the asteroid, again in the inertial frame. Then we may write $ \bm R' = \bm D + \bm U$, and Ref.~\cite{Gelderen1998TheSO} gives
 \begin{equation}
-S_{\ell m}(\mathbf R') = \sum_{\ell', m'} (-1)^{\ell'}R^*_{\ell' m'}(\mathbf U)S_{\ell+\ell', m + m'} (\mathbf D).
+S_{\ell m}(\bm R') = \sum_{\ell', m'} (-1)^{\ell'}R^*_{\ell' m'}(\bm U)S_{\ell+\ell', m + m'} (\bm D).
 \end{equation}
 
 Define the complex, unitless constants
 \begin{equation}
-J_{\ell m} = \int_\mathcal{P} d^3 R \rho_M(\mathbf R) \frac{R_{\ell m}(\mathbf R)}{\mu_M a_M^\ell}
+J_{\ell m} = \int_\mathcal{P} d^3 R \rho_M(\bm R) \frac{R_{\ell m}(\bm R)}{\mu_M a_M^\ell}
 \qquad
-K_{\ell m} = \int_\mathcal{A} d^3 r \rho_m(\mathbf r) \frac{R_{\ell m}(\mathbf r)}{\mu_m a_m^\ell}
+K_{\ell m} = \int_\mathcal{A} d^3 r \rho_m(\bm r) \frac{R_{\ell m}(\bm r)}{\mu_m a_m^\ell}
 \label{eqn:jlm}
 \end{equation}
 where the integrals are taken in the inertial and the body-fixed frames respectively. Here, $\rho_m$ denotes the density of the asteroid and $\mathcal{A}$ denotes its volume. The symmetry relations of $R_{\ell m}$ guarantee $J_{\ell m} = (-1)^m J_{\ell, -m}^*$ and similarly for $K_{\ell m}$. We have chosen $\mu_M$, $\mu_m$ to be the masses of the central body and asteroid respectively, and $a_M$ and $a_m$ to be scale lengths of both bodies (defined more precisely later). Then we can express the potential as
 \begin{equation}
-V(\mathbf U) = -G \brackets{\sum_{\ell, m} \mu_M a_M^\ell J_{\ell m} \sum_{\ell', m'} (-1)^{\ell'}R_{\ell' m'}(\mathbf U)S^*_{\ell+\ell', m + m'} (\mathbf D)}.
+V(\bm U) = -G \brackets{\sum_{\ell, m} \mu_M a_M^\ell J_{\ell m} \sum_{\ell', m'} (-1)^{\ell'}R_{\ell' m'}(\bm U)S^*_{\ell+\ell', m + m'} (\bm D)}.
 \label{eqn:pe-unrotated}
 \end{equation}
-To make use of $K_{\ell m}$ in equation \ref{eqn:jlm}, we need to rotate $\mathbf U$ from the inertial frame into $\mathbf u$ in the body fixed frame via $\mathbf U = M \mathbf u$. The rotation of a spherical harmonic satisfies
+To make use of $K_{\ell m}$ in equation \ref{eqn:jlm}, we need to rotate $\bm U$ from the inertial frame into $\bm u$ in the body fixed frame via $\bm U = M \bm u$. The rotation of a spherical harmonic satisfies
 \begin{equation}
-Y_{\ell m}(M\mathbf u) = \sum_{m'=-\ell}^\ell (-1)^{m+m'}\sqrt{\frac{(\ell-m')!(\ell+m)!}{(\ell+m')!(\ell-m)!}} \mathcal{D}^\ell_{mm'}(M)^* Y_{\ell m'}(\mathbf u).
+Y_{\ell m}(M\bm u) = \sum_{m'=-\ell}^\ell (-1)^{m+m'}\sqrt{\frac{(\ell-m')!(\ell+m)!}{(\ell+m')!(\ell-m)!}} \mathcal{D}^\ell_{mm'}(M)^* Y_{\ell m'}(\bm u).
 \end{equation}
 where $\mathcal{D}$ are the Wigner-$D$ matrices. The corollary of this formula for the regular solid spherical harmonic is
 \begin{equation}
-R_{\ell m} (M \mathbf u) = \sum_{m'=-\ell}^\ell \sqrt{\frac{(\ell-m')!(\ell+m')!}{(\ell-m)!(\ell+m)!}} \mathcal{D}^\ell_{mm'}(M)^* R_{\ell m'} (\mathbf u)
+R_{\ell m} (M \bm u) = \sum_{m'=-\ell}^\ell \sqrt{\frac{(\ell-m')!(\ell+m')!}{(\ell-m)!(\ell+m)!}} \mathcal{D}^\ell_{mm'}(M)^* R_{\ell m'} (\bm u)
 \label{eqn:rlm-rotations}
 \end{equation}
 where $\mathcal{D}^\ell_{mm'}$ are the Wigner-D matrix elements. In practice, these are computed from the Euler angles corresponding to the rotation $M$, which we specified in section \ref{sec:coordinates} are $z-y-z$ Euler angles. With this choice of Euler angles, the Wigner-D matrix elements are real with matrix elements given by
@@ -185,28 +186,28 @@ and $\mathcal{D}^\ell_{mm'}(\alpha, \beta, \gamma) = d^j_{mm'}e^{-im\alpha} e^{-
 
 Combining equations \ref{eqn:rlm-rotations} and \ref{eqn:pe-unrotated},
 \begin{equation}
-V(\mathbf u) = -G \brackets{\sum_{\ell, m} \mu_M a_M^\ell J_{\ell m} \sum_{\ell', m'} (-1)^{\ell'}S^*_{\ell+\ell', m + m'} (\mathbf D)\sum_{m''=-\ell'}^{\ell'} \sqrt{\frac{(\ell'-m'')!(\ell'+m'')!}{(\ell'-m')!(\ell'+m')!}} \mathcal{D}^{\ell'}_{m'm''}(M)^* R_{\ell' m''} (\mathbf u)}.
+V(\bm u) = -G \brackets{\sum_{\ell, m} \mu_M a_M^\ell J_{\ell m} \sum_{\ell', m'} (-1)^{\ell'}S^*_{\ell+\ell', m + m'} (\bm D)\sum_{m''=-\ell'}^{\ell'} \sqrt{\frac{(\ell'-m'')!(\ell'+m'')!}{(\ell'-m')!(\ell'+m')!}} \mathcal{D}^{\ell'}_{m'm''}(M)^* R_{\ell' m''} (\bm u)}.
 \end{equation}
 
-The tidal torque applied to an asteroid at a point $\mathbf u$ is given by $d\mathbf \tau(\mathbf u) = -\rho_m(\mathbf u) d^3u (\mathbf u \times (\nabla V_{\mathbf u}(\mathbf u)))$ in the body-fixed frame, which leaves
+The tidal torque applied to an asteroid at a point $\bm u$ is given by $d\bm \tau(\bm u) = -\rho_m(\bm u) d^3u (\bm u \times (\nabla V_{\bm u}(\bm u)))$ in the body-fixed frame, which leaves
 \begin{eqnarray}
-\mathbf\tau = &G\int_\mathcal{A}d^3u \rho_m(\mathbf u)  \mathbf u \times \nabla \left[\sum_{\ell, m} \mu_M a_M^\ell J_{\ell m} \sum_{\ell', m'} (-1)^{\ell'}S^*_{\ell+\ell', m + m'} (\mathbf D)
+\bm\tau = &G\int_\mathcal{A}d^3u \rho_m(\bm u)  \bm u \times \nabla \left[\sum_{\ell, m} \mu_M a_M^\ell J_{\ell m} \sum_{\ell', m'} (-1)^{\ell'}S^*_{\ell+\ell', m + m'} (\bm D)
 \right.\\
-& \left. \sum_{m''=-\ell'}^{\ell'} \sqrt{\frac{(\ell'-m'')!(\ell'+m'')!}{(\ell'-m')!(\ell'-m')!}} \mathcal{D}^{\ell'}_{m'm''}(M)^* R_{\ell' m''} (\mathbf u)\right].
+& \left. \sum_{m''=-\ell'}^{\ell'} \sqrt{\frac{(\ell'-m'')!(\ell'+m'')!}{(\ell'-m')!(\ell'-m')!}} \mathcal{D}^{\ell'}_{m'm''}(M)^* R_{\ell' m''} (\bm u)\right].
 \label{eqn:first-tidal-torque}
 \end{eqnarray}
 Using the identity
 \begin{eqnarray}
-\mathbf u \times \nabla R_{\ell m}(\mathbf u)=&\frac{1}{2}[(i\unit x - \unit y)(\ell-m+1)R_{\ell,m-1}(\mathbf u)\\
-&+(i\unit x+\unit y)(\ell+m+1)R_{\ell,m+1}(\mathbf u)+2im\unit z R_{\ell m}(\mathbf u)],
+\bm u \times \nabla R_{\ell m}(\bm u)=&\frac{1}{2}[(i\unit x - \unit y)(\ell-m+1)R_{\ell,m-1}(\bm u)\\
+&+(i\unit x+\unit y)(\ell+m+1)R_{\ell,m+1}(\bm u)+2im\unit z R_{\ell m}(\bm u)],
 \end{eqnarray}
 which was derived from Ref.~\cite{Gelderen1998TheSO}'s analysis of the angular momentum operators applied to spherical harmonics, we write equation \ref{eqn:first-tidal-torque} as
 \begin{eqnarray}
-\mathbf \tau = &G\frac{\mu_m\mu_M}{2}\left[\sum_{\ell, m} a_M^\ell J_{\ell m} \sum_{\ell', m'}a_m^{\ell'}S^*_{\ell+\ell', m + m'} (\mathbf D) (-1)^{\ell'}\sum_{m''=-\ell'}^{\ell'} \sqrt{\frac{(\ell'-m'')!(\ell'+m'')!}{(\ell'-m')!(\ell'+m')!}}  \mathcal{D}^{\ell'}_{m'm''}(M)^* \right. \\
+\bm \tau = &G\frac{\mu_m\mu_M}{2}\left[\sum_{\ell, m} a_M^\ell J_{\ell m} \sum_{\ell', m'}a_m^{\ell'}S^*_{\ell+\ell', m + m'} (\bm D) (-1)^{\ell'}\sum_{m''=-\ell'}^{\ell'} \sqrt{\frac{(\ell'-m'')!(\ell'+m'')!}{(\ell'-m')!(\ell'+m')!}}  \mathcal{D}^{\ell'}_{m'm''}(M)^* \right. \\
 &\bigg[(i\unit x - \unit y)(\ell'-m''+1)K_{\ell',m''-1} +(i\unit x+\unit y)(\ell'+m''+1)K_{\ell',m''+1}+2im''\unit z K_{\ell'm''}\bigg] \Bigg].
 \label{eqn:tidal-torque}
 \end{eqnarray}
-This equation contains complex values, but it was numerically confirmed that $\mathbf \tau$ is a real-valued vector.
+This equation contains complex values, but it was numerically confirmed that $\bm \tau$ is a real-valued vector.
 
 Note that each sum in this equation is weighted by a factor of $a_M^\ell a_m^{\ell'}/D^{\ell+\ell'+1}$. Since $D \gg a_M \gg a_m$ in general, the leading order torques come from low $\ell$ and $\ell'$. However, $\ell'=0$ contributes nothing because the inner bracketed term is zero, and $K_{\ell' = 1} = 0$ if we choose the origin of the body-fixed axes to be the center of mass of the asteroid. The leading order of equation \ref{eqn:tidal-torque} is therefore $1/D^3$ with $\ell = 0$ and $\ell' = 2$.
 
@@ -214,7 +215,7 @@ Note that each sum in this equation is weighted by a factor of $a_M^\ell a_m^{\e
 \subsection{Moment of Inertia}
 The inertia tensor of the asteroid is expressed as a matrix $I$. Written in terms of spherical harmonics in the body-fixed frame, we have
 \begin{eqnarray}
-I & = &\int_\mathcal{A} d^3 r\rho_m(\mathbf r) \parens{\begin{array}{ccc}
+I & = &\int_\mathcal{A} d^3 r\rho_m(\bm r) \parens{\begin{array}{ccc}
 y^2 + z^2 & -xy & -xz \\
 -xy & x^2 + z^2 & -xz \\
 -xz & -yz & x^2 + y^2 \\
@@ -228,7 +229,7 @@ K_{20}-3K_{2,-2}-3K_{22}+1 & 3i \parens{K_{22}-K_{2,-2}} & \frac{3}{2}\parens{K_
 \end{eqnarray}
 where we have defined, for neatness,
 \begin{eqnarray}
-a_m^2=\frac{1}{\mu_m}\int_\mathcal{A} d^3 r \rho_m(\mathbf r) r^2.
+a_m^2=\frac{1}{\mu_m}\int_\mathcal{A} d^3 r \rho_m(\bm r) r^2.
 \label{eqn:am}
 \end{eqnarray}
 With this definition of $a_m$, and an arbitrary definition of $a_M$ which may be taken to be similar to equation \ref{eqn:am} or a more convenient unit such as the central body radius, the parameters $J_{\ell m}$ and $K_{\ell m}$ of equation \ref{eqn:jlm} are completely defined. Note that $a_m$ is similar to the radius of the asteroid; if the asteroid is a sphere of uniform density and radius $r$, then $a_m = r\sqrt{3/5}$.
@@ -238,22 +239,22 @@ Henceforth, we define the body-fixed axis to be coincident with the principal ax
 \subsection{Equation of Motion}
 As a simplifying assumption, we will not model the effect of the central body's non-sphericity on the asteroid orbit. This effect has been studied in much detail and is small. We therefore separate the position dynamical variables from the angular variables and derive the standard equations of motion for asteroid position in the inertial frame:
 \begin{equation}
-\dot{\mathbf{V}} = -\frac{G\mu_M}{r^3}\mathbf{D}\qquad \dot{\mathbf{D}} = \mathbf{V}.
+\dot{\bm{V}} = -\frac{G\mu_M}{r^3}\bm{D}\qquad \dot{\bm{D}} = \bm{V}.
 \label{eqn:translaton-eom}
 \end{equation}
 The position variables will no longer be discussed.
 
-Let $\mathbf\omega$ be the rotational velocity of the asteroid in the body-fixed frame. We have two equations of motion for our system; one governs the evolution of $\mathbf \omega$ and the other governs the evolution of $\mathbf q$. Starting with the latter, consider a fixed point $\mathbf r$ in the body-fixed frame on a rotating asteroid. The corresponding point $\mathbf R=\Im[\quat q \mathbf r \quat q^{-1}]$ in the inertial frame satisfies $\dot{\mathbf R} = \Im[\quat q(\mathbf \omega \times \mathbf r )\quat q^{-1}]$. Furthermore, we can demand that $\mathbf \omega \perp \mathbf r$ so that $\mathbf \omega \times \mathbf r = \Im[\quat \omega \quat r]$. We obtain another equation for $\dot{\mathbf R}$ by differentiating equation \ref{eqn:quat-rot} with $\dot{\mathbf r} = 0$. Setting these equal,
+Let $\bm\omega$ be the rotational velocity of the asteroid in the body-fixed frame. We have two equations of motion for our system; one governs the evolution of $\bm \omega$ and the other governs the evolution of $\bm q$. Starting with the latter, consider a fixed point $\bm r$ in the body-fixed frame on a rotating asteroid. The corresponding point $\bm R=\Im[\quat q \bm r \quat q^{-1}]$ in the inertial frame satisfies $\dot{\bm R} = \Im[\quat q(\bm \omega \times \bm r )\quat q^{-1}]$. Furthermore, we can demand that $\bm \omega \perp \bm r$ so that $\bm \omega \times \bm r = \Im[\quat \omega \quat r]$. We obtain another equation for $\dot{\bm R}$ by differentiating equation \ref{eqn:quat-rot} with $\dot{\bm r} = 0$. Setting these equal,
 \begin{equation}
 \dot{\quat q} \quat r \quat q^{-1} + \quat q \quat r \dot{\quat q}^{-1} = \quat q\quat \omega \quat r \quat q^{-1}.
 \nonumber
 \end{equation}
-Substituting $\mathbf r \rightarrow \quat q^{-1}\mathbf R \quat q$ and acknowledging that $\Re[\dot{\quat q} \quat q^{-1}] = 0$,
+Substituting $\bm r \rightarrow \quat q^{-1}\bm R \quat q$ and acknowledging that $\Re[\dot{\quat q} \quat q^{-1}] = 0$,
 \begin{equation}
-  \dot{\quat q} \quat q^{-1}\mathbf R + \mathbf R \quat q \dot{\quat q}^{-1} = 2\dot{\quat q}\quat q^{-1}\quat R = \quat q\quat \omega \quat q^{-1}\mathbf R.
+  \dot{\quat q} \quat q^{-1}\bm R + \bm R \quat q \dot{\quat q}^{-1} = 2\dot{\quat q}\quat q^{-1}\quat R = \quat q\quat \omega \quat q^{-1}\bm R.
 \nonumber
 \end{equation}
-Since $\mathbf R$ is arbitrary, this simplifies to
+Since $\bm R$ is arbitrary, this simplifies to
 \begin{equation}
   2\dot{\quat q}\quat q^{-1} =  \quat q\quat \omega \quat q^{-1} \Rightarrow \dot{\quat q} = \frac{1}{2}\quat q\quat \omega.
 \label{eqn:quat-eom}
@@ -266,11 +267,11 @@ I_2 \dot \omega_2 - \omega_3 \omega_1 (I_3 - I_1) &= \tau_2\\
 I_3 \dot \omega_3 - \omega_1 \omega_2 (I_1 - I_2) &= \tau_3
 \label{eqn:omega-eom}
 \end{eqnarray}
-The components of $\mathbf \tau$ are given by equation \ref{eqn:tidal-torque}, which was also in the body-fixed frame.
+The components of $\bm \tau$ are given by equation \ref{eqn:tidal-torque}, which was also in the body-fixed frame.
 
 
 \subsection{Initial Values}
-We assume that the asteroid begins the simulation in its minimum energy configuration; that is, with $\mathbf \omega \parallel \unit z$. The initial conditions are therefore that $\mathbf \omega = \omega \unit z$, and the quaternion is fixed to rotate $\hat z$ to $\mathbf \Omega$ in the inertial frame, which fixes Euler angles $\beta$ and $\alpha$. The third Euler angle $\gamma$ represents the initial roll of the asteroid, and therefore cannot be determined from physical data. However, it is an initial condition of the simulation. Once the Euler angles are known, the quaternion is computed via equation \ref{eqn:euler-to-quat}.
+We assume that the asteroid begins the simulation in its minimum energy configuration; that is, with $\bm \omega \parallel \unit z$. The initial conditions are therefore that $\bm \omega = \omega \unit z$, and the quaternion is fixed to rotate $\hat z$ to $\bm \Omega$ in the inertial frame, which fixes Euler angles $\beta$ and $\alpha$. The third Euler angle $\gamma$ represents the initial roll of the asteroid, and therefore cannot be determined from physical data. However, it is an initial condition of the simulation. Once the Euler angles are known, the quaternion is computed via equation \ref{eqn:euler-to-quat}.
 
 
 \subsection{Fit Parameters}
@@ -294,9 +295,9 @@ We have one additional fit parameter, which is the only initial condition not fi
 \label{sec:simulation}
 Given the observed orbit of an asteroid and observational data of its resolved spin over time, we built a simulation that would integrate equations \ref{eqn:quat-eom} and \ref{eqn:omega-eom} to generate synthetic data. Inputs to the simulation were (1) the $\ell$ and $\ell'$ values at which to truncate the potential energy sum in equation \ref{eqn:tidal-torque}, (2) the cadence of observations, (3) the $J_{\ell m}$ parameters and mass and radius of the central body, (4) trial asteroid parameters $K_{\ell m}$, $\gamma_0$ and $a_m$, (5) the initial rotational velocity of the asteroid in the inertial frame, and (6) the asteroid's orbital parameters.
 
-The orbital parameters we use to describe the orbit are the hyperbolic excess velocity $v_\infty$ and the pericenter altitude $r_p$. The orbit orientation is fixed to lie in the $\unit X-\unit Y$ plane, with pericenter lying on $\hat X$. The position of the satellite as a function of time is therefore generated by numerically integrating the Newtonian equation of motion (equation \ref{eqn:translaton-eom}) from initial values $\mathbf r(t=0) = r_p \unit X$ and $\mathbf v(t=0)=\unit Y \sqrt{v_\infty^2 + 2G\mu_M / r_p}$
+The orbital parameters we use to describe the orbit are the hyperbolic excess velocity $v_\infty$ and the pericenter altitude $r_p$. The orbit orientation is fixed to lie in the $\unit X-\unit Y$ plane, with pericenter lying on $\hat X$. The position of the satellite as a function of time is therefore generated by numerically integrating the Newtonian equation of motion (equation \ref{eqn:translaton-eom}) from initial values $\bm r(t=0) = r_p \unit X$ and $\bm v(t=0)=\unit Y \sqrt{v_\infty^2 + 2G\mu_M / r_p}$
 
-Once the inputs were specified, the moments of inertia were pre-computed from $K_{\ell m}$, as was the orbital path of the satellite as a function of time. Equations \ref{eqn:quat-eom} and \ref{eqn:omega-eom} were then integrated by the Runge-Kutta fourth order method with a time step of \jtd{describe} seconds, with a custom implementation of the spherical harmonics and Wigner-D matrices to improve runtime. At fixed time intervals of one cadence, the rotational velocity in the body-fixed frame $\mathbf\omega_{xyz}$ was converted via equation \ref{eqn:quat-rot} to the inertial frame to produce the synthetic data set.
+Once the inputs were specified, the moments of inertia were pre-computed from $K_{\ell m}$, as was the orbital path of the satellite as a function of time. Equations \ref{eqn:quat-eom} and \ref{eqn:omega-eom} were then integrated by the Runge-Kutta fourth order method with a time step of \jtd{describe} seconds, with a custom implementation of the spherical harmonics and Wigner-D matrices to improve runtime. At fixed time intervals of one cadence, the rotational velocity in the body-fixed frame $\bm\omega_{xyz}$ was converted via equation \ref{eqn:quat-rot} to the inertial frame to produce the synthetic data set.
 
 We begin our simulation at $D = 10 r_p$. Since the leading order of the equations of motion is $\ell' = 2, \ell = 0$, this corresponds roughly to a torque of $10^{-3}$ times the maximum torque at perigee. Unless otherwise indicated, the simulation is terminated at $D=10 r_p$ as well.
 
@@ -313,13 +314,13 @@ Even with this ordering of parameters, the system's strong dependence on asteroi
 
 We are interested in finding not just the optimal parameters, but the probability distributions of each fit parameter. To do this, we use an Affine Invariant Markov Chain Monte Carlo Ensemble Sampler (MCMC), implemented in the Python package \texttt{emcee}, to conduct the fit to data \cite{ForemanMackey2013emceeTM}. This fit method requires the parameter space to be populated with ``walkers,'' indicating the a guess at the true parameters of the system. We center 32 walkers on the minimizing parameters computed by the minimization of $\chi^2$, and spread out the walkers such that the number density of walkers is proportional to the likelihood ($\ln \mathcal{L} = -\chi^2/2$) at each point. This is done explicitly by computing the Hessian $\Sigma$ of the $\chi^2$ value at each minimizing point $\theta_0$ and expressing the likelihood locally as a multi-dimensional Gaussian
 \begin{equation}
-\mathcal{L}(\mathbf \theta) \propto \text{exp}\parens{-\frac{1}{2}(\mathbf \theta-\mathbf \theta_0)^T \Sigma (\mathbf \theta-\mathbf \theta_0)}.
+\mathcal{L}(\bm \theta) \propto \text{exp}\parens{-\frac{1}{2}(\bm \theta-\bm \theta_0)^T \Sigma (\bm \theta-\bm \theta_0)}.
 \end{equation}
-We may change bases into a frame in which the parameters are uncorrelated by multiplying by $V^T$, where $V$ is the matrix of eigenvectors of $\Sigma$. Populating the walkers in this uncorrelated space according to Gaussian standard deviations given by the eigenvalues of $\Sigma$, we can convert these walkers back to $\mathbf \theta$-space by multiplying by $V$. In practice, we only compute the components of $\Sigma$ for parameters that are found in the same minimization step; for example, we do not compute the entries of $\Sigma$ corresponding to $K_{20}$ and $K{30}$, setting it equal to zero instead.
+We may change bases into a frame in which the parameters are uncorrelated by multiplying by $V^T$, where $V$ is the matrix of eigenvectors of $\Sigma$. Populating the walkers in this uncorrelated space according to Gaussian standard deviations given by the eigenvalues of $\Sigma$, we can convert these walkers back to $\bm \theta$-space by multiplying by $V$. In practice, we only compute the components of $\Sigma$ for parameters that are found in the same minimization step; for example, we do not compute the entries of $\Sigma$ corresponding to $K_{20}$ and $K{30}$, setting it equal to zero instead.
 
 Occasionally, the likelihood is non-Gaussian enough for $\Sigma$ to have negative or otherwise nonsensical eigenvalues (this occurs for strongly varying likelihood or due to numerical errors in the calculation of the Hessian). In these cases, we choose eigenvalues of between \jtd{limit} and \jtd{limit}.
 
-With the initial walkers distributed, we compute the posterior probability distribution of $\mathbf \theta$ given flat priors in the range outlined above for each parameter. We run the MCMC until results converge (defined as the condition that the autocorrelation time is less than one hundredth of the current iteration number and that the fractional difference between autocorrelation times is under 1\%), or for 100,000 iterations, whichever is smaller. The MCMC is observed only to run for all 100,000 iterations if the data is insufficiently precise to constrain some parameters.
+With the initial walkers distributed, we compute the posterior probability distribution of $\bm \theta$ given flat priors in the range outlined above for each parameter. We run the MCMC until results converge (defined as the condition that the autocorrelation time is less than one hundredth of the current iteration number and that the fractional difference between autocorrelation times is under 1\%), or for 100,000 iterations, whichever is smaller. The MCMC is observed only to run for all 100,000 iterations if the data is insufficiently precise to constrain some parameters.
 
 
 \subsection{Uncertainty Models}
@@ -329,11 +330,11 @@ We model uncertainties in experimental data according to several methods, compar
 \subsubsection{Nominal Method}
 The most detailed uncertainty model we use, and the one we use most often, is called the ``nominal method.'' It rotates each angular velocity vector $\omega$ by some angle $\Theta$ drawn from a normal distribution centered on $\Theta=0$ with standard deviation $\sigma_\theta$. The rotation is done around an arbitrary axis perpendicular to $\omega$. We also allow the length of $\omega$ to change by a fraction $\rho$ drawn from a log-normal distribution
 \begin{equation}
-  P(\rho) = \frac{1}{\rho\sqrt{2\pi \sigma_\rho^2}} \mathrm{\exp}\parens{-\frac{\ln^2\rho}{2\sigma_\rho^2}}
+  P(\rho) = \frac{1}{\rho\sqrt{2\pi \sigma_\rho^2}} \exp\parens{-\frac{\ln^2\rho}{2\sigma_\rho^2}}
 \end{equation}
 so that $\mathrm{ln} \rho$ is normally distributed with mean zero (no change in the length of $\omega$). Both uncertainties $\sigma_\theta$ and $\sigma_\rho$ are general parameters that can be tweaked to model uncertainty in spin axis direction and period. In our case, we often set $\sigma_\rho = 0$ for simplicity. \jtd{Explain why with evidence}.
 
-Practically, the randomization of the data is done by creating a rotation matrix $M$ that rotates $\unit Z$ to the true rotational velocity vector $\mathbf \omega$. This same rotation matrix is then used to rotate the random vector $\mathbf \Omega = \rho \omega (\sin \Theta \cos\Phi \unit X + \sin \Theta \sin \Phi\unit Y + \cos \Theta\unit Z)$ to the randomized velocity vector. Here, $\Phi$ is a uniformly random variable in the range $[0, \pi)$. Specifically, we write this matrix as
+Practically, the randomization of the data is done by creating a rotation matrix $M$ that rotates $\unit Z$ to the true rotational velocity vector $\bm \omega$. This same rotation matrix is then used to rotate the random vector $\bm \Omega = \rho \omega (\sin \Theta \cos\Phi \unit X + \sin \Theta \sin \Phi\unit Y + \cos \Theta\unit Z)$ to the randomized velocity vector. Here, $\Phi$ is a uniformly random variable in the range $[0, \pi)$. Specifically, we write this matrix as
 \begin{equation}
 M = \rho\parens{\begin{array}{ccc}
 \cos \phi & -\sin \phi & 0\\
@@ -347,11 +348,11 @@ M = \rho\parens{\begin{array}{ccc}
 \end{array}}
 \label{eqn:rotate-uncertainty-matrix}
 \end{equation}
-where $\theta$ and $\phi$ are the spherical coordinates of the original velocity vector $\mathbf \omega.$
+where $\theta$ and $\phi$ are the spherical coordinates of the original velocity vector $\bm \omega.$
 
-Equation \ref{eqn:rotate-uncertainty-matrix} is sufficient to randomize synthetic data, but an analytical expression for the coordinates of $\mathbf \omega$ is required to define the $\chi^2$ value used for fitting. We approximate the distribution of each spin coordinate as normal, with covariance given by the covariance of the true distribution. Based on equation \ref{eqn:rotate-uncertainty-matrix}, the covariance matrix is
+Equation \ref{eqn:rotate-uncertainty-matrix} is sufficient to randomize synthetic data, but an analytical expression for the coordinates of $\bm \omega$ is required to define the $\chi^2$ value used for fitting. We approximate the distribution of each spin coordinate as normal, with covariance given by the covariance of the true distribution. Based on equation \ref{eqn:rotate-uncertainty-matrix}, the covariance matrix is
 \begin{equation}
-\text{Cov}(\mathbf \omega) = \frac{1}{2}e^{-\sigma_\theta^2 + 2 \sigma_\rho^2}\brackets{\parens{e^{-\sigma_\theta^2}-2e^{-\sigma_\rho^2}+\textrm{cosh}(\sigma_\theta^2)} \parens{\begin{array}{ccc}
+\text{Cov}(\bm \omega) = \frac{1}{2}e^{-\sigma_\theta^2 + 2 \sigma_\rho^2}\brackets{\parens{e^{-\sigma_\theta^2}-2e^{-\sigma_\rho^2}+\textrm{cosh}(\sigma_\theta^2)} \parens{\begin{array}{ccc}
 \omega_x^2 & \omega_x \omega_y& \omega_x \omega_z\\
 \omega_x \omega_y & \omega_y^2 & \omega_y \omega_z\\
 \omega_x \omega_z & \omega_y \omega_z& \omega_z^2
@@ -363,24 +364,33 @@ The difference between this Gaussian approximation and the true distribution are
   \centering
   \gridline{
     \fig{nominal-covariance.pdf}{0.5\textwidth}{
-        (a) Pairwise-distributions of components of $\mathbf \omega$ show good agreement between the true distribution and the Gaussian approximation.
+        (a) Pairwise-distributions of components of $\bm \omega$ show good agreement between the true distribution and the Gaussian approximation.
       }
       \fig{nominal-norm.pdf}{0.45\textwidth}{
         (b) The norm of $\omega$ (a function of all three coordinates) differs between the approximation and true distribution.
       }
     }
-  \caption{The true distribution (blue) and the Gaussian approximation (orange) with the same covariance (orange)  for the components of angular velocity $\mathbf \omega$ under the nominal uncertainty method.}
+  \caption{The true distribution (blue) and the Gaussian approximation (orange) with the same covariance (orange)  for the components of angular velocity $\bm \omega$ under the nominal uncertainty method.}
   \label{fig:nominal-spin-distro}
 \end{figure}
 
-A larger source of disagreement between the Gaussian approximated likelihood and the true distribution is the correlation between all three components of $\omega$. If two components of $\omega$, the third component is known up to its sign except when $\sigma_\rho \neq 0$. However, the covariance matrix of $\mathbf \omega$ does not capture this, nor do the distributions displayed in figure \ref{fig:nominal-spin-distro} (a). Therefore, when $\sigma_\rho \simeq 0$, the Gaussian likelihood function may poorly represent the model. To demonstrate this, we show a histogram of the norm of $\omega$ for the Gaussian approximated distribution and the true distribution in figure  \ref{fig:nominal-spin-distro} (b), which demonstrates that statistics involving all three components of $\mathbf \omega$ can differ highly between the approximation and the true distribution.
+A larger source of disagreement between the Gaussian approximated likelihood and the true distribution is the correlation between all three components of $\omega$. If two components of $\omega$, the third component is known up to its sign except when $\sigma_\rho \neq 0$. However, the covariance matrix of $\bm \omega$ does not capture this, nor do the distributions displayed in figure \ref{fig:nominal-spin-distro} (a). Therefore, when $\sigma_\rho \simeq 0$, the Gaussian likelihood function may poorly represent the model. To demonstrate this, we show a histogram of the norm of $\omega$ for the Gaussian approximated distribution and the true distribution in figure  \ref{fig:nominal-spin-distro} (b), which demonstrates that statistics involving all three components of $\bm \omega$ can differ highly between the approximation and the true distribution.
 
 Aware of the failings of the Gaussian likelihood assumption, we then define the $\chi^2$ statistic to be
 \begin{equation}
-\chi^2 = \sum_{i=0} (\mathbf \omega_i^* - \mathbf \omega_i)^T\text{Cov}^{-1}(\mathbf\omega^*_i)(\mathbf \omega_i^* - \mathbf \omega_i)
+\chi^2 = \sum_{i=0} (\bm \omega_i^* - \bm \omega_i)^T\text{Cov}^{-1}(\bm\omega^*_i)(\bm \omega_i^* - \bm \omega_i)
 \label{eqn:chisq-nominal}
 \end{equation}
-where $\mathbf \omega_i$ is the $i$th expected spin and $\mathbf \omega_i^*$ is the data. We also refer to the reduced chi squared, $\chi^2_r = \chi^2 / (3N)$, where $N$ is the number of $\mathbf \omega_i$ in the data set.
+where $\bm \omega_i$ is the $i$th expected spin and $\bm \omega_i^*$ is the data. We also refer to the reduced chi squared, $\chi^2_r = \chi^2 / (3N)$, where $N$ is the number of $\bm \omega_i$ in the data set.
+
+\jtd{All this text is explanatory material for what I've been doing, but in the paper only the true likelihood will be there probably.}
+
+Given the above explanation of the nominal uncertainty method, we define the likelihood of our data to be
+\begin{equation}
+  \ln \mathcal{L} = \sum_{i = 0}-\frac{\cos^{-1} (\bm \omega_i^* \cdot \bm \omega_i)^2}{2\sigma_\theta^2}-\frac{\ln \parens{\omega_i^* /\omega_i}^2}{2\sigma_\rho^2} - \ln\frac{\omega_i^*}{\omega_i}.
+  \label{eqn:log-likelihood}
+\end{equation}
+Sometimes we compute the value $\chi^2_r = -2\ln \mathcal{L} / N$ where $N$ is the number of spin vectors in the data set. For uncorrelated uncertainty \jtd{Check the assumptions on which the chi squared distribution is met} we expect $\chi^2 \approx 1$ for large $N$. However, due to the highly correlated nature of our data, this limit occurs in our data set.
 
 In figure \ref{fig:example-data} we present example data for this asteroid using the two reference asteroid and orbit parameters described in appendix \ref{app:reference-config}. Additionally, one thousand simulations are also run with asteroid parameters $\gamma_0$, $K_{20}$, and $K_{22}$ changed slightly, distributed according to the likelihood defined by equation \ref{eqn:likelihood} with this nominal uncertainty method and $\sigma_\theta = 0.2$. The method for distributing these shape parameters is the same as the method for distributing the MCMC initial walker positions, described in section \ref{sec:fitting-method}. Bands containing 68.3\%, 95.5\%, and 99.7\% of these additional simulations are also plotted in figure \ref{fig:example-data}.
 
@@ -432,17 +442,17 @@ Using data from the NASA Saturn Fact Sheet, we arrive at $J_{20}\sim 10^{-8}$ fr
 \jtd{Don't actually use this section in the paper. I'm keeping it here as a math repository. Change the section to an oblate planet.}
 
 \subsection{Planet with a Moon: Distant Flyby}
-Consider a system with a moon of mass $\mu_{o}$ at constant displacement $\mathbf R$ from the central body. We assume that both the planet and the moon are spherical. As long as the distance from the barycenter of the planet-moon system to the asteroid $D$ always satisfies $D>r$ we are free to use the formalism developed above, absorbing the moon into $J_{\ell m}$. Making use of the identity \cite{Gelderen1998TheSO}
+Consider a system with a moon of mass $\mu_{o}$ at constant displacement $\bm R$ from the central body. We assume that both the planet and the moon are spherical. As long as the distance from the barycenter of the planet-moon system to the asteroid $D$ always satisfies $D>r$ we are free to use the formalism developed above, absorbing the moon into $J_{\ell m}$. Making use of the identity \cite{Gelderen1998TheSO}
 \begin{equation}
-R_{\ell m}(\mathbf R + \mathbf R') = \sum_{\ell' = 0}^\ell \sum_{m'=-\ell'}^\ell R_{\ell' m'}(\mathbf R') R_{\ell-\ell', m-m'}(\mathbf R)
+R_{\ell m}(\bm R + \bm R') = \sum_{\ell' = 0}^\ell \sum_{m'=-\ell'}^\ell R_{\ell' m'}(\bm R') R_{\ell-\ell', m-m'}(\bm R)
 \end{equation}
 \jtd{Is this true?}
 for $R > R'$, we have
 \begin{equation}
-J_{\ell m} = \frac{1}{(\mu_M+\mu_0) a_M^\ell}\brackets{\delta_{\ell 0}\delta_{m0}\mu_M + \int_\mathcal{P} d^3 r' \rho_o(\mathbf r') R_{\ell m}(\mathbf R + \mathbf r')}
+J_{\ell m} = \frac{1}{(\mu_M+\mu_0) a_M^\ell}\brackets{\delta_{\ell 0}\delta_{m0}\mu_M + \int_\mathcal{P} d^3 r' \rho_o(\bm r') R_{\ell m}(\bm R + \bm r')}
 \end{equation}
 \begin{equation}
-J_{\ell m} = \frac{1}{(\mu_M+\mu_0)}\brackets{\mu_M\delta_{\ell 0}\delta_{m0} + \mu_o \frac{R_{\ell m}(\mathbf R)}{ a_M^\ell}}
+J_{\ell m} = \frac{1}{(\mu_M+\mu_0)}\brackets{\mu_M\delta_{\ell 0}\delta_{m0} + \mu_o \frac{R_{\ell m}(\bm R)}{ a_M^\ell}}
 \end{equation}
 where the $\delta$s are Kroneker deltas. It is apparent that if $a_M^\ell$ remains the radius of the planet, $|J_{\ell m}| \rightarrow \infty$ as $\ell \rightarrow \infty$. However, since each $J_{\ell m}$ is damped by $a_M^\ell / D^\ell$ and since $R < D$ by construction, the series in equation \ref{eqn:tidal-torque} remains roughly geometric and does not blow up. For the sake of this calculation, we neglect motion of the moon during the flyby.
 
@@ -450,7 +460,7 @@ For our tests, we use parameters similar to our Moon: we set $\mu_o = 0.01 \mu_M
 
 
 \subsection{Planet with a Moon: Close Flyby}
-If, contrary to the previous section, we want to fly by both the moon and the planet of a binary system, we must consider the tidal torque contributions from both bodies separately. The formalism above cannot be extended to write one set of $J_{\ell m}$ for both the moon and planet. To do this, we generate two separate paths of $\mathbf D(t)$, one pointing from the central body to the asteroid and one pointing from the moon the asteroid. Both are defined in the inertial reference frames. Then the torque from both can be computed by equation \ref{eqn:tidal-torque} and added to get the net torque on the asteroid. Again, we neglect motion of the moon during the flyby.
+If, contrary to the previous section, we want to fly by both the moon and the planet of a binary system, we must consider the tidal torque contributions from both bodies separately. The formalism above cannot be extended to write one set of $J_{\ell m}$ for both the moon and planet. To do this, we generate two separate paths of $\bm D(t)$, one pointing from the central body to the asteroid and one pointing from the moon the asteroid. Both are defined in the inertial reference frames. Then the torque from both can be computed by equation \ref{eqn:tidal-torque} and added to get the net torque on the asteroid. Again, we neglect motion of the moon during the flyby.
 
 
 
@@ -492,7 +502,7 @@ The parameters $K_{22}$ and $K_{20}$ are then converted to the more physical par
 
 These figures demonstrate several key properties. Figure \ref{fig:probe-space-sigma} demonstrates that fit uncertainties for all three parameters are generally for asteroids with an axis of rotational symmetry --- i.e. $a=b$ or $K_{22} = 0$. This is likely due to the fact that the local axes, which are required to define the parameters, are set such that they align with the asteroid principal axes, and therefore are degenerate in the case of a symmetrical asteroid. For similar reasons, uncertainty in $\gamma_0$ especially is large for $a \approx b \approx c$, which is the spherical case in which no tidal torque is generated. Beyond these two trends, uncertainty in $a/c$ and $b/c$ appear to scale linearly with these ratios. 
 
-Figure \ref{fig:probe-space-corr} demonstrates that the parameters are generally correlated. Specficically, $\gamma_0$ and $|K_{22}|$ are strongly correlated for large $|K_{22}|$ which corresponds to highly asymmetric asteroids. Likewise, for the correlation of $a/c$ and $b/c$ with $\gamma_0$. $\mathrm{Corr}(\v, K_{20})$ shows slightly different behavior, since they are still correlated for asteroids with $a=b$. However, the correlation still increases for highly asymmetric asteroids. The correlation between shape parameters $K_{20}$ and $K_{22}$ is often near zero except in highly asymmetric asteroids, but the correlation between $a/c$ and $b/c$ is rarely zero; these correlate for $a\approx b$ and anti-correlate for $a \not \approx b$. The $K_{\ell m}$ coordinates may therefore be a better lens through which to view asteroid shape, due to their low correlation.
+Figure \ref{fig:probe-space-corr} demonstrates that the parameters are generally correlated. Specficically, $\gamma_0$ and $|K_{22}|$ are correlated for large $|K_{22}|$ which corresponds to highly asymmetric asteroids. Likewise, for the correlation of $a/c$ and $b/c$ with $\gamma_0$. $\mathrm{Corr}(\v, K_{20})$ are less correlated however. $K_{20}$ and $K_{22}$ are strongly correlated in general as are $a/c$ and $b/c$.
 
 Also shown in figures \ref{fig:probe-space-sigma} and \ref{fig:probe-space-corr} are the reference asteroid configurations which we study when fixing the asteroid shape and varying other parameters. We note that these reference configurations capture the above trends in variance and correlation, so that they can be viewed as representative of all but the most extreme asteroid configurations. The measured values of variance and covariance are displayed in table \ref{tab:probe-space-refernece-var-covar}.
 
@@ -500,15 +510,15 @@ Also shown in figures \ref{fig:probe-space-sigma} and \ref{fig:probe-space-corr}
   \centering
   \begin{tabular}{c c c c c c c}
     \hline \hline
-    Reference point & $\sigma(\gamma_0)$ / $\sigma_\theta$ & $\sigma(K_{22}\ [a/c])$ / $\sigma_\theta$ & $\sigma(K_{20}\ [b/c])$ / $\sigma_\theta$ & $\mathrm{Corr(\gamma_0, K_{22})}$ & $\mathrm{Corr(\gamma_0, K_{20})}$ & $\mathrm{Corr(K_{22}, K_{20})}$ \\ \hline
-    Symmetric: $a=b$ &  &  &  &  &  & \\
-    &  &  &  &  &  & \\
-    Asymmetric: $a<b$ &  &  &  &  &  & \\
-    &  &  &  &  &  & \\
-    Asymmetric: $a>b$  &  &  &  &  &  & \\
-    &  &  &  &  &  & \\
+    Benchmark configurations & $\sigma(\gamma_0)$ / $\sigma_\theta$ & $\sigma(K_{22}\ [a/c])$ / $\sigma_\theta$ & $\sigma(K_{20}\ [b/c])$ / $\sigma_\theta$ & $\mathrm{Corr(\gamma_0, K_{22})}$ & $\mathrm{Corr(\gamma_0, K_{20})}$ & $\mathrm{Corr(K_{22}, K_{20})}$ \\ \hline
+    Symmetric: $a=b$ & 36 & $1.9 \times 10^{-6}$ & $1.7 \times 10^{-5}$ & -0.40 & 0.36 & 0.19\\%24
+    & 36 & $9.4\times 10^{-5}$ & $1.9\times 10^{-4}$ & -0.42 & -0.29 & 0.96 \\
+    Asymmetric: $a<b$ & $1.6 \times 10^{-5}$ & $1.5 \times 10^{-6}$ & $5.4 \times 10^{-6}$ & 0.32 & -0.0053 & 0.88\\%94
+    & $1.6\times 10^{-5}$ & $9.4\times 10^{-5}$ & $1.8\times 10^{-4}$ & 0.082 & -0.019 & 0.99\\
+    Asymmetric: $a>b$  & $1.5 \times 10^{-5}$ & $9.1 \times 10^{-7}$ & $4.8 \times 10^{-6}$ & -0.58 & 0.017 & 0.15 \\%101
+    & $1.5\times 10^{-5}$ & $1.5\times 10^{-4}$ & $1.0\times 10^{-4}$ & -0.049 & 0.061 & 0.98\\
   \end{tabular}
-  \caption{Values for the standard deviation and correlation of $\gamma_0$, $K_{22}$, and $K_{20}$ (top entry of each row) or $\gamma_0$, $a/c$, and $b/c$ respectively (bottom entry of each row) for the symmetric and asymmetric reference points.}
+  \caption{Values for the standard deviation and correlation of $\gamma_0$, $K_{22}$, and $K_{20}$ (top entry of each row) or $\gamma_0$, $a/c$, and $b/c$ respectively (bottom entry of each row) for the symmetric and asymmetric reference points. The large $\sigma(\gamma_0)$ for the symmetric benchmark reflects the fact that $\gamma_0$ is not defined for a symmetric body, and the posterior probability distribution is poorly constrained.}
   \label{tab:probe-space-refernece-var-covar}
 \end{table}
 
@@ -516,7 +526,7 @@ Also shown in figures \ref{fig:probe-space-sigma} and \ref{fig:probe-space-corr}
 \subsection{Dependence on observational precision}
 \label{sec:probe-sigma}
 
-\jtd{Running Jan 11?}
+\jtd{Running Jan 13}
 
 \subsection{Dependence on orbital parameters}
 
@@ -546,13 +556,13 @@ To test this, we mask the perigee of the counter by removing data from the perio
 
 
 \section{Interpretation of the Fit Parameters}
-The physical parameters $K_{\ell m}$ resulting from a fit to flyby data, while physical, do not completely describe an asteroid. Since the density distribution of the asteroid has many more degrees of freedom in general than the number of known $K_{\ell m}$, there are often many degenerate density distributions associated with one set of $K_{\ell m}$. As an example, consider a spherical asteroid of radius $A$ and density distribution of the form $\rho(\mathbf r) = \sum_{\ell m} f_{\ell m}(r) Y_{\ell m}^*(\unit r)$. Then we have
+The physical parameters $K_{\ell m}$ resulting from a fit to flyby data, while physical, do not completely describe an asteroid. Since the density distribution of the asteroid has many more degrees of freedom in general than the number of known $K_{\ell m}$, there are often many degenerate density distributions associated with one set of $K_{\ell m}$. As an example, consider a spherical asteroid of radius $A$ and density distribution of the form $\rho(\bm r) = \sum_{\ell m} f_{\ell m}(r) Y_{\ell m}^*(\unit r)$. Then we have
 \begin{equation}
 K_{\ell m} = N_{\ell m} \frac{(-1)^m}{(\ell + m)!(\mu_m a_m^\ell)}\int_0^A r^{2+\ell} dr f_{\ell m}(r)
 \end{equation}
 where $N_{\ell m}$ is given by equation \ref{eqn:nlm}. Thus, $K_{\ell m}$ constrains only the integrals of $f_{\ell m}$, not the functions themselves. By relaxing the assumption that the asteroid is a sphere, even more degeneracy is introduced.
 
-To avoid this degeneracy, we either (1) assume that the density is constant and solve for the asteroid surface (section \ref{sec:constant-density}), (2) assume that the surface of the asteroid is fixed and solve for $\rho(\mathbf r)$. In the latter case, we can avoid the above degeneracy either by assuming $\nabla^2 \rho = 0$ (section \ref{sec:laplace-rho}) or by using a numerical approach to find a more characteristic density distribution (section \ref{sec:numerical-density}).
+To avoid this degeneracy, we either (1) assume that the density is constant and solve for the asteroid surface (section \ref{sec:constant-density}), (2) assume that the surface of the asteroid is fixed and solve for $\rho(\bm r)$. In the latter case, we can avoid the above degeneracy either by assuming $\nabla^2 \rho = 0$ (section \ref{sec:laplace-rho}) or by using a numerical approach to find a more characteristic density distribution (section \ref{sec:numerical-density}).
 
 \jtd{Not all of these models will be in the paper. This is a list of all the models I've thought of. I'll give some examples of applying these models to ``realistic'' asteroid density profiles (uniform, regolith over rock, etc) and see what they get, using that filter to describe the best.}
 
@@ -562,11 +572,11 @@ Suppose our asteroid has constant density $\rho_0$ and known parameters $K_{\ell
 
 Suppose the asteroid is ``star shaped'' in that every point on its surface maps to a unique set of spherical coordinates $\theta, \phi$, and $r(\theta, \phi)$. We use the helpful identity
 \begin{equation}
-  K_{\ell m} = \frac{\rho_m}{\mu_m a_m^\ell} \int_\mathcal{A} d^3 r R_{\ell m} (\mathbf r)
-   = \frac{\rho_m}{\mu_m a_m^\ell} \int_\mathcal{A} d^3 r \nabla \cdot \mathbf v (\mathbf r)
-    = \frac{\rho_m}{\mu_m a_m^\ell} \oint_{\partial \mathcal{A}} d^2 \mathbf r \cdot \mathbf v (\mathbf r)
+  K_{\ell m} = \frac{\rho_m}{\mu_m a_m^\ell} \int_\mathcal{A} d^3 r R_{\ell m} (\bm r)
+   = \frac{\rho_m}{\mu_m a_m^\ell} \int_\mathcal{A} d^3 r \nabla \cdot \bm v (\bm r)
+    = \frac{\rho_m}{\mu_m a_m^\ell} \oint_{\partial \mathcal{A}} d^2 \bm r \cdot \bm v (\bm r)
 \end{equation}
-where $\mathbf v (\mathbf r) = \unit r R_{\ell m} (\mathbf r) r / (3+\ell) $. We know the area element satisfies $d^2 \mathbf r = \partial \mathbf r / \partial \theta \times \partial \mathbf r / \partial \phi$ in our coordinates, and when dotted with $\mathbf v \propto \unit r$, this gives
+where $\bm v (\bm r) = \unit r R_{\ell m} (\bm r) r / (3+\ell) $. We know the area element satisfies $d^2 \bm r = \partial \bm r / \partial \theta \times \partial \bm r / \partial \phi$ in our coordinates, and when dotted with $\bm v \propto \unit r$, this gives
 \begin{equation}
   K_{\ell m} = \frac{\rho_m}{\mu_m a_m^\ell(3 + \ell)} \int_0^\pi d\theta \sin \theta\int_0^{2\pi}d\phi r(\theta, \phi)^3 R_{\ell m}(r(\theta, \phi), \theta, \phi).
   \label{eqn:constant-density-klm}
@@ -589,17 +599,17 @@ Again, the density of this asteroid cannot be extracted because, as is a general
 
 \subsection{Fixed Surface $\nabla^2 \rho = 0$ model}
 \label{sec:laplace-rho}
-Now suppose the shape of the asteroid is known, perhaps by a simplifying guess or perhaps by direct observation during a flyby. Then a density distribution $\rho(\mathbf r)$ can be solved for which is consistent with observed values of $K_{\ell m}$. Supposing $\nabla^2 \rho = 0$ and removing terms which are undefined at $r=0$, we write $\rho(\mathbf r) = \sum_{\ell m} C_{\ell m} R_{\ell m}^* a_m^\ell \mu_m$. Thus, $K_{\ell m} = \sum_{\ell' m'} C_{\ell' m'} B_{\ell \ell' m m'}$ where
+Now suppose the shape of the asteroid is known, perhaps by a simplifying guess or perhaps by direct observation during a flyby. Then a density distribution $\rho(\bm r)$ can be solved for which is consistent with observed values of $K_{\ell m}$. Supposing $\nabla^2 \rho = 0$ and removing terms which are undefined at $r=0$, we write $\rho(\bm r) = \sum_{\ell m} C_{\ell m} R_{\ell m}^* a_m^\ell \mu_m$. Thus, $K_{\ell m} = \sum_{\ell' m'} C_{\ell' m'} B_{\ell \ell' m m'}$ where
 \begin{equation}
-  B_{\ell \ell' m m'} = \int_{\mathcal{A}}d^3 r R_{\ell m}(\mathbf r) R_{\ell' m')}(\mathbf r)
+  B_{\ell \ell' m m'} = \int_{\mathcal{A}}d^3 r R_{\ell m}(\bm r) R_{\ell' m')}(\bm r)
   \label{eqn:blm}
 \end{equation}
 can be precomputeded due to the shape of $\mathcal{A}$ being known.
-If we write $K_{\ell m}$ as a vector $\mathbf K$ and similarly for $\mathbf C$, we can write $B_{\ell \ell' m m'}$ as a matrix $\hat B$, obtaining $\mathbf K = \hat B \mathbf C$. It follows that the density distribution coefficients are given by
+If we write $K_{\ell m}$ as a vector $\bm K$ and similarly for $\bm C$, we can write $B_{\ell \ell' m m'}$ as a matrix $\hat B$, obtaining $\bm K = \hat B \bm C$. It follows that the density distribution coefficients are given by
 \begin{equation}
-\mathbf C = \hat B^{-1} \mathbf K.
+\bm C = \hat B^{-1} \bm K.
 \end{equation}
-The scale parameter $a_m$ can be computed from the resulting values of $\mathbf C$ and the distance scale can be adjusted until $a_m$ matches the true value. As before, $\mu_m$ is a free parameter representing the impossibility of fitting for the mass of the asteroid. Since only a finite number of $K_{\ell m}$ are known, we can only solve for a finite number of $C_{\ell m}$ and neglect the higher order terms.
+The scale parameter $a_m$ can be computed from the resulting values of $\bm C$ and the distance scale can be adjusted until $a_m$ matches the true value. As before, $\mu_m$ is a free parameter representing the impossibility of fitting for the mass of the asteroid. Since only a finite number of $K_{\ell m}$ are known, we can only solve for a finite number of $C_{\ell m}$ and neglect the higher order terms.
 
 Physically, there is no reason to expect $\nabla^2 \rho = 0$. However, the space of density distributions with $\nabla^2 \rho = 0$ is a useful proxy for the true density distribution, since this section demonstrates how the density distribution can be solved for within this subspace. Conceptually, the density distribution derived from the $C_{\ell m}$s can be viewed as a projection from the true density distribution into the closest density distribution with $\nabla^2 \rho = 0$ everywhere.
 
@@ -607,12 +617,12 @@ Note that if $\mathcal{A}$ is assumed to be a sphere, $B_{\ell \ell' m m'} \prop
 
 \subsection{Fixed Surface Numerical Model}
 \label{sec:numerical-density}
-Now we approach the problem of solving for the density distribution of an asteroid from the $K_{\ell m}$ parameters with more general assumptions. Suppose the shape of the asteroid is known, where ``known'' in this case means that an indicator function $\mathds{1}(\mathbf r)$ exists such that $\mathds{1}(\mathbf r) = 1$  inside the asteroid and 0 elsewhere. Then we suggest a numerical algorithm to compute a representative distribution of the asteroid density distribution. Given $n$ known values of $K_{\ell m}$, the algorithm proceeds as follows.
+Now we approach the problem of solving for the density distribution of an asteroid from the $K_{\ell m}$ parameters with more general assumptions. Suppose the shape of the asteroid is known, where ``known'' in this case means that an indicator function $\mathds{1}(\bm r)$ exists such that $\mathds{1}(\bm r) = 1$  inside the asteroid and 0 elsewhere. Then we suggest a numerical algorithm to compute a representative distribution of the asteroid density distribution. Given $n$ known values of $K_{\ell m}$, the algorithm proceeds as follows.
 \begin{enumerate}
-\item Fill the asteroids with $n$ uniformly random ``seed points'' by distributing them inside a bounding box containing the asteroid and rejecting those with positions $\mathbf r_i$ such that $\mathds{1}(\mathbf r_i) = 0.$
+\item Fill the asteroids with $n$ uniformly random ``seed points'' by distributing them inside a bounding box containing the asteroid and rejecting those with positions $\bm r_i$ such that $\mathds{1}(\bm r_i) = 0.$
 \item Construct $n$ regions $\mathcal{R}_i$around each point such that the $i$th region is the set of all points inside the asteroid closest to the $i$th point. Suppose $R_i$ has uniform density $\rho_i$.
-\item For each region, compute $\overline K_{\ell m}^i = \frac{1}{\mu_m a_m^\ell}\int_{\mathcal{R}_i} d^3 r R_{\ell m}(\mathbf r)$. Once again, $\mu_m$ is a free parameter and units can be chosen such that $a_m=1$. Then %we can write $K_{\ell m} = \sum_i \rho_i \overline K_{\ell m}^i$.
-\item Write $\overline K_{\ell m}^i$ as a square matrix $\hat{\overline K}$ with columns indexed by $i$ and rows indexed by $\ell$ and $m$. Invert it to get $\mathbf \rho = \hat {\overline K}^{-1} \mathbf K$.
+\item For each region, compute $\overline K_{\ell m}^i = \frac{1}{\mu_m a_m^\ell}\int_{\mathcal{R}_i} d^3 r R_{\ell m}(\bm r)$. Once again, $\mu_m$ is a free parameter and units can be chosen such that $a_m=1$. Then %we can write $K_{\ell m} = \sum_i \rho_i \overline K_{\ell m}^i$.
+\item Write $\overline K_{\ell m}^i$ as a square matrix $\hat{\overline K}$ with columns indexed by $i$ and rows indexed by $\ell$ and $m$. Invert it to get $\bm \rho = \hat {\overline K}^{-1} \bm K$.
 \item Go back to step 1 and compute new density maps with new draws of seed points. Since $K_{\ell m}$ is linear in $\rho$, the average density distribution also satisfies the fitted $K_{\ell m}$. Use the average as the asteroid density distribution.
 \end{enumerate}
 
@@ -696,7 +706,7 @@ Figure \ref{fig:example-residuals} demonstrates that a good fit to data was achi
 
 
 
-\bibliography{asteroids}{}
+\bibliography{blank}{}
 \bibliographystyle{aasjournal}
 
 

@@ -49,7 +49,6 @@ for bare in file_names:
     f = open("{0}/{0}.txt".format(bare), 'r')
     max_j, max_l = f.readline().split(", ")
     max_j, max_l = (int(max_j), int(max_l))
-    num_fits = [int(i) for i in f.readline().split(', ')]
     cadence = int(f.readline())
     impact_parameter = int(f.readline())
     radius = float(f.readline())
@@ -59,7 +58,7 @@ for bare in file_names:
     theta_true = convert([[float(x) for x in f.readline().split(',')]])
     theta_high = [float(x) for x in f.readline().split(',')]
     theta_low = [float(x) for x in f.readline().split(',')]
-    SIGMA = float(f.readline())
+    SIGMA = [float(d) for d in f.readline().split(',')]
     f.close()
     names.append(bare)
     points.append(theta_true)
@@ -106,7 +105,7 @@ def covariance():
                         arrays = convert(arrays.transpose()).transpose()
 
                         diffs = np.mean(arrays, axis=1) - points[index]
-                        cov = np.cov(arrays) / SIGMA**2
+                        cov = np.cov(arrays) / SIGMA[0]**2
                     data.append((file, diffs, cov))
 
                 weights = [np.sum((data_row[1] / DIFF_EXPECTED_FACTOR) ** 2 ) for data_row in data]
@@ -151,8 +150,9 @@ def covariance():
         X.append(X_line)
         Y.append(Y_line)
 
+    NUM_LEVELS = 21
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, corr12_data, levels=20, cmap="Oranges_r")
+    c = plt.contourf(X, Y, corr12_data, levels=NUM_LEVELS-1, cmap="Oranges_r")
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Corr}(a/c, b/c)$")
     plot_pt()
@@ -164,7 +164,7 @@ def covariance():
     plt.savefig("compile-figs/corrab.pdf")
 
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, corr01_data, levels=20, cmap="Oranges_r")
+    c = plt.contourf(X, Y, corr01_data, levels=NUM_LEVELS-1, cmap="Oranges_r")
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Corr}(\\gamma_0 ,a/c)$")
     plot_pt()
@@ -176,7 +176,7 @@ def covariance():
     plt.savefig("compile-figs/corr1a.pdf")
 
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, corr02_data, levels=20, cmap="Oranges_r")
+    c = plt.contourf(X, Y, corr02_data, levels=NUM_LEVELS-1, cmap="Oranges_r")
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Corr}(\\gamma_0, b/c)$")
     plot_pt()
@@ -188,9 +188,10 @@ def covariance():
     plt.savefig("compile-figs/corr1b.pdf")
 
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, sigma0_data, levels=20, cmap="Purples_r")
+    flat_sig_0 = np.array(sigma0_data).reshape(-1) * 1e4
+    c = plt.contourf(X, Y, np.array(sigma0_data) * 1e4, levels=np.linspace(0, np.max(np.sort(flat_sig_0[np.isfinite(flat_sig_0)])[:-7]), NUM_LEVELS), cmap='Purples_r')
     axc = plt.colorbar(c)
-    axc.set_label("$\\sigma(\\gamma_0)/\\sigma_\\theta$")
+    axc.set_label("$\\sigma(\\gamma_0)/\\sigma_\\theta$ ($\\times 10^{-3}$)")
     plot_pt()
     plt.xlabel("$a/c$")
     plt.ylabel("$b/c$")
@@ -200,9 +201,9 @@ def covariance():
     plt.savefig("compile-figs/theta-1-ab-sigma.pdf")
 
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, sigma1_data, levels=20, cmap="Purples_r")
+    c = plt.contourf(X, Y, np.array(sigma1_data) * 10**3, levels=20, cmap="Purples_r")
     axc = plt.colorbar(c)
-    axc.set_label("$\\sigma(a/c)/\\sigma_\\theta$")
+    axc.set_label("$\\sigma(a/c)/\\sigma_\\theta$ ($\\times 10^{-4}$)")
     plot_pt()
     plt.xlabel("$a/c$")
     plt.ylabel("$b/c$")
@@ -212,9 +213,9 @@ def covariance():
     plt.savefig("compile-figs/theta-a-sigma.pdf")
 
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, sigma2_data, levels=20, cmap="Purples_r")
+    c = plt.contourf(X, Y, np.array(sigma2_data) * 10**3, levels=20, cmap="Purples_r")
     axc = plt.colorbar(c)
-    axc.set_label("$\\sigma(b/c)/\\sigma_\\theta$")
+    axc.set_label("$\\sigma(b/c)/\\sigma_\\theta$ ($\\times 10^{-3}$)")
     plot_pt()
     plt.xlabel("$a/c$")
     plt.ylabel("$b/c$")

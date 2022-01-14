@@ -31,9 +31,8 @@ for bare in file_names:
     f = open("{0}/{0}.txt".format(bare), 'r')
     max_j, max_l = f.readline().split(", ")
     max_j, max_l = (int(max_j), int(max_l))
-    num_fits = [int(i) for i in f.readline().split(', ')]
     cadence = int(f.readline())
-    impact_parameter = int(f.readline())
+    perigee = int(f.readline())
     radius = float(f.readline())
     speed = float(f.readline())
     spin = [float(x) for x in f.readline().split(',')]
@@ -41,7 +40,7 @@ for bare in file_names:
     theta_true = [float(x) for x in f.readline().split(',')]
     theta_high = [float(x) for x in f.readline().split(',')]
     theta_low = [float(x) for x in f.readline().split(',')]
-    SIGMA = float(f.readline())
+    SIGMA = [float(d) for d in f.readline().split(',')]
     f.close()
     names.append(bare)
     points.append(theta_true)
@@ -150,7 +149,7 @@ def covariance():
                         arrays = arrays.reshape(arrays.shape[0], arrays.shape[1] * arrays.shape[2])
 
                         diffs = np.mean(arrays, axis=1) - points[index]
-                        cov = np.cov(arrays) / SIGMA**2
+                        cov = np.cov(arrays) / SIGMA[0]**2
                     data.append((file, diffs, cov))
 
                 weights = [np.sum((data_row[1] / DIFF_EXPECTED_FACTOR) ** 2 ) for data_row in data]
@@ -195,8 +194,9 @@ def covariance():
         Y.append(Y_line)
 
 
+    NUM_LEVELS = 21
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, corr12_data, levels=20, cmap='Oranges_r')
+    c = plt.contourf(X, Y, corr12_data, levels=NUM_LEVELS-1, cmap='Oranges_r')
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Corr}(K_{22}, K_{20})$")
     plot_pt()
@@ -208,7 +208,7 @@ def covariance():
     plt.savefig("compile-figs/corr23.pdf")
 
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, np.array(corr01_data), levels=20, cmap='Oranges_r')
+    c = plt.contourf(X, Y, np.array(corr01_data), levels=NUM_LEVELS-1, cmap='Oranges_r')
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Corr}(\\gamma_0, K_{22})$")
     plot_pt()
@@ -220,7 +220,7 @@ def covariance():
     plt.savefig("compile-figs/corr12.pdf")
 
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, np.array(corr02_data), levels=20, cmap='Oranges_r')
+    c = plt.contourf(X, Y, np.array(corr02_data), levels=NUM_LEVELS-1, cmap='Oranges_r')
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Corr}(\\gamma_0, K_{20})$")
     plot_pt()
@@ -232,36 +232,37 @@ def covariance():
     plt.savefig("compile-figs/corr13.pdf")
 
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, sigma0_data, levels=20, cmap='Purples_r')
+    flat_sig_0 = np.array(sigma0_data).reshape(-1) * 1e4
+    c = plt.contourf(X, Y, np.array(sigma0_data) * 1e4, levels=np.linspace(0, np.max(np.sort(flat_sig_0[np.isfinite(flat_sig_0)])[:-7]), NUM_LEVELS), cmap='Purples_r')
     axc = plt.colorbar(c)
     plt.xlim(-0.11, 0.11)
     plot_pt()
     plt.ylim(-0.24, -0.03)
-    axc.set_label("$\\sigma(\\gamma_0)/\\sigma_\\theta$")
+    axc.set_label("$\\sigma(\\gamma_0)/\\sigma_\\theta$ ($\\times 10^{-4}$)")
     plt.xlabel("$K_{22}$")
     plt.ylabel("$K_{20}$")
     plt.tight_layout()
     plt.savefig("compile-figs/theta-1-sigma.pdf")
 
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, np.array(sigma1_data) * 10**4, levels=20, cmap='Purples_r')
+    c = plt.contourf(X, Y, np.array(sigma1_data) * 1e6, levels=np.linspace(0, np.nanmax(sigma1_data) * 1e6, NUM_LEVELS), cmap='Purples_r')
     axc = plt.colorbar(c)
     plt.xlim(-0.11, 0.11)
     plot_pt()
     plt.ylim(-0.24, -0.03)
-    axc.set_label("$\\sigma(K_{22})/\\sigma_\\theta$ ($\\times 10^{-4}$)")
+    axc.set_label("$\\sigma(K_{22})/\\sigma_\\theta$ ($\\times 10^{-6}$)")
     plt.xlabel("$K_{22}$")
     plt.ylabel("$K_{20}$")
     plt.tight_layout()
     plt.savefig("compile-figs/theta-2-sigma.pdf")
 
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, sigma2_data, levels=20, cmap='Purples_r')
+    c = plt.contourf(X, Y, np.array(sigma2_data) * 1e5, levels=np.linspace(0, np.nanmax(sigma2_data) * 1e5, NUM_LEVELS), cmap='Purples_r')
     axc = plt.colorbar(c)
     plt.xlim(-0.11, 0.11)
     plot_pt()
     plt.ylim(-0.24, -0.03)
-    axc.set_label("$\\sigma(K_{20})/\\sigma_\\theta$")
+    axc.set_label("$\\sigma(K_{20})/\\sigma_\\theta$ ($\\times 10^{-6}$)")
     plt.xlabel("$K_{22}$")
     plt.ylabel("$K_{20}$")
     plt.tight_layout()
