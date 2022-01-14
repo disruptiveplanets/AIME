@@ -21,3 +21,6 @@ I learned that in order to minimize for very low data sigma over l=3, I need to 
     - -5: Way too far back for sigma-2, but doesn't matter because the minimization can be done in run round
 
 The above information was used to set the maximum and minimum eigenvalues and the way they scale with sigma, as well as the minimization pattern for l=3
+
+# Jan 13
+I'm starting the run again with sigma theta to rho ratio of 1e-5. There may be some bugs still left over from the changes I made (corrected orientation update code and uncertainty model). I'm doing the asymmetric model, due to the irritating features of the symmetric model and its uncertainty with gamma zero

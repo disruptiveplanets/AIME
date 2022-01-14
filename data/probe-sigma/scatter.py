@@ -2,7 +2,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-LOW_ORDER_INDEX = 0
+LOW_ORDER_INDEX = 1
 BASE_NAME = f"sigma-{LOW_ORDER_INDEX}"
 LOW_LOG_SIGMA = -5
 HIGH_LOG_SIGMA = 0
@@ -21,7 +21,7 @@ def get_text(sigma):
 {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
 0.78539816339, 0.125, 0, 1, 1, 1, 1, 1, 1, 1
 -0.78539816339, -0.125, -0.25, -1, -1, -1, -1, -1, -1, -1
-{}""".format(LOW_ORDER[0], LOW_ORDER[1], LOW_ORDER[2], HIGH_ORDER[0], HIGH_ORDER[1],
+{}, 1e-5""".format(LOW_ORDER[0], LOW_ORDER[1], LOW_ORDER[2], HIGH_ORDER[0], HIGH_ORDER[1],
     HIGH_ORDER[2], HIGH_ORDER[3], HIGH_ORDER[4], HIGH_ORDER[5], HIGH_ORDER[6], sigma)
 
 for sigma_index, log_sigma in enumerate(np.linspace(LOW_LOG_SIGMA, HIGH_LOG_SIGMA, NUM_SIGMA_DIVISIONS)):
