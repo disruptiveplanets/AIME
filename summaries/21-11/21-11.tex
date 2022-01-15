@@ -669,8 +669,8 @@ Except when otherwise mentioned, we use the following fit parameters when runnin
 \begin{enumerate}
   \item An orbit around Earth with $6\siunit{km}\per{s}$ excess velocity and perigee at 5 Earth radii. \jtd{Cite Apophis close approach}
   \item An initial roll of $\gamma_0=\pi/8$.
-  \item A cadence of 2 minutes and observational uncertainty of $\sigma_\theta = 0.01$ and $\sigma_\rho$ = 0.
-  \item A rotational period of 9 hours, with the rotational velocity vector distributed between the $\unit X$, $\unit Y$, and $\unit Z$ axes in a 1:2:$-2$ ratio.
+  \item A cadence of 2 minutes and observational uncertainty of $\sigma_\theta = 0.01$ and $\sigma_\rho / \sigma_\theta = 10^{-5}$.
+  \item A rotational period of 9 hours, with the rotational velocity vector distributed between the $\unit X$, $\unit Y$, and $\unit Z$ axes in a $1:2:-2$ ratio.
   \item An asteroid with radius $a_m = 1\siunit{km}$ and $K_{3m}=0$. For $K_{22}$ and $K_{20}$, we use two standard values. One with $(K_{22}, K_{20}) = (0, -0.097)$ and one with $(0.052, -0.202)$. Including the third point obtained by reflection $K_{22}\rightarrow -K_{22}$, these are the three points that minimize the mean distance between an arbitrary point in the allowed parameter space (equation \ref{eqn:parameter-bounds}) and these reference values. The first point is called the symmetric case because the corresponding uniform-density-ellipsoid model is rotationally symmetric around $\unit z$. The second case and its reflection are called the asymmetric cases. Values of $(0.052, -0.202)$ have $a < b$ in the ellipsoid model, and the reflected value has $a > b$. If not specified, we use the $a < b$ case. 
 \end{enumerate}
 
@@ -684,7 +684,7 @@ Figure \ref{fig:example-residuals} shows the data with the best-fit overlayed an
 \begin{figure}
   \centering
   \includegraphics[width=0.7\textwidth]{example-residuals.pdf}
-  \caption{Data, best fit results, and residuals for a fit to synthetic data simulated for a symmetric reference asteroid with $\sigma_\theta = 10^{-5}$. The standard deviation of the data is plotted as an uncertainty band in the residuals plot, but these do not capture covariance between data points, so that the fact that many residuals lie outside the band does not disqualify the fit, which has a reduced $\chi^2$ value of 0.83.}
+  \caption{Data, best fit results, and residuals for a fit to synthetic data simulated for an asymmetric reference asteroid with $\sigma_\theta = 10^{-5}$. The standard deviation of the data is plotted as an uncertainty band in the residuals plot, but these do not capture covariance between data points, so that the fact that many residuals lie outside the band does not disqualify the fit, which has a reduced $\chi^2$ value of 0.68.}
   \label{fig:example-residuals}
 \end{figure}
 
@@ -693,7 +693,7 @@ Figure \ref{fig:example-corner} shows a corner plot of the ten fitted parameters
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{example-corner.pdf}
-  \caption{A corner plot for the fit results ten parameters to synthetic data simulated for a symmetric reference asteroid with $\sigma_\theta = 10^{-5}$. Marginal posterior PDFs for each parameter are shown (histograms) along with two-dimensional PDFs (contours). Individual points in the contours are samples from the MCMC fit, and the contours enclose 1-, 2-, and 3-$\sigma$ of them. True values (which are zero here due to the parameters being displayed relative to the true values) are also shown (blue lines).}
+  \caption{A corner plot for the fit results ten parameters to synthetic data simulated for an asymmetric reference asteroid with $\sigma_\theta = 10^{-5}$. Marginal posterior PDFs for each parameter are shown (histograms) along with two-dimensional PDFs (contours). Individual points in the contours are samples from the MCMC fit, and the contours enclose 1-, 2-, and 3-$\sigma$ of them. True values (which are zero here due to the parameters being displayed relative to the true values) are also shown (blue lines).}
   \label{fig:example-corner}
 \end{figure}
 

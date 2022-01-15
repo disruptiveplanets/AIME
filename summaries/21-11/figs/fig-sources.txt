@@ -15,8 +15,8 @@ probe-space-ab-ab.pdf data/probe-space/compile-figs/corrab.pdf
 nominal-data-sym.pdf code/other-figs/model-spread/spin-chaos-sym.pdf
 nominal-data-asym.pdf code/other-figs/model-spread/spin-chaos-asym.pdf
 
-example-residuals.pdf code/other-figs/example-corner/sigma-0-0-00-0-compare.pdf
-example-corner.pdf code/other-figs/example-corner/sigma-0-0-00-0-corner.pdf
+example-residuals.pdf code/other-figs/example-corner/sigma-1-00-0-compare.pdf
+example-corner.pdf code/other-figs/example-corner/sigma-1-00-0-corner.pdf
 
 nominal-covariance.pdf code/fit_resolved/random-figs/random-vector-unc.pdf
 nominal-norm.pdf code/fit_resolved/random-figs/random-vector-norm.pdf

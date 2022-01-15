@@ -383,7 +383,6 @@ def get_minimum(arg):
             if np.any(np.asarray(new_evals) < 0.0):
                 return None, None, None, None
             else:
-                print(l)
                 logging.warning("Allowing the Hessian to pass with reversed first eigenvalue.")
 
         if l == 3:
@@ -465,7 +464,8 @@ def minimize(l, fix_theta):
             continue
         choose = True
         for distinct_theta, _, _, _ in distinct_results:
-            if np.all((np.abs(distinct_theta - theta) < MIN_THETA_DIST)[1:]):
+            if np.all((np.abs(distinct_theta - theta) < MIN_THETA_DIST)[1:3]):
+                # Only scan for theta 1 and 2 (K2m)
                 choose = False
                 break
         if choose:
@@ -610,56 +610,3 @@ def mcmc_fit(theta_start, evals, evecs, index):
 
 for i, (theta, evals, evecs) in enumerate(kernel):
     mcmc_fit(theta, evals, evecs, i)
-
-
-####################################################################
-# Process data
-####################################################################
-
-i = 0
-while True:
-    logging.info("Showing i = {}".format(i))
-    try:
-        disp = display.Display("{0}".format(output_name), "{0}-{1}".format(output_name, i))
-    except Exception as e:
-        if i == 0:
-            raise e
-        break
-    disp.show_redchi()
-    disp.show_params()
-    disp.show_corner()
-    disp.show_compare()
-    disp.show_results()
-    plt.show()
-    if not collect.collect(output_name + "-" + str(i), output_name):
-        break
-    del disp
-    i += 1
-
-####################################################################
-# Save samples
-####################################################################
-
-for index in range(len(kernel)):
-    reader = emcee.backends.HDFBackend(output_name+"-{}.h5".format(index), read_only=True)
-
-    try:
-        tau = reader.get_autocorr_time()
-        burnin = int(2 * np.max(tau))
-        thin = DEFAULT_THIN#int(0.5 * np.min(tau))
-    except:
-        print("Could not find autocorrelation time because the chain is too short.")
-        thin = DEFAULT_THIN
-        burnin = 1000
-
-    samples = reader.get_chain(discard=burnin, thin=thin)
-    log_prob_samples = -reader.get_log_prob(discard=burnin, thin=thin) / 3 / n_data 
-    #log_prior_samples = reader.get_blobs(discard=burnin, thin=thin)
-    redchis = np.nanmin(log_prob_samples, axis=0)
-    
-    mask = np.where(redchis < 2)[0]
-
-    print(f"Saving samples from {len(mask)}/{len(redchis)} walkers")
-
-    with open(f"{output_name}-{index}-samples.npy", 'wb') as f:
-        np.save(f, samples[:,mask,:], allow_pickle=False)
