@@ -32,6 +32,7 @@ logging.basicConfig(level=logging.INFO)
 
 PLOT_POSES = True
 NUM_MINIMIZE_POINTS_PER = 8
+NUM_L3_MINIMIZATIONS = 2
 DISTANCE_RATIO_CUTS = [
     [2.0, None],
     [-2.0, None]
@@ -464,10 +465,15 @@ def minimize(l, fix_theta):
             continue
         choose = True
         for distinct_theta, _, _, _ in distinct_results:
-            if np.all((np.abs(distinct_theta - theta) < MIN_THETA_DIST)[1:3]):
+            if np.all(np.abs(distinct_theta - theta)[1:3] < MIN_THETA_DIST):
                 # Only scan for theta 1 and 2 (K2m)
                 choose = False
                 break
+            if len(theta) > 3 and len (distinct_results) >= NUM_L3_MINIMIZATIONS:
+                # Do not choose more than NUM_L3_MINIMIZATIONS l=3 tiers.
+                choose = False
+                break
+
         if choose:
             distinct_results.append((theta, evals, evecs, redchi))
     return distinct_results
