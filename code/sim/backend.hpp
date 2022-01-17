@@ -28,7 +28,7 @@
 #define SPACE_MP (SPACE_MPP * (2 * (ASTEROIDS_MAX_K + 1) + 1))
 #define SPACE_LP (SPACE_MP * (2 * (ASTEROIDS_MAX_K + 1) + 1))
 #define SPACE_M (SPACE_LP * (ASTEROIDS_MAX_K + 1))
-#define SPACE_L (SPACE_M * (ASTEROIDS_MAX_J + 1))
+#define SPACE_L (SPACE_M * (2 * (ASTEROIDS_MAX_J + 1) + 1))
 #define COEFF_LENGTH (SPACE_L * (ASTEROIDS_MAX_J + 1))
 
 class Asteroid {
