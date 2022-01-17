@@ -50,6 +50,12 @@ Abstract.
 \item Asteroids simulated in binaries \cite{Naidu_2015}
 \item Previous work on the math of asteroid rotations \cite{ashenberg07, paul88}
 \item CNEOS: 4 asteroids $D > 100 m$ are coming to within 1 LD of Earth in the next 10 years, 29 with $D > 10 m$.
+\item Moskowitz survey of Duende: \cite{BENSON2020113518} with companion observational article \cite{MOSKOVITZ2020113519}. Demonstrates that moment of inertia can be extracted from a tumbling asteroid via lightcurve analysis in the zero-torque regime (fourier transform of lightcurve to pick up on two frequencies and assign precession and nutation frequencies to them.) Assumes constant geometry.
+\item Study of asteroid binary to extract density \cite{DESCAMPS2020113726}
+\item Scheeres theoretical paper \cite{HouMar2017} detailing the different forces and torques felt by an asteroid.
+\item Paper stating in general that asteroids can be tidally disrupted on hyperbolic flyby. \cite{SCHEERES2000106}, plus similar paper \cite{RICHARDSON199847} for tidal disruption
+\item Another theoretical paper \cite{BOUE2009750} inspired by Paul
+\item Apophis will definitely pass by Earth and will definitely significantly change its rotation state, but will not undergo tidal disruption. \cite{SCHEERES2005281}
 \end{itemize}
 
 
@@ -132,6 +138,8 @@ This equation can be reversed for $\alpha$, $\beta$, $\gamma$ as follows:
 
 
 \subsection{Tidal Torque}
+Derivations for the tidal torque experienced by a rigid body in the gravitational field of a larger mass have been computed by several previous studies \cite{paul88,HouMar2017,BOUE2009750, ashenberg07}, sometimes in terms of the moment of inertia of the rigid body (or higher order moments of inertia), and to varying degrees of precision. We present a novel derivation of the tidal torque experienced by a rigid body in a gravitational field of another in terms of (complex) spherical harmonic coefficients of the bodies' mass distributions, which are closely related to their moments of inertia. This formulation of the problem will be more useful for this study. The calculation is performed to all orders of distance between the two bodies.
+
 We start by expressing the gravitational potential energy field of the central body in its most general form:
 \begin{equation}
 V(\bm R') = -G\int_\mathcal{P} d^3 R \rho_M(\bm R) \frac{1}{|\bm{R}-\bm{R'}|}.
@@ -232,7 +240,7 @@ where we have defined, for neatness,
 a_m^2=\frac{1}{\mu_m}\int_\mathcal{A} d^3 r \rho_m(\bm r) r^2.
 \label{eqn:am}
 \end{eqnarray}
-With this definition of $a_m$, and an arbitrary definition of $a_M$ which may be taken to be similar to equation \ref{eqn:am} or a more convenient unit such as the central body radius, the parameters $J_{\ell m}$ and $K_{\ell m}$ of equation \ref{eqn:jlm} are completely defined. Note that $a_m$ is similar to the radius of the asteroid; if the asteroid is a sphere of uniform density and radius $r$, then $a_m = r\sqrt{3/5}$.
+With this definition of $a_m$, and an arbitrary definition of $a_M$ which may be taken to be similar to equation \ref{eqn:am} or a more convenient unit such as the central body radius, the parameters $J_{\ell m}$ and $K_{\ell m}$ of equation \ref{eqn:jlm} are completely defined. Note that $a_m$ is roughly to the radius of the asteroid under certain assumptions; if the asteroid is a sphere of uniform density and radius $r$, then $a_m = r\sqrt{3/5}$.
 
 Henceforth, we define the body-fixed axis to be coincident with the principal axes of the asteroids, so that the off-diagonal components of $I$ are zero.
 
@@ -454,7 +462,7 @@ J_{\ell m} = \frac{1}{(\mu_M+\mu_0) a_M^\ell}\brackets{\delta_{\ell 0}\delta_{m0
 \begin{equation}
 J_{\ell m} = \frac{1}{(\mu_M+\mu_0)}\brackets{\mu_M\delta_{\ell 0}\delta_{m0} + \mu_o \frac{R_{\ell m}(\bm R)}{ a_M^\ell}}
 \end{equation}
-where the $\delta$s are Kroneker deltas. It is apparent that if $a_M^\ell$ remains the radius of the planet, $|J_{\ell m}| \rightarrow \infty$ as $\ell \rightarrow \infty$. However, since each $J_{\ell m}$ is damped by $a_M^\ell / D^\ell$ and since $R < D$ by construction, the series in equation \ref{eqn:tidal-torque} remains roughly geometric and does not blow up. For the sake of this calculation, we neglect motion of the moon during the flyby.
+where the $\delta$s are Kronecker deltas. It is apparent that if $a_M^\ell$ remains the radius of the planet, $|J_{\ell m}| \rightarrow \infty$ as $\ell \rightarrow \infty$. However, since each $J_{\ell m}$ is damped by $a_M^\ell / D^\ell$ and since $R < D$ by construction, the series in equation \ref{eqn:tidal-torque} remains roughly geometric and does not blow up. For the sake of this calculation, we neglect motion of the moon during the flyby.
 
 For our tests, we use parameters similar to our Moon: we set $\mu_o = 0.01 \mu_M$ and $R = 60 a_M$.
 
@@ -502,7 +510,7 @@ The parameters $K_{22}$ and $K_{20}$ are then converted to the more physical par
 
 These figures demonstrate several key properties. Figure \ref{fig:probe-space-sigma} demonstrates that fit uncertainties for all three parameters are generally for asteroids with an axis of rotational symmetry --- i.e. $a=b$ or $K_{22} = 0$. This is likely due to the fact that the local axes, which are required to define the parameters, are set such that they align with the asteroid principal axes, and therefore are degenerate in the case of a symmetrical asteroid. For similar reasons, uncertainty in $\gamma_0$ especially is large for $a \approx b \approx c$, which is the spherical case in which no tidal torque is generated. Beyond these two trends, uncertainty in $a/c$ and $b/c$ appear to scale linearly with these ratios. 
 
-Figure \ref{fig:probe-space-corr} demonstrates that the parameters are generally correlated. Specficically, $\gamma_0$ and $|K_{22}|$ are correlated for large $|K_{22}|$ which corresponds to highly asymmetric asteroids. Likewise, for the correlation of $a/c$ and $b/c$ with $\gamma_0$. $\mathrm{Corr}(\v, K_{20})$ are less correlated however. $K_{20}$ and $K_{22}$ are strongly correlated in general as are $a/c$ and $b/c$.
+Figure \ref{fig:probe-space-corr} demonstrates that the parameters are generally correlated. Specifically, $\gamma_0$ and $|K_{22}|$ are correlated for large $|K_{22}|$ which corresponds to highly asymmetric asteroids. Likewise, for the correlation of $a/c$ and $b/c$ with $\gamma_0$. $\mathrm{Corr}(\gamma_0, K_{20})$ is less, however. $K_{20}$ and $K_{22}$ are strongly correlated in general as are $a/c$ and $b/c$.
 
 Also shown in figures \ref{fig:probe-space-sigma} and \ref{fig:probe-space-corr} are the reference asteroid configurations which we study when fixing the asteroid shape and varying other parameters. We note that these reference configurations capture the above trends in variance and correlation, so that they can be viewed as representative of all but the most extreme asteroid configurations. The measured values of variance and covariance are displayed in table \ref{tab:probe-space-refernece-var-covar}.
 
@@ -679,7 +687,7 @@ Except when otherwise mentioned, we use the following fit parameters when runnin
 \section{Example fit results}
 In the interest of demonstrating the result of a fit to synthetic data, we present the results of a fit to synthetic data generated with the nominal sensitivity model and $\sigma_\theta = 10^{-5}$. The symmetric reference asteroid is used. The reduced $\chi^2$ value of this fit (defined as $\chi^2 / N$, where $N$ is the number of degrees of freedom) was 0.83, and fit results were in good agreement with the true parameters. Nearly 12,000 MCMC iterations were required before convergence.
 
-Figure \ref{fig:example-residuals} shows the data with the best-fit overlayed and the residuals. Uncertainties are plotted on the residuals corresponding to the square root of the diagonal entries of the covariance matrix --- i.e., 1-$\sigma$ uncertainties. However, the data often exceeds these uncertainty bands. This is because uncertainties are correlated in truth, and points that fall outside of the band are not necessary in conflict with the best fit.
+Figure \ref{fig:example-residuals} shows the data with the best-fit overlaid and the residuals. Uncertainties are plotted on the residuals corresponding to the square root of the diagonal entries of the covariance matrix --- i.e., 1-$\sigma$ uncertainties. However, the data often exceeds these uncertainty bands. This is because uncertainties are correlated in truth, and points that fall outside of the band are not necessary in conflict with the best fit.
 
 \begin{figure}
   \centering
@@ -706,7 +714,7 @@ Figure \ref{fig:example-residuals} demonstrates that a good fit to data was achi
 
 
 
-\bibliography{blank}{}
+\bibliography{asteroids}{}
 \bibliographystyle{aasjournal}
 
 

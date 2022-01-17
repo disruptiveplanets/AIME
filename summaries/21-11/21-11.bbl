@@ -5,4 +5,76 @@
 \providecommand{\doeprint}[1]{\href{http://ascl.net/#1}{\nolinkurl{http://ascl.net/#1}}}
 \providecommand{\doarXiv}[1]{\href{https://arxiv.org/abs/#1}{\nolinkurl{https://arxiv.org/abs/#1}}}
 
+\bibitem[{Ashenberg(2007)}]{ashenberg07}
+Ashenberg, J. 2007, Celestial Mechanics and Dynamical Astronomy, 99, 149,
+  \dodoi{10.1007/s10569-007-9092-7}
+
+\bibitem[{Benson {et~al.}(2020)Benson, Scheeres, \&
+  Moskovitz}]{BENSON2020113518}
+Benson, C.~J., Scheeres, D.~J., \& Moskovitz, N.~A. 2020, Icarus, 340, 113518,
+  \dodoi{https://doi.org/10.1016/j.icarus.2019.113518}
+
+\bibitem[{Boué \& Laskar(2009)}]{BOUE2009750}
+Boué, G., \& Laskar, J. 2009, Icarus, 201, 750,
+  \dodoi{https://doi.org/10.1016/j.icarus.2009.02.001}
+
+\bibitem[{Descamps {et~al.}(2020)Descamps, Vachier, Berthier, Normand, Wiggins,
+  {de Groot}, Coudert, Chojnacki, Labrevoir, Joly, Marcon, Olimpiade,
+  Dargoui-Pister, Delhaume, Duval, {El Farissi}, Giraud, Grieco, Kaderi, Laidi,
+  Lauze, Mary, Medour, Negre, Passabet, Perret, Peyron, Ramos, \&
+  Soridi}]{DESCAMPS2020113726}
+Descamps, P., Vachier, F., Berthier, J., {et~al.} 2020, Icarus, 345, 113726,
+  \dodoi{https://doi.org/10.1016/j.icarus.2020.113726}
+
+\bibitem[{Foreman-Mackey {et~al.}(2013)Foreman-Mackey, Hogg, Lang, \&
+  Goodman}]{ForemanMackey2013emceeTM}
+Foreman-Mackey, D., Hogg, D.~W., Lang, D., \& Goodman, J.~B. 2013, Publications
+  of the Astronomical Society of the Pacific, 125, 306
+
+\bibitem[{Gao \& Han(2012)}]{NelderMead}
+Gao, F., \& Han, L. 2012, Computational Optimization and Applications, 51, 259
+
+\bibitem[{{Graf}(2008)}]{2008arXiv0811.2889G}
+{Graf}, B. 2008, arXiv e-prints, arXiv:0811.2889.
+\newblock \doarXiv{0811.2889}
+
+\bibitem[{Hou {et~al.}(Mar 2017)Hou, Scheeres, \& Xin}]{HouMar2017}
+Hou, X., Scheeres, D.~J., \& Xin, X. Mar 2017, Celestial Mechanics and
+  Dynamical Astronomy, 127, 369.
+\newblock
+  \url{https://www.proquest.com/scholarly-journals/mutual-potential-between-two-rigid-bodies-with/docview/1867560429/se-2?accountid=12492}
+
+\bibitem[{Moskovitz {et~al.}(2020)Moskovitz, Benson, Scheeres, Endicott,
+  Polishook, Binzel, DeMeo, Ryan, Ryan, Willman, Hergenrother, Verveer, Lister,
+  Birtwhistle, Sickafoose, Nagayama, Gilmore, Kilmartin, Benecchi, Sheppard,
+  Marchis, Augusteijn, \& Smirnova}]{MOSKOVITZ2020113519}
+Moskovitz, N.~A., Benson, C.~J., Scheeres, D., {et~al.} 2020, Icarus, 340,
+  113519, \dodoi{https://doi.org/10.1016/j.icarus.2019.113519}
+
+\bibitem[{Naidu \& Margot(2015)}]{Naidu_2015}
+Naidu, S.~P., \& Margot, J.-L. 2015, The Astronomical Journal, 149, 80,
+  \dodoi{10.1088/0004-6256/149/2/80}
+
+\bibitem[{Paul(1988)}]{paul88}
+Paul, M.~K. 1988, Celestial mechanics, 44, 49, \dodoi{10.1007/BF01230706}
+
+\bibitem[{Richardson {et~al.}(1998)Richardson, Bottke, \&
+  Love}]{RICHARDSON199847}
+Richardson, D.~C., Bottke, W.~F., \& Love, S.~G. 1998, Icarus, 134, 47,
+  \dodoi{https://doi.org/10.1006/icar.1998.5954}
+
+\bibitem[{Scheeres {et~al.}(2005)Scheeres, Benner, Ostro, Rossi, Marzari, \&
+  Washabaugh}]{SCHEERES2005281}
+Scheeres, D., Benner, L., Ostro, S., {et~al.} 2005, Icarus, 178, 281,
+  \dodoi{https://doi.org/10.1016/j.icarus.2005.06.002}
+
+\bibitem[{Scheeres {et~al.}(2000)Scheeres, Ostro, Werner, Asphaug, \&
+  Hudson}]{SCHEERES2000106}
+Scheeres, D., Ostro, S., Werner, R., Asphaug, E., \& Hudson, R. 2000, Icarus,
+  147, 106, \dodoi{https://doi.org/10.1006/icar.2000.6443}
+
+\bibitem[{van Gelderen(1998)}]{Gelderen1998TheSO}
+van Gelderen, M. 1998, in The shift operators and translations of spherical
+  harmonics
+
 \end{thebibliography}
