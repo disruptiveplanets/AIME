@@ -524,7 +524,7 @@ Also shown in figures \ref{fig:probe-space-sigma} and \ref{fig:probe-space-corr}
     Asymmetric: $a<b$ & $1.6 \times 10^{-5}$ & $1.5 \times 10^{-6}$ & $5.4 \times 10^{-6}$ & 0.32 & -0.0053 & 0.88\\%94
     & $1.6\times 10^{-5}$ & $9.4\times 10^{-5}$ & $1.8\times 10^{-4}$ & 0.082 & -0.019 & 0.99\\
     Asymmetric: $a>b$  & $1.5 \times 10^{-5}$ & $9.1 \times 10^{-7}$ & $4.8 \times 10^{-6}$ & -0.58 & 0.017 & 0.15 \\%101
-    & $1.5\times 10^{-5}$ & $1.5\times 10^{-4}$ & $1.0\times 10^{-4}$ & -0.049 & 0.061 & 0.98\\
+    & $1.5\times 10^{-5}$ & $1.5\times 10^{-4}$ & $1.0\times 10^{-4}$ & -0.049 & 0.061 & 0.98\\ \hline
   \end{tabular}
   \caption{Values for the standard deviation and correlation of $\gamma_0$, $K_{22}$, and $K_{20}$ (top entry of each row) or $\gamma_0$, $a/c$, and $b/c$ respectively (bottom entry of each row) for the symmetric and asymmetric reference points. The large $\sigma(\gamma_0)$ for the symmetric benchmark reflects the fact that $\gamma_0$ is not defined for a symmetric body, and the posterior probability distribution is poorly constrained.}
   \label{tab:probe-space-refernece-var-covar}
@@ -534,7 +534,24 @@ Also shown in figures \ref{fig:probe-space-sigma} and \ref{fig:probe-space-corr}
 \subsection{Dependence on observational precision}
 \label{sec:probe-sigma}
 
-\jtd{Running Jan 13}
+Depending on the size of the asteroid, its orbital elements, and the availability of observation, uncertainty on the rotational pole of the asteroid is expected to vary between flybys. A detailed model of uncertainty in the rotational pole of the asteroid (a model that might simulate a full lightcurve, for example) is beyond the scope of this paper. However, in this section we demonstrate how the uncertainty in the fit parameters is governed by the experimental uncertainty in rotational pole $\sigma_\theta$ as a rule-of-thumb to guide future investigation.
+
+We represent 1-$\sigma$ uncertainty in the fit parameters as the difference between the 84th or 15th percentile of the marginal posterior PDF for each fit parameter and its mean. For a multivariate gaussian posterior PDF (which must also have gaussian marginal PDFs), this 1-$\sigma$ uncertainty is exactly the standard deviation of the marginal PDF. We perform a similar exercise for the 2-$\sigma$ uncertainty.
+
+These uncertainties in fit parameters are observed to scale precisely with $\sigma_\theta$, except where $\sigma_\theta$ is large enough that the fit parameter uncertainty is comparable to the size of the prior PDF. Figure \ref{fig:probe-sigma} shows the $\sigma / \sigma_\theta$ ratio for all 10 of the first two orders of parameters ($\gamma_0$, $K_{2m}$, and $K_{3m}$). The ratio of $\sigma_\rho$ to $\sigma_\theta$ is kept constant. The result is executed for the asymmetric asteroid model. The figure demonstrates that the ratio $\sigma/\sigma_\theta$ is constant for all values of $\sigma_\theta$ except large values. It also demonstrates that the posterior marginal PDFs are largely symmetric, in that the lower uncertainty is roughly equal to the upper uncertainty.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{probe-sigma.pdf}
+  \caption{Ratio of 1- and 2-$\sigma$ uncertainties of the marginal PDFs to the observational uncertainty $\sigma_\theta$ as a function of $\sigma_\theta$. Except at large $\sigma_\theta$, the ratio is observed to be constant. The asymmetric asteroid benchmark is used. Values of the ratio for other asteroid models can be computed from figure \ref{fig:probe-space-sigma}.}
+  \label{fig:probe-sigma}
+\end{figure}
+
+Due to the constancy of the ratio of fit to observational uncertainty, the ratio can be extracted for other asteroid configurations from figure \ref{fig:probe-space-sigma}, and we are not much concerned with the value of $\sigma_\theta$ used throughout this paper because we are aware that results can be easily rescaled.
+
+
+\subsection{Dependence on cadence}
+
 
 \subsection{Dependence on orbital parameters}
 
@@ -544,7 +561,6 @@ Also shown in figures \ref{fig:probe-space-sigma} and \ref{fig:probe-space-corr}
 
 \jtd{The period is also important, but probably depends too much on the start of the simulation. I'm more interested in the spin pole.}
 
-\subsection{Dependence on cadence}
 
 \subsection{Dependence on blocking out perigee}
 \label{sec:block-perigee}
