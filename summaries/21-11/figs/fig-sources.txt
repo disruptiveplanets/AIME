@@ -12,6 +12,8 @@ probe-space-ab-1a.pdf data/probe-space/compile-figs/corr1a.pdf
 probe-space-ab-1b.pdf data/probe-space/compile-figs/corr1b.pdf
 probe-space-ab-ab.pdf data/probe-space/compile-figs/corrab.pdf
 
+probe-sigma.pdf data/probe-sigma/sigmas.pdf
+
 nominal-data-sym.pdf code/other-figs/model-spread/spin-chaos-sym.pdf
 nominal-data-asym.pdf code/other-figs/model-spread/spin-chaos-asym.pdf
 

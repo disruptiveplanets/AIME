@@ -1,122 +1,105 @@
 # Goal: spawn a bunch of runs that cover the parameter space.
 from matplotlib import pyplot as plt
 import numpy as np
-import os
+from matplotlib.lines import Line2D
 
 plt.style.use("jcap")
 
-names_center = []
-names_edge = []
-sigmas_center = []
-sigmas_edge = []
-file_names = os.listdir()
-file_names.sort()
-true_center = None
-true_edge = None
+param_names = ["\\gamma_0", "K_{20}", "K_{22}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
 
-param_names = ["\\gamma_0", "$K_{20}$", "$K_{22}$", "$\Re K_{33}$", "$\Im K_{33}$", "$\Re K_{32}$", "$\Im K_{32}$", "$\Re K_{31}$", "$\Im K_{31}$", "$K_{30}$"]
+percentiles = {}
+name_index = {}
+true_sigmas = []
 
-DIFF_THRESHOLD = [0.01, 0.01, 0.01]
-SELECT_INDEX = 1
+AXIS_SIZE = 12
+LEGEND_SIZE = 12
 
-# Fill points
-for bare in file_names:
-    if not os.path.isdir(bare):
-        continue
-    f = open("{0}/{0}.txt".format(bare), 'r')
-    max_j, max_l = f.readline().split(", ")
-    max_j, max_l = (int(max_j), int(max_l))
-    num_fits = [int(i) for i in f.readline().split(', ')]
-    cadence = int(f.readline())
-    impact_parameter = int(f.readline())
-    radius = float(f.readline())
-    speed = float(f.readline())
-    spin = [float(x) for x in f.readline().split(',')]
-    jlms = [float(x) for x in f.readline().split(',')]
-    theta_true = [float(x) for x in f.readline().split(',')]
-    theta_high = [float(x) for x in f.readline().split(',')]
-    theta_low = [float(x) for x in f.readline().split(',')]
-    sigma = float(f.readline())
-    f.close()
-    if abs(theta_true[1]) < 0.001:
-        names_center.append(bare)
-        sigmas_center.append(sigma)
-        true_center = theta_true
+N_DIM = None
+N_PERCENTILES = None
+
+# Get percentiles
+with open("percentiles.dat", 'r') as f:
+    for line in f.readlines():
+        if line == '': continue
+        elements = line.split(':')
+        name = elements[0]
+        perc_array = []
+        for percs in elements[1:]:
+            perc_array.append([float(x) for x in percs.split(',')])
+        perc_array = np.array(perc_array)
+        N_DIM = perc_array.shape[0]
+        N_PERCENTILES = perc_array.shape[1]
+        percentiles[name] = perc_array
+
+# Get true sigmas
+for name in percentiles.keys():
+    dir_name = name[:10]
+    with open(f"{dir_name}/{dir_name}.txt", 'r') as f:
+        max_j, max_l = f.readline().split(", ")
+        max_j, max_l = (int(max_j), int(max_l))
+        cadence = int(f.readline())
+        perigee = int(f.readline())
+        radius = float(f.readline())
+        speed = float(f.readline())
+        spin = [float(x) for x in f.readline().split(',')]
+        jlms = [float(x) for x in f.readline().split(',')]
+        theta_true = [float(x) for x in f.readline().split(',')]
+        theta_high = [float(x) for x in f.readline().split(',')]
+        theta_low = [float(x) for x in f.readline().split(',')]
+        sigma = [float(d) for d in f.readline().split(',')]
+    name_index[name] = int(dir_name[-2:])
+    true_sigmas.append(sigma[0])
+
+true_sigmas = np.array(true_sigmas)
+
+fig, axs = plt.subplots(figsize=(10, 8), ncols=2, nrows=5, sharex=True)
+axs = axs.reshape(-1)
+
+for i in range(N_DIM):
+    param_data = np.zeros(len(true_sigmas) * N_PERCENTILES).reshape(N_PERCENTILES, len(true_sigmas))
+    for f in percentiles.keys():
+        param_data[:,name_index[f]] = percentiles[f][i]
+    scale = 10**5 if i < 3 else 1
+    axs[i].plot(true_sigmas, (param_data[1]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
+    axs[i].plot(true_sigmas, (param_data[-1]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
+    axs[i].fill_between(true_sigmas, (param_data[1]-param_data[0]) / true_sigmas * scale, 
+        (param_data[-1]-param_data[0]) / true_sigmas * scale,  color=f"C{i}", alpha=0.3)
+
+    axs[i].plot(true_sigmas, (param_data[2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
+    axs[i].plot(true_sigmas, (param_data[-2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
+    axs[i].fill_between(true_sigmas, (param_data[2]-param_data[0]) / true_sigmas * scale,
+        (param_data[-2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", alpha=0.3)
+
+    axs[i].plot(true_sigmas, (param_data[3]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+
+    axs[i].set_xscale('log')
+    if i < 3:
+        axs[i].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta\\ (\\times 10^{{-5}})$", size=AXIS_SIZE)
     else:
-        names_edge.append(bare)
-        sigmas_edge.append(sigma)
-        true_edge = theta_true
-sigmas_center = np.array(sigmas_center)
-sigmas_edge = np.array(sigmas_edge)
+        axs[i].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta$", size=AXIS_SIZE)
 
-data_center = [None] * len(sigmas_center)
-data_edge = [None] * len(sigmas_edge)
-diff_center = [None] * len(sigmas_center)
-diff_edge = [None] * len(sigmas_edge)
-f = open("percentiles.dat", 'r')
-for line in f.readlines():
-    if line == "":
-        continue
-    line = line.split(": ")
-    data = np.array([[float(f) for f in l.split(", ")] for l in line[1:]])
-    name = line[0][:-14]
-    if name in names_center:
-        i = names_center.index(name)
-        dist = np.abs(data[SELECT_INDEX][0] - true_center[SELECT_INDEX])
-        if dist < DIFF_THRESHOLD[SELECT_INDEX]:
-            if diff_center[i] is None or diff_center[i] > dist:
-                data_center[i] = data
-                diff_center[i] = dist
-    elif name in names_edge:
-        i = names_edge.index(name)
-        dist = np.abs(data[SELECT_INDEX][0] - true_edge[SELECT_INDEX])
-        if dist < DIFF_THRESHOLD[SELECT_INDEX]:
-            if diff_edge[i] is None or diff_edge[i] > dist:
-                data_edge[i] = data
-                diff_edge[i] = dist
-    else:
-        raise Exception(f"Could not find name {name}")
+    if i == 9 or i == 8:
+        axs[i].set_xlabel(f"$\sigma_\\theta$")
 
+    print(f"{param_names[i]}:\t mean:{np.mean((param_data[3]-param_data[0]) / true_sigmas)}\t"+
+        f"95\% high: {np.mean((param_data[1]-param_data[0]) / true_sigmas)}\t 95\% low: {np.mean((param_data[-1]-param_data[0]) / true_sigmas)}\t"+
+        f"68\% high: {np.mean((param_data[2]-param_data[0]) / true_sigmas)}\t 68\% low: {np.mean((param_data[-2]-param_data[0]) / true_sigmas)}")
 
-# Plot pdfs
-def plot_sigmas(names, sigmas, data, label_name, plot_index, color):
-    very_high = [np.nan] * len(names)
-    high = [np.nan] * len(names)
-    med = [np.nan] * len(names)
-    low = [np.nan] * len(names)
-    very_low = [np.nan] * len(names)
-    for i, name in enumerate(names):
-        if data[i] is None: continue
-        very_high[i] = data[i][plot_index][1]
-        high[i] = data[i][plot_index][2]
-        med[i] = data[i][plot_index][3]
-        low[i] = data[i][plot_index][4]
-        very_low[i] = data[i][plot_index][5]
+custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
+                Line2D([0], [0], color='k', lw=4, alpha=0.6),
+                Line2D([0], [0], color='k', lw=1, linestyle='dashed')]
+fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='lower center', prop={'size': LEGEND_SIZE})
+fig.tight_layout()
+plt.savefig("sigmas.pdf")
+plt.show()
 
-    very_high = np.array(very_high)
-    high = np.array(high)
-    med = np.array(med)
-    low = np.array(low)
-    very_low = np.array(very_low)
+print()
+for i in range(N_DIM):
+    param_data = np.zeros(len(true_sigmas) * N_PERCENTILES).reshape(N_PERCENTILES, len(true_sigmas))
+    for f in percentiles.keys():
+        param_data[:,name_index[f]] = percentiles[f][i]
 
-    plt.plot(sigmas, very_high-med, color=color, linewidth=1, linestyle='dashed')
-    plt.plot(sigmas, high-med, color=color, linewidth=1)
-    #plt.plot(sigmas, med, color=color)
-    plt.plot(sigmas, low-med, color=color, linewidth=1)
-    plt.plot(sigmas, very_low-med, color=color, linewidth=1, linestyle='dashed')
-    plt.fill_between(sigmas, low-med, high-med, color=color, alpha=0.5, label=label_name)
+    mean_95 = (np.mean((param_data[1]-param_data[0]) / true_sigmas) - np.mean((param_data[-1]-param_data[0]) / true_sigmas)) / 2
+    mean_68 = (np.mean((param_data[2]-param_data[0]) / true_sigmas) - np.mean((param_data[-2]-param_data[0]) / true_sigmas)) / 2
 
-
-if __name__ == "__main__":
-    for i in range(3):#len(true_center)):
-        plt.figure()
-        plot_sigmas(names_center, sigmas_center, data_center, "center", i, "C0")
-        plot_sigmas(names_edge, sigmas_edge, data_edge, "edge", i, "C1")
-        plt.xlabel("$\sigma_\\theta$")
-        plt.xscale('log')
-        plt.xscale('log')
-        plt.ylabel("$\sigma_{}$".format(i))
-        plt.legend()
-        plt.tight_layout()
-        plt.savefig("sigmas-{}.png".format(i))
-    plt.show()
+    print(f"{param_names[i]}:\t mean:{np.mean((param_data[3]-param_data[0]) / true_sigmas)}\t95\%: {mean_95}\t 68\%: {mean_68}")
