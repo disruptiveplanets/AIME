@@ -1,8 +1,8 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "probe-sigma"
-FORBIDDEN_NAMES = ["ob"]
+PATH = "oblateness"
+FORBIDDEN_NAMES = []
 
 I_LIMIT = -1
 
