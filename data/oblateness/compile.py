@@ -7,6 +7,13 @@ plt.style.use("jcap")
 
 param_names = ["\\gamma_0", "K_{20}", "K_{22}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
 
+oblateness_markers = {
+    "Moon": 203e-6/2,
+    "Earth": 1082e-6/2,
+    #"Mars": 1960e-6/2,
+    "Jupiter": 14696e-6/2,
+    "Neptune": 3343e-6/2,}
+
 percentiles = {}
 name_index = {}
 true_sigma = []
@@ -76,6 +83,13 @@ for i in range(N_DIM):
 
     axs[i].set_xscale('log')
     axs[i].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta\\ (\\times 10^{{-5}})$", size=AXIS_SIZE)
+
+    for ob in oblateness_markers.values():
+        axs[i].axvline(x=ob, color='k', linewidth=1)
+
+    if i == 0:
+        for name, ob in oblateness_markers.items():
+            axs[i].text(x=ob, y=17, verticalalignment='bottom', horizontalalignment='center', s=name, fontsize=12)
 
     if i == 2:
         axs[i].set_xlabel(f"$\epsilon$")

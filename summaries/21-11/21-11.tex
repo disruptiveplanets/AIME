@@ -569,8 +569,29 @@ Much of the data available concerning an asteroid's rotational velocity is captu
 To test this, we mask the perigee of the counter by removing data from the period when $D < f_\textrm{mask} r_p$, where $f_\textrm{mask}>1$ is a unit-less fraction. We also allow the simulation to continue beyond the standard $f = 10$, so that the actual length of the data set is unaffected by the mask and induces no lack of precision on the fit of $K_{3m}$. We then fit to synthetic data for each mask and plot the standard deviations of the parameter posterior PDFs for (1) $\gamma_0$ and $K_{2m}$ as a control, and (2) $K_{3m}$, to test whether they can still be fitted for without data concerning the perigee. To maximize the changes in posterior PDF, we use an experimental error of $\sigma_\theta = 10^{-5}$, the lowest we test in this study.
 
 \subsection{Exotic scenarios}
+Until this point, we have assumed an asteroid flyby of Earth because observations are most plentiful for near-Earth asteroids. However, it is worth considering how observations taken around another planet --- by a large Earth-orbiting telescope or an interplanetary mission, for instance --- could affect the efficacy of this model.
+
+In particular, we consider how high planetary oblateness and the presence of moons affects the torque dynamics of asteroids. Other central body parameters worth of mention are the central body mass and radius. However, the dependence of tidal torque on these properties is clear from equation \ref{eqn:tidal-torque} without requiring a simulation. If the central planet mass $\mu_M$ is increased, tidal torque increases uniformly and we expect greater precision in our measurements. If the planetary radius is increased, we also expect an increase in the distance $D$ to the planet. Therefore, we consider changes in $(a_M/D)$. Each $J_{\ell m}$ term is multiplied by a factor of $(a_M/D)^\ell$, so an increase in planetary radius without a change in mass only affects the subdominant terms of \ref{eqn:tidal-torque}.
 
 \subsubsection{Oblate planet}
+
+Depending on the composition and rotation rate of the planet which the asteroid is encountering, the oblateness (equivalently, the planet's $J_{20}$ or $J_2$ value) may vary. The $J_{1m}$ values are fixed at zero by the constraint that the center of mass of the central body must be at the origin. Equation \ref{eqn:tidal-torque} shows that the presence of a large $J_{20}$ value introduces a second factor through which the $K_{2m}$ parameters can affect the tidal torque, which is damped by an extra factor of $D^{-2}$ compared to the $J_{00}$ term. In this section, we ask what can be gained by a large oblateness.
+
+Another factor work consideration is the presence of a planetary ring, which will affect $J_{2}$. However, using the properties of Saturn's rings as an benchmark, we compute that the oblateness of the planet far outstrips the increase in $J_{2}$ caused by the ring, so we ignore this scenario henceforth. \jtd{Cite an appendix?}
+
+For our purposes, we define oblateness to be $\epsilon = (I_z - I_x)/(\mu_M a_M^2)$ for central body moments of inertia $I_{x,y,z}$ where $I_x = I_y$ (that is, $J_{22} = 0$) and $a_M$ is the true radius of the body, not the value defined in equation \ref{eqn:am}. Expressed in terms of $J_{\ell m}$, this is $\epsilon = -2J_{20}$. Given this conversion between $\epsilon$ and $J_2$, we generate simulated data sets and fit $K_{2m}$ parameters to them for logarithmically spaced values of $\epsilon$ between $10^{-4}$ and $10^{-1}$. The 68th and 95th percentiles deviations, computed as in figure \ref{fig:probe-space-sigma}, are shown in figure \ref{fig:oblateness}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{oblateness.pdf}
+  \caption{Ratio of 1- and 2-$\sigma$ uncertainties of the marginal PDFs to the observational uncertainty $\sigma_\theta$ as a function of the oblateness $\epsilon$ of the central planet. Also shown are the oblatenesses of reference Solar System bodies \cite{pater_lissauer_2015}.}
+  \label{fig:oblateness}
+\end{figure}
+
+Figure \ref{fig:oblateness} shows no strong dependence of best-fit uncertainty on oblateness, as expected due to the weakness of the $J_{2}$ term in equation \ref{eqn:tidal-torque} compared to the dominant $J_{00}$ term. However, the fit parameter uncertainty does slightly decrease as oblateness increases on further study. \jtd{Give some quotes}. Other asteroid parameters $K_{3m}$ will likely be affected by oblateness to similar degrees. It is therefore reasonable to include that the presence of a large $J_2$ will not substantially affect the ability of this model to constrain asteroid interiors.
+
+Figure \ref{fig:oblateness} also includes reference Solar System $J_2$ values listed in \cite{pater_lissauer_2015} for comparison. However truly comparing these reference oblatenesses is complicated by the fact that the $J_2$ term of equation \ref{eqn:tidal-torque} is modified by a factor of $(a_M/D)^2$. If the perigee of the orbit is fixed at the benchmark value of 5 planetary radii, we expect this term to remain roughly comparable between the different reference planets. However, if $a_M / D$ increases for larger planet mass, which seems likely given that a larger planet presents a larger target, we expect the large-mass reference planets to show more dependence on oblateness than figure \ref{fig:oblateness} suggests. In general, larger mass planets are gas giants and therefore have higher oblatenesses than rocky planets. Therefore, we expect more dependence on oblateness for gas giants.
+
 
 \subsubsection{Distant moon}
 

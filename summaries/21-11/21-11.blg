@@ -4,44 +4,44 @@ The top-level auxiliary file: 21-11.aux
 The style file: aasjournal.bst
 Database file #1: asteroids.bib
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
-You've used 15 entries,
+You've used 16 entries,
             3168 wiz_defined-function locations,
-            779 strings with 8940 characters,
-and the built_in function-call counts, 6995 in all, are:
-= -- 561
-> -- 526
-< -- 7
-+ -- 175
-- -- 185
-* -- 623
-:= -- 1287
-add.period$ -- 17
-call.type$ -- 15
-change.case$ -- 81
-chr.to.int$ -- 15
-cite$ -- 15
-duplicate$ -- 249
-empty$ -- 434
-format.name$ -- 205
-if$ -- 1413
+            783 strings with 9045 characters,
+and the built_in function-call counts, 7422 in all, are:
+= -- 597
+> -- 549
+< -- 9
++ -- 182
+- -- 192
+* -- 655
+:= -- 1358
+add.period$ -- 18
+call.type$ -- 16
+change.case$ -- 88
+chr.to.int$ -- 19
+cite$ -- 16
+duplicate$ -- 268
+empty$ -- 473
+format.name$ -- 216
+if$ -- 1507
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 14
-newline$ -- 55
-num.names$ -- 60
-pop$ -- 91
+missing$ -- 15
+newline$ -- 58
+num.names$ -- 64
+pop$ -- 101
 preamble$ -- 1
-purify$ -- 81
+purify$ -- 86
 quote$ -- 0
-skip$ -- 224
+skip$ -- 242
 stack$ -- 0
-substring$ -- 299
-swap$ -- 0
+substring$ -- 308
+swap$ -- 2
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 135
+type$ -- 141
 warning$ -- 0
-while$ -- 57
+while$ -- 61
 width$ -- 0
-write$ -- 169
+write$ -- 179
