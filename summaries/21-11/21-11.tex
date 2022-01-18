@@ -579,7 +579,7 @@ Depending on the composition and rotation rate of the planet which the asteroid 
 
 Another factor work consideration is the presence of a planetary ring, which will affect $J_{2}$. However, using the properties of Saturn's rings as an benchmark, we compute that the oblateness of the planet far outstrips the increase in $J_{2}$ caused by the ring, so we ignore this scenario henceforth. \jtd{Cite an appendix?}
 
-For our purposes, we define oblateness to be $\epsilon = (I_z - I_x)/(\mu_M a_M^2)$ for central body moments of inertia $I_{x,y,z}$ where $I_x = I_y$ (that is, $J_{22} = 0$) and $a_M$ is the true radius of the body, not the value defined in equation \ref{eqn:am}. Expressed in terms of $J_{\ell m}$, this is $\epsilon = -2J_{20}$. Given this conversion between $\epsilon$ and $J_2$, we generate simulated data sets and fit $K_{2m}$ parameters to them for logarithmically spaced values of $\epsilon$ between $10^{-4}$ and $10^{-1}$. The 68th and 95th percentiles deviations, computed as in figure \ref{fig:probe-space-sigma}, are shown in figure \ref{fig:oblateness}.
+For our purposes, we define oblateness to be $\epsilon = (I_z - I_x)/(\mu_M a_M^2)$ for central body moments of inertia $I_{x,y,z}$ where $I_x = I_y$ (that is, $J_{22} = 0$) and $a_M$ is the true radius of the body, not the value defined in equation \ref{eqn:am}. (Some sources such as \cite{pater_lissauer_2015} take this definition of $\epsilon$ as their definition of $J_2$. Expressed in terms of $J_{\ell m}$, this is $\epsilon = -2J_{20}$. Given this conversion between $\epsilon$ and $J_{20}$, we generate simulated data sets and fit $K_{2m}$ parameters to them for logarithmically spaced values of $\epsilon$ between $10^{-4}$ and $10^{-1}$. The 68th and 95th percentiles deviations, computed as in figure \ref{fig:probe-space-sigma}, are shown in figure \ref{fig:oblateness}.
 
 \begin{figure}
   \centering
@@ -588,9 +588,9 @@ For our purposes, we define oblateness to be $\epsilon = (I_z - I_x)/(\mu_M a_M^
   \label{fig:oblateness}
 \end{figure}
 
-Figure \ref{fig:oblateness} shows no strong dependence of best-fit uncertainty on oblateness, as expected due to the weakness of the $J_{2}$ term in equation \ref{eqn:tidal-torque} compared to the dominant $J_{00}$ term. However, the fit parameter uncertainty does slightly decrease as oblateness increases on further study. \jtd{Give some quotes}. Other asteroid parameters $K_{3m}$ will likely be affected by oblateness to similar degrees. It is therefore reasonable to include that the presence of a large $J_2$ will not substantially affect the ability of this model to constrain asteroid interiors.
+Figure \ref{fig:oblateness} shows no strong dependence of best-fit uncertainty on oblateness, as expected due to the weakness of the $J_{20}$ term in equation \ref{eqn:tidal-torque} compared to the dominant $J_{00}$ term. However, the fit parameter uncertainty does slightly decrease as oblateness increases on further study. \jtd{Give some quotes}. Other asteroid parameters $K_{3m}$ will likely be affected by oblateness to similar degrees. It is therefore reasonable to include that the presence of a large $J_{20}$ will not substantially affect the ability of this model to constrain asteroid interiors.
 
-Figure \ref{fig:oblateness} also includes reference Solar System $J_2$ values listed in \cite{pater_lissauer_2015} for comparison. However truly comparing these reference oblatenesses is complicated by the fact that the $J_2$ term of equation \ref{eqn:tidal-torque} is modified by a factor of $(a_M/D)^2$. If the perigee of the orbit is fixed at the benchmark value of 5 planetary radii, we expect this term to remain roughly comparable between the different reference planets. However, if $a_M / D$ increases for larger planet mass, which seems likely given that a larger planet presents a larger target, we expect the large-mass reference planets to show more dependence on oblateness than figure \ref{fig:oblateness} suggests. In general, larger mass planets are gas giants and therefore have higher oblatenesses than rocky planets. Therefore, we expect more dependence on oblateness for gas giants.
+Figure \ref{fig:oblateness} also includes reference Solar System $J_{2}$ values listed in \cite{pater_lissauer_2015} for comparison. However truly comparing these reference oblatenesses is complicated by the fact that the $J_{20}$ term of equation \ref{eqn:tidal-torque} is modified by a factor of $(a_M/D)^2$. If the perigee of the orbit is fixed at the benchmark value of 5 planetary radii, we expect this term to remain roughly comparable between the different reference planets. However, if $a_M / D$ increases for larger planet mass, which seems likely given that a larger planet presents a larger target, we expect the large-mass reference planets to show more dependence on oblateness than figure \ref{fig:oblateness} suggests. In general, larger mass planets are gas giants and therefore have higher oblatenesses than rocky planets. Therefore, we expect more dependence on oblateness for gas giants.
 
 
 \subsubsection{Distant moon}
@@ -751,7 +751,7 @@ Figure \ref{fig:example-residuals} demonstrates that a good fit to data was achi
 
 
 
-\bibliography{asteroids}{}
+\bibliography{blank}{}
 \bibliographystyle{aasjournal}
 
 

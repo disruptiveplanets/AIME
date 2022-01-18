@@ -8,11 +8,11 @@ plt.style.use("jcap")
 param_names = ["\\gamma_0", "K_{20}", "K_{22}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
 
 oblateness_markers = {
-    "Moon": 203e-6/2,
-    "Earth": 1082e-6/2,
-    #"Mars": 1960e-6/2,
-    "Jupiter": 14696e-6/2,
-    "Neptune": 3343e-6/2,}
+    "Moon": 203e-6,
+    "Earth": 1082e-6,
+    #"Mars": 1960e-6,
+    "Jupiter": 14696e-6,
+    "Neptune": 3343e-6,}
 
 percentiles = {}
 name_index = {}
@@ -107,4 +107,5 @@ fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, framealpha=1, loc="lo
 fig.tight_layout()
 fig.subplots_adjust(bottom=0.15)
 plt.savefig("oblateness.pdf")
+plt.savefig("oblateness.png")
 plt.show()
