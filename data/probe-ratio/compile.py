@@ -5,7 +5,7 @@ from matplotlib.lines import Line2D
 
 plt.style.use("jcap")
 
-param_names = ["\\gamma_0", "K_{20}", "K_{22}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
+param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
 
 percentiles = {}
 name_index = {}
@@ -66,30 +66,31 @@ for i in range(N_DIM):
     for f in percentiles.keys():
         param_data[:,name_index[f]] = percentiles[f][i]
     scale = 1
+    sigma_rho = sigma_rat * true_sigma
 
-    axs[i].plot(sigma_rat, (param_data[1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[i].plot(sigma_rat, (param_data[-1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[i].fill_between(sigma_rat, (param_data[1]-param_data[0]) / true_sigma * scale, 
-        (param_data[-1]-param_data[0]) / true_sigma * scale,  color=f"C{i}", alpha=0.3)
+    axs[i].plot(sigma_rho, (param_data[1]-param_data[0]) / sigma_rho * scale, color=f"C{i}", linewidth=1)
+    axs[i].plot(sigma_rho, (param_data[-1]-param_data[0]) / sigma_rho * scale, color=f"C{i}", linewidth=1)
+    axs[i].fill_between(sigma_rho, (param_data[1]-param_data[0]) / sigma_rho * scale, 
+        (param_data[-1]-param_data[0]) / sigma_rho * scale,  color=f"C{i}", alpha=0.3)
 
-    axs[i].plot(sigma_rat, (param_data[2]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[i].plot(sigma_rat, (param_data[-2]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[i].fill_between(sigma_rat, (param_data[2]-param_data[0]) / true_sigma * scale,
-        (param_data[-2]-param_data[0]) / true_sigma * scale, color=f"C{i}", alpha=0.3)
+    axs[i].plot(sigma_rho, (param_data[2]-param_data[0]) / sigma_rho * scale, color=f"C{i}", linewidth=1)
+    axs[i].plot(sigma_rho, (param_data[-2]-param_data[0]) / sigma_rho * scale, color=f"C{i}", linewidth=1)
+    axs[i].fill_between(sigma_rho, (param_data[2]-param_data[0]) / sigma_rho * scale,
+        (param_data[-2]-param_data[0]) / sigma_rho * scale, color=f"C{i}", alpha=0.3)
 
-    axs[i].plot(sigma_rat, (param_data[3]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+    axs[i].plot(sigma_rho, (param_data[3]-param_data[0]) / sigma_rho * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
 
-    y_min_norm = np.min((param_data[-1]-param_data[0]) / true_sigma * scale)
-    y_max_norm = np.max((param_data[1]-param_data[0]) / true_sigma * scale)
+    y_min_norm = np.min((param_data[-1]-param_data[0]) / sigma_rho * scale)
+    y_max_norm = np.max((param_data[1]-param_data[0]) / sigma_rho * scale)
     axs[i].set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
 
-    axs[i].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta$", size=AXIS_SIZE)
+    axs[i].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\rho$", size=AXIS_SIZE)
 
-    #axs[i].set_xscale('log')
+    axs[i].set_xscale('log')
     #axs[i].set_yscale('log')
 
     if i == 9 or i == 8:
-        axs[i].set_xlabel(f"$\sigma_\\rho / \sigma_\\theta$")
+        axs[i].set_xlabel(f"$\sigma_\\rho$")
 
 custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=4, alpha=0.6),

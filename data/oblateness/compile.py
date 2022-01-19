@@ -5,7 +5,7 @@ from matplotlib.lines import Line2D
 
 plt.style.use("jcap")
 
-param_names = ["\\gamma_0", "K_{20}", "K_{22}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
+param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
 
 oblateness_markers = {
     "Moon": 203e-6,
@@ -24,6 +24,12 @@ LEGEND_SIZE = 12
 
 N_DIM = None
 N_PERCENTILES = None
+
+def plot_best_fit(ax, xs, ys, scale):
+    slope = np.cov(ys, xs)[0][1] / np.var(xs)
+    yint = np.mean(ys) - slope * np.mean(xs)
+    ax.plot(xs, (xs * slope + yint) * scale, color='k', linewidth=1, linestyle='dotted')
+    return slope
 
 # Get percentiles
 with open("percentiles.dat", 'r') as f:
@@ -84,6 +90,14 @@ for i in range(N_DIM):
     axs[i].set_xscale('log')
     axs[i].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta\\ (\\times 10^{{-5}})$", size=AXIS_SIZE)
 
+    s1n = plot_best_fit(axs[i], oblatenesses, (param_data[-1]-param_data[0]) / true_sigma, scale)
+    s1 = plot_best_fit(axs[i], oblatenesses, (param_data[1]-param_data[0]) / true_sigma, scale)
+    s2n = plot_best_fit(axs[i], oblatenesses, (param_data[-2]-param_data[0]) / true_sigma, scale)
+    s2 = plot_best_fit(axs[i], oblatenesses, (param_data[2]-param_data[0]) / true_sigma, scale)
+    #sm = plot_best_fit(axs[i], oblatenesses, (param_data[3]-param_data[0]) / true_sigma, scale)
+    
+    print((s1n - s1) / 4, (s2n - s2) / 2, ((s1n - s1) / 4 + (s2n - s2) / 2) / 2)
+
     for ob in oblateness_markers.values():
         axs[i].axvline(x=ob, color='k', linewidth=1)
 
@@ -93,12 +107,6 @@ for i in range(N_DIM):
 
     if i == 2:
         axs[i].set_xlabel(f"$\epsilon$")
-
-    print(f"Slope for {param_names[i]}: {np.cov((param_data[-1]-param_data[0]) / true_sigma, oblatenesses)[0][1] / np.var(oblatenesses)}")
-    print(f"Slope for {param_names[i]}: {np.cov((param_data[-2]-param_data[0]) / true_sigma, oblatenesses)[0][1] / np.var(oblatenesses)}")
-    print(f"Slope for {param_names[i]}: {np.cov((param_data[3]-param_data[0]) / true_sigma, oblatenesses)[0][1] / np.var(oblatenesses)}")
-    print(f"Slope for {param_names[i]}: {np.cov((param_data[2]-param_data[0]) / true_sigma, oblatenesses)[0][1] / np.var(oblatenesses)}")
-    print(f"Slope for {param_names[i]}: {np.cov((param_data[1]-param_data[0]) / true_sigma, oblatenesses)[0][1] / np.var(oblatenesses)}")
 
 custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=4, alpha=0.6),

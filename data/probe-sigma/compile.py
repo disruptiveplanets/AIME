@@ -5,7 +5,7 @@ from matplotlib.lines import Line2D
 
 plt.style.use("jcap")
 
-param_names = ["\\gamma_0", "K_{20}", "K_{22}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
+param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
 
 percentiles = {}
 name_index = {}
@@ -93,6 +93,7 @@ custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
 fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='lower center', prop={'size': LEGEND_SIZE})
 fig.tight_layout()
 plt.savefig("sigmas.pdf")
+plt.savefig("sigmas.png")
 plt.show()
 
 print()

@@ -9,3 +9,7 @@ After solving the minimization bugs, I really started the oblateness scan. I had
 ## Jan 18 
 
 Everything worked; however, I looked up the J2 values of Jupiter and Saturn and realized they were beyond the scan. I'm extending the plot. Shouldn't take long.
+
+## Jan 19
+
+Extended the plot
