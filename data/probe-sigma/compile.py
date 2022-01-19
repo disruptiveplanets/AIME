@@ -17,6 +17,7 @@ LEGEND_SIZE = 12
 N_DIM = None
 N_PERCENTILES = None
 
+
 # Get percentiles
 with open("percentiles.dat", 'r') as f:
     for line in f.readlines():
@@ -49,6 +50,7 @@ for name in percentiles.keys():
         sigma = [float(d) for d in f.readline().split(',')]
     name_index[name] = int(dir_name[-2:])
     true_sigmas.append(sigma[0])
+    ratio = sigma[1]
 
 true_sigmas = np.array(true_sigmas)
 
@@ -60,17 +62,17 @@ for i in range(N_DIM):
     for f in percentiles.keys():
         param_data[:,name_index[f]] = percentiles[f][i]
     scale = 10**5 if i < 3 else 1
-    axs[i].plot(true_sigmas, (param_data[1]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
-    axs[i].plot(true_sigmas, (param_data[-1]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
-    axs[i].fill_between(true_sigmas, (param_data[1]-param_data[0]) / true_sigmas * scale, 
+    axs[i].plot(true_sigmas**2 * ratio, (param_data[1]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
+    axs[i].plot(true_sigmas**2 * ratio, (param_data[-1]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
+    axs[i].fill_between(true_sigmas**2 * ratio, (param_data[1]-param_data[0]) / true_sigmas * scale, 
         (param_data[-1]-param_data[0]) / true_sigmas * scale,  color=f"C{i}", alpha=0.3)
 
-    axs[i].plot(true_sigmas, (param_data[2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
-    axs[i].plot(true_sigmas, (param_data[-2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
-    axs[i].fill_between(true_sigmas, (param_data[2]-param_data[0]) / true_sigmas * scale,
+    axs[i].plot(true_sigmas**2 * ratio, (param_data[2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
+    axs[i].plot(true_sigmas**2 * ratio, (param_data[-2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
+    axs[i].fill_between(true_sigmas**2 * ratio, (param_data[2]-param_data[0]) / true_sigmas * scale,
         (param_data[-2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", alpha=0.3)
 
-    axs[i].plot(true_sigmas, (param_data[3]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+    axs[i].plot(true_sigmas**2 * ratio, (param_data[3]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
 
     axs[i].set_xscale('log')
     if i < 3:
@@ -79,7 +81,7 @@ for i in range(N_DIM):
         axs[i].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta$", size=AXIS_SIZE)
 
     if i == 9 or i == 8:
-        axs[i].set_xlabel(f"$\sigma_\\theta$")
+        axs[i].set_xlabel(f"$\sigma_\\theta\sigma_\\rho$")
 
     print(f"{param_names[i]}:\t mean:{np.mean((param_data[3]-param_data[0]) / true_sigmas)}\t"+
         f"95\% high: {np.mean((param_data[1]-param_data[0]) / true_sigmas)}\t 95\% low: {np.mean((param_data[-1]-param_data[0]) / true_sigmas)}\t"+

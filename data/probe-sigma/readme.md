@@ -24,3 +24,7 @@ The above information was used to set the maximum and minimum eigenvalues and th
 
 # Jan 13
 I'm starting the run again with sigma theta to rho ratio of 1e-5. There may be some bugs still left over from the changes I made (corrected orientation update code and uncertainty model). I'm doing the asymmetric model, due to the irritating features of the symmetric model and its uncertainty with gamma zero
+
+# Jan 18
+
+Today I realized that really what I want is two plots: one of the parameters / sigma_theta with the product sigma_theta sigma_rho varied and the ratio constant (this one) and one with the product fixed and the ratio constant (probe-ratio-prod). So I changed the axes on my plot.

@@ -4,4 +4,4 @@ I started this folder to scan the ratio between sigma_rho and sigma_theta, not j
 
 ## Jan 18
 
-Everything worked; however, I looked up the J2 values of Jupiter and Saturn and realized they were beyond the scan. I'm extending the plot. Shouldn't take long.
+It worked. However, I looked at the plots and decided this is not really what I want. I want to fix the sigma product and show the parameters as a function of ratio. So I'll do that with my probe-ratio-prod directory.

@@ -9,7 +9,7 @@ param_names = ["\\gamma_0", "K_{20}", "K_{22}", "\Re K_{33}", "\Im K_{33}", "\Re
 
 percentiles = {}
 name_index = {}
-true_sigma = []
+true_sigma = None
 sigma_rat = []
 
 AXIS_SIZE = 12
@@ -17,6 +17,8 @@ LEGEND_SIZE = 12
 
 N_DIM = None
 N_PERCENTILES = None
+
+SCALE_Y = 1.1
 
 # Get percentiles
 with open("percentiles.dat", 'r') as f:
@@ -33,6 +35,7 @@ with open("percentiles.dat", 'r') as f:
         percentiles[name] = perc_array
 
 # Get true sigmas
+index = 0
 for name in percentiles.keys():
     dir_name = name[:10]
     with open(f"{dir_name}/{dir_name}.txt", 'r') as f:
@@ -48,7 +51,8 @@ for name in percentiles.keys():
         theta_high = [float(x) for x in f.readline().split(',')]
         theta_low = [float(x) for x in f.readline().split(',')]
         sigma = [float(d) for d in f.readline().split(',')]
-    name_index[name] = int(dir_name[-2:])
+    name_index[name] = index
+    index += 1
     true_sigma = sigma[0]
     sigma_rat.append(sigma[1])
 
@@ -61,7 +65,8 @@ for i in range(N_DIM):
     param_data = np.zeros(len(sigma_rat) * N_PERCENTILES).reshape(N_PERCENTILES, len(sigma_rat))
     for f in percentiles.keys():
         param_data[:,name_index[f]] = percentiles[f][i]
-    scale = 10**5 if i < 3 else 1
+    scale = 1
+
     axs[i].plot(sigma_rat, (param_data[1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
     axs[i].plot(sigma_rat, (param_data[-1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
     axs[i].fill_between(sigma_rat, (param_data[1]-param_data[0]) / true_sigma * scale, 
@@ -74,34 +79,23 @@ for i in range(N_DIM):
 
     axs[i].plot(sigma_rat, (param_data[3]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
 
-    axs[i].set_xscale('log')
-    if i < 3:
-        axs[i].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta\\ (\\times 10^{{-5}})$", size=AXIS_SIZE)
-    else:
-        axs[i].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta$", size=AXIS_SIZE)
+    y_min_norm = np.min((param_data[-1]-param_data[0]) / true_sigma * scale)
+    y_max_norm = np.max((param_data[1]-param_data[0]) / true_sigma * scale)
+    axs[i].set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
+
+    axs[i].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta$", size=AXIS_SIZE)
+
+    #axs[i].set_xscale('log')
+    #axs[i].set_yscale('log')
 
     if i == 9 or i == 8:
         axs[i].set_xlabel(f"$\sigma_\\rho / \sigma_\\theta$")
-
-    print(f"{param_names[i]}:\t mean:{np.mean((param_data[3]-param_data[0]) / true_sigma)}\t"+
-        f"95\% high: {np.mean((param_data[1]-param_data[0]) / true_sigma)}\t 95\% low: {np.mean((param_data[-1]-param_data[0]) / true_sigma)}\t"+
-        f"68\% high: {np.mean((param_data[2]-param_data[0]) / true_sigma)}\t 68\% low: {np.mean((param_data[-2]-param_data[0]) / true_sigma)}")
 
 custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=4, alpha=0.6),
                 Line2D([0], [0], color='k', lw=1, linestyle='dashed')]
 fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='lower center', prop={'size': LEGEND_SIZE})
 fig.tight_layout()
-plt.savefig("sigmas.pdf")
+plt.savefig("ratios.pdf")
+plt.savefig("ratios.png")
 plt.show()
-
-print()
-for i in range(N_DIM):
-    param_data = np.zeros(len(sigma_rat) * N_PERCENTILES).reshape(N_PERCENTILES, len(sigma_rat))
-    for f in percentiles.keys():
-        param_data[:,name_index[f]] = percentiles[f][i]
-
-    mean_95 = (np.mean((param_data[1]-param_data[0]) / true_sigma) - np.mean((param_data[-1]-param_data[0]) / true_sigma)) / 2
-    mean_68 = (np.mean((param_data[2]-param_data[0]) / true_sigma) - np.mean((param_data[-2]-param_data[0]) / true_sigma)) / 2
-
-    print(f"{param_names[i]}:\t mean:{np.mean((param_data[3]-param_data[0]) / true_sigma)}\t95\%: {mean_95}\t 68\%: {mean_68}")
