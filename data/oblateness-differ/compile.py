@@ -29,7 +29,7 @@ def plot_best_fit(ax, xs, ys, scale):
     slope = np.cov(ys, xs)[0][1] / np.var(xs)
     yint = np.mean(ys) - slope * np.mean(xs)
     ax.plot(xs, (xs * slope + yint) * scale, color='k', linewidth=1, linestyle='dotted')
-    return slope / yint
+    return slope
 
 # Get percentiles
 with open("percentiles.dat", 'r') as f:
@@ -96,7 +96,7 @@ for i in range(N_DIM):
     s2 = plot_best_fit(axs[i], oblatenesses, (param_data[2]-param_data[0]) / true_sigma, scale)
     #sm = plot_best_fit(axs[i], oblatenesses, (param_data[3]-param_data[0]) / true_sigma, scale)
     
-    print((s1n + s1 + s2n + s2) / 4)
+    print((s1n - s1) / 4, (s2n - s2) / 2, ((s1n - s1) / 4 + (s2n - s2) / 2) / 2)
 
     for ob in oblateness_markers.values():
         axs[i].axvline(x=ob, color='k', linewidth=1)

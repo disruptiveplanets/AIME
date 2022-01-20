@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "oblateness"
+PATH = "probe-ratio-prod"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1

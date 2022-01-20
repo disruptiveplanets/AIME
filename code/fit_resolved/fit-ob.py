@@ -18,6 +18,7 @@ from scipy import optimize
 from scipy.linalg import pinvh
 from mpmath import mp
 import plotille
+import display, collect
 
 import numdifftools as nd
 
@@ -170,6 +171,21 @@ else:
 
 np.save(f"{output_name}-data.npy", y)
 np.save(f"{output_name}-unc.npy", y_inv_covs)
+
+
+
+
+
+##
+# Switch to zero oblateness regime
+ASTEROIDS_MAX_J = 0
+jlms = [1.0]
+##
+
+
+
+
+
 
 logging.info(f"DOF: {len(y)}")
 
