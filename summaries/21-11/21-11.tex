@@ -568,12 +568,13 @@ Much of the data available concerning an asteroid's rotational velocity is captu
 
 To test this, we mask the perigee of the counter by removing data from the period when $D < f_\textrm{mask} r_p$, where $f_\textrm{mask}>1$ is a unit-less fraction. We also allow the simulation to continue beyond the standard $f = 10$, so that the actual length of the data set is unaffected by the mask and induces no lack of precision on the fit of $K_{3m}$. We then fit to synthetic data for each mask and plot the standard deviations of the parameter posterior PDFs for (1) $\gamma_0$ and $K_{2m}$ as a control, and (2) $K_{3m}$, to test whether they can still be fitted for without data concerning the perigee. To maximize the changes in posterior PDF, we use an experimental error of $\sigma_\theta = 10^{-5}$, the lowest we test in this study.
 
-\subsection{Exotic scenarios}
+
+\subsection{Oblate planet}
+
+
 Until this point, we have assumed an asteroid flyby of Earth because observations are most plentiful for near-Earth asteroids. However, it is worth considering how observations taken around another planet --- by a large Earth-orbiting telescope or an interplanetary mission, for instance --- could affect the efficacy of this model.
 
 In particular, we consider how high planetary oblateness and the presence of moons affects the torque dynamics of asteroids. Other central body parameters worth of mention are the central body mass and radius. However, the dependence of tidal torque on these properties is clear from equation \ref{eqn:tidal-torque} without requiring a simulation. If the central planet mass $\mu_M$ is increased, tidal torque increases uniformly and we expect greater precision in our measurements. If the planetary radius is increased, we also expect an increase in the distance $D$ to the planet. Therefore, we consider changes in $(a_M/D)$. Each $J_{\ell m}$ term is multiplied by a factor of $(a_M/D)^\ell$, so an increase in planetary radius without a change in mass only affects the subdominant terms of \ref{eqn:tidal-torque}.
-
-\subsubsection{Oblate planet}
 
 Depending on the composition and rotation rate of the planet which the asteroid is encountering, the oblateness (equivalently, the planet's $J_{20}$ or $J_2$ value) may vary. The $J_{1m}$ values are fixed at zero by the constraint that the center of mass of the central body must be at the origin. Equation \ref{eqn:tidal-torque} shows that the presence of a large $J_{20}$ value introduces a second factor through which the $K_{2m}$ parameters can affect the tidal torque, which is damped by an extra factor of $D^{-2}$ compared to the $J_{00}$ term. In this section, we ask what can be gained by a large oblateness.
 
@@ -583,35 +584,23 @@ For our purposes, we define oblateness to be $\epsilon = (I_z - I_x)/(\mu_M a_M^
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{oblateness.pdf}
+  \includegraphics[width=0.4\textwidth]{oblateness.pdf}
   \caption{Ratio of 1- and 2-$\sigma$ uncertainties of the marginal PDFs to the observational uncertainty $\sigma_\theta$ as a function of the oblateness $\epsilon$ of the central planet. Linear best fit lines (black, dotted) are plotted over the 1- and 2-$\sigma$ uncertainties. Also shown are the oblatenesses of reference Solar System bodies \cite{pater_lissauer_2015}.}
   \label{fig:oblateness}
 \end{figure}
 
-Figure \ref{fig:oblateness} shows a slight dependence of best-fit uncertainty on oblateness, as expected due to the weakness of the $J_{20}$ term in equation \ref{eqn:tidal-torque} compared to the dominant $J_{00}$ term. However, the fit parameter uncertainty does slightly decrease as oblateness increases on further study. The trend of the decrease is linear, as shown by the close agreement between the overlaid best fit linear trend between the 1- and 2-$\sigma$ best fit uncertainties to the measured values. We compute an average slope by assuming that the true 2-$\sigma$ slope is twice the true 1-$\sigma$ slope, arriving at $\Delta \sigma / \Delta \epsilon = 1.9 \times 10^{-5}$ for $\gamma_0$, $1.35 \times 10^{-5}$ for $K_{22}$, and $1.8 \times 10^{-4}$ for $K_{22}$. Other asteroid parameters $K_{3m}$ will likely be affected by oblateness to similar degrees, however fitting these extra parameters is computationally more expensive. \jtd{I could scan over them}.
+Figure \ref{fig:oblateness} shows a slight dependence of best-fit uncertainty on oblateness, as expected due to the weakness of the $J_{20}$ term in equation \ref{eqn:tidal-torque} compared to the dominant $J_{00}$ term. However, the fit parameter uncertainty does slightly decrease as oblateness increases on further study. The trend of the decrease is linear, as shown by the close agreement between the overlaid best fit linear trend between the 1- and 2-$\sigma$ best fit uncertainties to the measured values. We compute an average slope of the 1-$\sigma$ trend divided by the uncertainty for zero eccentricity as $\Delta \sigma / \Delta \epsilon / \sigma_{\epsilon=0}= -0.25$ for $\gamma_0$, $-0.94$ for $K_{22}$, and $-1.2$ for $K_{22}$. Other asteroid parameters $K_{3m}$ will likely be affected by oblateness to similar degrees, however fitting these extra parameters is computationally more expensive.
 
 Figure \ref{fig:oblateness} also includes reference Solar System $J_{2}$ values listed in \cite{pater_lissauer_2015} for comparison. However truly comparing these reference oblatenesses is complicated by the fact that the $J_{20}$ term of equation \ref{eqn:tidal-torque} is modified by a factor of $(a_M/D)^2$. If the perigee of the orbit is fixed at the benchmark value of 5 planetary radii, we expect this term to remain roughly comparable between the different reference planets. However, if $a_M / D$ increases for larger planet mass, which seems likely given that a larger planet presents a larger target, we expect the large-mass reference planets to show more dependence on oblateness than figure \ref{fig:oblateness} suggests. In general, larger mass planets are gas giants and therefore have higher oblatenesses than rocky planets. Therefore, we expect more dependence on oblateness for gas giants.
 
 
-\subsubsection{Distant moon}
-
-\subsubsection{Close moon}
-
-
-
 
 \section{Interpretation of the Fit Parameters}
-The physical parameters $K_{\ell m}$ resulting from a fit to flyby data, while physical, do not completely describe an asteroid. Since the density distribution of the asteroid has many more degrees of freedom in general than the number of known $K_{\ell m}$, there are often many degenerate density distributions associated with one set of $K_{\ell m}$. As an example, consider a spherical asteroid of radius $A$ and density distribution of the form $\rho(\bm r) = \sum_{\ell m} f_{\ell m}(r) Y_{\ell m}^*(\unit r)$. Then we have
-\begin{equation}
-K_{\ell m} = N_{\ell m} \frac{(-1)^m}{(\ell + m)!(\mu_m a_m^\ell)}\int_0^A r^{2+\ell} dr f_{\ell m}(r)
-\end{equation}
-where $N_{\ell m}$ is given by equation \ref{eqn:nlm}. Thus, $K_{\ell m}$ constrains only the integrals of $f_{\ell m}$, not the functions themselves. By relaxing the assumption that the asteroid is a sphere, even more degeneracy is introduced.
+The physical parameters $K_{\ell m}$ resulting from a fit to flyby data, while physical, do not completely describe an asteroid. Since the density distribution of the asteroid has many more degrees of freedom in general than the number of known $K_{\ell m}$, there are often many degenerate density distributions associated with one set of $K_{\ell m}$.
 
-To avoid this degeneracy, we either (1) assume that the density is constant and solve for the asteroid surface (section \ref{sec:constant-density}), (2) assume that the surface of the asteroid is fixed and solve for $\rho(\bm r)$. In the latter case, we can avoid the above degeneracy either by assuming $\nabla^2 \rho = 0$ (section \ref{sec:laplace-rho}) or by using a numerical approach to find a more characteristic density distribution (section \ref{sec:numerical-density}).
+To avoid this degeneracy, we either (1) assume that the density is constant and solve for the asteroid surface (section \ref{sec:constant-density}), (2) assume that the surface of the asteroid is fixed and solve for the density distribution under various assumptions. (sections \ref{sec:laplace-rho}, \ref{sec:numerical-density}, and \ref{sec:like-density}). In the latter case, we can avoid the above degeneracy either by assuming $\nabla^2 \rho = 0$ (section \ref{sec:laplace-rho}), by using a numerical approach to find an average density distribution (section \ref{sec:numerical-density}), or by associating a likelihood with each density distribution and taking the distribution with maximum likelihood (section \ref{sec:like-density}).
 
-\jtd{Not all of these models will be in the paper. This is a list of all the models I've thought of. I'll give some examples of applying these models to ``realistic'' asteroid density profiles (uniform, regolith over rock, etc) and see what they get, using that filter to describe the best.}
-
-\subsection{Constant Density Asteroid Model}
+\subsection{Constant Density Model}
 \label{sec:constant-density}
 Suppose our asteroid has constant density $\rho_0$ and known parameters $K_{\ell m}$ and $a_m$. We do not expect to solve for $\rho_0$ or equivalently $\mu_m$ since the mass of the asteroid cannot be extracted from tidal torque. However, we can solve for the asteroid shape required to match the known $K_{\ell m}$. In this process, we ignore $a_m$ until the last step, when we rescale the asteroid shape model until the correct $a_m$ is yielded.
 
@@ -626,8 +615,12 @@ where $\bm v (\bm r) = \unit r R_{\ell m} (\bm r) r / (3+\ell) $. We know the ar
   K_{\ell m} = \frac{\rho_m}{\mu_m a_m^\ell(3 + \ell)} \int_0^\pi d\theta \sin \theta\int_0^{2\pi}d\phi r(\theta, \phi)^3 R_{\ell m}(r(\theta, \phi), \theta, \phi).
   \label{eqn:constant-density-klm}
 \end{equation}
-The integrand of each $K_{\ell m}$ therefore is proportional to $r(\theta, \phi)^(3+\ell)$ times constants and a spherical harmonic. We can write $r(\theta \phi) = \sum_{\ell m} Y_{\ell m}^* C_{\ell m}$ without loss of generality, in which case equation \ref{eqn:constant-density-klm} becomes a polynomial of degree $3+\ell$ in terms of $C_{\ell' m'}$ and integrals of products of spherical harmonics. These integrals can be precomputed, since they are taken over the whole sphere $\theta \in (0, \pi)$ and $\phi \in (0, 2\pi)$. Equation \ref{eqn:constant-density-klm} can then be numerically solved to get $C_{\ell m}$. Specifically, the ratios of $K_{\ell m} / K_{\ell 0}$ can be solved for to eliminate the prefactor, then $\rho_m / \mu_m$ chosen such that $K_{00} = 1$. If $n$ values of $K_{\ell m}$ are known, then this method solves exactly for $n$ values of $C_{\ell m}$.
-\jtd{Implement this as a check.}
+The integrand of each $K_{\ell m}$ therefore is proportional to $r(\theta, \phi)^{(3+\ell)}$ times constants and a spherical harmonic. We can write $r(\theta, \phi) = \sum_{\ell m} Y_{\ell m}^* C_{\ell m}$ without loss of generality, in which case equation \ref{eqn:constant-density-klm} becomes a polynomial of degree $3+\ell$ in terms of $C_{\ell' m'}$ and integrals of products of spherical harmonics. These integrals can be precomputed, since they are taken over the whole sphere $\theta \in (0, \pi)$ and $\phi \in (0, 2\pi)$. Equation \ref{eqn:constant-density-klm} can then be numerically solved to get $C_{\ell m}$. To remove the degeneracy caused by the factor of $\rho_m$, we instead solve given constraints of $K_{\ell m} / K_{00}$. (Note that $K_{00} = \rho_m / \mu_m$). We force the solution to reproduce the correct value of $a_m^2/K_{00}$, defined in equation \ref{eqn:am}. We calculate this via
+\begin{equation}
+  a_m^2 = \frac{\rho_m}{\mu_m}\int_\mathcal{A} d^3 r r^2 = \frac{K_{00}}{5}\oint_\mathcal{A} d^2 \bm r \cdot \bm r(r^2) = \frac{K_{00}}{5}\int_0^\pi d\theta \sin\theta \int_0^{2\pi}d\phi r(\theta, \phi)^5.
+\end{equation}
+
+Unfortunately, this method is extremely slow. As mentioned above, the polynomial to be solved is order $3+\ell$ with $L^2$ $C_{\ell m}$ components, where $L$ is the maximum value of $\ell$ considered. This makes the number of terms $(L^2)^{3+L} = O(L^L)$. It is therefore exponential in the level of $L$ fitted.
 
 
 \subsubsection{Special Case: Constant Density Ellipsoid}
@@ -646,7 +639,7 @@ Again, the density of this asteroid cannot be extracted because, as is a general
 \label{sec:laplace-rho}
 Now suppose the shape of the asteroid is known, perhaps by a simplifying guess or perhaps by direct observation during a flyby. Then a density distribution $\rho(\bm r)$ can be solved for which is consistent with observed values of $K_{\ell m}$. Supposing $\nabla^2 \rho = 0$ and removing terms which are undefined at $r=0$, we write $\rho(\bm r) = \sum_{\ell m} C_{\ell m} R_{\ell m}^* a_m^\ell \mu_m$. Thus, $K_{\ell m} = \sum_{\ell' m'} C_{\ell' m'} B_{\ell \ell' m m'}$ where
 \begin{equation}
-  B_{\ell \ell' m m'} = \int_{\mathcal{A}}d^3 r R_{\ell m}(\bm r) R_{\ell' m')}(\bm r)
+  B_{\ell \ell' m m'} = \int_{\mathcal{A}}d^3 r R_{\ell m}(\bm r) R_{\ell' m'}(\bm r)
   \label{eqn:blm}
 \end{equation}
 can be precomputeded due to the shape of $\mathcal{A}$ being known.
@@ -660,7 +653,7 @@ Physically, there is no reason to expect $\nabla^2 \rho = 0$. However, the space
 
 Note that if $\mathcal{A}$ is assumed to be a sphere, $B_{\ell \ell' m m'} \propto \delta_{\ell \ell'} \delta_{m m'}$ and $B_{\ell \ell m m}$ can be computed analytically. Thus, the matrix inversion step is not required in this case.
 
-\subsection{Fixed Surface Numerical Model}
+\subsection{Fixed Surface Ensemble Average Model}
 \label{sec:numerical-density}
 Now we approach the problem of solving for the density distribution of an asteroid from the $K_{\ell m}$ parameters with more general assumptions. Suppose the shape of the asteroid is known, where ``known'' in this case means that an indicator function $\mathds{1}(\bm r)$ exists such that $\mathds{1}(\bm r) = 1$  inside the asteroid and 0 elsewhere. Then we suggest a numerical algorithm to compute a representative distribution of the asteroid density distribution. Given $n$ known values of $K_{\ell m}$, the algorithm proceeds as follows.
 \begin{enumerate}
@@ -672,6 +665,21 @@ Now we approach the problem of solving for the density distribution of an astero
 \end{enumerate}
 
 \jtd{What does this give mathematically?}
+
+\subsection{Fixed Surface Maximum Likelihood Finite Element Model}
+\label{sec:like-density}
+We present a final method to extract the density distribution of an asteroid with fixed surface and parameters $K_{\ell m}$. Suppose the asteroid is divided into $N$ finite, constant density units with volume $\Delta V$ (a square grid, for instance). We further write the density of the $i$th unit as $\mu_m / (N \Delta V)C_i$, where $C_i$ is a free real parameter. Approximating each unit as small, we may write 
+\begin{equation}
+  K_{\ell m} = \frac{1}{Na_m^\ell} \sum_i^N C_i R_{\ell m}(\bm r_i)
+  \label{eqn:klm-finite-constraint}
+\end{equation}
+where $\bm r_i$ are the centers of the units. Equation \ref{eqn:klm-finite-constraint} is a matrix equation, which can be written in the form $\bm K = A \bm C$ where $K_{\ell m}$ have been arranged as a vector and $\bm C$ contains the $N$ values of $C_i$. The matrix $A$ is non-square and cannot be inverted to find $\bm C$ because equation \ref{eqn:klm-finite-constraint} has many solutions. However, by imposing a probability distribution on $\bm C$, we find one configuration of $\bm C$ that maximizes likelihood.
+
+Suppose that the likelihood for $\bm C$ is multivariate-Gaussian distributed with no correlation, meaning that the log-likelihood is $\ln \mathcal{L} \propto -(x - \mu)^2$. We expect that $C_{i}$ average to one by the definition of $C_i$, so we set $\mu = 1$. Thus, the value of $\bm C$ we choose is the value which minimizes $|\bm C - \bm 1|^2$, where $\bm 1$ is an $N$-dimensional vector of only ones.
+
+This problem has already been solved in the context of the Moore-Penrose pseudoinverse. First, we define $\bm k = \bm K - A\bm 1$, so that if $\bm k = A \bm c$, then $\bm C = \bm c + 1$ solves equation \ref{eqn:klm-finite-constraint}. We therefore attempt to minimize $|\bm c|^2$ to maximize the likelihood of density distributions.
+
+The Moore-Penrose pseudoinverse of $A$ is defined as $A^+ = A^* (AA^*)^{-1}$, where $A^*$ is the adjoint of $A$. Ref. \cite{Barata2012} gives that all solutions to $\bm k = A \bm c$ are given by $\bm c = A^+\bm k + (\mathds{1}-A^+A)\bm z$ for any vector $\bm z$. Solving $\nabla_z c^2 = 0$ with this formula requires that $\bm z$ is an eigenvector of $\mathds{1}-A^+A$ with eigenvalue zero. The linearity of equation \ref{eqn:klm-finite-constraint} requires that, even if there are multiple zero-eigenvalue eigenvectors of $\mathds{1}-A^+A$, they must correspond to the same solution of $\bm c$. Thus, the density distribution of the asteroid is uniquely determined.
 
 
 
@@ -751,6 +759,7 @@ Figure \ref{fig:example-residuals} demonstrates that a good fit to data was achi
 
 
 
+%\bibliography{asteroids}{}
 \bibliography{blank}{}
 \bibliographystyle{aasjournal}
 
