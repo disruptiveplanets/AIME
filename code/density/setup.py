@@ -5,7 +5,7 @@ DIVISION = 100
 MAX_RADIUS = 2001
 pos_array = np.arange(-MAX_RADIUS, MAX_RADIUS, DIVISION)
 
-TYPE = 0
+TYPE = 3
 
 if TYPE == 0:
     TAG = "asym-ell"
@@ -25,6 +25,18 @@ elif TYPE == 1:
     c = np.sqrt(5/3) * A_M * np.sqrt(1 + 4 * KLMS[8])
     def indicator(pos):
         return pos[0] * pos[0]/(a*a) + pos[1] * pos[1]/(b*b) + pos[2] * pos[2]/(c*c) < 1
+elif TYPE == 2:
+    TAG = "asym-sph"
+    KLMS = [1.0, 0, 0, 0, 0.05200629, 0, 0, 0, -0.2021978]
+    A_M = 1000
+    def indicator(pos):
+        return pos[0] * pos[0] + pos[1] * pos[1] + pos[2] * pos[2] < (A_M * A_M * 5/3)
+elif TYPE == 3:
+    TAG = "sym-sph"
+    KLMS = [1.0, 0, 0, 0, 0, 0, 0, 0, -0.09766608]
+    A_M = 1000
+    def indicator(pos):
+        return pos[0] * pos[0] + pos[1] * pos[1] + pos[2] * pos[2] < (A_M * A_M * 5/3)
 else:
     KLMS = None
     A_M = None

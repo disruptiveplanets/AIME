@@ -6,6 +6,9 @@ from multiprocessing import Pool
 
 plt.style.use("jcap")
 
+VERY_SMALL = 1
+NUM_SLICES = 5
+EXPAND_X=1.15
 
 
 
@@ -62,6 +65,51 @@ def show_cross_section(densities, fname):
     plt.tight_layout()
     plt.savefig(fname)
 
+def make_slices(densities, name):
+    fig = plt.figure(figsize=(8,5))
+    ax = fig.gca(projection='3d')
+    #ax.set_axis_off()
+    ax.grid(False)
+
+    levels = np.linspace(0, np.nanmax(densities / np.nanmean(densities)), 40)
+    mins = np.min(np.where(~np.isnan(densities)), axis=1)
+    maxes = np.max(np.where(~np.isnan(densities)), axis=1)
+
+
+    for i in range(mins[2], maxes[2], (maxes[2] - mins[2])//NUM_SLICES):
+        z = pos_array[i]
+        ax.contourf(pos_array, pos_array, z+densities[:,:,i]*VERY_SMALL / np.nanmean(densities),
+            zdir='z', levels=z+VERY_SMALL*levels, cmap='plasma')
+
+    ax.view_init(elev=10, azim=45)
+
+    fig2 = plt.figure()
+    ax2 = fig2.gca()
+    contour_handle = ax2.contourf(pos_array, pos_array, densities[:,:,0], levels=levels, cmap='plasma')
+
+    max_radius = max([max(abs(pos_array[mins[i]]), abs(pos_array[maxes[i]])) for i in range(len(densities.shape))])
+
+    ax.set_xlim3d(-max_radius * EXPAND_X / 2, max_radius * EXPAND_X / 2)
+    ax.set_ylim3d(-max_radius * EXPAND_X / 2, max_radius * EXPAND_X / 2)
+    ax.set_zlim3d(-max_radius / 2, max_radius / 2)
+
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_zticks([])
+
+    ax.set_xlabel("$x$")
+    ax.set_ylabel("$y$")
+    ax.set_zlabel("$z$")
+
+    c = fig.colorbar(contour_handle, ax=ax)
+    c.set_label("$\\eta / \overline{\\eta}$")
+
+    fig.tight_layout()
+    fig.savefig(name+".pdf")
+    fig.savefig(name+".png")
+
+    plt.show()
+
 def make_figs(barename):
     print(barename.upper())
     with open("data/"+barename+".dat", 'rb') as f:
@@ -71,10 +119,11 @@ def make_figs(barename):
     show_cross_section(densities, "figs/"+barename+".png")
     show_cross_section(densities, "figs/"+barename+".pdf")
     print("Cross section done")
+    make_slices(densities, "figs/"+barename+"-slice.png")
 
 if __name__ == "__main__":
-    #make_figs(TAG+"-harmonic")
+    make_figs(TAG+"-harmonic")
     make_figs(TAG+"-surface")
-    #make_figs(TAG+"-likelihood")
-    #make_figs(TAG+"-ensemble")
+    make_figs(TAG+"-likelihood")
+    make_figs(TAG+"-ensemble")
     plt.show()

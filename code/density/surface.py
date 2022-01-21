@@ -149,11 +149,10 @@ if __name__ == "__main__":
 
     def multi_solve(seed):
         res = root(solve_function, seed, args=(hlm_coeffs, radius_coeffs))
-        if res.success:
-            success, densities = write_densities(res.x)
-            if success:
-                print(res.x)
-                return densities
+        success, densities = write_densities(res.x)
+        if success:
+            print(res.x)
+            return densities
         return None
 
     #res = [multi_solve(s) for s in seeds]
