@@ -18,7 +18,6 @@ from scipy import optimize
 from scipy.linalg import pinvh
 from mpmath import mp
 import plotille
-import display, collect
 
 import numdifftools as nd
 
@@ -37,7 +36,7 @@ DISTANCE_RATIO_CUTS = [
     [2.0, None],
     [-2.0, None]
 ]
-THRESHOLD_LIKE_RAT = 2
+THRESHOLD_LIKE_RAT = 1e6
 
 GM = 3.986004418e14
 EARTH_RADIUS = 6_370_000
