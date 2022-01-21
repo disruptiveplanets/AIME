@@ -16,6 +16,7 @@ sigma-products.pdf data/probe-sigma/sigmas.pdf
 sigma-ratios.pdf data/probe-ratio-prod/ratios-prod.pdf
 
 oblateness.pdf data/oblateness/oblateness.pdf
+oblateness-differ.pdf data/oblateness-differ/oblateness-differ.pdf
 
 nominal-data-sym.pdf code/other-figs/model-spread/spin-chaos-sym.pdf
 nominal-data-asym.pdf code/other-figs/model-spread/spin-chaos-asym.pdf

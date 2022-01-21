@@ -23,8 +23,10 @@ for bare in file_names:
         if not file[-11:] == "samples.npy": continue
         with open("{}/{}".format(bare, file), 'rb') as f:
             array = np.load(f)
-        
+        if array.shape[1] == 0:
+            continue
         flat_samples = array.reshape(-1, array.shape[-1])
+        print(array.shape)
 
         # Get means
         means = np.mean(flat_samples, axis=0)
