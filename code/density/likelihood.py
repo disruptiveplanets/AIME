@@ -1,7 +1,5 @@
 import numpy as np
 from scipy.linalg import pinv, norm
-from scipy.sparse.linalg import eigsh
-from matplotlib import pyplot as plt
 from setup import *
 
 max_index = None
@@ -63,7 +61,7 @@ if __name__ == "__main__":
     densities = write_densities(c)
     print(f"Wrote densities")
 
-    with open("data/likelihood.dat", 'wb') as f:
+    with open("data/"+TAG+"-likelihood.dat", 'wb') as f:
         np.save(f, densities)
     
     radius = get_radius(densities)

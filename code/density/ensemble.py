@@ -1,4 +1,3 @@
-import density
 from setup import *
 from multiprocessing import Pool
 import numpy as np
@@ -63,7 +62,7 @@ if __name__ == "__main__":
     
     densities = np.mean(density_list, axis=0)
 
-    with open("data/ensemble.dat", 'wb') as f:
+    with open("data/"+TAG+"-ensemble.dat", 'wb') as f:
         np.save(f, densities)
     
     radius = get_radius(densities)

@@ -5,16 +5,31 @@ DIVISION = 100
 MAX_RADIUS = 2001
 pos_array = np.arange(-MAX_RADIUS, MAX_RADIUS, DIVISION)
 
-KLMS = [
-    1.0,
-    0, 0, 0,
-    0.03, 0, 0, 0, -0.1,
-]
+TYPE = 0
 
-A_M = 1000
-
-def indicator(pos):
-    return pos[0] * pos[0] + pos[1] * pos[1] + pos[2] * pos[2] < 1000**2
+if TYPE == 0:
+    TAG = "asym-ell"
+    KLMS = [1.0, 0, 0, 0, 0.05200629, 0, 0, 0, -0.2021978]
+    A_M = 1000
+    a = np.sqrt(5/3) * A_M * np.sqrt(1 - 2 * KLMS[8] + 12 * KLMS[4])
+    b = np.sqrt(5/3) * A_M * np.sqrt(1 - 2 * KLMS[8] - 12 * KLMS[4])
+    c = np.sqrt(5/3) * A_M * np.sqrt(1 + 4 * KLMS[8])
+    def indicator(pos):
+        return pos[0] * pos[0]/(a*a) + pos[1] * pos[1]/(b*b) + pos[2] * pos[2]/(c*c) < 1
+elif TYPE == 1:
+    TAG = "sym-ell"
+    KLMS = [1.0, 0, 0, 0, 0, 0, 0, 0, -0.09766608]
+    A_M = 1000
+    a = np.sqrt(5/3) * A_M * np.sqrt(1 - 2 * KLMS[8] + 12 * KLMS[4])
+    b = np.sqrt(5/3) * A_M * np.sqrt(1 - 2 * KLMS[8] - 12 * KLMS[4])
+    c = np.sqrt(5/3) * A_M * np.sqrt(1 + 4 * KLMS[8])
+    def indicator(pos):
+        return pos[0] * pos[0]/(a*a) + pos[1] * pos[1]/(b*b) + pos[2] * pos[2]/(c*c) < 1
+else:
+    KLMS = None
+    A_M = None
+    def indicator(pos):
+        return None
 
 ######################################################
 

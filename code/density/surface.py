@@ -3,10 +3,10 @@ from scipy.special import lpmv, factorial
 from scipy.optimize import root
 from multiprocessing import Pool
 from setup import *
-from functools import lru_cache
+#from functools import lru_cache
 
 INTEGRAL_WIDTH = 200
-NUM_THREADS = 7
+NUM_THREADS = 24
 
 realized_hlms = []
 for l in range(MAX_L+1):
@@ -141,7 +141,7 @@ def write_densities(clms):
 if __name__ == "__main__":
     hlm_coeffs, radius_coeffs = generate_integrals()
     print("Calculated integrals")
-    #print(solve_function([np.sqrt(5/3) * 1000, 0, 0, 0], hlm_coeffs, radius_coeffs))
+    #print(solve_function([np.sqrt(5/3) * 1000, 0, 0, 0, 0, 0, 0, 0, 0], hlm_coeffs, radius_coeffs))
 
     seeds = []
     for i in range(NUM_THREADS):
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     print(f"There were {len(valids)} valid densities with {NUM_THREADS} threads")
 
     densities = np.mean(valids, axis=0)
-    with open("data/surface.dat", 'wb') as f:
+    with open("data/"+TAG+"-surface.dat", 'wb') as f:
         np.save(f, densities)
     
     radius = get_radius(densities)

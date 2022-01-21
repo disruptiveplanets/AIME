@@ -1,8 +1,5 @@
-import sys
 import numpy as np
-from scipy.linalg import pinv, norm
-from scipy.sparse.linalg import eigsh
-from matplotlib import pyplot as plt
+from scipy.linalg import pinv
 from setup import *
 from multiprocessing import Pool
 
@@ -13,7 +10,7 @@ def compute_b(l, m, lp, mp):
         for y in pos_array:
             for z in pos_array:
                 if indicator([x, y, z]):
-                    integral += rlm(l, m, [x, y, z]) * rlm(lp, mp, [x, y, z]).conj() 
+                    integral += rlm(l, m, [x, y, z]) * rlm(lp, mp, [x, y, z]).conj() / A_M**l
     return integral * DIVISION**3
 
 def wrapped_b(args):
@@ -30,7 +27,7 @@ def compute_v(l, m):
         for y in pos_array:
             for z in pos_array:
                 if indicator([x, y, z]):
-                    integral += (x*x + y*y + z*z) * rlm(l, m, [x, y, z]).conj() 
+                    integral += (x*x + y*y + z*z) * rlm(l, m, [x, y, z]).conj() / A_M**2
     return integral * DIVISION**3
 
 def get_clms():
@@ -47,7 +44,11 @@ def get_clms():
     B.append(v)
     A = np.array(B)
 
-    data = np.append(complex_hlms, A_M**2)
+    data = []
+    for l in range(MAX_L+1):
+        for m in range(-l, l+1):
+            data.append(complex_hlms[get_index(l, m)] / A_M**l)
+    data.append(1)
     clms = np.matmul(pinv(A), data)
     return clms
 
@@ -68,7 +69,7 @@ if __name__ == "__main__":
     clms = get_clms()
     densities = write_density(clms)
 
-    with open("data/harmonic.dat", 'wb') as f:
+    with open("data/"+TAG+"-harmonic.dat", 'wb') as f:
         np.save(f, densities)
     
     radius = get_radius(densities)
