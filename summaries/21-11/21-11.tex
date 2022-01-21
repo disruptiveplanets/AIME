@@ -534,20 +534,30 @@ Also shown in figures \ref{fig:probe-space-sigma} and \ref{fig:probe-space-corr}
 \subsection{Dependence on observational precision}
 \label{sec:probe-sigma}
 
-Depending on the size of the asteroid, its orbital elements, and the availability of observation, uncertainty on the rotational pole of the asteroid is expected to vary between flybys. A detailed model of uncertainty in the rotational pole of the asteroid (a model that might simulate a full lightcurve, for example) is beyond the scope of this paper. However, in this section we demonstrate how the uncertainty in the fit parameters is governed by the experimental uncertainty in rotational pole $\sigma_\theta$ as a rule-of-thumb to guide future investigation.
+Depending on the size of the asteroid, its orbital elements, and the availability of observation, uncertainty on the rotational pole of the asteroid is expected to vary between flybys. A detailed model of uncertainty in the rotational pole of the asteroid (a model that might simulate a full lightcurve, for example) is beyond the scope of this paper. However, in this section we demonstrate how the uncertainty in the fit parameters is governed by the observational uncertainty in rotational pole $\sigma_\theta$ and in the period $\sigma_\rho$  as a rule-of-thumb to guide future investigation.
 
 We represent 1-$\sigma$ uncertainty in the fit parameters as the difference between the 84th or 15th percentile of the marginal posterior PDF for each fit parameter and its mean. For a multivariate gaussian posterior PDF (which must also have gaussian marginal PDFs), this 1-$\sigma$ uncertainty is exactly the standard deviation of the marginal PDF. We perform a similar exercise for the 2-$\sigma$ uncertainty.
 
-These uncertainties in fit parameters are observed to scale precisely with $\sigma_\theta$, except where $\sigma_\theta$ is large enough that the fit parameter uncertainty is comparable to the size of the prior PDF. Figure \ref{fig:probe-sigma} shows the $\sigma / \sigma_\theta$ ratio for all 10 of the first two orders of parameters ($\gamma_0$, $K_{2m}$, and $K_{3m}$). The ratio of $\sigma_\rho$ to $\sigma_\theta$ is kept constant. The result is executed for the asymmetric asteroid model. The figure demonstrates that the ratio $\sigma/\sigma_\theta$ is constant for all values of $\sigma_\theta$ except large values. It also demonstrates that the posterior marginal PDFs are largely symmetric, in that the lower uncertainty is roughly equal to the upper uncertainty.
+We expect that high observational uncertainty corresponds to high uncertainty in the best-fit parameters. To show this trend, in figure \ref{fig:probe-sigma-product} we plot the best-fit uncertainty as a function of the product of the two uncertainty types, with the ratio fixed at $\sigma_\rho / \sigma_\theta = 10^{-5}$ (the benchmark value) so that we are only sensitive to the total uncertainty. To check deviation from a linear trend, we plot the ratio of fit uncertainty to $\sigma_\theta$. The figure shows no deviation from a linear trend except for high observational uncertainty, at which point the posterior distributions begin to fill the prior distributions and are no longer Gaussian.observations.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.8\textwidth]{probe-sigma.pdf}
-  \caption{Ratio of 1- and 2-$\sigma$ uncertainties of the marginal PDFs to the observational uncertainty $\sigma_\theta$ as a function of $\sigma_\theta$. Except at large $\sigma_\theta$, the ratio is observed to be constant. The asymmetric asteroid benchmark is used. Values of the ratio for other asteroid models can be computed from figure \ref{fig:probe-space-sigma}.}
-  \label{fig:probe-sigma}
+  \includegraphics[width=0.9\textwidth]{sigma-products.pdf}
+  \caption{Ratio of 1- and 2-$\sigma$ uncertainties of the marginal PDFs to the observational uncertainty $\sigma_\theta$ as a function of the product $\sigma_\theta\sigma_\rho$. A horizontal line divides the precise $\ell=2$ parameters from the others. Except at large $\sigma_\theta$, the ratio is observed to be constant. The asymmetric asteroid benchmark is used. Values of the ratio for other asteroid models can be computed from figure \ref{fig:probe-space-sigma}.}
+  \label{fig:probe-sigma-product}
 \end{figure}
 
-Due to the constancy of the ratio of fit to observational uncertainty, the ratio can be extracted for other asteroid configurations from figure \ref{fig:probe-space-sigma}, and we are not much concerned with the value of $\sigma_\theta$ used throughout this paper because we are aware that results can be easily rescaled.
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\textwidth]{sigma-ratios.pdf}
+  \caption{1- and 2-$\sigma$ uncertainties of the marginal PDFs as a function of the ratio $\sigma_\rho / \sigma_\theta$. A horizontal line divides the precise $\ell=2$ parameters from the others. Period uncertainty $\sigma_\rho$ is shown to be more vital than pole uncertainty $\sigma_\theta$.}
+  \label{fig:probe-sigma-ratio}
+\end{figure}
+
+
+To test the relative importance of $\sigma_\rho$ and $\sigma_\theta$, we also show best-fit uncertainty as a function of the ratio $\sigma_\rho / \sigma_\theta$ with the product fixed at $\sigma_\rho \sigma_\theta = 10^{-7}$ (the benchmark value) in figure \ref{fig:probe-sigma-ratio}. If $\sigma_\rho$ and $\sigma_\theta$ were interchangeable in terms of their effect on precision of the posterior distributions, (e.g., if the experimental uncertainty were a function of $\sigma_\rho \sigma_\theta$ we might expect no dependence on the ratio of the uncertainties. However, we see relatively low uncertainty for low $\sigma_\rho / \sigma_\theta$ in figure \ref{fig:probe-sigma-ratio}, with roughly stable (or slightly decreasing) fit uncertainty for $\sigma_\rho \approx \sigma_\theta$. Therefore, for fixed product $\sigma_\rho \sigma_\theta$, low $\sigma_\rho$ compared to $\sigma_\theta$ will yield more precise fits.
+
+Due to the constancy of the ratio of fit to observational uncertainty for fixed $\sigma_\rho \sigma_\theta$, the ratio can be extracted for other asteroid configurations from figure \ref{fig:probe-space-sigma}, and we are not much concerned with the value of $\sigma_\theta$ used throughout this paper because we are aware that results can be easily rescaled.
 
 
 \subsection{Dependence on cadence}
@@ -596,31 +606,39 @@ Figure \ref{fig:oblateness} also includes reference Solar System $J_{2}$ values 
 
 
 \section{Interpretation of the Fit Parameters}
-The physical parameters $K_{\ell m}$ resulting from a fit to flyby data, while physical, do not completely describe an asteroid. Since the density distribution of the asteroid has many more degrees of freedom in general than the number of known $K_{\ell m}$, there are often many degenerate density distributions associated with one set of $K_{\ell m}$.
+The previous sections have demonstrated that the parameters $K_{\ell m}$ can be extracted from a fit to spin data taken of an asteroid encounter given $a_m$. However, the most interesting physical property of the asteroid is the interior density distribution $\rho(\bm r)$. Unfortunately, the density distribution is strongly degenerate given fixed parameters $K_{\ell m}$ and $a_m$. In this section, we outline four methods to extract density distributions under assumptions that reduce the degeneracy.
 
-To avoid this degeneracy, we either (1) assume that the density is constant and solve for the asteroid surface (section \ref{sec:constant-density}), (2) assume that the surface of the asteroid is fixed and solve for the density distribution under various assumptions. (sections \ref{sec:laplace-rho}, \ref{sec:numerical-density}, and \ref{sec:like-density}). In the latter case, we can avoid the above degeneracy either by assuming $\nabla^2 \rho = 0$ (section \ref{sec:laplace-rho}), by using a numerical approach to find an average density distribution (section \ref{sec:numerical-density}), or by associating a likelihood with each density distribution and taking the distribution with maximum likelihood (section \ref{sec:like-density}).
+The first simplifying step we take is to extract $\eta(\bm r) = \rho(\bm r) / \mu_m$ instead of $\rho(\bm r)$ from $K_{\ell m}$ and $a_m$; we do this because tidal torque data is not affected by the mass of the asteroid and the average density of the asteroid will therefore never be constrained. We further simplify matters by defining $H_{\ell m} = a_m^\ell K_{\ell m}$, so that the task is to find $\eta(\bm r)$ such that 
+\begin{equation}
+  a_m^2 = \int_{\mathcal{A}} d^3 r \eta(\bm r) r^2 \qquad H_{\ell m} = \int_{\mathcal{A}} d^3 r \eta(\bm r) R_{\ell m}(\bm r) 
+  \label{eqn:density-constraints}
+\end{equation}
+is satisfied with $a_m^2$ and $H_{\ell m}$ known. We made the shift from $K_{\ell m}$ to $H_{\ell m}$ because the constraints are now linear in $\eta(\bm r)$; thus, if $\eta_1(\bm r)$ and $\eta_2(\bm r)$ both satisfy equation \ref{eqn:density-constraints}, then $(\eta_1 + \eta_2) / 2$ does as well.
+
+Equation \ref{eqn:density-constraints} amounts to $N$ constraints, when $N$ values of $H_{\ell m}$ are known. This is because $H_{00} = 1$ by definition.
+
+To resolve further degeneracy, we either assume (1) that the density $\eta$ is constant and solve for the shape (section \ref{sec:constant-density}), or (2) that the shape is fixed and solve for $\eta(\bm r)$. In the latter case, a further simplification is needed. We propose three models: one in which $\nabla^2 \eta = 0$ (section \ref{sec:laplace-rho}), one which averages over an ensemble of extracted distributions (section \ref{sec:numerical-density}), and one which defines a likelihood on density distributions and find that which maximizes the likelihood (section \ref{sec:like-density}).
+
 
 \subsection{Constant Density Model}
 \label{sec:constant-density}
-Suppose our asteroid has constant density $\rho_0$ and known parameters $K_{\ell m}$ and $a_m$. We do not expect to solve for $\rho_0$ or equivalently $\mu_m$ since the mass of the asteroid cannot be extracted from tidal torque. However, we can solve for the asteroid shape required to match the known $K_{\ell m}$. In this process, we ignore $a_m$ until the last step, when we rescale the asteroid shape model until the correct $a_m$ is yielded.
-
-Suppose the asteroid is ``star shaped'' in that every point on its surface maps to a unique set of spherical coordinates $\theta, \phi$, and $r(\theta, \phi)$. We use the helpful identity
+Suppose our asteroid has constant density $\eta_0$ and known parameters $H_{\ell m}$ and $a_m^2$, and that the asteroid is ``star shaped'' in that every point on its surface maps to a unique set of spherical coordinates $\theta, \phi$, and $r(\theta, \phi)$. We use the helpful identity
 \begin{equation}
-  K_{\ell m} = \frac{\rho_m}{\mu_m a_m^\ell} \int_\mathcal{A} d^3 r R_{\ell m} (\bm r)
-   = \frac{\rho_m}{\mu_m a_m^\ell} \int_\mathcal{A} d^3 r \nabla \cdot \bm v (\bm r)
-    = \frac{\rho_m}{\mu_m a_m^\ell} \oint_{\partial \mathcal{A}} d^2 \bm r \cdot \bm v (\bm r)
+  H_{\ell m} = \eta_0 \int_\mathcal{A} d^3 r R_{\ell m} (\bm r)
+   = \eta_0 \int_\mathcal{A} d^3 r \nabla \cdot \bm v (\bm r)
+    = \eta_0 \oint_{\partial \mathcal{A}} d^2 \bm r \cdot \bm v (\bm r)
 \end{equation}
 where $\bm v (\bm r) = \unit r R_{\ell m} (\bm r) r / (3+\ell) $. We know the area element satisfies $d^2 \bm r = \partial \bm r / \partial \theta \times \partial \bm r / \partial \phi$ in our coordinates, and when dotted with $\bm v \propto \unit r$, this gives
 \begin{equation}
-  K_{\ell m} = \frac{\rho_m}{\mu_m a_m^\ell(3 + \ell)} \int_0^\pi d\theta \sin \theta\int_0^{2\pi}d\phi r(\theta, \phi)^3 R_{\ell m}(r(\theta, \phi), \theta, \phi).
+  H_{\ell m} = \frac{\eta_0 }{3 + \ell} \int_0^\pi d\theta \sin \theta\int_0^{2\pi}d\phi r(\theta, \phi)^3 R_{\ell m}(r(\theta, \phi), \theta, \phi).
   \label{eqn:constant-density-klm}
 \end{equation}
-The integrand of each $K_{\ell m}$ therefore is proportional to $r(\theta, \phi)^{(3+\ell)}$ times constants and a spherical harmonic. We can write $r(\theta, \phi) = \sum_{\ell m} Y_{\ell m}^* C_{\ell m}$ without loss of generality, in which case equation \ref{eqn:constant-density-klm} becomes a polynomial of degree $3+\ell$ in terms of $C_{\ell' m'}$ and integrals of products of spherical harmonics. These integrals can be precomputed, since they are taken over the whole sphere $\theta \in (0, \pi)$ and $\phi \in (0, 2\pi)$. Equation \ref{eqn:constant-density-klm} can then be numerically solved to get $C_{\ell m}$. To remove the degeneracy caused by the factor of $\rho_m$, we instead solve given constraints of $K_{\ell m} / K_{00}$. (Note that $K_{00} = \rho_m / \mu_m$). We force the solution to reproduce the correct value of $a_m^2/K_{00}$, defined in equation \ref{eqn:am}. We calculate this via
+The integrand of each $H_{\ell m}$ therefore is proportional to $r(\theta, \phi)^{(3+\ell)}$ times constants and a spherical harmonic. We can write $r(\theta, \phi) = \sum_{\ell m} Y_{\ell m}^* C_{\ell m}$ without loss of generality, in which case equation \ref{eqn:constant-density-klm} becomes a polynomial of degree $3+\ell$ in terms of $C_{\ell' m'}$ and integrals of products of spherical harmonics. These integrals can be precomputed, since they are taken over the whole sphere $\theta \in (0, \pi)$ and $\phi \in (0, 2\pi)$. Equation \ref{eqn:constant-density-klm} can then be numerically solved to get $C_{\ell m}$. To remove the degeneracy caused by the factor of $\eta_0$, we evaluate $H_{\ell m} / H_{00}$ instead of $H_{\ell m}$. We also force the solution to reproduce the correct value of $a_m^2/H_{00}$, calculated as
 \begin{equation}
-  a_m^2 = \frac{\rho_m}{\mu_m}\int_\mathcal{A} d^3 r r^2 = \frac{K_{00}}{5}\oint_\mathcal{A} d^2 \bm r \cdot \bm r(r^2) = \frac{K_{00}}{5}\int_0^\pi d\theta \sin\theta \int_0^{2\pi}d\phi r(\theta, \phi)^5.
+  a_m^2 = \eta_0 \int_\mathcal{A} d^3 r r^2 = \frac{\eta_0}{5}\oint_\mathcal{A} d^2 \bm r \cdot \bm r(r^2) = \frac{\eta_0}{5}\int_0^\pi d\theta \sin\theta \int_0^{2\pi}d\phi r(\theta, \phi)^5.
 \end{equation}
 
-Unfortunately, this method is extremely slow. As mentioned above, the polynomial to be solved is order $3+\ell$ with $L^2$ $C_{\ell m}$ components, where $L$ is the maximum value of $\ell$ considered. This makes the number of terms $(L^2)^{3+L} = O(L^L)$. It is therefore exponential in the level of $L$ fitted.
+Unfortunately, this method is extremely slow. As mentioned above, the polynomial to be solved is order $3+\ell$ with $L^2$ $C_{\ell m}$ components, where $L$ is the maximum value of $\ell$ considered. This makes the number of terms $(L^2)^{3+L} = O(L^L)$.
 
 
 \subsubsection{Special Case: Constant Density Ellipsoid}
@@ -637,49 +655,48 @@ Again, the density of this asteroid cannot be extracted because, as is a general
 
 \subsection{Fixed Surface $\nabla^2 \rho = 0$ model}
 \label{sec:laplace-rho}
-Now suppose the shape of the asteroid is known, perhaps by a simplifying guess or perhaps by direct observation during a flyby. Then a density distribution $\rho(\bm r)$ can be solved for which is consistent with observed values of $K_{\ell m}$. Supposing $\nabla^2 \rho = 0$ and removing terms which are undefined at $r=0$, we write $\rho(\bm r) = \sum_{\ell m} C_{\ell m} R_{\ell m}^* a_m^\ell \mu_m$. Thus, $K_{\ell m} = \sum_{\ell' m'} C_{\ell' m'} B_{\ell \ell' m m'}$ where
+Now suppose the shape of the asteroid is known, perhaps by a simplifying guess or perhaps by direct observation during a flyby. Then a density distribution $\eta(\bm r)$ can be solved for which is consistent with observed values of $H_{\ell m}$ and $a_m^2$. Supposing $\nabla^2 \eta = 0$, we write $\eta(\bm r) = \sum_{\ell m} C_{\ell m} R_{\ell m}(\bm r)^*$. Thus, $H_{\ell m} = \sum_{\ell' m'} C_{\ell' m'} B_{\ell \ell' m m'}$ and $a_m^2 = \sum_{\ell' m'} C_{\ell' m'} v_{\ell' m'}$ where
 \begin{equation}
-  B_{\ell \ell' m m'} = \int_{\mathcal{A}}d^3 r R_{\ell m}(\bm r) R_{\ell' m'}(\bm r)
+  B_{\ell \ell' m m'} = \int_{\mathcal{A}}d^3 r R_{\ell m}(\bm r) R_{\ell' m'}(\bm r)^* \qquad v_{\ell' m'} = \int_{\mathcal{A}}d^3 r R_{\ell' m'}(\bm r)^* r^2
   \label{eqn:blm}
 \end{equation}
-can be precomputeded due to the shape of $\mathcal{A}$ being known.
-If we write $K_{\ell m}$ as a vector $\bm K$ and similarly for $\bm C$, we can write $B_{\ell \ell' m m'}$ as a matrix $\hat B$, obtaining $\bm K = \hat B \bm C$. It follows that the density distribution coefficients are given by
+can be precomputeded due to the shape of $\mathcal{A}$ being known. If we write $H_{\ell m}$ as a vector $\bm H$ and similarly for $\bm C$, we can write $B_{\ell \ell' m m'}$ as a matrix $B$, obtaining $\bm H = B \bm C$. Combining this with the equation $a_m^2 = \bm v \cdot \bm C$, we get an overdetermined matrix equation $\bm d = A \bm C$ where $A$ is $B$ with $\bm v$ added as an additional row, and $\bm d$ is $\bm H$ with $a_m^2$ added. It follows that the density distribution coefficients that minimize the least squares distance between $\bm d$ and $A \bm C$ are 
 \begin{equation}
-\bm C = \hat B^{-1} \bm K.
+\bm C = A^+ \bm d
 \end{equation}
-The scale parameter $a_m$ can be computed from the resulting values of $\bm C$ and the distance scale can be adjusted until $a_m$ matches the true value. As before, $\mu_m$ is a free parameter representing the impossibility of fitting for the mass of the asteroid. Since only a finite number of $K_{\ell m}$ are known, we can only solve for a finite number of $C_{\ell m}$ and neglect the higher order terms.
+where $A^+$ is the Moore-Penrose pseudoinverse \cite{Barata2012}, defined by $A^+ = A^* (AA^*)^{-1}$ where $A^*$ is the adjoint of $A$.
 
-Physically, there is no reason to expect $\nabla^2 \rho = 0$. However, the space of density distributions with $\nabla^2 \rho = 0$ is a useful proxy for the true density distribution, since this section demonstrates how the density distribution can be solved for within this subspace. Conceptually, the density distribution derived from the $C_{\ell m}$s can be viewed as a projection from the true density distribution into the closest density distribution with $\nabla^2 \rho = 0$ everywhere.
-
-Note that if $\mathcal{A}$ is assumed to be a sphere, $B_{\ell \ell' m m'} \propto \delta_{\ell \ell'} \delta_{m m'}$ and $B_{\ell \ell m m}$ can be computed analytically. Thus, the matrix inversion step is not required in this case.
+Physically, there is no reason to expect $\nabla^2 \rho = 0$. However, the density distribution derived from the $C_{\ell m}$s can be viewed as a projection from the true density distribution into the closest density distribution with $\nabla^2 \rho = 0$ everywhere, and therefore an approximation of the true distribution. This formulation for the density distribution of the asteroid is also conceptually useful because when $\mathcal{A}$ is spherical, $B_{\ell \ell' m m'} \propto \delta_{\ell \ell'} \delta_{m m'}$. Thus, the fit coefficients $K_{\ell m}$ are proportional to $C_{\ell m}$, with proportionality constants governed by the values of $B_{\ell \ell' m m'}$ and $a_m^\ell$. For a nearly spherical asteroid, small off-diagonal terms will be added to $B$, but we still expect $K_{\ell m}$ to roughly correspond to $C_{\ell m}$.
 
 \subsection{Fixed Surface Ensemble Average Model}
 \label{sec:numerical-density}
-Now we approach the problem of solving for the density distribution of an asteroid from the $K_{\ell m}$ parameters with more general assumptions. Suppose the shape of the asteroid is known, where ``known'' in this case means that an indicator function $\mathds{1}(\bm r)$ exists such that $\mathds{1}(\bm r) = 1$  inside the asteroid and 0 elsewhere. Then we suggest a numerical algorithm to compute a representative distribution of the asteroid density distribution. Given $n$ known values of $K_{\ell m}$, the algorithm proceeds as follows.
+Now we approach the problem of solving for the density distribution of an asteroid from $H_{\ell m}$ and $a_m$ with more general assumptions. Suppose the shape of the asteroid is known, where ``known'' in this case means that an indicator function $\mathds{1}(\bm r)$ exists such that $\mathds{1}(\bm r) = 1$  inside the asteroid and 0 elsewhere. Then we suggest a numerical algorithm to compute a representative distribution of the asteroid density distribution as follows.
 \begin{enumerate}
 \item Fill the asteroids with $n$ uniformly random ``seed points'' by distributing them inside a bounding box containing the asteroid and rejecting those with positions $\bm r_i$ such that $\mathds{1}(\bm r_i) = 0.$
-\item Construct $n$ regions $\mathcal{R}_i$around each point such that the $i$th region is the set of all points inside the asteroid closest to the $i$th point. Suppose $R_i$ has uniform density $\rho_i$.
-\item For each region, compute $\overline K_{\ell m}^i = \frac{1}{\mu_m a_m^\ell}\int_{\mathcal{R}_i} d^3 r R_{\ell m}(\bm r)$. Once again, $\mu_m$ is a free parameter and units can be chosen such that $a_m=1$. Then %we can write $K_{\ell m} = \sum_i \rho_i \overline K_{\ell m}^i$.
-\item Write $\overline K_{\ell m}^i$ as a square matrix $\hat{\overline K}$ with columns indexed by $i$ and rows indexed by $\ell$ and $m$. Invert it to get $\bm \rho = \hat {\overline K}^{-1} \bm K$.
-\item Go back to step 1 and compute new density maps with new draws of seed points. Since $K_{\ell m}$ is linear in $\rho$, the average density distribution also satisfies the fitted $K_{\ell m}$. Use the average as the asteroid density distribution.
+\item Construct $n$ regions $\mathcal{V}_i$around each point such that the $i$th region is the set of all points inside the asteroid closest to the $i$th point. Suppose $\mathcal{V}_i$ has uniform density $\rho_i$.
+\item Equation \ref{eqn:density-constraints} then becomes two linear equations $a_m^2 = \bm v \cdot \bm \rho$ and $\bm H = A \bm \rho$ where $\rho_i$ are the components of $\bm \rho$ and $\bm H$ are $H_{\ell m}$ arranged as a vector. The components of $\bm v$ and the matrix $A$ are given by
+\begin{equation}
+  v_i = \int_{\mathcal{V}_i} d^3 r r^2 \qquad A_{(\ell m),j} = \int_{\mathcal{V}_i} d^3 r R_{\ell m}.
+\end{equation}
+Precompute $\bm v$ and $A$.
+\item We can write equation \ref{eqn:density-constraints} now as a matrix equation $\bm d = M\rho$, where $M = A$ with $\bm v$ added as an additional row, and $\bm d = \bm K$ with $a_m^2$ added in the corresponding entry. Thus, $\bm \rho = M^{-1} \bm d$ can be directly computed. Note that $M$ is $N +1 \times N+1$, with the extra constraint enforcing that $\int_\mathcal{A} d^3 r\eta(\bm r) = 1$.
+\item Go back to step 1 and compute new density maps with new draws of seed points. After sufficiently many computations, return the average of all the density distributions.
 \end{enumerate}
-
-\jtd{What does this give mathematically?}
 
 \subsection{Fixed Surface Maximum Likelihood Finite Element Model}
 \label{sec:like-density}
-We present a final method to extract the density distribution of an asteroid with fixed surface and parameters $K_{\ell m}$. Suppose the asteroid is divided into $N$ finite, constant density units with volume $\Delta V$ (a square grid, for instance). We further write the density of the $i$th unit as $\mu_m / (N \Delta V)C_i$, where $C_i$ is a free real parameter. Approximating each unit as small, we may write 
+We present a final method to extract the density distribution of an asteroid with fixed surface and parameters $H_{\ell m}$ and $a_m^2$. Suppose the asteroid is divided into $N$ finite, constant density units with volume $\Delta V$ (a square grid, for instance). We further write the density of the $i$th unit as $\eta_i = C_i / \Delta V$, where $C_i$ is a free real parameter. Approximating each unit as small, we may write 
 \begin{equation}
-  K_{\ell m} = \frac{1}{Na_m^\ell} \sum_i^N C_i R_{\ell m}(\bm r_i)
+  a_m^2 = \sum_i^N C_i r_i^2 \qquad H_{\ell m} = \sum_i^N C_i R_{\ell m}(\bm r_i)
   \label{eqn:klm-finite-constraint}
 \end{equation}
-where $\bm r_i$ are the centers of the units. Equation \ref{eqn:klm-finite-constraint} is a matrix equation, which can be written in the form $\bm K = A \bm C$ where $K_{\ell m}$ have been arranged as a vector and $\bm C$ contains the $N$ values of $C_i$. The matrix $A$ is non-square and cannot be inverted to find $\bm C$ because equation \ref{eqn:klm-finite-constraint} has many solutions. However, by imposing a probability distribution on $\bm C$, we find one configuration of $\bm C$ that maximizes likelihood.
+where $\bm r_i$ are the centers of the units. Equation \ref{eqn:klm-finite-constraint} is a matrix equation, which can be written in the form $\bm d = A \bm C$ where $a_m$ and $H_{\ell m}$ have been arranged as a vector $\bm d$ and $\bm C$ contains the $N$ values of $C_i$. The matrix $A$ is non-square and cannot be inverted to find $\bm C$ because equation \ref{eqn:klm-finite-constraint} has many solutions. However, by imposing a probability distribution on $\bm C$, we find one configuration of $\bm C$ that maximizes likelihood.
 
-Suppose that the likelihood for $\bm C$ is multivariate-Gaussian distributed with no correlation, meaning that the log-likelihood is $\ln \mathcal{L} \propto -(x - \mu)^2$. We expect that $C_{i}$ average to one by the definition of $C_i$, so we set $\mu = 1$. Thus, the value of $\bm C$ we choose is the value which minimizes $|\bm C - \bm 1|^2$, where $\bm 1$ is an $N$-dimensional vector of only ones.
+Suppose that the likelihood for $\bm C$ is multivariate independent Gaussian distributed with each $C_i$ having the same standard deviation. The log-likelihood is therefore $\ln \mathcal{L} \propto -(x - \mu)^2$. We expect that $C_{i}$ sum to one by the definition of $C_i$, so we set $\mu = 1/N$. Thus, the value of $\bm C$ we choose is the value which minimizes $|\bm C - \bm 1 /N|^2$, where $\bm 1$ is an $N$-dimensional vector of only ones.
 
-This problem has already been solved in the context of the Moore-Penrose pseudoinverse. First, we define $\bm k = \bm K - A\bm 1$, so that if $\bm k = A \bm c$, then $\bm C = \bm c + 1$ solves equation \ref{eqn:klm-finite-constraint}. We therefore attempt to minimize $|\bm c|^2$ to maximize the likelihood of density distributions.
+This problem has already been solved in the context of the Moore-Penrose pseudoinverse. First, we define $\bm k = \bm K - A\bm 1/N$, so that if $\bm k = A \bm c$, then $\bm C = \bm c + \bm 1/N$ solves equation \ref{eqn:klm-finite-constraint}. We therefore attempt to minimize $|\bm c|^2$ to maximize the likelihood of density distributions.
 
-The Moore-Penrose pseudoinverse of $A$ is defined as $A^+ = A^* (AA^*)^{-1}$, where $A^*$ is the adjoint of $A$. Ref. \cite{Barata2012} gives that all solutions to $\bm k = A \bm c$ are given by $\bm c = A^+\bm k + (\mathds{1}-A^+A)\bm z$ for any vector $\bm z$. Solving $\nabla_z c^2 = 0$ with this formula requires that $\bm z$ is an eigenvector of $\mathds{1}-A^+A$ with eigenvalue zero. The linearity of equation \ref{eqn:klm-finite-constraint} requires that, even if there are multiple zero-eigenvalue eigenvectors of $\mathds{1}-A^+A$, they must correspond to the same solution of $\bm c$. Thus, the density distribution of the asteroid is uniquely determined.
+The Moore-Penrose pseudoinverse of $A$ is defined as $A^+ = A^* (AA^*)^{-1}$, where $A^*$ is the adjoint of $A$ \cite{Barata2012}. The solution that minimizes $|\bm c|^2$ is $\bm c = A^+\bm k$. 
 
 
 

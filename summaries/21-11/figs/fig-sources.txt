@@ -12,7 +12,8 @@ probe-space-ab-1a.pdf data/probe-space/compile-figs/corr1a.pdf
 probe-space-ab-1b.pdf data/probe-space/compile-figs/corr1b.pdf
 probe-space-ab-ab.pdf data/probe-space/compile-figs/corrab.pdf
 
-probe-sigma.pdf data/probe-sigma/sigmas.pdf
+sigma-products.pdf data/probe-sigma/sigmas.pdf
+sigma-ratios.pdf data/probe-ratio-prod/ratios-prod.pdf
 
 oblateness.pdf data/oblateness/oblateness.pdf
 

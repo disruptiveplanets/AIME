@@ -51,47 +51,62 @@ for name in percentiles.keys():
     name_index[name] = int(dir_name[-2:])
     true_sigmas.append(sigma[0])
     ratio = sigma[1]
+    print(ratio)
 
 true_sigmas = np.array(true_sigmas)
 
-fig, axs = plt.subplots(figsize=(10, 8), ncols=2, nrows=5, sharex=True)
+fig, axs = plt.subplots(figsize=(14, 8), ncols=3, nrows=4, sharex=True)
 axs = axs.reshape(-1)
+i = 0
 
-for i in range(N_DIM):
-    param_data = np.zeros(len(true_sigmas) * N_PERCENTILES).reshape(N_PERCENTILES, len(true_sigmas))
+for plot_index in range(N_DIM+1):
+    if plot_index == 9:
+        continue
+    product = true_sigmas**2 * ratio
+    param_data = np.zeros(len(product) * N_PERCENTILES).reshape(N_PERCENTILES, len(product))
     for f in percentiles.keys():
         param_data[:,name_index[f]] = percentiles[f][i]
     scale = 10**5 if i < 3 else 1
-    axs[i].plot(true_sigmas**2 * ratio, (param_data[1]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
-    axs[i].plot(true_sigmas**2 * ratio, (param_data[-1]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
-    axs[i].fill_between(true_sigmas**2 * ratio, (param_data[1]-param_data[0]) / true_sigmas * scale, 
+
+    axs[plot_index].plot(product, (param_data[1]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].plot(product, (param_data[-1]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].fill_between(product, (param_data[1]-param_data[0]) / true_sigmas * scale, 
         (param_data[-1]-param_data[0]) / true_sigmas * scale,  color=f"C{i}", alpha=0.3)
 
-    axs[i].plot(true_sigmas**2 * ratio, (param_data[2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
-    axs[i].plot(true_sigmas**2 * ratio, (param_data[-2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
-    axs[i].fill_between(true_sigmas**2 * ratio, (param_data[2]-param_data[0]) / true_sigmas * scale,
+    axs[plot_index].plot(product, (param_data[2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].plot(product, (param_data[-2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].fill_between(product, (param_data[2]-param_data[0]) / true_sigmas * scale,
         (param_data[-2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", alpha=0.3)
 
-    axs[i].plot(true_sigmas**2 * ratio, (param_data[3]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+    axs[plot_index].plot(product, (param_data[3]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
 
-    axs[i].set_xscale('log')
     if i < 3:
-        axs[i].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta\\ (\\times 10^{{-5}})$", size=AXIS_SIZE)
+        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta\\ (\\times 10^{{-5}})$", size=AXIS_SIZE)
     else:
-        axs[i].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta$", size=AXIS_SIZE)
+        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta$", size=AXIS_SIZE)
 
-    if i == 9 or i == 8:
-        axs[i].set_xlabel(f"$\sigma_\\theta\sigma_\\rho$")
+    axs[plot_index].set_xscale('log')
+    
+    if plot_index in [6, 8, 10]:
+        axs[plot_index].set_xlabel(f"$\sigma_\\theta\sigma_\\rho$")
 
     print(f"{param_names[i]}:\t mean:{np.mean((param_data[3]-param_data[0]) / true_sigmas)}\t"+
         f"95\% high: {np.mean((param_data[1]-param_data[0]) / true_sigmas)}\t 95\% low: {np.mean((param_data[-1]-param_data[0]) / true_sigmas)}\t"+
         f"68\% high: {np.mean((param_data[2]-param_data[0]) / true_sigmas)}\t 68\% low: {np.mean((param_data[-2]-param_data[0]) / true_sigmas)}")
+    i += 1
+
+axs[9].remove()
+axs[11].remove()
 
 custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=4, alpha=0.6),
                 Line2D([0], [0], color='k', lw=1, linestyle='dashed')]
-fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='lower center', prop={'size': LEGEND_SIZE})
+fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='lower right', prop={'size': LEGEND_SIZE})
 fig.tight_layout()
+
+line = plt.Line2D([0,1],[0.77, 0.77], transform=fig.transFigure, color="black")
+fig.add_artist(line)
+
 plt.savefig("sigmas.pdf")
 plt.savefig("sigmas.png")
 plt.show()
