@@ -12,3 +12,4 @@ I finished my checks and started making paper figures. I also made the slice plo
     * Symmetric and asymmetric models with correct ellipsoid forms
     * Symmetric and asymmetric models with spheres
     * ???
+Need to review the surface model I think, and the layer figure. Then put these in the paper.
