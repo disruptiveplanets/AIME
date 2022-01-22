@@ -178,7 +178,7 @@ class Display:
         asteroids_max_j, asteroids_max_k = f.readline().split(', ')
         self.maxj = int(asteroids_max_j)
         self.maxk = int(asteroids_max_k)
-        self.cadence = int(f.readline())
+        self.cadence = int(float(f.readline()))
         self.impact_parameter = EARTH_RADIUS * float(f.readline())
         self.radius = float(f.readline())
         self.speed = float(f.readline())

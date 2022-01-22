@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "oblateness-differ"
+PATH = "scan-cadence"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1

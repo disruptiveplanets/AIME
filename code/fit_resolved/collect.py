@@ -39,7 +39,7 @@ def collect(d, bare):
     f = open("../../staged/"+bare+".txt", 'r')
     max_j, max_l = f.readline().split(", ")
     max_j, max_l = (int(max_j), int(max_l))
-    cadence = int(f.readline())
+    cadence = int(float(f.readline()))
     impact_parameter = int(f.readline())
     radius = float(f.readline())
     speed = float(f.readline())

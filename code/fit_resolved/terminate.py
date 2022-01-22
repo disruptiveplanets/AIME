@@ -16,7 +16,7 @@ def terminal(output_name, do_not_duplicate=True):
 
     f = open("../../staged/" + output_name+".txt", 'r')
     f.readline()
-    cadence = int(f.readline())
+    cadence = int(float(f.readline()))
     perigee = EARTH_RADIUS * float(f.readline())
     radius = float(f.readline())
     speed = float(f.readline())
@@ -135,5 +135,5 @@ if __name__ == "__main__":
                 continue
             run_names.append(name[:-4])
 
-        with Pool() as pool:
+        with Pool(16) as pool:
             pool.map(wrap_terminal, run_names)
