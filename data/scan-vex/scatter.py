@@ -6,14 +6,14 @@ LOW_ORDER_INDEX = 1
 BASE_NAME = f"vex"
 LOW_V_EX= 1000
 HIGH_V_EX = 10000
-NUM_DIVISIONS = 48 # Run with 8 cores per process.
+NUM_DIVISIONS = 48 # Run with 12 cores per process.
 LOW_ORDER = [(0.39269908169, 0, -0.09766608), (0.39269908169, 0.05200629, -0.2021978)][LOW_ORDER_INDEX]
 HIGH_ORDER = [0, 0, 0, 0, 0, 0, 0]
 
 # Fix product, vary ratio
 
 def get_text(perigee):
-    return """0, 2
+    return """0, 3
 120
 5
 1000

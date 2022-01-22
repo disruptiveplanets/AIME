@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 LOW_ORDER_INDEX = 1
-BASE_NAME = f"perigee"
+BASE_NAME = f"peri"
 LOW_PERIGEE = 2
 HIGH_PERIGEE = 50
 NUM_DIVISIONS = 48 # Run with 12 cores per process.
@@ -13,7 +13,7 @@ HIGH_ORDER = [0, 0, 0, 0, 0, 0, 0]
 # Fix product, vary ratio
 
 def get_text(perigee):
-    return """0, 2
+    return """0, 3
 120
 {}
 1000
