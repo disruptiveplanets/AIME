@@ -7,9 +7,9 @@ from multiprocessing import Pool
 plt.style.use("jcap")
 
 VERY_SMALL = 1
-NUM_SLICES = 5
-EXPAND_X=1.15
-
+NUM_SLICES = 6
+EXPAND_X=1.15 # Scale along x and y so that spheres look circular
+AXIS_LIMIT = 1000
 
 
 def make_gif(densities, fname, duration):
@@ -31,7 +31,7 @@ def make_frame(densities, z_index):
     fig = plt.figure()
     csection = densities[:,:,z_index] / np.nanmean(densities)
     c = plt.pcolormesh(pos_array, pos_array, csection.transpose()   , shading='auto',
-        vmin=0,
+        vmin=np.nanmin(densities / np.nanmean(densities)),
         vmax=np.nanmax(densities / np.nanmean(densities)),
         cmap='plasma')
     plt.colorbar(c, label="$\\eta / \overline{\\eta}$")
@@ -50,7 +50,7 @@ def show_cross_section(densities, fname):
     plt.figure()
     csection = densities[:,:,densities.shape[-1]//2] / np.nanmean(densities)
     plt.pcolormesh(pos_array, pos_array, csection.transpose(), shading='auto',
-        vmin=0,
+        vmin=np.nanmin(densities / np.nanmean(densities)),
         vmax=np.nanmax(densities / np.nanmean(densities)),
         cmap='plasma')
     c = plt.colorbar()
@@ -68,15 +68,19 @@ def show_cross_section(densities, fname):
 def make_slices(densities, name):
     fig = plt.figure(figsize=(8,5))
     ax = fig.gca(projection='3d')
-    #ax.set_axis_off()
+    ax.set_axis_off()
     ax.grid(False)
 
-    levels = np.linspace(0, np.nanmax(densities / np.nanmean(densities)), 40)
+    if np.nanmin(densities) != np.nanmax(densities):
+        levels = np.linspace(np.nanmin(densities / np.nanmean(densities)), np.nanmax(densities / np.nanmean(densities)), 40)
+    else:
+        levels = np.linspace(0.99, 1.01, 40)
     mins = np.min(np.where(~np.isnan(densities)), axis=1)
     maxes = np.max(np.where(~np.isnan(densities)), axis=1)
 
 
-    for i in range(mins[2], maxes[2], (maxes[2] - mins[2])//NUM_SLICES):
+    for i in np.linspace(mins[2], maxes[2], NUM_SLICES):
+        i = int(i)
         z = pos_array[i]
         ax.contourf(pos_array, pos_array, z+densities[:,:,i]*VERY_SMALL / np.nanmean(densities),
             zdir='z', levels=z+VERY_SMALL*levels, cmap='plasma')
@@ -87,11 +91,13 @@ def make_slices(densities, name):
     ax2 = fig2.gca()
     contour_handle = ax2.contourf(pos_array, pos_array, densities[:,:,0], levels=levels, cmap='plasma')
 
-    max_radius = max([max(abs(pos_array[mins[i]]), abs(pos_array[maxes[i]])) for i in range(len(densities.shape))])
-
+    '''max_radius = max([max(abs(pos_array[mins[i]]), abs(pos_array[maxes[i]])) for i in range(len(densities.shape))])
     ax.set_xlim3d(-max_radius * EXPAND_X / 2, max_radius * EXPAND_X / 2)
     ax.set_ylim3d(-max_radius * EXPAND_X / 2, max_radius * EXPAND_X / 2)
-    ax.set_zlim3d(-max_radius / 2, max_radius / 2)
+    ax.set_zlim3d(-max_radius / 2, max_radius / 2)'''
+    ax.set_xlim3d(-AXIS_LIMIT * EXPAND_X, AXIS_LIMIT * EXPAND_X)
+    ax.set_ylim3d(-AXIS_LIMIT * EXPAND_X, AXIS_LIMIT * EXPAND_X)
+    ax.set_zlim3d(-AXIS_LIMIT, AXIS_LIMIT)
 
     ax.set_xticks([])
     ax.set_yticks([])
@@ -108,8 +114,6 @@ def make_slices(densities, name):
     fig.savefig(name+".pdf")
     fig.savefig(name+".png")
 
-    plt.show()
-
 def make_figs(barename):
     print(barename.upper())
     with open("data/"+barename+".dat", 'rb') as f:
@@ -119,11 +123,11 @@ def make_figs(barename):
     show_cross_section(densities, "figs/"+barename+".png")
     show_cross_section(densities, "figs/"+barename+".pdf")
     print("Cross section done")
-    make_slices(densities, "figs/"+barename+"-slice.png")
+    make_slices(densities, "figs/"+barename+"-slice")
 
 if __name__ == "__main__":
     make_figs(TAG+"-harmonic")
     make_figs(TAG+"-surface")
     make_figs(TAG+"-likelihood")
     make_figs(TAG+"-ensemble")
-    plt.show()
+    #plt.show()
