@@ -26,3 +26,32 @@ example-corner.pdf code/other-figs/example-corner/sigma-1-00-0-corner.pdf
 
 nominal-covariance.pdf code/fit_resolved/random-figs/random-vector-unc.pdf
 nominal-norm.pdf code/fit_resolved/random-figs/random-vector-norm.pdf
+
+cadence-precision.pdf data/scan-cadence/cadences.pdf
+cadence-accuracy.pdf data/scan-cadence/differ.pdf
+
+harmonic-asym-ell.pdf code/density/figs/asym-ell-harmonic-slice.pdf
+ensemble-asym-ell.pdf code/density/figs/asym-ell-ensemble-slice.pdf
+likelihood-asym-ell.pdf code/density/figs/asym-ell-likelihood-slice.pdf
+surface-asym.pdf code/density/figs/asym-ell-surface-slice.pdf
+
+harmonic-sym-ell.pdf code/density/figs/sym-ell-harmonic-slice.pdf
+ensemble-sym-ell.pdf code/density/figs/sym-ell-ensemble-slice.pdf
+likelihood-sym-ell.pdf code/density/figs/sym-ell-likelihood-slice.pdf
+surface-sym.pdf code/density/figs/sym-ell-surface-slice.pdf
+
+harmonic-asym-sph.pdf code/density/figs/asym-sph-harmonic-slice.pdf
+ensemble-asym-sph.pdf code/density/figs/asym-sph-ensemble-slice.pdf
+likelihood-asym-sph.pdf code/density/figs/asym-sph-likelihood-slice.pdf
+
+harmonic-sym-sph.pdf code/density/figs/sym-sph-harmonic-slice.pdf
+ensemble-sym-sph.pdf code/density/figs/sym-sph-ensemble-slice.pdf
+likelihood-sym-sph.pdf code/density/figs/sym-sph-likelihood-slice.pdf
+
+harmonic-tet.pdf code/density/figs/tet-harmonic-slice.pdf
+ensemble-tet.pdf code/density/figs/tet-ensemble-slice.pdf
+likelihood-tet.pdf code/density/figs/tet-likelihood-slice.pdf
+
+harmonic-dumb-bell.pdf code/density/figs/dumb-bell-harmonic-slice.pdf
+ensemble-dumb-bell.pdf code/density/figs/dumb-bell-ensemble-slice.pdf
+likelihood-dumb-bell.pdf code/density/figs/dumb-bell-likelihood-slice.pdf

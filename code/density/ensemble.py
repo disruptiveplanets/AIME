@@ -69,4 +69,4 @@ if __name__ == "__main__":
     print(f"Radius: {radius}\tTrue radius: {A_M}")
     for l in range(MAX_L+1):
         for m in range(-l, l+1):
-            print(f"Klm: {get_hlms(l, m, densities)}\tTrue Klm: {complex_hlms[get_index(l, m)]}")
+            print(f"Hlm: {get_hlms(l, m, densities)}\tTrue Hlm: {complex_hlms[get_index(l, m)]}")

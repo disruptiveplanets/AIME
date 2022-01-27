@@ -5,9 +5,9 @@ from scipy.linalg import norm
 DIVISION = 50
 MAX_RADIUS = 2001
 pos_array = np.arange(-MAX_RADIUS, MAX_RADIUS, DIVISION)
-TET_SHRINK = np.sqrt(2 * 0.90233392 / 1.19533216 - 1)
+TET_SHRINK = 1#np.sqrt(2 * 0.90233392 / 1.19533216 - 1)
 
-TYPE = 0
+TYPE = 4
 
 if TYPE == 0:
     TAG = "asym-ell"
@@ -42,8 +42,8 @@ elif TYPE == 3:
 elif TYPE == 4:
     TAG = "tet"
     KLMS = [1.0, 0, 0, 0, 0, 0, 0, 0, 0]
-    A_M = 505.1
-    tet_corners = 1000 * np.array([
+    A_M = 1000
+    tet_corners = 1.82688329031 * A_M * np.array([
         (1, 0, -1/np.sqrt(2)*TET_SHRINK),
         (-1, 0, -1/np.sqrt(2)*TET_SHRINK),
         (0, 1, 1/np.sqrt(2)*TET_SHRINK),
@@ -60,7 +60,7 @@ elif TYPE == 4:
         return np.all([np.dot(pos, tet_norms[i]) / d[i] < 1 for i in range(4)])
 elif TYPE == 5:
     TAG = "dumb-bell"
-    db_rad = 1000
+    db_rad = 1200
     KLMS = [1.0, 0, 0, 0, 25/608, 0, 0, 0, -25/304]
     A_M = np.sqrt(19/20) * db_rad
     def indicator(pos):

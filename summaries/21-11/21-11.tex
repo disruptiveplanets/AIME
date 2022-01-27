@@ -561,7 +561,25 @@ Due to the constancy of the ratio of fit to observational uncertainty for fixed 
 
 
 \subsection{Dependence on cadence}
+To analyze the degree to which our fit accuracy and precision depends on the rapidity of observation, we simulate a flyby of the reference asteroid with data taken at fixed intervals (``cadences'') of 2 minutes to one hour, perform a fit to each, and compare the precision and accuracy of the fit results as a function of cadence.
 
+Figure \ref{fig:cadence-precision} shows the 68th and 95th percentiles of the posterior PDF for each fit parameter as a function of evenly-spaced cadences from 2 to 60 minutes. The percentiles are divided by $\sigma_\theta$ (which is constant in this figure) since they are expected to be linearly proportional to $\sigma_\theta$ in general. As expected, the precision of the fit result decreases with increased cadence (less data). However, the decrease is not uniform. All parameters show a slow increase in posterior PDF width until $\Delta t \approx 40 \siunit{min}$, at when a sharp increase PDF width occurs, often followed by a slight decrease before the uncertainty rises again. \jtd{Say more about this once the orbital information comes through}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{cadence-precision.pdf}
+  \caption{The 68th and 95th percentile envelopes for the posterior PDFs associated with ten fit parameters as a function of the cadence of the data set, plotted as a function of cadence.}
+  \label{fig:cadence-precision}
+\end{figure}
+
+Figure \ref{fig:cadence-accuracy} shows the difference between best fit parameter results and the true values as a function of cadence. No divergence is seen between then true and best-fit results for high cadence, demonstrating that even a small amount of data is sufficient to extract accurate parameters for the asteroid density distribution, albeit with the precision penalties shown in figure \ref{fig:cadence-precision}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{cadence-accuracy.pdf}
+  \caption{The difference between the fit parameters and the true parameters, with 68th and 95th percentile envelopes shown, for ten fit parameters as a function of cadence. No significant divergence is seen for high cadence.}
+  \label{fig:cadence-accuracy}
+\end{figure}
 
 \subsection{Dependence on orbital parameters}
 
@@ -636,12 +654,12 @@ where $\bm v (\bm r) = \unit r R_{\ell m} (\bm r) r / (3+\ell) $. We know the ar
   H_{\ell m} = \frac{\eta_0 }{3 + \ell} \int_0^\pi d\theta \sin \theta\int_0^{2\pi}d\phi r(\theta, \phi)^3 R_{\ell m}(r(\theta, \phi), \theta, \phi).
   \label{eqn:constant-density-klm}
 \end{equation}
-The integrand of each $H_{\ell m}$ therefore is proportional to $r(\theta, \phi)^{(3+\ell)}$ times constants and a spherical harmonic. We can write $r(\theta, \phi) = \sum_{\ell m} Y_{\ell m}^* C_{\ell m}$ without loss of generality, in which case equation \ref{eqn:constant-density-klm} becomes a polynomial of degree $3+\ell$ in terms of $C_{\ell' m'}$ and integrals of products of spherical harmonics. These integrals can be precomputed, since they are taken over the whole sphere $\theta \in (0, \pi)$ and $\phi \in (0, 2\pi)$. Equation \ref{eqn:constant-density-klm} can then be numerically solved to get $C_{\ell m}$. To remove the degeneracy caused by the factor of $\eta_0$, we evaluate $H_{\ell m} / H_{00}$ instead of $H_{\ell m}$. We also force the solution to reproduce the correct value of $a_m^2/H_{00}$, calculated as
+The integrand of each $H_{\ell m}$ therefore is proportional to $r(\theta, \phi)^{(3+\ell)}$ times constants and a spherical harmonic. We can write $r(\theta, \phi) = \sum_{\ell m} Y_{\ell m}^* C_{\ell m}$ without loss of generality.  To keep $r(\theta, \phi) \in \mathds{R}$, we require $C_{\ell m}^* = (-1)^m (\ell-m)!/(\ell+m) C_{l,-m}$ so that the $\ell, m$ term of the sum for $r$ is the conjugate of the $\ell, -m$ term.
+
+With this definition of $r(\theta, \phi)$, equation \ref{eqn:constant-density-klm} becomes a polynomial of degree $3+\ell$ in terms of $C_{\ell' m'}$ and integrals of products of spherical harmonics. These integrals can be precomputed, since they are taken over the whole sphere $\theta \in (0, \pi)$ and $\phi \in (0, 2\pi)$. Equation \ref{eqn:constant-density-klm} can then be numerically solved to get $C_{\ell m}$. To remove the degeneracy caused by the factor of $\eta_0$, we evaluate $H_{\ell m} / H_{00}$ instead of $H_{\ell m}$. We also force the solution to reproduce the correct value of $a_m^2/H_{00}$, calculated as
 \begin{equation}
   a_m^2 = \eta_0 \int_\mathcal{A} d^3 r r^2 = \frac{\eta_0}{5}\oint_\mathcal{A} d^2 \bm r \cdot \bm r(r^2) = \frac{\eta_0}{5}\int_0^\pi d\theta \sin\theta \int_0^{2\pi}d\phi r(\theta, \phi)^5.
 \end{equation}
-
-Unfortunately, this method is extremely slow. As mentioned above, the polynomial to be solved is order $3+\ell$ with $L^2$ $C_{\ell m}$ components, where $L$ is the maximum value of $\ell$ considered. This makes the number of terms $(L^2)^{3+L} = O(L^L)$.
 
 
 \subsubsection{Special Case: Constant Density Ellipsoid}
@@ -702,27 +720,76 @@ This problem has already been solved in the context of the Moore-Penrose pseudoi
 The Moore-Penrose pseudoinverse of $A$ is defined as $A^+ = A^* (AA^*)^{-1}$, where $A^*$ is the adjoint of $A$ \cite{Barata2012}. The solution that minimizes $|\bm c|^2$ is $\bm c = A^+\bm k$. 
 
 
+\subsection{Comparison of density distribution models}
+In this section, we compare the above methods of extracting asteroid density distributions given sample values for $K_{\ell m}$, to demonstrate their differences in behavior.
+
+The sample $K_{\ell m}$ values we investigate are the symmetric and asymmetric benchmark values listed in appendix \ref{app:reference-config}. We execute the models for both benchmarks, and for the three models which require a fixed surface, we use both a spherical surface (radius equal to $\sqrt{5/3} a_m$) and an elliptical (axes set by section \ref{sec:constant-density-ellipsoid}) model.
+
+Figure \ref{fig:fix-ellipsoid-model-test} shows the density distribution produced by the three methods that fix the surface of the asteroid (the harmonic, ensemble average, and likelihood methods) for the symmetric and asymmetric benchmarks. Since the fixed shape is that of the constant-density ellipsoid associated with the same $K_{\ell m}$s, we expect nearly constant density distributions. The harmonic and likelihood models produce the most uniform density distributions, with the likelihood model producing slightly less uniform distributions for the asymmetric case. The non-uniformity of the harmonic model appears to occur by extreme edges of the asteroid possessing different densities than the majority of the asteroid, whereas the likelihood model appears to establish a more radial gradient. The ensemble average shows a stochastic randomness of the density distribution throughout the asteroid.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.32\textwidth]{harmonic-asym-ell.pdf}
+  \includegraphics[width=0.32\textwidth]{ensemble-asym-ell.pdf}
+  \includegraphics[width=0.32\textwidth]{likelihood-asym-ell.pdf}
+
+  \includegraphics[width=0.32\textwidth]{harmonic-sym-ell.pdf}
+  \includegraphics[width=0.32\textwidth]{ensemble-sym-ell.pdf}
+  \includegraphics[width=0.32\textwidth]{likelihood-sym-ell.pdf}
+  \caption{Density distributions extracted for the harmonic (\textit{left}), ensemble average (\textit{center}), and likelihood (\textit{right}) models, with $K_{\ell m}$ values equal to the asymmetric (\textit{top}) and symmetric (\textit{bottom}) benchmark values, and ellipsoidal shapes equal to the shape of the associated constant-density ellipsoid. The same length scale is used in all six images.}
+  \label{fig:fix-ellipsoid-model-test}
+\end{figure}
+
+In contrast, figure \ref{fig:fix-sphere-model-test} shows density distributions extracted for spherical shapes with the asymmetric and symmetric benchmark $K_{\ell m}$ parameters. As expected, distinctly non-uniform densities are produced; indeed, negative densities are produced. For the ensemble average model, solutions with negative density regions could be discarded. But negative density values for the other two models are unavoidable without changes to the model, such as a different likelihood distribution for the density of each chunk.
+
+Figure \ref{fig:fix-sphere-model-test} shows that the harmonic and likelihood models produce very similar results \jtd{Is this because of non-uniformity in density or because of the spherical surface?}. The ensemble average value again produces a more noisy distribution.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.32\textwidth]{harmonic-asym-sph.pdf}
+  \includegraphics[width=0.32\textwidth]{ensemble-asym-sph.pdf}
+  \includegraphics[width=0.32\textwidth]{likelihood-asym-sph.pdf}
+
+  \includegraphics[width=0.32\textwidth]{harmonic-sym-sph.pdf}
+  \includegraphics[width=0.32\textwidth]{ensemble-sym-sph.pdf}
+  \includegraphics[width=0.32\textwidth]{likelihood-sym-sph.pdf}
+  \caption{Density distributions extracted for the harmonic (\textit{left}), ensemble average (\textit{center}), and likelihood (\textit{right}) models, with $K_{\ell m}$ values equal to the asymmetric (\textit{top}) and symmetric (\textit{bottom}) benchmark values, and spherical shapes with radius $r=\sqrt{5/3} a_m$. The same length scale is used in all six images.}
+  \label{fig:fix-sphere-model-test}
+\end{figure}
+
+In addition to these two shape constraints placed on benchmark asteroid parameters, we consider two asteroid shapes of note: a tetrahedron and a ``dumb-bell.'' These shapes are interesting because tetrahedral shape models for asteroids have hitherto been explored \jtd{Citation needed} and a dumb-bell shape can be taken as a proxy for a contact binary asteroid. The tetrahedron is composed out of four equilateral triangular sides and the dumb-bell consists of two spheres with radius $r$, separated by distance $r/2$. These shapes are fixed and values of $K_{\ell m}$ are calculated assuming constant density. Then the three shape models are run on the resulting $K_{\ell m}$ to reproduce the density distribution of the asteroid (figure \ref{fig:tet-and-db}). Once again, the harmonic and the likelihood models produce nearly uniform density distributions, with the ensemble method also producing a nearly uniform distribution. Similar to before, the likelihood model tends to show radial density distribution and the harmonic model tends to produce axial differences in density. All three models seem well suited for the both shapes.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.32\textwidth]{harmonic-tet.pdf}
+  \includegraphics[width=0.32\textwidth]{ensemble-tet.pdf}
+  \includegraphics[width=0.32\textwidth]{likelihood-tet.pdf}
+
+  \includegraphics[width=0.32\textwidth]{harmonic-dumb-bell.pdf}
+  \includegraphics[width=0.32\textwidth]{ensemble-dumb-bell.pdf}
+  \includegraphics[width=0.32\textwidth]{likelihood-dumb-bell.pdf}
+  \caption{Density distributions extracted for the harmonic (\textit{left}), ensemble average (\textit{center}), and likelihood (\textit{right}) models, with a tetrahedral asteroid shape (\textit{top}) and a ``dumb-bell'' asteroid shape (\textit{bottom}). $K_{\ell m}$ values were extracted assuming uniform density for both asteroids.}
+  \label{fig:tet-and-db}
+\end{figure}
+
+Finally, we discuss the model which fixes constant density and solves for the asteroid surface. This model was run for the two benchmark $K_{\ell m}$ cases considered. A cutout diagram of the resulting density distribution is shown in figure \ref{fig:surface-density-distro}. For the symmetric case, we see an ellipsoid of revolution closely resembling the true asteroid ellipsoid. For the asymmetric case, we see a two-lobed asymmetric formation with equal $K_{\ell m}$ to the asymmetric ellipsoid because a triaxial ellipsoid cannot be represented with spherical harmonics of degree $\ell \leq 2$. The model therefore takes the closest approximating route.
+
+The figure demonstrates the limitations on the uniform density model: only a small number of shapes are accessible given fixed parameters $K_{\ell m}$ which may in fact be drawn from a diverse set of shapes from ellipsoids to tetrahedra to dumb-bells. However, a smooth shape distribution approximating the true distribution can nevertheless be fitted.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.32\textwidth]{surface-asym.pdf}
+  \includegraphics[width=0.32\textwidth]{surface-sym.pdf}
+  \caption{Density distributions extracted for the constant-density model, from the asymmetric (\textit{left}) and symmetric (\textit{right}) benchmark $K_{\ell m}$ parameters.}
+  \label{fig:surface-density-distro}
+\end{figure}
+
+
 
 \section{Uncertainty Testing}
 
 
 \section{Conclusion}
-
-
-\jtd{Talk about the walker spacing: the clamps, the scale with sigma, and the block diagonal hermitian matrices}
-
-\jtd{Talk about first order torque}
-
-\jtd{Talk about how numerical accuracy was chosen}
-
-\jtd{Show plot of likelihood? (May not be necessary, since the corner plots are also shown)}
-
-\jtd{Move up error bar section so that plots can be explained?}
-
-\jtd{Compare the results to gaussians (they are not gaussian near the edges). Could do moment testing, or the Shapiro-Wilk test, which is frequentist so I don't want to do it.}
-
-\jtd{Question: How to express non-gaussianity of distro?}
-\jtd{Question: How important is it that the true value is not reproduced by the fit? Should I try to fix this? It's caused by the Gaussian approximation of the likelihood being incorrectm and by the fact that the data is not quite drawn from the distributions we model in the likeihood (it's drawn from the distribution of the true spin, not the data spin).}
 
 \vspace{5mm}
 \facilities{MIT Supercloud}
@@ -771,11 +838,6 @@ Figure \ref{fig:example-corner} shows a corner plot of the ten fitted parameters
 \end{figure}
 
 Figure \ref{fig:example-residuals} demonstrates that a good fit to data was achieved, despite the small error bars and strong dependence of the model on initial conditions. Figure \ref{fig:example-corner} shows that the posterior distributions are largely Gaussian-distributed, with several of the parameters strongly correlated. The true values lie within $2\sigma$ contours in most cases, as expected. Parameters are computed to very high accuracy --- $O(10^{-7})$ for $\gamma_0$ and $O(10^{-9})$ for $K_{2m}$ (the first tier of parameters as ordered by the sensitivity of the asteroid system to their values), and $O(10^{-4})-O(10^{-6})$ for $K_{3m}$. These ranges should be compared to the width of the prior distributions for these parameters, which is $O(1)$ for all. The success of this fit demonstrates that these higher order parameters can be fitted to data as long as good enough precision on the data is achieved.
-
-
-
-\section{Gaussianity of Parameter Posterior Distributions}
-\label{app:gaussian-posteriors}
 
 
 
