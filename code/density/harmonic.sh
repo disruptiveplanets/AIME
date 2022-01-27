@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Slurm sbatsh options
-#SBATCH -o
+#SBATCH -o harmonic.log
 #SBATCH -c 24
 
 source /etc/profile
