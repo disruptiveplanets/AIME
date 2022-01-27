@@ -11,5 +11,10 @@ Next, I need to run some checks (How to make agreement better for harmonic?) (Is
 I finished my checks and started making paper figures. I also made the slice plot. The paper figures are 
     * Symmetric and asymmetric models with correct ellipsoid forms
     * Symmetric and asymmetric models with spheres
-    * ???
 Need to review the surface model I think, and the layer figure. Then put these in the paper.
+
+## Jan 26 (after wisdom teeth hiatus)
+
+I finished up the above tests and put them in the paper. I also thought of modelling a symmetric tetrahedral asteroid and perhaps a contact binary or an asteroid with a bumps, and implemented the tetrahedron and c.b.
+
+Next I need to figure out algorithm runtime and consider asteroid with bumps? Maybe redundant with other two.

@@ -1,11 +1,13 @@
 import numpy as np
 from scipy.special import lpmv, factorial
+from scipy.linalg import norm
 
-DIVISION = 100
+DIVISION = 50
 MAX_RADIUS = 2001
 pos_array = np.arange(-MAX_RADIUS, MAX_RADIUS, DIVISION)
+TET_SHRINK = np.sqrt(2 * 0.90233392 / 1.19533216 - 1)
 
-TYPE = 3
+TYPE = 0
 
 if TYPE == 0:
     TAG = "asym-ell"
@@ -37,6 +39,34 @@ elif TYPE == 3:
     A_M = 1000
     def indicator(pos):
         return pos[0] * pos[0] + pos[1] * pos[1] + pos[2] * pos[2] < (A_M * A_M * 5/3)
+elif TYPE == 4:
+    TAG = "tet"
+    KLMS = [1.0, 0, 0, 0, 0, 0, 0, 0, 0]
+    A_M = 505.1
+    tet_corners = 1000 * np.array([
+        (1, 0, -1/np.sqrt(2)*TET_SHRINK),
+        (-1, 0, -1/np.sqrt(2)*TET_SHRINK),
+        (0, 1, 1/np.sqrt(2)*TET_SHRINK),
+        (0, -1, 1/np.sqrt(2)*TET_SHRINK)])
+    tet_norms = []
+    for i in range(len(tet_corners)):
+        v1 = tet_corners[i]
+        v2 = tet_corners[(i+1)%4]
+        v3 = tet_corners[(i+2)%4]
+        normal = np.cross(v2-v1, v3-v1)
+        tet_norms.append(normal / norm(normal))
+    d = [np.dot(tet_norms[i], tet_corners[i]) for i in range(4)]
+    def indicator(pos):
+        return np.all([np.dot(pos, tet_norms[i]) / d[i] < 1 for i in range(4)])
+elif TYPE == 5:
+    TAG = "dumb-bell"
+    db_rad = 1000
+    KLMS = [1.0, 0, 0, 0, 25/608, 0, 0, 0, -25/304]
+    A_M = np.sqrt(19/20) * db_rad
+    def indicator(pos):
+        r1 = np.sum((pos - np.array([db_rad/2, 0, 0]))**2)
+        r2 = np.sum((pos + np.array([db_rad/2, 0, 0]))**2)
+        return r1 < db_rad*db_rad or r2 < db_rad*db_rad
 else:
     KLMS = None
     A_M = None
@@ -73,7 +103,7 @@ def rlm(l, m, pos):
     r = np.sqrt(max(0, pos[0] * pos[0] + pos[1] * pos[1] + pos[2] * pos[2]))
     return lpmv(m, l, pos[2] / r) / factorial(l + m) * r**l * np.exp(1j * m * np.arctan2(pos[1], pos[0]))
 
-def get_hlms(l, m, densities, radius):
+def get_hlms(l, m, densities):
     hlm = 0
     for nx, x in enumerate(pos_array):
         for ny, y in enumerate(pos_array):
@@ -90,3 +120,19 @@ def get_radius(densities):
                 if not np.isnan(densities[nx,ny,nz]):
                     rad += densities[nx,ny,nz] * (x**2 + y**2 + z**2)
     return np.sqrt(rad * DIVISION**3)
+
+if __name__ == "__main__":
+    densities = np.full((len(pos_array), len(pos_array), len(pos_array)), np.nan)
+    for nx, x in enumerate(pos_array):
+        for ny, y in enumerate(pos_array):
+            for nz, z in enumerate(pos_array):
+                if indicator([x, y, z]):
+                    densities[nx, ny, nz] = 1
+    densities /= np.nansum(densities) * DIVISION**3
+    radius = get_radius(densities)
+    print(radius, '\t', A_M)
+    i = 0
+    for l in range(3):
+        for m in range(-l, l+1):
+            print(get_hlms(l, m, densities) / radius**l, "\t", complex_hlms[i] / A_M**l)
+            i += 1

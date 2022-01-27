@@ -5,8 +5,9 @@ from multiprocessing import Pool
 from setup import *
 #from functools import lru_cache
 
-INTEGRAL_WIDTH = 200
-NUM_THREADS = 24
+INTEGRAL_WIDTH = 500
+NUM_THREADS = 48
+EPSILON = 1e-10
 
 realized_hlms = []
 for l in range(MAX_L+1):
@@ -94,15 +95,33 @@ def generate_integrals():
     return hlm_coeffs, radius_coeffs
 
 
+def gen_complex_clms(clms):
+    complex_clms = []
+    clm_index = 0
+    for l in range(MAX_L+1):
+        for m in range(-l, l+1):
+            if m < 0:
+                complex_clms.append(clms[clm_index] + 1j * clms[clm_index+1])
+                clm_index += 2
+            if m == 0:
+                complex_clms.append(clms[clm_index])
+                clm_index += 1
+            if m > 0:
+                reciprocal = complex_clms[-2*m]
+                complex_clms.append((-1)**m * factorial(l-m) / factorial(l+m) * reciprocal.conj())
+    return complex_clms
+
+
 def solve_function(clms, hlm_coeffs, radius_coeffs):
     hlms = []
+    complex_clms = gen_complex_clms(clms)
     for l in range(MAX_L+1):
         for m in range(0, l+1):
             hlm = 0
             for i, q in enumerate(make_quantity_lists(l+3)):
                 this_term = hlm_coeffs[get_index(l, m)][i]
                 for clm_index, count in enumerate(q):
-                    this_term *= clms[clm_index]**count
+                    this_term *= complex_clms[clm_index]**count
                 hlm += this_term
             hlms.append(hlm.real)
             if m != 0:
@@ -112,13 +131,14 @@ def solve_function(clms, hlm_coeffs, radius_coeffs):
     for i, q in enumerate(make_quantity_lists(5)):
         this_term = radius_coeffs[i]
         for clm_index, count in enumerate(q):
-            this_term *= clms[clm_index]**count
+            this_term *= complex_clms[clm_index]**count
         radius += this_term
     
     return np.append(hlms[1:], radius.real) / hlms[0].real - data
 
 def write_densities(clms):
     densities = np.full((len(pos_array), len(pos_array), len(pos_array)), np.nan)
+    complex_clms = gen_complex_clms(clms)
     for nx, x in enumerate(pos_array):
         for ny, y in enumerate(pos_array):
             for nz, z in enumerate(pos_array):
@@ -129,7 +149,10 @@ def write_densities(clms):
                 for l in range(MAX_L + 1):
                     for m in range(-l, l+1):
                         index = get_index(l, m)
-                        limit_r += clms[index] * ylms_phi(index)(phi) * ylms_theta(index)(theta)
+                        limit_r += complex_clms[index] * ylms_phi(index)(phi) * ylms_theta(index)(theta)
+
+                if abs(limit_r.imag) > EPSILON:
+                    raise Exception(f"Limit r had imaginary part ({limit_r})")
                 if limit_r.real < 0:
                     return False, None
                 if limit_r.real > r:
@@ -149,9 +172,11 @@ if __name__ == "__main__":
 
     def multi_solve(seed):
         res = root(solve_function, seed, args=(hlm_coeffs, radius_coeffs))
+        if np.any(res.fun > 1):
+            return None
         success, densities = write_densities(res.x)
         if success:
-            print(res.x)
+            print(res.x, res.fun)
             return densities
         return None
 
@@ -164,7 +189,7 @@ if __name__ == "__main__":
             valids.append(d)
     print(f"There were {len(valids)} valid densities with {NUM_THREADS} threads")
 
-    densities = np.mean(valids, axis=0)
+    densities = valids[0]#np.mean(valids, axis=0)
     with open("data/"+TAG+"-surface.dat", 'wb') as f:
         np.save(f, densities)
     
@@ -172,5 +197,5 @@ if __name__ == "__main__":
     print(f"Radius: {radius}\tTrue radius: {A_M}")
     for l in range(MAX_L+1):
         for m in range(-l, l+1):
-            print(f"Klm: {get_hlms(l, m, densities, radius)}\tTrue Klm: {complex_hlms[get_index(l, m)]}")
+            print(f"Hlm: {get_hlms(l, m, densities)}\tTrue Hlm: {complex_hlms[get_index(l, m)]}")
     
