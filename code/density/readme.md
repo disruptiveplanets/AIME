@@ -16,3 +16,11 @@ Need to review the surface model I think, and the layer figure. Then put these i
 ## Jan 26 (after wisdom teeth hiatus)
 
 I finished up the above tests and put them in the paper. I also thought of modelling a symmetric tetrahedral asteroid and perhaps a contact binary or an asteroid with a bumps, and implemented the tetrahedron and c.b. I also fixed the issue with the surface model.
+
+## Jan 27
+
+I refined the parameters to get better estimates and pushed everything to the supercomputer. It appears that this will take a while.
+- Likelihood done ___
+- Harmonic done ___
+- Ensemble done ___
+- Surface done ___

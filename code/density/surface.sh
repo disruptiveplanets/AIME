@@ -2,7 +2,7 @@
 
 # Slurm sbatsh options
 #SBATCH -o surface.log
-#SBATCH -c 48
+#SBATCH -c 24
 
 source /etc/profile
 
