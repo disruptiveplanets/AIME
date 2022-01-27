@@ -3,7 +3,7 @@ from multiprocessing import Pool
 import numpy as np
 from scipy.linalg import inv, norm
 
-NUM_DISTROS = 8*4
+NUM_DISTROS = 48
 
 # Setup provides klm, radius, and indicator
 

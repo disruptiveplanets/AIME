@@ -2,12 +2,12 @@ import numpy as np
 from scipy.special import lpmv, factorial
 from scipy.linalg import norm
 
-DIVISION = 50
+DIVISION = 10
 MAX_RADIUS = 2001
 pos_array = np.arange(-MAX_RADIUS, MAX_RADIUS, DIVISION)
 TET_SHRINK = 1#np.sqrt(2 * 0.90233392 / 1.19533216 - 1)
 
-TYPE = 4
+TYPE = 0
 
 if TYPE == 0:
     TAG = "asym-ell"

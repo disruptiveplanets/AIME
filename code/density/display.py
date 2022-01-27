@@ -79,7 +79,7 @@ def make_slices(densities, name):
     maxes = np.max(np.where(~np.isnan(densities)), axis=1)
 
 
-    for i in np.linspace(mins[2], maxes[2], NUM_SLICES):
+    for i in np.linspace(mins[2]+1, maxes[2]-1, NUM_SLICES):
         i = int(i)
         z = pos_array[i]
         ax.contourf(pos_array, pos_array, z+densities[:,:,i]*VERY_SMALL / np.nanmean(densities),

@@ -5,7 +5,7 @@ from multiprocessing import Pool
 from setup import *
 #from functools import lru_cache
 
-INTEGRAL_WIDTH = 500
+INTEGRAL_WIDTH = 1000
 NUM_THREADS = 48
 EPSILON = 1e-10
 
@@ -172,24 +172,18 @@ if __name__ == "__main__":
 
     def multi_solve(seed):
         res = root(solve_function, seed, args=(hlm_coeffs, radius_coeffs))
-        if np.any(res.fun > 1):
-            return None
         success, densities = write_densities(res.x)
         if success:
             print(res.x, res.fun)
-            return densities
-        return None
+            return np.sum(res.fun**2), densities
+        return np.inf, None
 
     #res = [multi_solve(s) for s in seeds]
     with Pool() as pool:
         res = pool.map(multi_solve, seeds)
-    valids = []
-    for d in res:
-        if d is not None:
-            valids.append(d)
-    print(f"There were {len(valids)} valid densities with {NUM_THREADS} threads")
+    
+    densities = sorted(res, key = lambda x: x[0])[0][1] # Take density with lowest residual
 
-    densities = valids[0]#np.mean(valids, axis=0)
     with open("data/"+TAG+"-surface.dat", 'wb') as f:
         np.save(f, densities)
     
