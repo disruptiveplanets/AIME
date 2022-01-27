@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "scan-cadence"
+PATH = "scan-vex"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1

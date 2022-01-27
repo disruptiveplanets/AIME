@@ -577,13 +577,25 @@ Figure \ref{fig:cadence-accuracy} shows the difference between best fit paramete
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{cadence-accuracy.pdf}
-  \caption{The difference between the fit parameters and the true parameters, with 68th and 95th percentile envelopes shown, for ten fit parameters as a function of cadence. No significant divergence is seen for high cadence.}
+  \caption{The difference between the fit parameters and the true parameters, with 68th and 95th percentile envelopes shown, for ten fit parameters as a function of cadence. No significant divergence is seen for high cadence. \jtd{Is this figure necessary?}}
   \label{fig:cadence-accuracy}
 \end{figure}
 
 \subsection{Dependence on orbital parameters}
 
-\jtd{Do v and rp separately? Perhaps do not map}
+The dependency of the best-fit parameter uncertainty on the orbit of the asteroid is analyzed in this section. We parameterize the orbit by $v_\infty$, the excess velocity, and $r_p$, the distance of the perigee. We do not change the plane of the orbit because this is equivalent to rotating $J_{\ell m}$, and since we use the benchmark model for this section (with a spherical planet) orbital plane changes have no effect.
+
+Figure \ref{fig:scan-vex} shows the best-fit uncertainty divided by (constant) $\sigma_\theta$ as a function of $v_\infty$. The true $K_{\ell m}$ parameters are extracted in all cases, generally with larger uncertainty for large $v_\infty$. This trend is in agreement with intuition, since flybys with larger $v_\infty$ occur over a faster time range. Uncertainty in the high- and low-order parameters increases at a similar rate with $v_\infty$.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{scan-vex.pdf}
+  \caption{Best-fit uncertainties as a function of $v_\infty$, the excess velocity of the asteroid orbit. The three higher order parameters (top) are plotted with the seven lower order parameters. A general trend of increasing uncertainty for higher $v_\infty$ is visible.}
+  \label{fig:scan-vex}
+\end{figure}
+
+Figure \ref{fig:scan-vex} also demonstrates a strong dependence on the exact value of $v_\infty$ through small-scale oscillations in precision as a function of $v_\infty$. This is because uncertainty is strongly dependent on the amplitude of oscillations after the encounter \jtd{how?}, and these oscillations are highly sensitive to initial conditions such as $v_\infty$.
+
 
 \subsection{Dependence on spin pole}
 
@@ -592,9 +604,9 @@ Figure \ref{fig:cadence-accuracy} shows the difference between best fit paramete
 
 \subsection{Dependence on blocking out perigee}
 \label{sec:block-perigee}
-Much of the data available concerning an asteroid's rotational velocity is captured much before or much after the flyby perigee, where tidal torque is low. The angular velocity evolution here is dominated by torque-free precession dictated by the moment of inertia components, so that zero-torque data can still be used to fix $K_{20}$ and $K_{22}$. However, $K_{3m}$ are not extractable from precession data alone. We are therefore curious how much of the sensitivity of the system to $K_{3m}$ components is due only data taken during the encounter perigee.
+Much of the data available concerning an asteroid's rotational velocity is captured long before or after the flyby perigee, where tidal torque is low. The angular velocity evolution here is dominated by torque-free precession dictated by the moment of inertia components, so that zero-torque data can still be used to fix $K_{20}$ and $K_{22}$. However, $K_{3m}$ are not extractable from precession data alone. We are therefore curious how much of the sensitivity of the system to $K_{3m}$ components is due only data taken during the encounter perigee.
 
-To test this, we mask the perigee of the counter by removing data from the period when $D < f_\textrm{mask} r_p$, where $f_\textrm{mask}>1$ is a unit-less fraction. We also allow the simulation to continue beyond the standard $f = 10$, so that the actual length of the data set is unaffected by the mask and induces no lack of precision on the fit of $K_{3m}$. We then fit to synthetic data for each mask and plot the standard deviations of the parameter posterior PDFs for (1) $\gamma_0$ and $K_{2m}$ as a control, and (2) $K_{3m}$, to test whether they can still be fitted for without data concerning the perigee. To maximize the changes in posterior PDF, we use an experimental error of $\sigma_\theta = 10^{-5}$, the lowest we test in this study.
+To test this, we mask the perigee of the counter by removing data within time $T$ of the perigee, where $T$ ranges from 0 to 1 hour. To prevent lack of precision on $K_{\ell m}$ induced by lower amounts of data for high $T$, we always cut 1 hr$-T$ from the beginning and end of the data set, so that all data sets produced for all $T$ have the same length of data before and after the perigee. We then fit the same asteroid model to the cut data for all $T$ and plot the standard deviations of the parameter posterior PDFs for (1) $\gamma_0$ and $K_{2m}$ as a control, and (2) $K_{3m}$, to test whether they can still be fitted for without data concerning the perigee. We use the asymmetric benchmark asteroid configuration.
 
 
 \subsection{Oblate planet}
@@ -721,7 +733,7 @@ The Moore-Penrose pseudoinverse of $A$ is defined as $A^+ = A^* (AA^*)^{-1}$, wh
 
 
 \subsection{Comparison of density distribution models}
-In this section, we compare the above methods of extracting asteroid density distributions given sample values for $K_{\ell m}$, to demonstrate their differences in behavior.
+In this section, we compare the above methods of extracting asteroid density distributions given sample values for $K_{\ell m}$, to demonstrate their differences in behavior. To display the density distributions (and to derive them for the likelihood and ensemble average models), we subdivide the asteroid into a lattice of uniform-density cubes, each with a side length of ten meters. In the case of the ensemble average model, we average over 48 ensembles.
 
 The sample $K_{\ell m}$ values we investigate are the symmetric and asymmetric benchmark values listed in appendix \ref{app:reference-config}. We execute the models for both benchmarks, and for the three models which require a fixed surface, we use both a spherical surface (radius equal to $\sqrt{5/3} a_m$) and an elliptical (axes set by section \ref{sec:constant-density-ellipsoid}) model.
 

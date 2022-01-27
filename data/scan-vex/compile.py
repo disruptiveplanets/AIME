@@ -10,7 +10,7 @@ param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re
 percentiles = {}
 name_index = {}
 true_sigma = None
-sigma_rat = []
+v_excess = []
 
 AXIS_SIZE = 12
 LEGEND_SIZE = 12
@@ -37,7 +37,7 @@ with open("percentiles.dat", 'r') as f:
 # Get true sigmas
 index = 0
 for name in percentiles.keys():
-    dir_name = name[:10]
+    dir_name = name[:6]
     with open(f"{dir_name}/{dir_name}.txt", 'r') as f:
         max_j, max_l = f.readline().split(", ")
         max_j, max_l = (int(max_j), int(max_l))
@@ -54,49 +54,63 @@ for name in percentiles.keys():
     name_index[name] = index
     index += 1
     true_sigma = sigma[0]
-    sigma_rat.append(sigma[1])
+    v_excess.append(speed / 1000)
 
-sigma_rat = np.array(sigma_rat)
+v_excess = np.array(v_excess)
 
-fig, axs = plt.subplots(figsize=(10, 8), ncols=2, nrows=5, sharex=True)
+fig, axs = plt.subplots(figsize=(14, 8), ncols=3, nrows=4, sharex=True)
 axs = axs.reshape(-1)
+i = 0
 
-for i in range(N_DIM):
-    param_data = np.zeros(len(sigma_rat) * N_PERCENTILES).reshape(N_PERCENTILES, len(sigma_rat))
+for plot_index in range(N_DIM+1):
+    if plot_index == 9:
+        continue
+    param_data = np.zeros(len(v_excess) * N_PERCENTILES).reshape(N_PERCENTILES, len(v_excess))
     for f in percentiles.keys():
         param_data[:,name_index[f]] = percentiles[f][i]
-    scale = 1
-    sigma_rho = sigma_rat * true_sigma
+    scale = 1e5 if i < 3 else 1
 
-    axs[i].plot(sigma_rho, (param_data[1]-param_data[0]) / sigma_rho * scale, color=f"C{i}", linewidth=1)
-    axs[i].plot(sigma_rho, (param_data[-1]-param_data[0]) / sigma_rho * scale, color=f"C{i}", linewidth=1)
-    axs[i].fill_between(sigma_rho, (param_data[1]-param_data[0]) / sigma_rho * scale, 
-        (param_data[-1]-param_data[0]) / sigma_rho * scale,  color=f"C{i}", alpha=0.3)
+    axs[plot_index].plot(v_excess, (param_data[1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].plot(v_excess, (param_data[-1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].fill_between(v_excess, (param_data[1]-param_data[0]) / true_sigma * scale, 
+        (param_data[-1]-param_data[0]) / true_sigma * scale,  color=f"C{i}", alpha=0.3)
 
-    axs[i].plot(sigma_rho, (param_data[2]-param_data[0]) / sigma_rho * scale, color=f"C{i}", linewidth=1)
-    axs[i].plot(sigma_rho, (param_data[-2]-param_data[0]) / sigma_rho * scale, color=f"C{i}", linewidth=1)
-    axs[i].fill_between(sigma_rho, (param_data[2]-param_data[0]) / sigma_rho * scale,
-        (param_data[-2]-param_data[0]) / sigma_rho * scale, color=f"C{i}", alpha=0.3)
+    axs[plot_index].plot(v_excess, (param_data[2]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].plot(v_excess, (param_data[-2]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].fill_between(v_excess, (param_data[2]-param_data[0]) / true_sigma * scale,
+        (param_data[-2]-param_data[0]) / true_sigma * scale, color=f"C{i}", alpha=0.3)
 
-    axs[i].plot(sigma_rho, (param_data[3]-param_data[0]) / sigma_rho * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+    axs[plot_index].plot(v_excess, (param_data[3]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
 
-    y_min_norm = np.min((param_data[-1]-param_data[0]) / sigma_rho * scale)
-    y_max_norm = np.max((param_data[1]-param_data[0]) / sigma_rho * scale)
-    axs[i].set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
+    y_min_norm = np.min((param_data[-1]-param_data[0]) / true_sigma * scale)
+    y_max_norm = np.max((param_data[1]-param_data[0]) / true_sigma * scale)
+    axs[plot_index].set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
 
-    axs[i].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\rho$", size=AXIS_SIZE)
+    if i < 3:
+        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta (\\times 10^{{-5}})$", size=AXIS_SIZE)
+    else:
+        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta$", size=AXIS_SIZE)
 
-    axs[i].set_xscale('log')
+    #axs[i].set_xscale('log')
     #axs[i].set_yscale('log')
 
-    if i == 9 or i == 8:
-        axs[i].set_xlabel(f"$\sigma_\\rho$")
+    if plot_index in [6, 8, 10]:
+        axs[plot_index].set_xlabel(f"$v_\infty$ (km/s)")
+        
+    i += 1
+
+axs[9].remove()
+axs[11].remove()
 
 custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=4, alpha=0.6),
                 Line2D([0], [0], color='k', lw=1, linestyle='dashed')]
-fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='lower center', prop={'size': LEGEND_SIZE})
+fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='lower right', prop={'size': LEGEND_SIZE})
 fig.tight_layout()
-plt.savefig("ratios.pdf")
-plt.savefig("ratios.png")
+
+line = plt.Line2D([0,1],[0.77, 0.77], transform=fig.transFigure, color="black")
+fig.add_artist(line)
+
+plt.savefig("vex.pdf")
+plt.savefig("vex.png")
 plt.show()
