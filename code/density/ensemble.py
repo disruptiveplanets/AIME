@@ -58,7 +58,7 @@ if __name__ == "__main__":
     data = np.array(data)
     args = []
     for i in range(NUM_DISTROS):
-        args.append(get_seed_points(), data)
+        args.append([get_seed_points(), data])
 
     with Pool() as pool:
         density_list = pool.map(get_voronoi_density, args)

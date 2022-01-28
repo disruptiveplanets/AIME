@@ -20,7 +20,9 @@ I finished up the above tests and put them in the paper. I also thought of model
 ## Jan 27
 
 I refined the parameters to get better estimates and pushed everything to the supercomputer. It appears that this will take a while.
-- Likelihood done ___
-- Harmonic done ___
-- Ensemble done ___
-- Surface done ___
+
+## Jan 28
+
+Logged in today and everything was finished. I ran all the displays.
+
+All the algorithms executed accurately except for surface, which has some slight issues. The ensemble method repeated seeds across threads, so I have fixed that bug and fixed it.
