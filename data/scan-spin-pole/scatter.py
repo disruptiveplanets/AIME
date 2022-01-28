@@ -34,7 +34,7 @@ pts = []
 data = []
 theta_phis = []
 for pole_index in range(NUM_DIVISIONS):
-    #f = open("../../staged/{}-{:02}.txt".format(BASE_NAME, pole_index), 'w')
+    f = open("../../staged/{}-{:02}.txt".format(BASE_NAME, pole_index), 'w')
     theta, phi = get_angle(pole_index)
     spin_x = POLE_NORM * np.sin(theta) * np.cos(phi)
     spin_y = POLE_NORM * np.sin(theta) * np.sin(phi)
@@ -44,8 +44,8 @@ for pole_index in range(NUM_DIVISIONS):
     pts.append([np.sin(theta) * np.cos(phi), np.sin(theta) * np.sin(phi), np.cos(theta)])
     theta_phis.append((np.pi / 2 - theta, phi))
     data.append(d)
-    #f.write(get_text(spin_x, spin_y, spin_z))
-    #f.close()
+    f.write(get_text(spin_x, spin_y, spin_z))
+    f.close()
 theta_phis = np.array(theta_phis)
 
 lons = np.linspace(-np.pi, np.pi, 100)
