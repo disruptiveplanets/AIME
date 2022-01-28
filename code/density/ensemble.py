@@ -41,8 +41,8 @@ def write_densities(rhos, seeds):
                     densities[nx, ny, nz] = rhos[seed_index].real
     return densities
 
-def get_voronoi_density(data):
-    seeds = get_seed_points()
+def get_voronoi_density(args):
+    seeds, data = args
     kilms = []
     for l in range(MAX_L+1):
         for m in range(-l, l+1):
@@ -56,9 +56,12 @@ if __name__ == "__main__":
     data = [c for c in complex_hlms]
     data.append(A_M**2)
     data = np.array(data)
+    args = []
+    for i in range(NUM_DISTROS):
+        args.append(get_seed_points(), data)
 
     with Pool() as pool:
-        density_list = pool.map(get_voronoi_density, np.full((NUM_DISTROS, len(data)), data))
+        density_list = pool.map(get_voronoi_density, args)
     
     densities = np.mean(density_list, axis=0)
 
