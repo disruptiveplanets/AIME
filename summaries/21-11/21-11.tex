@@ -829,14 +829,14 @@ Except when otherwise mentioned, we use the following fit parameters when runnin
 
 
 \section{Example fit results}
-In the interest of demonstrating the result of a fit to synthetic data, we present the results of a fit to synthetic data generated with the nominal sensitivity model and $\sigma_\theta = 10^{-5}$. The symmetric reference asteroid is used. The reduced $\chi^2$ value of this fit (defined as $\chi^2 / N$, where $N$ is the number of degrees of freedom) was 0.83, and fit results were in good agreement with the true parameters. Nearly 12,000 MCMC iterations were required before convergence.
+In the interest of demonstrating the result of a fit to synthetic data, we present the results of a fit to synthetic data generated with the nominal sensitivity model and $\sigma_\theta = 9.5 \times 10^{-3}$. The symmetric reference asteroid is used. The reduced $\chi^2$ value of this fit (defined as $\chi^2 / N$, where $N$ is the number of degrees of freedom) was 0.83, and fit results were in good agreement with the true parameters. Nearly 12,000 MCMC iterations were required before convergence.
 
 Figure \ref{fig:example-residuals} shows the data with the best-fit overlaid and the residuals. Uncertainties are plotted on the residuals corresponding to the square root of the diagonal entries of the covariance matrix --- i.e., 1-$\sigma$ uncertainties. However, the data often exceeds these uncertainty bands. This is because uncertainties are correlated in truth, and points that fall outside of the band are not necessary in conflict with the best fit.
 
 \begin{figure}
   \centering
   \includegraphics[width=0.7\textwidth]{example-residuals.pdf}
-  \caption{Data, best fit results, and residuals for a fit to synthetic data simulated for an asymmetric reference asteroid with $\sigma_\theta = 10^{-5}$. The standard deviation of the data is plotted as an uncertainty band in the residuals plot, but these do not capture covariance between data points, so that the fact that many residuals lie outside the band does not disqualify the fit, which has a reduced $\chi^2$ value of 0.68.}
+  \caption{Data, best fit results, and residuals for a fit to synthetic data simulated for an asymmetric reference asteroid with $\sigma_\theta = 9.5 \times 10^{-3}$. The standard deviation of the data is plotted as an uncertainty band in the residuals plot, but these do not capture covariance between data points, so that the fact that many residuals lie outside the band does not disqualify the fit, which has a reduced $\chi^2$ value of 0.68.}
   \label{fig:example-residuals}
 \end{figure}
 
@@ -845,11 +845,11 @@ Figure \ref{fig:example-corner} shows a corner plot of the ten fitted parameters
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{example-corner.pdf}
-  \caption{A corner plot for the fit results ten parameters to synthetic data simulated for an asymmetric reference asteroid with $\sigma_\theta = 10^{-5}$. Marginal posterior PDFs for each parameter are shown (histograms) along with two-dimensional PDFs (contours). Individual points in the contours are samples from the MCMC fit, and the contours enclose 1-, 2-, and 3-$\sigma$ of them. True values (which are zero here due to the parameters being displayed relative to the true values) are also shown (blue lines).}
+  \caption{A corner plot for the fit results ten parameters to synthetic data simulated for an asymmetric reference asteroid with $\sigma_\theta = 9.5 \times 10^{-3}$. Marginal posterior PDFs for each parameter are shown (histograms) along with two-dimensional PDFs (contours). Individual points in the contours are samples from the MCMC fit, and the contours enclose 1-, 2-, and 3-$\sigma$ of them. True values (which are zero here due to the parameters being displayed relative to the true values) are also shown (blue lines).}
   \label{fig:example-corner}
 \end{figure}
 
-Figure \ref{fig:example-residuals} demonstrates that a good fit to data was achieved, despite the small error bars and strong dependence of the model on initial conditions. Figure \ref{fig:example-corner} shows that the posterior distributions are largely Gaussian-distributed, with several of the parameters strongly correlated. The true values lie within $2\sigma$ contours in most cases, as expected. Parameters are computed to very high accuracy --- $O(10^{-7})$ for $\gamma_0$ and $O(10^{-9})$ for $K_{2m}$ (the first tier of parameters as ordered by the sensitivity of the asteroid system to their values), and $O(10^{-4})-O(10^{-6})$ for $K_{3m}$. These ranges should be compared to the width of the prior distributions for these parameters, which is $O(1)$ for all. The success of this fit demonstrates that these higher order parameters can be fitted to data as long as good enough precision on the data is achieved.
+Figure \ref{fig:example-residuals} demonstrates that a good fit to data was achieved, despite the small error bars and strong dependence of the model on initial conditions. Figure \ref{fig:example-corner} shows that the posterior distributions are largely Gaussian-distributed, with several of the parameters strongly correlated. The true values lie within $2\sigma$ contours in most cases, as expected. Parameters are computed to very high accuracy --- $O(10^{-6})$ for $\gamma_0$ and $O(10^{-7})$ for $K_{2m}$ (the first tier of parameters as ordered by the sensitivity of the asteroid system to their values), and $O(10^{-4})-O(10^{-2})$ for $K_{3m}$. These ranges should be compared to the width of the prior distributions for these parameters, which is $O(1)$ for all. The success of this fit demonstrates that these higher order parameters can be fitted to data as long as good enough precision on the data is achieved.
 
 
 
