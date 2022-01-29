@@ -26,3 +26,7 @@ I refined the parameters to get better estimates and pushed everything to the su
 Logged in today and everything was finished. I ran all the displays.
 
 All the algorithms executed accurately except for surface, which has some slight issues. The ensemble method repeated seeds across threads, so I have fixed that bug and fixed it.
+
+## Jan 29
+
+I pulled the ensembles and ran the displays. Everything looks good

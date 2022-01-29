@@ -7,7 +7,7 @@ MAX_RADIUS = 2001
 pos_array = np.arange(-MAX_RADIUS, MAX_RADIUS, DIVISION)
 TET_SHRINK = 1#np.sqrt(2 * 0.90233392 / 1.19533216 - 1)
 
-TYPE = 0
+TYPE = 5
 
 if TYPE == 0:
     TAG = "asym-ell"
