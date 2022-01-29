@@ -40,7 +40,6 @@ for pole_index in range(NUM_DIVISIONS):
     spin_y = POLE_NORM * np.sin(theta) * np.sin(phi)
     spin_z = POLE_NORM * np.cos(theta)
     d = np.cos(2*theta) * np.sin(2*phi)
-    #pts.append([theta, phi])
     pts.append([np.sin(theta) * np.cos(phi), np.sin(theta) * np.sin(phi), np.cos(theta)])
     theta_phis.append((np.pi / 2 - theta, phi))
     data.append(d)

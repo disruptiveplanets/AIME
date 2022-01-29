@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "scan-vex"
+PATH = "observation-gap"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1

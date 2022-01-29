@@ -5,7 +5,7 @@ import numpy as np
 LOW_ORDER_INDEX = 1
 BASE_NAME = f"gap"
 LOW_GAP = 0
-HIGH_GAP = 1
+HIGH_GAP = 2
 NUM_DIVISIONS = 30 # Run with 8 cores per process.
 LOW_ORDER = [(0.39269908169, 0, -0.09766608), (0.39269908169, 0.05200629, -0.2021978)][LOW_ORDER_INDEX]
 HIGH_ORDER = [0, 0, 0, 0, 0, 0, 0]
