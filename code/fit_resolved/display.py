@@ -30,6 +30,9 @@ REDCHI_THRESHOLD = 2
 CENTRAL_RADIUS = EARTH_RADIUS
 CENTRAL_MU = 5.972e24 * 6.674e-11
 
+DATA_POINT_LIMIT = 440
+
+
 AUTO_BURNIN = 100
 DEFAULT_THIN = 10
 
@@ -188,6 +191,12 @@ class Display:
         theta_high = np.asarray([float(x) for x in f.readline().split(',')])
         theta_low = np.asarray([float(x) for x in f.readline().split(',')])
         self.sigma = [float(d) for d in f.readline().split(',')]
+
+        try:
+            self.gap = float(f.readline())
+        except Exception:
+            self.gap = None
+
         f.close()
 
         if self.maxj == 0:
@@ -248,7 +257,27 @@ class Display:
         except:
             print("Coordinates are invalid ({})".format(theta))
             return None
-        return np.asarray(resolved_data).reshape(-1, 3)
+        vector_data = np.asarray(resolved_data).reshape(-1, 3)
+
+        if self.gap is not None:
+            # Time of data in hours
+            times = np.arange(len(vector_data)) * self.cadence / 3600
+            times -= times[-1] / 2
+
+            # Generate mask
+            uncut_mask = abs(times) > self.gap
+            chop_index = 0
+            while chop_index < len(uncut_mask)/2:
+                if np.sum(uncut_mask[chop_index:-(1+chop_index)]) > DATA_POINT_LIMIT:
+                    chop_index += 1
+                else:
+                    break
+            uncut_mask[:chop_index] = False
+            uncut_mask[-(1+chop_index):] = False
+            
+            return vector_data[uncut_mask]
+        else:
+            return vector_data
 
     def show_compare(self):
         self.get_params()
