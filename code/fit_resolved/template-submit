@@ -2,11 +2,11 @@
 
 # Slurm sbatsh options
 #SBATCH -o
-#SBATCH -c 8
+#SBATCH -c 16
 #ggSBATCH --gres=gpu:volta:1
 
 source /etc/profile
 
 module load anaconda/2021a
 
-python fit.py
+python fit-gap.py

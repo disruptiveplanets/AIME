@@ -9,3 +9,7 @@ Completed today. I pulled things from the supercomputer after making a slight ad
 ## Jan 31
 
 Completed today. Pulled everything but gap 14. Things still don't look quite right, so I extended to 3 hours and tried again.
+
+## Feb 1
+
+Reran the program because of a mistake I made (forgot to change the mask size)

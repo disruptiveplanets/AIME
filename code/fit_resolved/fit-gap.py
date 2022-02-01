@@ -41,7 +41,7 @@ THRESHOLD_LIKE_RAT = 2
 
 
 
-DATA_POINT_LIMIT = 700
+DATA_POINT_LIMIT = 642
 
 
 
@@ -210,6 +210,7 @@ while chop_index < len(uncut_mask)/2:
         break
 uncut_mask[:chop_index] = False
 uncut_mask[-(1+chop_index):] = False
+print(uncut_mask)
 
 for line in data_cuts:
     cut_line = []
