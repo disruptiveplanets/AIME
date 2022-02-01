@@ -37,7 +37,7 @@ with open("percentiles.dat", 'r') as f:
 
 index = 0
 for name in percentiles.keys():
-    dir_name = name[:6]
+    dir_name = name[:7]
     with open(f"{dir_name}/{dir_name}.txt", 'r') as f:
         max_j, max_l = f.readline().split(", ")
         max_j, max_l = (int(max_j), int(max_l))
@@ -52,27 +52,33 @@ for name in percentiles.keys():
         theta_low = [float(x) for x in f.readline().split(',')]
         sigma = [float(d) for d in f.readline().split(',')]
     name_index[name] = index
+    sigma_theta = sigma[0]
     index += 1
     theta, phi = np.pi / 2 - np.arccos(spin[2] / norm(spin)), np.arctan2(spin[1], spin[0])
-    print(norm(spin))
     theta_phis.append((theta, phi))
     xyzs.append(np.array(spin) / norm(spin))
 
 theta_phis = np.array(theta_phis)
-lons = np.linspace(-np.pi, np.pi, 100)
-lats = np.linspace(-np.pi/2, np.pi/2, 50)
+lons = np.linspace(-np.pi, np.pi, 180)
+lats = np.linspace(-np.pi/2, np.pi/2, 90)
 Lon, Lat = np.meshgrid(lons, lats)
 
-fig, axs = plt.subplots(figsize=(14, 8), ncols=3, nrows=4, projection="mollweide")
+fig, axs = plt.subplots(figsize=(14, 8), ncols=3, nrows=4, subplot_kw=dict(projection="mollweide"))
 axs = axs.reshape(-1)
+
+data = []
+net_data = np.zeros(len(percentiles))
+for i in range(N_DIM):
+    data_line = []
+    for f in percentiles.keys():
+        scale = 1 if i >= 3 else 1e5;
+        data_line.append(np.abs(percentiles[f][i][2] - percentiles[f][i][0]) * scale / sigma_theta)
+    data.append(data_line)
+    net_data += np.array(data_line) / np.mean(data_line) / N_DIM
+
+net_data *= np.mean(data)
+
 i = 0
-
-data = np.zeros((N_DIM, len(percentiles)))
-for f in percentiles.keys():
-    for i in range(N_DIM):
-        scale = 1
-        data[i] = np.abs(percentiles[f][i][2] - percentiles[f][i][0]) * scale
-
 for plot_index in range(N_DIM+1):
     if plot_index == 9:
         continue
@@ -91,11 +97,12 @@ for plot_index in range(N_DIM+1):
             cart_line.append(interp(x, y, z))
         cart_array.append(cart_line)
 
-    fig = plt.figure()
     im = axs[plot_index].pcolormesh(Lon, Lat, cart_array)#, vmax=np.max(data), vmin=np.min(data))
-    #axs[plot_index].set_suptitle(f"${param_names[i]}$")
-    cbar = fig.colorbar(im, orientation='horizontal')
-    cbar.set_title(f"${param_names[i]}$")
+    cbar = fig.colorbar(im, ax=axs[plot_index])
+    if i < 3:
+        cbar.set_label(f"$\sigma({param_names[i]}) / \sigma_\\theta$ ($\\times 10^{{-5}})$")
+    else:
+        cbar.set_label(f"$\sigma({param_names[i]}) / \sigma_\\theta$")
 
     if plot_index != 10:
         axs[plot_index].set_xticks([])
@@ -113,12 +120,36 @@ axs[11].remove()
 custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=4, alpha=0.6),
                 Line2D([0], [0], color='k', lw=1, linestyle='dashed')]
-fig.colorbar(im, orientation='horizontal')
+#fig.colorbar(im, orientation='horizontal')
 fig.tight_layout()
 
-line = plt.Line2D([0,1],[0.77, 0.77], transform=fig.transFigure, color="black")
+line = plt.Line2D([0,1],[0.75, 0.75], transform=fig.transFigure, color="black")
 fig.add_artist(line)
 
 plt.savefig("pole.pdf")
 plt.savefig("pole.png")
+
+
+
+# Plot average
+interp = LinearNDInterpolator(xyzs, net_data)
+fig, ax = plt.subplots(ncols=1, nrows=1, subplot_kw=dict(projection="mollweide"))
+cart_array = []
+for lat in lats:
+    cart_line = []
+    for lon in lons:
+        shrink = 0.8
+        x, y, z = np.cos(lat) * np.cos(lon) * shrink, np.cos(lat) * np.sin(lon) * shrink, np.sin(lat) * shrink
+        cart_line.append(interp(x, y, z))
+    cart_array.append(np.array(cart_line))
+print(cart_array)
+im = ax.pcolormesh(Lon, Lat, cart_array)#, vmax=np.max(data), vmin=np.min(data))
+cbar = fig.colorbar(im, ax=ax)
+cbar.set_label(f"$\overline{{\sigma}} / \sigma_\\theta$")
+fig.tight_layout()
+
+plt.savefig("avg-pole.pdf")
+plt.savefig("avg-pole.png")
+
+
 plt.show()
