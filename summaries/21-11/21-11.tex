@@ -50,7 +50,7 @@ Abstract.
 \item Asteroids simulated in binaries \cite{Naidu_2015}
 \item Previous work on the math of asteroid rotations \cite{ashenberg07, paul88}
 \item CNEOS: 4 asteroids $D > 100 m$ are coming to within 1 LD of Earth in the next 10 years, 29 with $D > 10 m$.
-\item Moskowitz survey of Duende: \cite{BENSON2020113518} with companion observational article \cite{MOSKOVITZ2020113519}. Demonstrates that moment of inertia can be extracted from a tumbling asteroid via lightcurve analysis in the zero-torque regime (fourier transform of lightcurve to pick up on two frequencies and assign precession and nutation frequencies to them.) Assumes constant geometry.
+\item Moskowitz survey of Duende: \cite{BENSON2020113518} with companion observational article \cite{MOSKOVITZ2020113519}. Demonstrates that moment of inertia can be extracted from a tumbling asteroid via lightcurve analysis in the zero-torque regime (Fourier transform of lightcurve to pick up on two frequencies and assign precession and nutation frequencies to them.) Assumes constant geometry.
 \item Study of asteroid binary to extract density \cite{DESCAMPS2020113726}
 \item Scheeres theoretical paper \cite{HouMar2017} detailing the different forces and torques felt by an asteroid.
 \item Paper stating in general that asteroids can be tidally disrupted on hyperbolic flyby. \cite{SCHEERES2000106}, plus similar paper \cite{RICHARDSON199847} for tidal disruption
@@ -536,7 +536,7 @@ Also shown in figures \ref{fig:probe-space-sigma} and \ref{fig:probe-space-corr}
 
 Depending on the size of the asteroid, its orbital elements, and the availability of observation, uncertainty on the rotational pole of the asteroid is expected to vary between flybys. A detailed model of uncertainty in the rotational pole of the asteroid (a model that might simulate a full lightcurve, for example) is beyond the scope of this paper. However, in this section we demonstrate how the uncertainty in the fit parameters is governed by the observational uncertainty in rotational pole $\sigma_\theta$ and in the period $\sigma_\rho$  as a rule-of-thumb to guide future investigation.
 
-We represent 1-$\sigma$ uncertainty in the fit parameters as the difference between the 84th or 15th percentile of the marginal posterior PDF for each fit parameter and its mean. For a multivariate gaussian posterior PDF (which must also have gaussian marginal PDFs), this 1-$\sigma$ uncertainty is exactly the standard deviation of the marginal PDF. We perform a similar exercise for the 2-$\sigma$ uncertainty.
+We represent 1-$\sigma$ uncertainty in the fit parameters as the difference between the 84th or 15th percentile of the marginal posterior PDF for each fit parameter and its mean. For a multivariate Gaussian posterior PDF (which must also have Gaussian marginal PDFs), this 1-$\sigma$ uncertainty is exactly the standard deviation of the marginal PDF. We perform a similar exercise for the 2-$\sigma$ uncertainty.
 
 We expect that high observational uncertainty corresponds to high uncertainty in the best-fit parameters. To show this trend, in figure \ref{fig:probe-sigma-product} we plot the best-fit uncertainty as a function of the product of the two uncertainty types, with the ratio fixed at $\sigma_\rho / \sigma_\theta = 10^{-5}$ (the benchmark value) so that we are only sensitive to the total uncertainty. To check deviation from a linear trend, we plot the ratio of fit uncertainty to $\sigma_\theta$. The figure shows no deviation from a linear trend except for high observational uncertainty, at which point the posterior distributions begin to fill the prior distributions and are no longer Gaussian.observations.
 
@@ -607,6 +607,13 @@ Figure \ref{fig:scan-vex} also demonstrates a strong dependence on the exact val
 Much of the data available concerning an asteroid's rotational velocity is captured long before or after the flyby perigee, where tidal torque is low. The angular velocity evolution here is dominated by torque-free precession dictated by the moment of inertia components, so that zero-torque data can still be used to fix $K_{20}$ and $K_{22}$. However, $K_{3m}$ are not extractable from precession data alone. We are therefore curious how much of the sensitivity of the system to $K_{3m}$ components is due only data taken during the encounter perigee.
 
 To test this, we mask the perigee of the counter by removing data within time $T$ of the perigee, where $T$ ranges from 0 to 1 hour. To prevent lack of precision on $K_{\ell m}$ induced by lower amounts of data for high $T$, we always cut 1 hr$-T$ from the beginning and end of the data set, so that all data sets produced for all $T$ have the same length of data before and after the perigee. We then fit the same asteroid model to the cut data for all $T$ and plot the standard deviations of the parameter posterior PDFs for (1) $\gamma_0$ and $K_{2m}$ as a control, and (2) $K_{3m}$, to test whether they can still be fitted for without data concerning the perigee. We use the asymmetric benchmark asteroid configuration.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{observation-gap.pdf}
+  \caption{Observation gap}
+  \label{fig:observation-gap}
+\end{figure}
 
 
 \subsection{Oblate planet}

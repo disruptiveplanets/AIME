@@ -55,7 +55,7 @@ for name in percentiles.keys():
     name_index[name] = index
     index += 1
     true_sigma = sigma[0]
-    gaps.append(gap_size * 60)
+    gaps.append(gap_size * 60 * 60)
 
 gaps = np.array(gaps)
 
@@ -96,7 +96,7 @@ for plot_index in range(N_DIM + 1):
     #axs[plot_index].set_yscale('log')
 
     if plot_index in [6, 8, 10]:
-        axs[plot_index].set_xlabel(f"$T$ (min)")
+        axs[plot_index].set_xlabel(f"$T$ (hr)")
 
     i += 1
 

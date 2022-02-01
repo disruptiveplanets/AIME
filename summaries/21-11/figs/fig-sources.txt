@@ -30,6 +30,8 @@ nominal-norm.pdf code/fit_resolved/random-figs/random-vector-norm.pdf
 cadence-precision.pdf data/scan-cadence/cadences.pdf
 cadence-accuracy.pdf data/scan-cadence/differ.pdf
 
+observation-gap.pdf data/observation-gap/gap.pdf
+
 scan-vex.pdf data/scan-vex/vex.pdf
 
 harmonic-asym-ell.pdf code/density/figs/asym-ell-harmonic-slice.pdf
