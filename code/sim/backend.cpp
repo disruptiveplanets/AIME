@@ -154,7 +154,6 @@ void Asteroid::calculate_poses() {
     positions.push_back(position);
     velocities.push_back(velocity);
 
-
     expire_time = time;
 
     #ifdef TEXT_DEBUG
@@ -220,6 +219,7 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
     
     #ifndef FIRST_ORDER
     Vector3 angles = quat.euler_angles();
+    std::cout << angles << std::endl;
     DMatGen dgen = DMatGen(angles[0], angles[1], angles[2]);
     double pos_r = position.mag();
     double pos_ct = position[2] / position.mag();
@@ -243,6 +243,7 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
         }
     }
     torque = Vector3({x_torque.r, y_torque.r, z_torque.r});
+    std::cout << torque << std::endl;
     
     #else
 

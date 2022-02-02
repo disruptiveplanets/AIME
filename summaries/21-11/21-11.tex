@@ -598,17 +598,29 @@ Figure \ref{fig:scan-vex} also demonstrates a strong dependence on the exact val
 
 
 \subsection{Dependence on spin pole}
+In addition to the physical parameters of the asteroid, the initial orientation of the asteroid spin pole strongly effects the precision of the best-fit parameters attainable from the data. For example, an asteroid with initial spin pole parallel to the orbital plane ($\beta=0$) gives Wigner-$D$ matrix elements $D^\ell_{m m'} \propto \delta_{m m'}$ and $D^\ell_{mm}={D^\ell_{-m,-m}}^*$. Note that the inner bracketed term of equation \ref{eqn:tidal-torque} transforms under $m \rightarrow -m$ as $[\cdot ] \rightarrow -(-1)^m[\cdot]^*$. Since $S_{\ell m}$ and $D_{\ell m}$ transform to their conjugates and $J_{\ell m} \rightarrow (-1)^m J_{\ell m}^*$ while none of the other terms transform, the entire equation for tidal torque transforms to the opposite of its conjugate. Since $\tau$ is invariant under this transformation, which is equivalent to a rearrangement of terms, we must have $\tau = -\tau^*$. Since $\tau \in \mathds{R}^3$, we have $\tau = 0$. Therefore the fit parameters $K_{\ell m}$ are entirely invisible when $\omega \propto \unit Z$ initially, and we expect to see decreasing fit precision near this limit.
+
+Figure \ref{fig:spin-pole} displays the $1-\sigma$ uncertainties on the first ten fit parameters of the asymmetric reference asteroid flyby as a function of the initial direction of the spin pole. In all cases, the asteroid's initial period was set to the reference 9 hours. The data is presented mapped onto a sphere which indicates the direction of the spin pole, in the Mollweide projection. To highlight common features between the ten parameters, the average standard deviation is presented in figure \ref{fig:spin-pole-avg}. The average is weighted such that the uncertainty map for each parameter contributes an equal amount (the weight of each is set to one-tenth of its mean). Also shown in \ref{fig:spin-pole-avg} is the map of the average uncertainty with a polar projection, to show the high uncertainty near $\omega \propto \unit Z$.
+
+To generate figures \ref{fig:spin-pole} and \ref{fig:spin-pole-avg}, the sphere was populated with 64 sample sites spaced on a Fibonacci sphere $(\theta_i, \phi_i) = (1-(2i + 1) / 64, 2\pi  i/\varphi)$, where $\varphi\approx 1.618$ is the golden ratio. This yielded points that were roughly evenly distributed to avoid discontinuities in the figures. The locations of these 64 points are plotted in figure \ref{fig:spin-pole-avg} for reference.
+
+Figure \ref{fig:spin-pole-avg} displays other points of lack of precision: those of $\bm \omega \propto \pm \unit Y+ \frac{1}{2}\unit Z$ and to some degree $\unit X - \unit Z$. Not all of the parameters shown in figure \ref{fig:spin-pole} demonstrate this bare point, and some show lack of precision at $\bm \omega \propto -\unit Y+ \frac{1}{2}\unit Z$ as well. Better precision, however, was generally attained when aligning parallel or antiparallel to $\unit X$, the perigee vector. Initial poles with negative latitude also often relatively precise estimates. However, the average best-fit is not very volatile; it rarely grows to twice its mean over the sphere. Exactly which regions of the sphere yield better precision is likely controlled by particulars of the reference asteroid rather than fundamental properties of asteroid flybys, since no cases except when $\bm \omega \propto \unit Z$ does $\bm \tau = 0$.
+
+The increased uncertainty in the non-polar regions stems from the way the $K_{\ell m}$ are correlated. (If two $K_{\ell m}$ are highly correlated, we ``double count'' uncertainty because uncertainty in one parameter will yield uncertainty in the other). A metric of average uncertainty which is immune to correlation is the trace of the covariance matrix, since the trace of a covariance matrix transformed by an orthogonal matrix is the trace of the original covariance matrix. Note that this trace is also the sum of eigenvectors of the covariance matrix, which is the sum of the variances of uncorrelated parameters. This covariance matrix trace is plotted in figure \ref{fig:spin-pole-avg-trace}.
+
+
 
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{spin-pole.pdf}
-  \caption{Spin pole}
+  \caption{$1-\sigma$ uncertainties in the first 10 asteroid fit parameters as a function of the initial direction of spin. All maps are made in the Mollweide projection and shown in the inertial $\unit X-\unit Y-\unit Z$ frame.}
   \label{fig:spin-pole}
 \end{figure}
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{spin-pole-avg.pdf}
-  \caption{Average spin pole}
+  \includegraphics[width=0.45\textwidth]{spin-pole-avg-mollweide.pdf}
+  \includegraphics[width=0.45\textwidth]{spin-pole-avg-polar.pdf}
+  \caption{The weighted average of the uncertainties shown in figure \ref{fig:spin-pole}, in Mollweide (\textit{left}) and polar (\textit{right}) projections. See text for a description of how the average was computed.}
   \label{fig:spin-pole-avg}
 \end{figure}
 

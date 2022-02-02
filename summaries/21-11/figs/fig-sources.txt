@@ -33,7 +33,8 @@ cadence-accuracy.pdf data/scan-cadence/differ.pdf
 observation-gap.pdf data/observation-gap/gap.pdf
 
 spin-pole.pdf data/scan-spin-pole/pole.pdf
-spin-pole-avg.pdf data/scan-spin-pole/avg-pole.pdf
+spin-pole-avg-mollweide.pdf data/scan-spin-pole/avg-pole-mollweide.pdf
+spin-pole-avg-polar.pdf data/scan-spin-pole/avg-pole-polar.pdf
 
 scan-vex.pdf data/scan-vex/vex.pdf
 

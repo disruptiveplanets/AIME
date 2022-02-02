@@ -34,7 +34,7 @@ pts = []
 data = []
 theta_phis = []
 for pole_index in range(NUM_DIVISIONS):
-    f = open("../../staged/{}-{:02}.txt".format(BASE_NAME, pole_index), 'w')
+    #f = open("../../staged/{}-{:02}.txt".format(BASE_NAME, pole_index), 'w')
     theta, phi = get_angle(pole_index)
     spin_x = POLE_NORM * np.sin(theta) * np.cos(phi)
     spin_y = POLE_NORM * np.sin(theta) * np.sin(phi)
@@ -43,8 +43,8 @@ for pole_index in range(NUM_DIVISIONS):
     pts.append([np.sin(theta) * np.cos(phi), np.sin(theta) * np.sin(phi), np.cos(theta)])
     theta_phis.append((np.pi / 2 - theta, phi))
     data.append(d)
-    f.write(get_text(spin_x, spin_y, spin_z))
-    f.close()
+    #f.write(get_text(spin_x, spin_y, spin_z))
+    #f.close()
 theta_phis = np.array(theta_phis)
 
 lons = np.linspace(-np.pi, np.pi, 100)
@@ -65,5 +65,12 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection="mollweide")
 im = ax.pcolormesh(Lon, Lat, cart_array)
 ax.scatter(theta_phis[:,1], theta_phis[:,0], s=1, c='k')
+for i, (theta, phi) in enumerate(theta_phis):
+    plt.text(x=phi, y=theta, s=i)
 fig.colorbar(im, orientation='horizontal')
+ax.set_xticks([-3 * np.pi / 4, -np.pi / 2, -np.pi / 4, 0, np.pi / 4, np.pi / 2, 3 * np.pi / 4])
+ax.set_yticks([np.pi/3, np.pi/6, 0, -np.pi/6, -np.pi/3])
+ax.set_xticklabels(['']*7)
+ax.set_yticklabels(['']*5)
+ax.grid(True)
 plt.show()

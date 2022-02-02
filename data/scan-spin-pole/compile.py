@@ -76,7 +76,9 @@ for i in range(N_DIM):
     data.append(data_line)
     net_data += np.array(data_line) / np.mean(data_line) / N_DIM
 
-net_data *= np.mean(data)
+with open("projecteds.dat", 'rb') as f:
+    projected_vecs = np.load(f)
+
 
 i = 0
 for plot_index in range(N_DIM+1):
@@ -89,29 +91,25 @@ for plot_index in range(N_DIM+1):
     interp = LinearNDInterpolator(xyzs, data[i])
 
     cart_array = []
-    for lat in lats:
+    for pi, lat in enumerate(lats):
         cart_line = []
-        for lon in lons:
-            shrink = 0.8
-            x, y, z = np.cos(lat) * np.cos(lon) * shrink, np.cos(lat) * np.sin(lon) * shrink, np.sin(lat) * shrink
-            cart_line.append(interp(x, y, z))
+        for pj, lon in enumerate(lons):
+            p = projected_vecs[pi][pj]
+            cart_line.append(interp(p[0], p[1], p[2]))
         cart_array.append(cart_line)
 
-    im = axs[plot_index].pcolormesh(Lon, Lat, cart_array)#, vmax=np.max(data), vmin=np.min(data))
+    im = axs[plot_index].pcolormesh(Lon, Lat, cart_array, vmin=0, cmap='Blues_r')#, vmax=np.max(data), vmin=np.min(data))
     cbar = fig.colorbar(im, ax=axs[plot_index])
     if i < 3:
         cbar.set_label(f"$\sigma({param_names[i]}) / \sigma_\\theta$ ($\\times 10^{{-5}})$")
     else:
         cbar.set_label(f"$\sigma({param_names[i]}) / \sigma_\\theta$")
 
-    if plot_index != 10:
-        axs[plot_index].set_xticks([])
-        axs[plot_index].set_yticks([])
-    else:
-        axs[plot_index].scatter(theta_phis[:,1], theta_phis[:,0], s=1, c='k')
-        axs[plot_index].set_xlabel("$\\theta$")
-        axs[plot_index].set_ylabel("$\\phi$")
-
+    axs[plot_index].set_xticks([-3 * np.pi / 4, -np.pi / 2, -np.pi / 4, 0, np.pi / 4, np.pi / 2, 3 * np.pi / 4])
+    axs[plot_index].set_yticks([np.pi/3, np.pi/6, 0, -np.pi/6, -np.pi/3])
+    axs[plot_index].set_xticklabels(['']*7)
+    axs[plot_index].set_yticklabels(['']*5)
+    axs[plot_index].grid(True)
     i += 1
 
 axs[9].remove()
@@ -131,25 +129,40 @@ plt.savefig("pole.png")
 
 
 
-# Plot average
+# Plot average    
 interp = LinearNDInterpolator(xyzs, net_data)
-fig, ax = plt.subplots(ncols=1, nrows=1, subplot_kw=dict(projection="mollweide"))
 cart_array = []
-for lat in lats:
+for i, lat in enumerate(lats):
     cart_line = []
-    for lon in lons:
-        shrink = 0.8
-        x, y, z = np.cos(lat) * np.cos(lon) * shrink, np.cos(lat) * np.sin(lon) * shrink, np.sin(lat) * shrink
-        cart_line.append(interp(x, y, z))
+    for j, lon in enumerate(lons):
+        p = projected_vecs[i][j]
+        cart_line.append(interp(p[0], p[1], p[2]))
     cart_array.append(np.array(cart_line))
-print(cart_array)
-im = ax.pcolormesh(Lon, Lat, cart_array)#, vmax=np.max(data), vmin=np.min(data))
-cbar = fig.colorbar(im, ax=ax)
-cbar.set_label(f"$\overline{{\sigma}} / \sigma_\\theta$")
-fig.tight_layout()
 
-plt.savefig("avg-pole.pdf")
-plt.savefig("avg-pole.png")
+fig, ax = plt.subplots(figsize=(6,5), ncols=1, nrows=1, subplot_kw=dict(projection="mollweide"))
+im = ax.pcolormesh(Lon, Lat, cart_array, vmin=0, cmap='Blues_r')#, vmax=np.max(data), vmin=np.min(data))
+cbar = fig.colorbar(im, ax=ax, orientation='horizontal')
+cbar.set_label(f"$\overline{{\sigma}}$")
+ax.scatter(theta_phis[:,1], theta_phis[:,0], s=1, c='k')
+ax.set_xlabel("$\\theta$")
+ax.set_ylabel("$\\phi$")
+ax.set_xticks([-3 * np.pi / 4, -np.pi / 2, -np.pi / 4, 0, np.pi / 4, np.pi / 2, 3 * np.pi / 4])
+ax.set_yticks([np.pi/3, np.pi/6, 0, -np.pi/6, -np.pi/3])
+ax.grid(True)
+fig.tight_layout()
+plt.savefig("avg-pole-mollweide.pdf")
+plt.savefig("avg-pole-mollweide.png")
+
+fig, ax = plt.subplots(figsize=(6,5), ncols=1, nrows=1, subplot_kw=dict(projection="polar"))
+im = ax.pcolormesh(Lon, Lat, cart_array, vmin=0, cmap='Blues_r')#, vmax=np.max(data), vmin=np.min(data))
+cbar = fig.colorbar(im, ax=ax)
+cbar.set_label(f"$\overline{{\sigma}}$")
+fig.tight_layout()
+ax.scatter(theta_phis[:,1], theta_phis[:,0], s=1, c='k')
+ax.set_yticklabels(['']*5)
+ax.grid(True)
+plt.savefig("avg-pole-polar.pdf")
+plt.savefig("avg-pole-polar.png")
 
 
 plt.show()
