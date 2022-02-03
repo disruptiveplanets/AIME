@@ -2,132 +2,60 @@ import sys
 import matplotlib.pyplot as plt
 from shutil import copyfile
 import numpy as np
-from numdifftools import Hessian
 sys.path.append("../../fit_resolved")
-import asteroids_0_2 as asteroids
-import random_vector
+import asteroids_0_2
+import random
+from multiprocessing import Pool
 
 
 plt.style.use("jcap")
 
-SYMMETRIC = True
-
-if SYMMETRIC:
-    TRUE_PARAMS = np.array([0.39269908169, 0, -0.09766608])
-    SIGMA = 0.1
-
-else:
-    TRUE_PARAMS = np.array([0.39269908169, 0.05200629, -0.2021978])
-    SIGMA = 0.1
-
-
+SYMMETRIC = False
 NUM_TRIALS = 1000
-SPIN_RESOLUTION = 20
-
-SPIN = [0.00006464182, 0.00012928364, -0.00012928364]
-EARTH_RADIUS = 6_378_000
+EARTH_RADIUS = 6_370_000
+AMPLIFY = 700 * 3
+FILE_NAME = "../../../data/probe-sigma/sigma-1-47/sigma-1-47"
 GM = 3.986004418e14
-IMPACT_PARAMETER = 5 * EARTH_RADIUS
-SPEED = 6000
-RADIUS = 1000
-JLMS = [1]
-CADENCE = 120
 
-data = np.array(asteroids.simulate(CADENCE, JLMS, TRUE_PARAMS, RADIUS, SPIN[0], SPIN[1], SPIN[2],
-    IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)).reshape(-1, 3)
-err_y, y_inv_covs = random_vector.randomize_rotate_uniform(data, SIGMA)
+with open(f"{FILE_NAME}.txt", 'r') as f:
+    ASTEROIDS_MAX_J, ASTEROIDS_MAX_K = f.readline().split(', ')
+    ASTEROIDS_MAX_J = int(ASTEROIDS_MAX_J)
+    ASTEROIDS_MAX_K = int(ASTEROIDS_MAX_K)
+    cadence = int(float(f.readline()))
+    perigee = EARTH_RADIUS * float(f.readline())
+    radius = float(f.readline())
+    speed = float(f.readline())
+    spin = [float(x) for x in f.readline().split(',')]
+    jlms = [float(x) for x in f.readline().split(',')]
+    theta_true = [float(x) for x in f.readline().split(',')][:3]
+    theta_high = np.asarray([float(x) for x in f.readline().split(',')])[:3]
+    theta_low = np.asarray([float(x) for x in f.readline().split(',')])[:3]
+    sigma = [float(d) for d in f.readline().split(", ")]# theta, ratio
 
-def hess_func(theta):
-    try:
-        model = np.array(asteroids.simulate(CADENCE, JLMS, theta, RADIUS, SPIN[0], SPIN[1], SPIN[2],
-            IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)).reshape(-1, 3)
-    except Exception:
-        return np.inf
-    chisq = 0
-    for i in range(len(data)):
-        chisq += np.matmul(data[i] - model[i], np.matmul(y_inv_covs[i], data[i] - model[i]))
-    return -chisq / 2.0
-    
+data = np.array(asteroids_0_2.simulate(cadence, jlms, theta_true, radius,
+                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False))
 
-def populate(evals, diagonalizer, count):
-    spacing = 20 / np.sqrt(evals)
-    diagonal_points = spacing * (np.random.randn(count * len(TRUE_PARAMS)).reshape(count, len(TRUE_PARAMS)))
-    global_points = np.asarray([np.matmul(diagonalizer, d) for d in diagonal_points])
-    return global_points
+with open(f"{FILE_NAME}-0-samples.npy", 'rb') as f:
+    samples = np.load(f).reshape(-1, 10)
 
 def gen_data():
-    HESSIAN = -Hessian(hess_func)(TRUE_PARAMS)
-    print("Hessian", HESSIAN)
-
-    evals, diagonalizer = np.linalg.eigh(HESSIAN)
-    print(diagonalizer)
-    print("Evals", evals)
-    if SYMMETRIC:
-        evals[0] = 10e10
-    if np.any(evals < 0):
-        raise Exception(f"Some eigenvalues were negative ({evals})")
     results = []
-    trial = 0
-    while trial < NUM_TRIALS:
-        print(f"{trial}/{NUM_TRIALS}")
-        if trial == 0:
-            theta = TRUE_PARAMS
-        else:
-            theta = TRUE_PARAMS + populate(evals, diagonalizer, 1)[0]
+    seeds = [theta_true]
+    for _ in range(NUM_TRIALS):
+        seeds.append((samples[random.randint(0, len(samples))][:3] - theta_true) * AMPLIFY+ theta_true)
+    for i, seed in enumerate(seeds):
+        print(i)
         try:
-            resolved_data = asteroids.simulate(CADENCE, JLMS, theta, RADIUS, SPIN[0], SPIN[1],
-                SPIN[2], IMPACT_PARAMETER, SPEED, GM, EARTH_RADIUS, -1, False)
+            results.append(asteroids_0_2.simulate(cadence, jlms, seed, radius,
+                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False))
         except Exception:
             continue
-        results.append(resolved_data) # x1, y1, z1, x2, y2, z2, ...
-        trial += 1
-
     if SYMMETRIC:
         with open("data_runs-sym.npy", 'wb') as f:
             np.save(f, results)
     else:
         with open("data_runs-asym.npy", 'wb') as f:
             np.save(f, results)
-
-def plot_data():
-    with open("data_runs.npy", 'rb') as f:
-        runs = np.load(f)
-    time = np.arange(0, len(runs[0])//3) *  CADENCE / 3600.0
-    time -= time[-1] / 2
-    spins = np.linspace(np.min(runs), np.max(runs), SPIN_RESOLUTION + 1)
-    spins_middle = np.array([(spins[i] + spins[i+1]) / 2 for i in range(SPIN_RESOLUTION)])
-    x_hist = []
-    y_hist = []
-    z_hist = []
-    for i in range(len(time)):
-        counts_x, _ = np.histogram(runs[:, 3 * i], bins=spins)
-        counts_y, _ = np.histogram(runs[:, 3 * i + 1], bins=spins)
-        counts_z, _ = np.histogram(runs[:, 3 * i + 2], bins=spins)
-        x_hist.append(counts_x)
-        y_hist.append(counts_y)
-        z_hist.append(counts_z)
-
-    plt.figure()
-    #plt.plot(time, runs[0, ::3], label="$\omega_x$", color="black")
-    #plt.plot(time, runs[0, 1::3], label="$\omega_y$")
-    #plt.plot(time, runs[0, 2::3], label="$\omega_z$")
-
-    reds = np.array([[1, 0, 0, a] for a in np.linspace(0, 1, 4)])
-    greens = np.array([[0, 1, 0, a] for a in np.linspace(0, 1, 4)])
-    blues = np.array([[0, 0, 1, a] for a in np.linspace(0, 1, 4)])
-
-    plt.contourf(time, spins_middle, np.array(x_hist).transpose(), colors=reds)
-    plt.contourf(time, spins_middle, np.array(y_hist).transpose(), colors=greens)
-    plt.contourf(time, spins_middle, np.array(z_hist).transpose(), colors=blues)
-
-    plt.legend()
-    plt.xlabel("Time to periapsis (h)")
-    plt.ylabel("Angular velocity (rad / s)")
-    plt.tight_layout()
-    if SYMMETRIC:
-        plt.savefig("spin-chaos-sym.pdf")
-    else:
-        plt.savefig("spin-chaos-asym.pdf")
 
 def plot_sigma():
     if SYMMETRIC:
@@ -136,10 +64,8 @@ def plot_sigma():
     else:
         with open("data_runs-asym.npy", 'rb') as f:
             runs = np.load(f)
-    time = np.arange(0, len(runs[0])//3) *  CADENCE / 3600.0
+    time = np.arange(0, len(runs[0])//3) *  cadence / 3600.0
     time -= time[-1] / 2
-    spins = np.linspace(np.min(runs), np.max(runs), SPIN_RESOLUTION + 1)
-    spins_middle = np.array([(spins[i] + spins[i+1]) / 2 for i in range(SPIN_RESOLUTION)])
     lows_1 = []
     lows_2 = []
     lows_3 = []
@@ -187,9 +113,6 @@ def plot_sigma():
     plt.plot(time, runs[0, ::3] * 3600, color="black")
     plt.plot(time, runs[0, 1::3] * 3600, color="black")
     plt.plot(time, runs[0, 2::3] * 3600, color="black")
-    #plt.scatter(time, err_y[:,0] * 3600, color="black")
-    #plt.scatter(time, err_y[:,1] * 3600, color="black")
-    #plt.scatter(time, err_y[:,2] * 3600, color="black")
     plt.plot([], [], label="$\omega_x$", color="C0")
     plt.plot([], [], label="$\omega_y$", color="C1")
     plt.plot([], [], label="$\omega_z$", color="C2")
@@ -226,6 +149,5 @@ def plot_sigma():
         plt.savefig("spin-chaos-asym.png")
 
 gen_data()
-#plot_data()
 plot_sigma()
 plt.show()
