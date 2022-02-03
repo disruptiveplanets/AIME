@@ -13,3 +13,7 @@ Completed today. Pulled everything but gap 14. Things still don't look quite rig
 ## Feb 1
 
 Reran the program because of a mistake I made (forgot to change the mask size)
+
+## Feb 2
+
+I pulled the results today, but the data still doesn't look right. It has these weird tiered increase structures, that sometimes line up with integer hours. So I ran the benchmark test with the same system to see if it shows the same features. It does not. I re-pulled the true test and got the same thing. So I think it's real. I also fixed the summarizing figure, with the bands indicating divergence in the spin vectors. I wrote up the observation gap section as well.

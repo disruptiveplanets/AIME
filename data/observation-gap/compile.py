@@ -55,7 +55,7 @@ for name in percentiles.keys():
     name_index[name] = index
     index += 1
     true_sigma = sigma[0]
-    gaps.append(gap_size * 60 * 60)
+    gaps.append(gap_size)
 
 gaps = np.array(gaps)
 

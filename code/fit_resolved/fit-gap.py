@@ -1,4 +1,4 @@
-TEST = False
+TEST = True
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -113,11 +113,6 @@ logging.info("Theta low {}".format(theta_low))
 logging.info("Sigma {}".format(sigma))
 logging.info("Name {}".format(output_name))
 N_DIM = len(theta_true)
-
-reload = False
-if len(sys.argv) == 3 and sys.argv[2] == "reload":
-    reload = True
-    REGENERATE_DATA = False
 
 uncut_mask = []
 cut_masks = []
@@ -599,33 +594,25 @@ def populate(evals, diagonalizer, count, start):
 def mcmc_fit(theta_start, evals, evecs, index):
     backend = emcee.backends.HDFBackend(output_name+"-{}.h5".format(index))
 
-    if not reload:
-        pos = populate(evals, evecs, N_WALKERS, theta_start)
+    pos = populate(evals, evecs, N_WALKERS, theta_start)
 
-
-        if PLOT_POSES:
-            for i in range(len(pos[0])):
-                print(plotille.histogram(
-                    pos[:,i],
-                    bins=8,
-                    width=80,
-                    height=15,
-                    X_label='theta {}'.format(i),
-                    Y_label='Counts',
-                    linesep='\n',
-                ))
-        backend.reset(N_WALKERS, N_DIM)
-    else:
-        pos=None
-        logging.info("Initial size: {}".format(backend.iteration))
+    if PLOT_POSES:
+        for i in range(len(pos[0])):
+            print(plotille.histogram(
+                pos[:,i],
+                bins=8,
+                width=80,
+                height=15,
+                X_label='theta {}'.format(i),
+                Y_label='Counts',
+                linesep='\n',
+            ))
+    backend.reset(N_WALKERS, N_DIM)
 
     old_tau = np.inf
     with Pool() as pool:
         sampler = emcee.EnsembleSampler(N_WALKERS, N_DIM, log_probability,
             args=(y, y_inv_covs), backend=backend, pool=pool)
-
-        if reload:
-            pos = sampler._previous_state
 
         if not emcee.walkers_independent(pos):
             f = open("errors.dat", 'a')
@@ -653,11 +640,7 @@ def mcmc_fit(theta_start, evals, evecs, index):
                 redchis = -2 * sample.log_prob / len(y) / 3
                 logging.info(f"Minimum redchi at {sampler.iteration/MAX_N_STEPS * 100}\%: {np.min(redchis)}")
         sampler._previous_state = sample
-
-    if reload:
-        logging.info("New size: {}".format(backend.iteration))
-    else:
-        logging.info("Done")
+    logging.info("Done")
 
 for i, (theta, evals, evecs) in enumerate(kernel):
     mcmc_fit(theta, evals, evecs, i)

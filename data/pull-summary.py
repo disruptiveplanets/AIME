@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "scan-spin-pole"
+PATH = "observation-gap"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1
