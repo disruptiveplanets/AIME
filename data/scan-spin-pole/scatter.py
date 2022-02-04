@@ -39,7 +39,7 @@ for pole_index in range(NUM_DIVISIONS):
     spin_x = POLE_NORM * np.sin(theta) * np.cos(phi)
     spin_y = POLE_NORM * np.sin(theta) * np.sin(phi)
     spin_z = POLE_NORM * np.cos(theta)
-    d = np.cos(2*theta) * np.sin(2*phi)
+    d = np.sin(2 * theta) * np.sin(2  * phi)
     pts.append([np.sin(theta) * np.cos(phi), np.sin(theta) * np.sin(phi), np.cos(theta)])
     theta_phis.append((np.pi / 2 - theta, phi))
     data.append(d)
@@ -47,23 +47,32 @@ for pole_index in range(NUM_DIVISIONS):
     #f.close()
 theta_phis = np.array(theta_phis)
 
-lons = np.linspace(-np.pi, np.pi, 100)
-lats = np.linspace(-np.pi/2, np.pi/2, 50)
+lons = np.linspace(-np.pi, np.pi, 180)
+lats = np.linspace(-np.pi/2, np.pi/2, 90)
 Lon, Lat = np.meshgrid(lons, lats)
 interp = LinearNDInterpolator(pts, data)
+try:
+    with open("projecteds.dat", 'rb') as f:
+        projected_vecs = np.load(f)
+except Exception:
+    projected_vecs = None
 
 cart_array = []
-for lat in lats:
+for pi, lat in enumerate(lats):
     cart_line = []
-    for lon in lons:
-        shrink = 0.8
-        x, y, z = np.cos(lat) * np.cos(lon) * shrink, np.cos(lat) * np.sin(lon) * shrink, np.sin(lat) * shrink
-        cart_line.append(interp(x, y, z))
+    for pj, lon in enumerate(lons):
+        if projected_vecs is not None:
+            p = projected_vecs[pi][pj]
+            cart_line.append(interp(p[0], p[1], p[2]))
+        else:
+            shrink = 0.8
+            x, y, z = np.cos(lat) * np.cos(lon) * shrink, np.cos(lat) * np.sin(lon) * shrink, np.sin(lat) * shrink
+            cart_line.append(interp(x, y, z))
     cart_array.append(cart_line)
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection="mollweide")
-im = ax.pcolormesh(Lon, Lat, cart_array)
+im = ax.pcolormesh(Lon, Lat, cart_array, cmap='cool')
 ax.scatter(theta_phis[:,1], theta_phis[:,0], s=1, c='k')
 for i, (theta, phi) in enumerate(theta_phis):
     plt.text(x=phi, y=theta, s=i)
@@ -73,4 +82,14 @@ ax.set_yticks([np.pi/3, np.pi/6, 0, -np.pi/6, -np.pi/3])
 ax.set_xticklabels(['']*7)
 ax.set_yticklabels(['']*5)
 ax.grid(True)
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection="polar")
+im = ax.pcolormesh(Lon, Lat, cart_array, cmap='cool')
+ax.scatter(theta_phis[:,1], theta_phis[:,0], s=1, c='k')
+for i, (theta, phi) in enumerate(theta_phis):
+    plt.text(x=phi, y=theta, s=i)
+fig.colorbar(im, orientation='vertical')
+ax.grid(True)
 plt.show()
+

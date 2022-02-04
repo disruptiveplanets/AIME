@@ -10,11 +10,14 @@ from multiprocessing import Pool
 
 plt.style.use("jcap")
 
-SYMMETRIC = False
+SYMMETRIC = True
 NUM_TRIALS = 1000
 EARTH_RADIUS = 6_370_000
 AMPLIFY = 700 * 3
-FILE_NAME = "../../../data/probe-sigma/sigma-1-47/sigma-1-47"
+if not SYMMETRIC:
+    FILE_NAME = "../../../data/probe-sigma/sigma-1-47/sigma-1-47"
+if SYMMETRIC:
+    FILE_NAME = "sigma-1-47-sym"
 GM = 3.986004418e14
 
 with open(f"{FILE_NAME}.txt", 'r') as f:
@@ -36,7 +39,10 @@ data = np.array(asteroids_0_2.simulate(cadence, jlms, theta_true, radius,
                 spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False))
 
 with open(f"{FILE_NAME}-0-samples.npy", 'rb') as f:
-    samples = np.load(f).reshape(-1, 10)
+    if SYMMETRIC:
+        samples = np.load(f).reshape(-1, 3)
+    else:
+        samples = np.load(f).reshape(-1, 10)
 
 def gen_data():
     results = []

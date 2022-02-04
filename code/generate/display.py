@@ -1,9 +1,15 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
+
+if len(sys.argv) == 2:
+    file_name = sys.argv[-1]
+else:
+    file_name = "2-params"
 
 plt.figure(figsize=(8, 4))
 
-f = open("2-params-resolved-perfect.dat", 'r')
+f = open(f"{file_name}-resolved-perfect.dat", 'r')
 perfect_xs = []
 perfect_ys = []
 perfect_zs = []
@@ -19,8 +25,9 @@ time = np.arange(0, len(perfect_xs), 1) * 120/3600
 plt.plot(time, perfect_xs, label=f'x perfect')
 plt.plot(time, perfect_ys, label=f'y perfect')
 plt.plot(time, perfect_zs, label=f'z perfect')
+plt.title(file_name)
 
-f = open("2-params-resolved.dat", 'r')
+f = open(f"{file_name}-resolved.dat", 'r')
 xs = []
 ys = []
 zs = []
@@ -51,12 +58,11 @@ plt.legend()
 plt.tight_layout()
 
 plt.figure()
-plt.title("Residuals")
+plt.title(f"Residuals: {file_name}")
 plt.plot(time, np.array(xs) - np.array(perfect_xs), label="x")
 plt.plot(time, np.array(ys) - np.array(perfect_ys),  label="y")
 plt.plot(time, np.array(zs) - np.array(perfect_zs), label="z")
 plt.legend()
 plt.tight_layout()
-plt.savefig("resids.png")
 
 plt.show()

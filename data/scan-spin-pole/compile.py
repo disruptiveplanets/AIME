@@ -98,7 +98,8 @@ for plot_index in range(N_DIM+1):
             cart_line.append(interp(p[0], p[1], p[2]))
         cart_array.append(cart_line)
 
-    im = axs[plot_index].pcolormesh(Lon, Lat, cart_array, vmin=0, cmap='Blues_r')#, vmax=np.max(data), vmin=np.min(data))
+    vmax=np.mean(cart_array) * 3
+    im = axs[plot_index].pcolormesh(Lon, Lat, cart_array, vmin=0, cmap='Blues_r', vmax=vmax)#, vmax=np.max(data), vmin=np.min(data))
     cbar = fig.colorbar(im, ax=axs[plot_index])
     if i < 3:
         cbar.set_label(f"$\sigma({param_names[i]}) / \sigma_\\theta$ ($\\times 10^{{-5}})$")
