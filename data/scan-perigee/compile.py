@@ -2,6 +2,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 from matplotlib.lines import Line2D
+import lmfit
 
 plt.style.use("jcap")
 
@@ -10,7 +11,7 @@ param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re
 percentiles = {}
 name_index = {}
 true_sigma = None
-v_excess = []
+perigees = []
 
 AXIS_SIZE = 12
 LEGEND_SIZE = 12
@@ -37,12 +38,12 @@ with open("percentiles.dat", 'r') as f:
 # Get true sigmas
 index = 0
 for name in percentiles.keys():
-    dir_name = name[:6]
+    dir_name = name[:7]
     with open(f"{dir_name}/{dir_name}.txt", 'r') as f:
         max_j, max_l = f.readline().split(", ")
         max_j, max_l = (int(max_j), int(max_l))
         cadence = int(f.readline())
-        perigee = int(f.readline())
+        perigee = float(f.readline())
         radius = float(f.readline())
         speed = float(f.readline())
         spin = [float(x) for x in f.readline().split(',')]
@@ -54,9 +55,9 @@ for name in percentiles.keys():
     name_index[name] = index
     index += 1
     true_sigma = sigma[0]
-    v_excess.append(speed / 1000)
+    perigees.append(perigee)
 
-v_excess = np.array(v_excess)
+perigees = np.array(perigees)
 
 fig, axs = plt.subplots(figsize=(14, 8), ncols=3, nrows=4, sharex=True)
 axs = axs.reshape(-1)
@@ -65,22 +66,42 @@ i = 0
 for plot_index in range(N_DIM+1):
     if plot_index == 9:
         continue
-    param_data = np.zeros(len(v_excess) * N_PERCENTILES).reshape(N_PERCENTILES, len(v_excess))
+    param_data = np.zeros(len(perigees) * N_PERCENTILES).reshape(N_PERCENTILES, len(perigees))
     for f in percentiles.keys():
         param_data[:,name_index[f]] = percentiles[f][i]
     scale = 1e5 if i < 3 else 1
 
-    axs[plot_index].plot(v_excess, (param_data[1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].plot(v_excess, (param_data[-1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].fill_between(v_excess, (param_data[1]-param_data[0]) / true_sigma * scale, 
+    axs[plot_index].plot(perigees, (param_data[1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].plot(perigees, (param_data[-1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].fill_between(perigees, (param_data[1]-param_data[0]) / true_sigma * scale, 
         (param_data[-1]-param_data[0]) / true_sigma * scale,  color=f"C{i}", alpha=0.3)
 
-    axs[plot_index].plot(v_excess, (param_data[2]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].plot(v_excess, (param_data[-2]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].fill_between(v_excess, (param_data[2]-param_data[0]) / true_sigma * scale,
+    axs[plot_index].plot(perigees, (param_data[2]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].plot(perigees, (param_data[-2]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].fill_between(perigees, (param_data[2]-param_data[0]) / true_sigma * scale,
         (param_data[-2]-param_data[0]) / true_sigma * scale, color=f"C{i}", alpha=0.3)
 
-    axs[plot_index].plot(v_excess, (param_data[3]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+    axs[plot_index].plot(perigees, (param_data[3]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+
+    def fit_func(x, power, slope):
+        m = x[:len(x)//2]**power * slope
+        return np.append(m, -m)
+    model = lmfit.Model(fit_func)
+    params = lmfit.Parameters()
+    params.add('power', min=0.1, max=5, value=3)
+    params.add('slope', min=0, max=100, value=1)
+    data = np.append((param_data[1]-param_data[0]) / true_sigma * scale, (param_data[-1]-param_data[0]) / true_sigma * scale)
+    result = model.fit(data, params, x=np.append(perigees, perigees), weights=np.ones(len(perigees)*2))
+    power, slope = result.params["power"].value, result.params["slope"].value
+    power_unc, slope_unc = result.params["power"].stderr, result.params["slope"].stderr
+    print(param_names[i])
+    print(power, "+/-", power_unc)
+    print(slope, "+/-", slope_unc)
+    print()
+
+    if i != 9:
+        axs[plot_index].plot(perigees, perigees**power * slope, color="k", linewidth=1, linestyle='dotted')
+        axs[plot_index].plot(perigees, -perigees**power * slope, color="k", linewidth=1, linestyle='dotted')
 
     y_min_norm = np.min((param_data[-1]-param_data[0]) / true_sigma * scale)
     y_max_norm = np.max((param_data[1]-param_data[0]) / true_sigma * scale)
@@ -95,7 +116,7 @@ for plot_index in range(N_DIM+1):
     #axs[i].set_yscale('log')
 
     if plot_index in [6, 8, 10]:
-        axs[plot_index].set_xlabel(f"$v_\infty$ (km/s)")
+        axs[plot_index].set_xlabel(f"$r_p$ (Earth radii)")
         
     i += 1
 
@@ -111,6 +132,6 @@ fig.tight_layout()
 line = plt.Line2D([0,1],[0.77, 0.77], transform=fig.transFigure, color="black")
 fig.add_artist(line)
 
-plt.savefig("vex.pdf")
-plt.savefig("vex.png")
+plt.savefig("perigee.pdf")
+plt.savefig("perigee.png")
 plt.show()

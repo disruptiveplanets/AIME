@@ -40,7 +40,7 @@ def collect(d, bare):
     max_j, max_l = f.readline().split(", ")
     max_j, max_l = (int(max_j), int(max_l))
     cadence = int(float(f.readline()))
-    impact_parameter = int(f.readline())
+    impact_parameter = float(f.readline())
     radius = float(f.readline())
     speed = float(f.readline())
     spin = [float(x) for x in f.readline().split(',')]
