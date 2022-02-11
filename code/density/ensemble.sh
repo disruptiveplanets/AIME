@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Slurm sbatsh options
-#SBATCH -o ensemble.log
+#SBATCH -o ensemble-6.log
 #SBATCH -c 24
 
 source /etc/profile

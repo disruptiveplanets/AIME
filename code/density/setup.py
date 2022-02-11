@@ -7,7 +7,7 @@ MAX_RADIUS = 2001
 pos_array = np.arange(-MAX_RADIUS, MAX_RADIUS, DIVISION)
 TET_SHRINK = 1#np.sqrt(2 * 0.90233392 / 1.19533216 - 1)
 
-TYPE = 5
+TYPE = 6
 
 if TYPE == 0:
     TAG = "asym-ell"
@@ -67,6 +67,16 @@ elif TYPE == 5:
         r1 = np.sum((pos - np.array([db_rad/2, 0, 0]))**2)
         r2 = np.sum((pos + np.array([db_rad/2, 0, 0]))**2)
         return r1 < db_rad*db_rad or r2 < db_rad*db_rad
+if TYPE == 6:
+    TAG = "high"# Asymmetric ellipsoid
+    KLMS = [1.0, 0, 0, 0, 0.05200629, 0, 0, 0, -0.2021978,
+           0.16198444315705496, 0.8853382508342368, 0.3944908154957124, 0.6851413655288043, 0.9216270447227185, 0.473563020493851, 0.06681023856831536]
+    A_M = 1000
+    a = np.sqrt(5/3) * A_M * np.sqrt(1 - 2 * KLMS[8] + 12 * KLMS[4])
+    b = np.sqrt(5/3) * A_M * np.sqrt(1 - 2 * KLMS[8] - 12 * KLMS[4])
+    c = np.sqrt(5/3) * A_M * np.sqrt(1 + 4 * KLMS[8])
+    def indicator(pos):
+        return pos[0] * pos[0]/(a*a) + pos[1] * pos[1]/(b*b) + pos[2] * pos[2]/(c*c) < 1
 else:
     KLMS = None
     A_M = None

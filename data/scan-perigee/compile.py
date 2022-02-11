@@ -69,7 +69,7 @@ for plot_index in range(N_DIM+1):
     param_data = np.zeros(len(perigees) * N_PERCENTILES).reshape(N_PERCENTILES, len(perigees))
     for f in percentiles.keys():
         param_data[:,name_index[f]] = percentiles[f][i]
-    scale = 1e5 if i < 3 else 1
+    scale = 1e3 if i < 1 else 1
 
     axs[plot_index].plot(perigees, (param_data[1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
     axs[plot_index].plot(perigees, (param_data[-1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
@@ -107,8 +107,8 @@ for plot_index in range(N_DIM+1):
     y_max_norm = np.max((param_data[1]-param_data[0]) / true_sigma * scale)
     axs[plot_index].set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
 
-    if i < 3:
-        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta (\\times 10^{{-5}})$", size=AXIS_SIZE)
+    if i < 1:
+        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta (\\times 10^{{-3}})$", size=AXIS_SIZE)
     else:
         axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta$", size=AXIS_SIZE)
 

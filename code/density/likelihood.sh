@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Slurm sbatsh options
-#SBATCH -o likelihood.log
-#SBATCH -c 12
+#SBATCH -o likelihood-6.log
+#SBATCH -c 24
 
 source /etc/profile
 

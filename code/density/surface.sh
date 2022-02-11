@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Slurm sbatsh options
-#SBATCH -o surface.log
+#SBATCH -o surface-6.log
 #SBATCH -c 24
 
 source /etc/profile

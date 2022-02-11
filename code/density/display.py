@@ -126,8 +126,8 @@ def make_figs(barename):
     make_slices(densities, "figs/"+barename+"-slice")
 
 if __name__ == "__main__":
-    #make_figs(TAG+"-surface")
-    #make_figs(TAG+"-harmonic")
-    #make_figs(TAG+"-likelihood")
+    make_figs(TAG+"-surface")
+    make_figs(TAG+"-harmonic")
+    make_figs(TAG+"-likelihood")
     make_figs(TAG+"-ensemble")
-    #plt.show()
+    plt.show()
