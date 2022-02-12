@@ -181,6 +181,9 @@ if __name__ == "__main__":
     #res = [multi_solve(s) for s in seeds]
     with Pool() as pool:
         res = pool.map(multi_solve, seeds)
+
+    for resid, _ in res:
+        print("Residuals:", resid)
     
     densities = sorted(res, key = lambda x: x[0])[0][1] # Take density with lowest residual
 
