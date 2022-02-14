@@ -1,3 +1,4 @@
+from re import S
 import numpy as np
 from scipy.linalg import pinv, norm
 from setup import *
@@ -47,9 +48,9 @@ def write_densities(c):
         for ny, y in enumerate(pos_array):
             for nz, z in enumerate(pos_array):
                 if indicator([x, y, z]):
-                    densities[nx, ny, nz] = c[num].real / DIVISION**3
+                    densities[nx, ny, nz] = c[num].real
                     num += 1
-    return densities
+    return densities / DIVISION**3
 
 if __name__ == "__main__":
     n_elements = get_number_elements()
@@ -66,7 +67,12 @@ if __name__ == "__main__":
     
     radius = get_radius(densities)
     print(f"Radius: {radius}\tTrue radius: {A_M}")
-    for l in range(MAX_L+1):
+
+    '''for l in range(MAX_L+1):
         for m in range(-l, l+1):
-            print(f"Hlm: {get_hlms(l, m, densities)}\tTrue Hlm: {complex_hlms[get_index(l, m)]}")
+            print(f"Hlm: {get_hlms(l, m, densities)}\tTrue Hlm: {complex_hlms[get_index(l, m)]}")'''
+    
+    for percentile in range(0, 101, 10):
+        print(f"Percentile {percentile}", np.nanpercentile(densities, percentile))
+    print(np.nanmean(densities))
     

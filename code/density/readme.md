@@ -30,3 +30,11 @@ All the algorithms executed accurately except for surface, which has some slight
 ## Jan 29
 
 I pulled the ensembles and ran the displays. Everything looks good
+
+## Feb 13
+
+I added some l=3 components and didn't get sensible results (big density blowups). At first I thought this was a bug, but in fact it's because the high order klms are just inconsistent with the shape. I wrote likelihood-pt-2 to debug this. Now I'm using a sphere with no 2 components to test the 3 components, and you still get some issues.
+
+## Feb 14
+
+I made the test directory, which creates a bunch of random density distributions and gets their Klms. It's difficult to get Klm much over 1e-2. So I generated random Klms with abs < 0.01 and reran in the supercomputer.

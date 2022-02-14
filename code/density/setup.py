@@ -67,16 +67,17 @@ elif TYPE == 5:
         r1 = np.sum((pos - np.array([db_rad/2, 0, 0]))**2)
         r2 = np.sum((pos + np.array([db_rad/2, 0, 0]))**2)
         return r1 < db_rad*db_rad or r2 < db_rad*db_rad
-if TYPE == 6:
+elif TYPE == 6:
     TAG = "high"# Asymmetric ellipsoid
-    KLMS = [1.0, 0, 0, 0, 0.05200629, 0, 0, 0, -0.2021978,
-           0.16198444315705496, 0.8853382508342368, 0.3944908154957124, 0.6851413655288043, 0.9216270447227185, 0.473563020493851, 0.06681023856831536]
+    KLMS = [1.0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0.004444906415833378, 0.003477837670425714, 0.005378876304115907, 0.005783583661113503, -0.002305670990235569, -0.004974910518199871, 0.003351084537350686]
     A_M = 1000
     a = np.sqrt(5/3) * A_M * np.sqrt(1 - 2 * KLMS[8] + 12 * KLMS[4])
     b = np.sqrt(5/3) * A_M * np.sqrt(1 - 2 * KLMS[8] - 12 * KLMS[4])
     c = np.sqrt(5/3) * A_M * np.sqrt(1 + 4 * KLMS[8])
     def indicator(pos):
-        return pos[0] * pos[0]/(a*a) + pos[1] * pos[1]/(b*b) + pos[2] * pos[2]/(c*c) < 1
+        return pos[0] * pos[0] + pos[1] * pos[1] + pos[2] * pos[2] < (A_M * A_M * 5/3)
+        #return pos[0] * pos[0]/(a*a) + pos[1] * pos[1]/(b*b) + pos[2] * pos[2]/(c*c) < 1
 else:
     KLMS = None
     A_M = None
@@ -97,17 +98,19 @@ def lm_from_index(index):
 MAX_L = int(np.sqrt(len(KLMS))) - 1
 
 real_hlms = [k for k in KLMS]
+real_klms = [k for k in KLMS]
 complex_hlms = np.zeros_like(KLMS, dtype=np.cdouble)
+complex_klms = np.zeros_like(KLMS, dtype=np.cdouble)
 for l in range(MAX_L+1):
     for m in range(-l, l+1):
         if m == 0:
-            complex_hlms[get_index(l, m)] = KLMS[(l+1)**2 - 1]
+            complex_klms[get_index(l, m)] = KLMS[(l+1)**2 - 1]
         else:
-            complex_hlms[get_index(l, m)] = KLMS[(l)**2 + 2 * l - 2 * abs(m)] + 1.0j * KLMS[(l)**2 + 2 * l - 2 * abs(m) + 1]
+            complex_klms[get_index(l, m)] = KLMS[(l)**2 + 2 * l - 2 * abs(m)] + 1.0j * KLMS[(l)**2 + 2 * l - 2 * abs(m) + 1]
         if m < 0:
-            complex_hlms[get_index(l, m)] = (-1)**m * complex_hlms[get_index(l, m)].conj()
-        real_hlms[get_index(l, m)] *= A_M**l
-        complex_hlms[get_index(l, m)] *= A_M**l
+            complex_klms[get_index(l, m)] = (-1)**m * complex_klms[get_index(l, m)].conj()
+        real_hlms[get_index(l, m)] = real_klms[get_index(l, m)] * A_M**l
+        complex_hlms[get_index(l, m)] = complex_klms[get_index(l, m)] * A_M**l
 
 def rlm(l, m, pos):
     r = np.sqrt(max(0, pos[0] * pos[0] + pos[1] * pos[1] + pos[2] * pos[2]))
@@ -131,18 +134,22 @@ def get_radius(densities):
                     rad += densities[nx,ny,nz] * (x**2 + y**2 + z**2)
     return np.sqrt(rad * DIVISION**3)
 
+def get_mass(densities):
+    return np.nansum(densities) * DIVISION**3
+
 if __name__ == "__main__":
     densities = np.full((len(pos_array), len(pos_array), len(pos_array)), np.nan)
     for nx, x in enumerate(pos_array):
         for ny, y in enumerate(pos_array):
             for nz, z in enumerate(pos_array):
                 if indicator([x, y, z]):
-                    densities[nx, ny, nz] = 1
+                    densities[nx, ny, nz] = -rlm(3,0,[x,y,z]).real / A_M**3
     densities /= np.nansum(densities) * DIVISION**3
     radius = get_radius(densities)
     print(radius, '\t', A_M)
     i = 0
-    for l in range(3):
+    for l in range(4):
+        print()
         for m in range(-l, l+1):
             print(get_hlms(l, m, densities) / radius**l, "\t", complex_hlms[i] / A_M**l)
             i += 1
