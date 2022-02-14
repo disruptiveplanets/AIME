@@ -1,0 +1,46 @@
+\documentclass[11pt]{article}
+
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\usepackage[backend=bibtex, style=numeric, sorting=none,
+  doi=false, isbn=false, url=false]{biblatex}
+\usepackage[colorlinks=true, citecolor=magenta]{hyperref}
+\addbibresource{asteroids.bib}
+
+\title{Constraining the Interiors of Asteroids Through Close Encounters\\ 
+{\Large Spring 2022 UROP proposal}}
+
+\author{Jack Dinsmore}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+  This UROP will be conducted with Prof. Julien de Wit of the Earth, Atmospheric, and Planetary Sciences Department (office: 54-1726) during the Spring of 2022. It will be a theoretical UROP, so no room number is applicable. I am applying for 20 hours per week of direct funding.
+\end{abstract}
+
+\section{Overview}
+Asteroids provide vital information about the properties and evolution of the early Solar System. Many asteroids are preserved fragments of the planetesimals that made up the Sun's protoplanetary disk and are some of the only remnants from this era which are not bound in planets or stars and altered beyond recognition. Much research has therefore been devoted to studying asteroids in recent years, including many observational initiatives such as the NEOWISE mission and asteroid sample return missions Hayabusa and OSIRIS-REx. In total, hundreds of thousands of asteroids have been discovered.
+
+However, it is difficult to determine the properties of many of these asteroids. For nearby or large asteroids, the surface topography and composition can be constrained given data of the total amount of sunlight reflected off the rotating asteroid as a function of time (light curve analysis). In general, however, it is very difficult to constrain the interior distribution of an asteroid without sending an expensive spacecraft to the body itself.
+
+One way of constraining the interior properties of an asteroid is to observe its gravitational interactions. This has been done in general, from a theoretical perspective \cite{ashenberg07, paul88, BOUE2009750}, in the context of observing an asteroid binary system \cite{Naidu_2015, DESCAMPS2020113726}, and for asteroid encounters with a planet \cite{BENSON2020113518, MOSKOVITZ2020113519, SCHEERES2005281}. But only a small set of the parameters capable of being observed by this gravitational analysis have actually been constrained to this point.
+
+In this project, we derive new equations of motion for an asteroid encounter with a planet to arbitrary order and build a simulation for the asteroid encounter system. We use Markov Chain Monte Carlo fit algorithm to perform many injection-retrieval tests, extracting parameters constraining the density distribution of the asteroid. We sudy both parameters which have previously been extracted, and parameters which have not yet been observed. By studying many different flyby settings, we determine what system parameters lead to poor constraints on the asteroid parameters. We then discuss four methods to extract density distributions from these parameters under different assumptions, and conclude with a discussion of what technology and flyby types are required to observe the hitherto undetected asteroid parameters.
+
+To keep the scope of this project appropriate, we make several physical assumptions about the asteroid encounter system. Specifically, we assume that (1) the system contains two bodies (perturbations from the Sun and moons are neglected), (2) the asteroid remains rigid throughout the flyby, and (3) the asteroid is initially not tumbling. We also make several assumptions about the encounter data available, namely (1) that the angular velocity of the asteroid can be extracted as a function of time, and (2) that the uncertainty on the angular velocity follows our uncertainty model. To apply the model to specific flybys in which these assumptions do not hold would require a modification to the asteroid model. However, these assumptions are data-motivated, designed to be characteristic of many asteroid flybys. By making them, we intend to increase the generality of our findings.
+
+
+\section{Work Plan \& Goals}
+I have been working on this research project since last summer and have made significant progress. The project is nearly complete insofar as it is currently scoped. This semester, I will write up my work into a paper which will be submitted for publication in \textit{The Astrophysical Journal}, and I will present my work to several faculty in the EAPS department. I anticipate making several modifications to respond to suggestions made by the faculty members, which is why I require 20 hours of funding this semester. Examples of additional work that may be required are (1) performing a flyby fit to actual data rather than synthetic data and (2) a more careful review of assumptions.
+
+My personal goal for this project initially was to continue with a project I had enjoyed from a class. I viewed it as a good way to increase my research skills, especially simulation design and statistics knowledge. As the project has expanded, my perception of the project has switched from one of personal improvement to an actual paper that would be submitted. My primary goal now is one of aiding scientific research on asteroids. My research shows that we may be able to constrain the interior distribution of asteroids better than is currently done, and I'm excited to help in that effort.
+
+\section{Personal Statement}
+When I started this project, I was considering not going to grad school and moving to industry instead. My experience in doing self-directed research in this project, and enjoying it, helped me make the decision to apply to grad school. It also convinced me to apply for astrophysics programs; I had previously been considering condensed matter and other fields.
+
+Now that I've been accepted to grad school, I'm interested in branching out into other research areas. Specifically, research areas that are not purely classical. Compact body physics, for instance. However, this research project will still be extremely useful to me as a full-fledged example of a theoretical, classical physics research project, and I will use it to help guide myself towards my eventual field of specialization, regardless of whether I continue with asteroid research specifically.
+
+\printbibliography
+
+
+\end{document}
