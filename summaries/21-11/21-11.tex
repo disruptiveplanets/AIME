@@ -780,6 +780,7 @@ The Moore-Penrose pseudoinverse of $A$ is defined as $A^+ = A^* (AA^*)^{-1}$, wh
 
 
 \subsection{Comparison of density distribution models}
+\label{sec:density-results}
 In this section, we compare the above methods of extracting asteroid density distributions given sample values for $K_{\ell m}$, to demonstrate their differences in behavior. To display the density distributions (and to derive them for the likelihood and ensemble average models), we subdivide the asteroid into a lattice of uniform-density cubes, each with a side length of ten meters. In the case of the ensemble average model, we average over 48 ensembles.
 
 The sample $K_{\ell m}$ values we investigate are the symmetric and asymmetric benchmark values listed in appendix \ref{app:reference-config}. We execute the models for both benchmarks, and for the three models which require a fixed surface, we use both a spherical surface (radius equal to $\sqrt{5/3} a_m$) and an elliptical (axes set by section \ref{sec:constant-density-ellipsoid}) model.
@@ -844,8 +845,60 @@ The figure demonstrates the limitations on the uniform density model: only a sma
 \end{figure}
 
 
+\subsection{High order parameters}
+In the above demonstrations of the four density distribution models, we test examples where only the $K_{2m}$ parameters are known. In this section, we show density distributions extracted for example values of known $K_{3m}$.
 
-\section{Uncertainty Testing}
+Suppose $K_{2m} = 0$. For the models that fix the surface of the asteroid, we assume a spherical shape, which is the uniform-density shape associated with $K_{2m} = 0$. We introduce $K_{3m}$ parameters uniformly randomly chosen in $(-0.01, 0.01)$; larger values of $K_{3m}$ tended to lead to highly negative density distributions. The three fixed-shape density distributions are shown in figure \ref{fig:high-order-fixed} and the constant-density distribution is shown in figure \ref{fig:high-order-surface}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.32\textwidth]{harmonic-high.pdf}
+  \includegraphics[width=0.32\textwidth]{likelihood-high.pdf}
+  \includegraphics[width=0.32\textwidth]{ensemble-high.pdf}
+  \caption{Density distributions extracted for the three fixed-surface models, for a spherical asteroid with $I_x=I_y=I_z$ but nonzero $K_{3m}$.}
+  \label{fig:high-order-fixed}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.32\textwidth]{surface-high.pdf}
+  \caption{Asteroid shape extracted for an asteroid with $I_x = I_y = I_z$ but nonzero $K_{3m}$ as a demonstration of the effects of the higher order $K_{3m}$ moments.}
+  \label{fig:high-order-surface}
+\end{figure}
+
+Beyond demonstrating the effectiveness of the density distribution algorithms when $K_{3m}$ parameters are introduced, figure \ref{fig:high-order-fixed} demonstrates again the similarity between the likelihood and the harmonic models, and shows that both still prefer smoothly varying distributions. The ensemble distribution is much less smoothly varying. More drawings of Voronoi cells would likely smooth the distribution further. All three density distributions produce negative (and therefore unphysical) density distributions.
+
+Figure \ref{fig:high-order-surface} shows that the constant density model is able to find a smooth surface to match an asteroid with nonzero $K_{3m}$ despite the negative densities in the fixed-surface model. Specifically, the surface model appears to have removed parts of the sphere that corresponded to low density in the fixed-surface model and extruded the asteroid shape in regions of high density. This fact demonstrates the sensitivity of the fixed-surface density distributions of figure \ref{fig:high-order-fixed} to the surface model; a relatively small change to the shape of the distribution can change the density distribution from unphysical (negative) to physical (positive --- indeed constant). It also suggests that a reasonable way to adjust a surface model to avoid unphysical density distributions is to remove regions with low density and add to regions with high density.
+
+\jtd{Should I explore the location / size of a rock?}
+\jtd{How should I talk about the scale size of the high order moments? By my random draw method? By calculating them for an ellipsoid, tetrahedron, and dumbbell?}
+
+
+\subsection{Structure of density moments}
+In this section, we qualitatively describe the properties of the density moments for the sake of interpreting them.
+
+First, we mention the symmetry property $K_{\ell m} = (-)^m K_{\ell,-m}^*$ which causes each degree $\ell$ to contain $2\ell + 1$ degrees of freedom (Further degrees of freedom are removed by fixing the origin of the coordinate system, its orientation, and the asteroid's mass). Also, $\Im K_{\ell 0} = 0$. Each $K_{\ell m}$ contains a factor of $r^\ell / a_m^\ell$ in its integrand, and since we generally expect $r \sim a_m$, naively we expect all $K_{\ell m}$ to be of the same order of magnitude. However, the fact that $\rho > 0$ everywhere induces other complications. Specifically, \jtd{The part listed in the paper for $K_{20}$}. For the allowed values of $K_{3 m}$ are more difficult to constrain, but we note that $|K_{\ell m}| \gtrsim 0.01$ often lead to negative density distributions. Furthermore, of the four shapes studied in section \ref{sec:density-results} (a sphere, ellipsoid, tetrahedron, and dumbbell), only the tetrahedron has nonzero $K_{3 m}$ and even for the tetrahedron, $K_{3m}=0$ except $\Re K_{32} = -0.036$.
+
+Symmetries of the asteroid density model may set some $K_{\ell m}=0$. Specifically, the parity properties of $R_{\ell m}$ under axis flips along $x$, $y$, and $z$ guarantee that asteroid density distributions that are flip-symmetric along $z$ have $K_{\ell m}=0$ when $\ell + m$ is odd. Flip-symmetry along $x$ guarantees $\Re K_{\ell m} = 0$ for $m$ odd and $\Im K_{\ell m} = 0$ for $m$ even. Flip-symmetry along $y$ guarantees $\Im K_{\ell m} = 0$ always. These results are summarized in table \ref{tab:symmetries}.
+
+The first three rows of table \ref{tab:symmetries} are as intuitively expected. $K_{00}$ (mass) is not zeroed by any mirror symmetries. This fact is even more clear from the definition of $K_{\ell m}$, which normalizes by mass such that $K_{00}=1$. But even without this normalization, $K_{00}$ would not be zeroed by symmetries. Also, $K_{1m}$ each correspond to one symmetry axis because they are the coordinates of the center of mass. Finally, $K_{21}$ and $\Im K_{22}$ are each zeroed by two symmetry axes because they express coordinate system orientation. The other two degree-two moments $K_{20}$ and $\Re K_{22}$ are not zeroed by mirror symmetries because they are moment of inertia ratios and must be positive.
+
+The last row of table \ref{tab:symmetries} shows that all $K_{3m}$ moments are zeroed by at least one symmetry. Therefore, a highly non-mirror symmetric distribution is necessary to produce large $K_{3m}$ values. This is why the constant density sphere, ellipsoid, and dumbbell shapes all have $K_{3m} = 0$.
+
+\begin{table}
+  \centering
+  \begin{tabular}{c|ccccccc}
+    \hline\hline
+    $\ell$ & $\Re K_{\ell 3}$ & $\Im K_{\ell 3}$ & $\Re K_{\ell 2}$ & $\Im K_{\ell 2}$ & $\Re K_{\ell 1}$ & $\Im K_{\ell 1}$ & $K_{\ell 0}$ \\ \hline
+    0&   &   &   &   &   &   &$-$\\
+    1&   &   &   &   &$x$&$y$&$z$\\
+    2&   &   &$-$&$x,y$&$x,z$&$y,z$&$-$\\
+    3&$x$&$y$&$z$&$x,y,z$&$x$&$y$&$z$\\ \hline \hline
+  \end{tabular}
+  \caption{For each $K_{\ell m}$ value from $\ell = 0$ to 3, the density distribution mirror symmetries which set $K_{\ell m} = 0$ are listed. Mirror symmetries around the axis $x$ are marked with $x$ and so on. A dash indicates that no mirror symmetries set $K_{\ell m} = 0$.}
+  \label{tab:symmetries}
+\end{table}
+
 
 
 \section{Conclusion}

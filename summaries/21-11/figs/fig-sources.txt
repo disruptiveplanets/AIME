@@ -63,3 +63,10 @@ likelihood-tet.pdf code/density/figs/tet-likelihood-slice.pdf
 harmonic-dumb-bell.pdf code/density/figs/dumb-bell-harmonic-slice.pdf
 ensemble-dumb-bell.pdf code/density/figs/dumb-bell-ensemble-slice.pdf
 likelihood-dumb-bell.pdf code/density/figs/dumb-bell-likelihood-slice.pdf
+
+
+harmonic-high.pdf code/density/figs/high-harmonic-slice.pdf
+ensemble-high.pdf code/density/figs/high-ensemble-slice.pdf
+likelihood-high.pdf code/density/figs/high-likelihood-slice.pdf
+surface-high.pdf code/density/figs/high-surface-slice.pdf
+
