@@ -68,28 +68,28 @@ for plot_index in range(N_DIM+1):
     param_data = np.zeros(len(v_excess) * N_PERCENTILES).reshape(N_PERCENTILES, len(v_excess))
     for f in percentiles.keys():
         param_data[:,name_index[f]] = percentiles[f][i]
-    scale = 1e5 if i < 3 else 1
+    scale = 1e7 if i < 3 else 1e2
 
-    axs[plot_index].plot(v_excess, (param_data[1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].plot(v_excess, (param_data[-1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].fill_between(v_excess, (param_data[1]-param_data[0]) / true_sigma * scale, 
-        (param_data[-1]-param_data[0]) / true_sigma * scale,  color=f"C{i}", alpha=0.3)
+    axs[plot_index].plot(v_excess, (param_data[1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].plot(v_excess, (param_data[-1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].fill_between(v_excess, (param_data[1]-param_data[0]) * scale, 
+        (param_data[-1]-param_data[0]) * scale,  color=f"C{i}", alpha=0.3)
 
-    axs[plot_index].plot(v_excess, (param_data[2]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].plot(v_excess, (param_data[-2]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].fill_between(v_excess, (param_data[2]-param_data[0]) / true_sigma * scale,
-        (param_data[-2]-param_data[0]) / true_sigma * scale, color=f"C{i}", alpha=0.3)
+    axs[plot_index].plot(v_excess, (param_data[2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].plot(v_excess, (param_data[-2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].fill_between(v_excess, (param_data[2]-param_data[0]) * scale,
+        (param_data[-2]-param_data[0]) * scale, color=f"C{i}", alpha=0.3)
 
-    axs[plot_index].plot(v_excess, (param_data[3]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+    axs[plot_index].plot(v_excess, (param_data[3]-param_data[0]) * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
 
-    y_min_norm = np.min((param_data[-1]-param_data[0]) / true_sigma * scale)
-    y_max_norm = np.max((param_data[1]-param_data[0]) / true_sigma * scale)
+    y_min_norm = np.min((param_data[-1]-param_data[0]) * scale)
+    y_max_norm = np.max((param_data[1]-param_data[0]) * scale)
     axs[plot_index].set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
 
     if i < 3:
-        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta (\\times 10^{{-5}})$", size=AXIS_SIZE)
+        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) (\\times 10^{{-7}})$", size=AXIS_SIZE)
     else:
-        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta$", size=AXIS_SIZE)
+        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) (\\times 10^{{-2}})$", size=AXIS_SIZE)
 
     #axs[i].set_xscale('log')
     #axs[i].set_yscale('log')

@@ -74,26 +74,26 @@ for i in range(N_DIM):
     param_data = np.zeros(len(oblatenesses) * N_PERCENTILES).reshape(N_PERCENTILES, len(oblatenesses))
     for f in percentiles.keys():
         param_data[:,name_index[f]] = percentiles[f][i]
-    scale = 10**5 if i < 3 else 1
-    axs[i].plot(oblatenesses, (param_data[1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[i].plot(oblatenesses, (param_data[-1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[i].fill_between(oblatenesses, (param_data[1]-param_data[0]) / true_sigma * scale, 
-        (param_data[-1]-param_data[0]) / true_sigma * scale,  color=f"C{i}", alpha=0.3)
+    scale = 10**7 if i < 3 else 1
+    axs[i].plot(oblatenesses, (param_data[1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[i].plot(oblatenesses, (param_data[-1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[i].fill_between(oblatenesses, (param_data[1]-param_data[0]) * scale, 
+        (param_data[-1]-param_data[0]) * scale,  color=f"C{i}", alpha=0.3)
 
-    axs[i].plot(oblatenesses, (param_data[2]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[i].plot(oblatenesses, (param_data[-2]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[i].fill_between(oblatenesses, (param_data[2]-param_data[0]) / true_sigma * scale,
-        (param_data[-2]-param_data[0]) / true_sigma * scale, color=f"C{i}", alpha=0.3)
+    axs[i].plot(oblatenesses, (param_data[2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[i].plot(oblatenesses, (param_data[-2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[i].fill_between(oblatenesses, (param_data[2]-param_data[0]) * scale,
+        (param_data[-2]-param_data[0]) * scale, color=f"C{i}", alpha=0.3)
 
-    axs[i].plot(oblatenesses, (param_data[3]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+    axs[i].plot(oblatenesses, (param_data[3]-param_data[0]) * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
 
     axs[i].set_xscale('log')
-    axs[i].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta\\ (\\times 10^{{-5}})$", size=AXIS_SIZE)
+    axs[i].set_ylabel(f"$\sigma({param_names[i]})\\ (\\times 10^{{-7}})$", size=AXIS_SIZE)
 
-    s1n = plot_best_fit(axs[i], oblatenesses, (param_data[-1]-param_data[0]) / true_sigma, scale)
-    s1 = plot_best_fit(axs[i], oblatenesses, (param_data[1]-param_data[0]) / true_sigma, scale)
-    s2n = plot_best_fit(axs[i], oblatenesses, (param_data[-2]-param_data[0]) / true_sigma, scale)
-    s2 = plot_best_fit(axs[i], oblatenesses, (param_data[2]-param_data[0]) / true_sigma, scale)
+    s1n = plot_best_fit(axs[i], oblatenesses, (param_data[-1]-param_data[0]), scale)
+    s1 = plot_best_fit(axs[i], oblatenesses, (param_data[1]-param_data[0]), scale)
+    s2n = plot_best_fit(axs[i], oblatenesses, (param_data[-2]-param_data[0]), scale)
+    s2 = plot_best_fit(axs[i], oblatenesses, (param_data[2]-param_data[0]), scale)
     #sm = plot_best_fit(axs[i], oblatenesses, (param_data[3]-param_data[0]) / true_sigma, scale)
     
     print((s1n + s1 + s2n + s2) / 4)

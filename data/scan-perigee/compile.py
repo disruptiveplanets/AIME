@@ -69,19 +69,19 @@ for plot_index in range(N_DIM+1):
     param_data = np.zeros(len(perigees) * N_PERCENTILES).reshape(N_PERCENTILES, len(perigees))
     for f in percentiles.keys():
         param_data[:,name_index[f]] = percentiles[f][i]
-    scale = 1e3 if i < 1 else 1
+    scale = 1e5 if i < 1 else 1e2
 
-    axs[plot_index].plot(perigees, (param_data[1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].plot(perigees, (param_data[-1]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].fill_between(perigees, (param_data[1]-param_data[0]) / true_sigma * scale, 
-        (param_data[-1]-param_data[0]) / true_sigma * scale,  color=f"C{i}", alpha=0.3)
+    axs[plot_index].plot(perigees, (param_data[1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].plot(perigees, (param_data[-1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].fill_between(perigees, (param_data[1]-param_data[0]) * scale, 
+        (param_data[-1]-param_data[0]) * scale,  color=f"C{i}", alpha=0.3)
 
-    axs[plot_index].plot(perigees, (param_data[2]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].plot(perigees, (param_data[-2]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].fill_between(perigees, (param_data[2]-param_data[0]) / true_sigma * scale,
-        (param_data[-2]-param_data[0]) / true_sigma * scale, color=f"C{i}", alpha=0.3)
+    axs[plot_index].plot(perigees, (param_data[2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].plot(perigees, (param_data[-2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].fill_between(perigees, (param_data[2]-param_data[0]) * scale,
+        (param_data[-2]-param_data[0]) * scale, color=f"C{i}", alpha=0.3)
 
-    axs[plot_index].plot(perigees, (param_data[3]-param_data[0]) / true_sigma * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+    axs[plot_index].plot(perigees, (param_data[3]-param_data[0]) * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
 
     def fit_func(x, power, slope):
         m = x[:len(x)//2]**power * slope
@@ -90,7 +90,7 @@ for plot_index in range(N_DIM+1):
     params = lmfit.Parameters()
     params.add('power', min=0.1, max=5, value=3)
     params.add('slope', min=0, max=100, value=1)
-    data = np.append((param_data[1]-param_data[0]) / true_sigma * scale, (param_data[-1]-param_data[0]) / true_sigma * scale)
+    data = np.append((param_data[1]-param_data[0]) * scale, (param_data[-1]-param_data[0]) * scale)
     result = model.fit(data, params, x=np.append(perigees, perigees), weights=np.ones(len(perigees)*2))
     power, slope = result.params["power"].value, result.params["slope"].value
     power_unc, slope_unc = result.params["power"].stderr, result.params["slope"].stderr
@@ -103,14 +103,14 @@ for plot_index in range(N_DIM+1):
         axs[plot_index].plot(perigees, perigees**power * slope, color="k", linewidth=1, linestyle='dotted')
         axs[plot_index].plot(perigees, -perigees**power * slope, color="k", linewidth=1, linestyle='dotted')
 
-    y_min_norm = np.min((param_data[-1]-param_data[0]) / true_sigma * scale)
-    y_max_norm = np.max((param_data[1]-param_data[0]) / true_sigma * scale)
+    y_min_norm = np.min((param_data[-1]-param_data[0]) * scale)
+    y_max_norm = np.max((param_data[1]-param_data[0]) * scale)
     axs[plot_index].set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
 
     if i < 1:
-        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta (\\times 10^{{-3}})$", size=AXIS_SIZE)
+        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) (\\times 10^{{-5}})$", size=AXIS_SIZE)
     else:
-        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta$", size=AXIS_SIZE)
+        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) (\\times 10^{{-2}})$", size=AXIS_SIZE)
 
     #axs[i].set_xscale('log')
     #axs[i].set_yscale('log')

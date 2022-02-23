@@ -51,7 +51,6 @@ for name in percentiles.keys():
     name_index[name] = int(dir_name[-2:])
     true_sigmas.append(sigma[0])
     ratio = sigma[1]
-    print(ratio)
 
 true_sigmas = np.array(true_sigmas)
 
@@ -86,6 +85,9 @@ for plot_index in range(N_DIM+1):
         axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta$", size=AXIS_SIZE)
 
     axs[plot_index].set_xscale('log')
+
+    constant_val = (param_data[1]-param_data[0])[0] * scale / true_sigmas**2
+    axs[plot_index].plot(product, np.ones_like(param_data[1]) * constant_val * true_sigmas, color='k', linewidth=1, linestyle='dotted')
     
     if plot_index in [6, 8, 10]:
         axs[plot_index].set_xlabel(f"$\sigma_\\theta\sigma_\\rho$")
@@ -100,8 +102,9 @@ axs[11].remove()
 
 custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=4, alpha=0.6),
-                Line2D([0], [0], color='k', lw=1, linestyle='dashed')]
-fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='lower right', prop={'size': LEGEND_SIZE})
+                Line2D([0], [0], color='k', lw=1, linestyle='dashed'),
+                Line2D([0], [0], color='k', lw=1, linestyle='dotted')]
+fig.legend(custom_lines, ['95\%', '68\%', '50\%', "Constant $\sigma K_{\ell m}$"], ncol=3, loc='lower right', prop={'size': LEGEND_SIZE})
 fig.tight_layout()
 
 line = plt.Line2D([0,1],[0.77, 0.77], transform=fig.transFigure, color="black")

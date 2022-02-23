@@ -52,7 +52,6 @@ for name in percentiles.keys():
     name_index[name] = index
     index += 1
     true_sigmas.append(sigma[0])
-    print(sigma[0]**2 * sigma[1])
     sigma_rat.append(sigma[1])
 
 sigma_rat = np.array(sigma_rat)
