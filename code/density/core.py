@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.special import lpmv, factorial
+from scipy.linalg import norm
 from display import make_gif, make_slices
 
 import warnings
@@ -111,9 +112,9 @@ class Asteroid:
         self.grid_line = np.arange(-max_radius, max_radius, division)
         self.indicator = indicator
         self.indicator_map = self.get_indicator_map()
-        self.data, self.sigma_data = self.load_samples(sample_file)
+        if sample_file != "":
+            self.data, self.sigma_data = self.load_samples(sample_file)
         self.moments = None
-
 
     def load_samples(self, fname):
         with open(fname, 'rb') as f:
@@ -184,12 +185,14 @@ class Asteroid:
         return a.reshape(-1)[self.indicator_map.reshape(-1)]
 
 
-    def moment_field(self):
+    def moment_field(self, max_l=None):
+        if max_l is None:
+            max_l = self.max_l
         if self.moments is None:
-            n = (self.max_l+1)**2 + 1
+            n = (max_l+1)**2 + 1
             self.moments = np.zeros((n, len(self.grid_line), len(self.grid_line), len(self.grid_line)), dtype=np.complex)
             i = 0
-            for l in range(0, self.max_l+1):
+            for l in range(0, max_l+1):
                 for m in range(-l, l+1):
                     self.moments[i] = self.map_np(rlm_gen(l,m))
                     i += 1
@@ -200,3 +203,30 @@ class Asteroid:
 class Indicator:
     def sph(am):
         return lambda x,y,z: x*x + y*y + z*z < am*am*5/3
+
+    def ell(am, k22, k20):
+        b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
+        a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 + 12 * k22)
+        c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
+        return lambda x,y,z: x*x/(a*a) + y*y/(b*b) + z*z/(c*c) < 1
+
+    def tet(am, tet_shrink=1):
+        tet_corners = 1.82688329031 * am * np.array([
+            (1, 0, -1/np.sqrt(2)*tet_shrink),
+            (-1, 0, -1/np.sqrt(2)*tet_shrink),
+            (0, 1, 1/np.sqrt(2)*tet_shrink),
+            (0, -1, 1/np.sqrt(2)*tet_shrink)])
+        tet_norms = []
+        for i in range(len(tet_corners)):
+            v1 = tet_corners[i]
+            v2 = tet_corners[(i+1)%4]
+            v3 = tet_corners[(i+2)%4]
+            normal = np.cross(v2-v1, v3-v1)
+            tet_norms.append(normal / norm(normal))
+        d = [np.dot(tet_norms[i], tet_corners[i]) for i in range(4)]
+        return lambda x,y,z: np.array([np.all([np.dot([xi,yi,zi], tet_norms[i]) / d[i] < 1 for i in range(4)]) for xi, yi, zi in zip(x.reshape(-1), y.reshape(-1), z.reshape(-1))]).reshape(x.shape)
+
+    def dumbbell(am):
+        db_rad = am / np.sqrt(19/20)
+        return lambda x,y,z: np.array([np.sum(([xi,yi,zi] - np.array([db_rad/2, 0, 0]))**2) < db_rad*db_rad or \
+            np.sum(([xi,yi,zi] + np.array([db_rad/2, 0, 0]))**2) < db_rad*db_rad for xi, yi, zi in zip(x.reshape(-1), y.reshape(-1), z.reshape(-1))]).reshape(x.shape)

@@ -13,6 +13,8 @@
 \newcommand{\quat}[1]{\widetilde{\bm{#1}}}
 \newcommand{\siunit}[1]{\ \textrm{#1}}
 \newcommand{\per}[1]{\ \textrm{#1}^{-1}}
+\newcommand{\Cov}{\textrm{Cov}}
+\newcommand{\Var}{\textrm{Var}}
 \usetikzlibrary{arrows.meta}
 
 \shorttitle{Constraining the Interiors of Asteroids Through Close Encounters}
@@ -899,6 +901,89 @@ The last row of table \ref{tab:symmetries} shows that all $K_{3m}$ moments are z
   \label{tab:symmetries}
 \end{table}
 
+
+
+\section{Density distributions, but redone}
+
+In this section, we describe a pipeline to convert the density moments $K_{\ell m}$ to a density distribution $\rho(\bm r)$ which correctly reproduces the density moments via equation \ref{eqn:jlm}. We will also produce a function $\sigma_\rho(\bm r)$ which represents the uncertainty in density propagated from uncertainty in the $K_{\ell m}$ moments. Unfortunately, $\rho(\bm r)$ represents infinitely many degrees of freedom, whereas generally only a few $K_{\ell m}$ are known. Additional assumptions must therefore be made to produce one $\rho(\bm r)$ solution. One assumption we will make is that the surface of the asteroid has been accurately determined, from light curve data for instance. A method of computing a density distribution when no asteroid surface is known is presented in appendix \jtd{Appendix}. A few example sets of solutions are described below, but first we investigate the problem in a general formulation, agnostic of what assumptions beyond a known surface are chosen to eliminate the degeneracy.
+
+\subsection{General formulation}
+We assume that an indicator function $\mathds{1}(\bm r)$ has been determined such that $\mathds{1}(\bm r) = 1$ inside the asteroid and 0 outside, where $\mathds{1}(\bm r)$ is defined in some frame whose orientation with respect to Earth is known. The initial orientation of the asteroid's spin pole with respect to Earth is also known, which fixes the initial orientation of the local frame (the asteroid's frame) with respect to Earth up to one parameter $\gamma_0$, which is attained by a fit as seen in previous sections.
+
+We define a new coordinate system, the ``hybrid frame,'' which coincides exactly with the initial orientation of the asteroid assuming that the fit result for $\gamma_0$ is perfectly accurate. The indicator function $\mathds{1}$ is then assumed to be known exactly in this frame, and the $K_{\ell m}$ components are known in the local frame which aligns with the hybrid frame up to uncertainty in $\gamma_0$. We will solve for $\rho(\bm r)$ in the hybrid frame given fit results $K_{\ell m}$ and the known $a_m$.
+
+The density moments $K_{\ell m}$ defined in equation \ref{eqn:jlm} are not linear in $\rho(\bm r)$, but we may fix $a_m$ at the value assumed during the fit, removing the non-linearity induced by division by $a_m$. Furthermore, since the system is independent of the total asteroid mass, we set $\mu_m$ equal to an arbitrary constant which makes equation \ref{eqn:jlm} linear in $\rho(\bm r)$. Similarly, the form of equation \ref{eqn:am} guarantees that $a_m^2$ is linear in $\rho(\bm r)$. Equations \ref{eqn:am} and the $\ell, m = 0, 0$ component of equation \ref{eqn:jlm} can be used to enforce the choices of $\mu_m$ and $a_m^2$.
+
+Suppose that we restrict the number of degrees of freedom of $\rho(\bm r)$ from infinity to $m$ by explicitly defining some function $\rho(\bm r, \bm D)$ for an $m$-dimensional vector $\bm D$ which controls the free parameters of $\rho$. We will leave the explicit definition of $\rho$ to the model descriptions below, but for now we assume that $\rho$ is linear in $\bm D$; i.e.,
+\begin{equation}
+  \rho(\bm r, \bm D) = \bm B(\bm r) \cdot \bm D
+  \label{eqn:density-distro}
+\end{equation}
+for a $m$-dimensional vector $\bm B(\bm r)$. Thus, equations \ref{eqn:hlm-constraint} and \ref{eqn:b-constraint} represent a linear function that gives $K_{\ell m}$ in terms of $\bm D$. We further assume that the model describes a way to reverse this equation, to write
+\begin{equation}
+  \bm D = A \bm K.
+  \label{eqn:density-model}
+\end{equation}
+Here, we have arranged $a_m^2$ and the components of $K_{\ell m}$ into a vector $K$, which we say has $n$ dimensions. The order of this arrangement is irrelevant, as long as it is kept consistent.
+
+To calculate the uncertainty on $\bm D$ and therefore $\rho(\bm r)$, we first need the covariance matrix $\Sigma_K$ for $\bm K$. First, assume that the hybrid frame is offset from the local frame by some small angle $\Delta \gamma$, which results from uncertainty in $\gamma_0$. Then
+\begin{equation}
+  K_{\ell m}^\mathrm{hybrid} = e^{-im\Delta \gamma}K_{\ell m}^\mathrm{local}.
+  \label{eqn:local-to-hybrid}
+\end{equation}
+Since $K_{\ell m}^\mathrm{local}$ was obtained by an MCMC fit, a large set of posterior-distributed samples are available for $\Delta \gamma$ and $K_{\ell m}^\mathrm{local}$, and the covariance matrix $\Sigma_K$ can be computed statistically by applying equation \ref{eqn:local-to-hybrid} to the samples. Then, propagation of uncertainty guarantees that the covariance matrix of $\bm D$ is $\Sigma_D = A \Sigma_K A^T$
+and the density distribution and uncertainty on density distribution are equal to
+\begin{equation}
+  \rho(\bm r) = \rho(\bm r, A\bm K) \qquad \sigma^2_\rho(\bm r) = \bm B(\bm r)^T A \Sigma_K A^T \bm B(\bm r).
+  \label{eqn:unc-rho}
+\end{equation}
+
+The job of a model is therefore to restrict the space of valid density distributions by defining the $m\times n$-dimensional constant matrix $A$ and the $m$-dimensional vector $\bm B(\bm r)$ such that equations \ref{eqn:density-model} and \ref{eqn:density-distro} are true. Then the density distribution and its uncertainty are given by equation \ref{eqn:unc-rho}.
+
+\subsection{Likelihood model}
+In order to restrict the space of density distributions that correspond to the known $H_{\ell m}$ so that only one distribution remains, we define a function $\mathcal{L}$ which takes large values for ``nice'' density distributions according to some metric of niceness. We then take the density distribution which maximizes $\mathcal{L}$. In this way, $\mathcal{L}$ can be thought of a likelihood for the density distribution, but it should not be confused with the likelihood used to extract the fit parameters $K_{\ell m}$. 
+
+To employ this method, we divide the asteroid into a square grid of $m \gg n$ elements, each of which is assumed to have constant density $\rho_0$ plus some deviation $D_i$. This defines the model function $\bm B(\bm r)$, which is zeroed in all components except for the $i$th, where $i$ is the index of the grid element that contains $\bm r$.
+
+The task is to define a likelihood $\mathcal{L}(\bm D)$ such that the minimum satisfies equation \ref{eqn:density-model}. This happens to be an uncorrelated Gaussian likelihood
+\begin{equation}
+  \mathcal{L}(\bm D) = \prod_{i=1}^m \frac{1}{\sqrt{2\pi \sigma^2}} \exp\parens{-\frac{D_i^2}{2 \sigma^2}}
+\end{equation}
+with free parameters $\mu$ and $\sigma$. These parameters do not affect the location of the maximum, so we do not define them. Given this likelihood, the log likelihood is proportional to $-|\bm D|^2$. Minimizing the norm of $\bm D$ is therefore equivalent to finding the maximum likelihood.
+
+To minimize this norm, we use the fact that equations \ref{eqn:jlm} and \ref{eqn:am} correspond exactly to a matrix equation $\bm K = M \bm D$, where the $i$th entry of every row of the $n\times m$ matrix $M$ is the integral presented in \ref{eqn:jlm} or \ref{eqn:am} evaluated over the $i$th finite element. Since $m>n$, we define the Moore-Penrose inverse of $M$ as
+\begin{equation}
+  M^+ = M^*(MM^*)^{-1}
+  \label{eqn:mpi-underdetermined}
+\end{equation}
+where $M^*$ is the adjoint of $M$. The value of $\bm D$ that minimizes $|\bm D|^2$ and also satisfies equation \ref{eqn:density-model} is then $A=M^+$, which fully defines the model.
+
+Note that this model is fast to compute; assuming fast matrix multiplication, the most time-consuming step is the matrix inversion of equation \ref{eqn:mpi-underdetermined}. However, $MM^*$ is an $n$-dimensional square matrix, which is very small compared to the number of finite elements $m$.
+
+
+\subsection{Harmonic model}
+We now explore a model that seeks to narrow down the space of allowed density distributions a different way than the likelihood model; we define the ``nice'' density distributions directly. They are the density distributions with zero Laplacian: $\nabla^2 \rho = 0$ inside the asteroid. The expansion of such a function in spherical coordinates is given by 
+\begin{equation}
+  \rho(\bm r) = \sum_{\ell, m} D_{\ell m} R_{\ell m}^*(\bm r)
+  \label{eqn:harmonic-rho}
+\end{equation}
+where the terms which lead to $\rho \rightarrow \infty$ at the origin have been removed and $D_{\ell m}$ are free parameters. The complex conjugate was added for convenience. By setting a maximum on $\ell$, we restrict the number of degrees of freedom to $(\ell_\mathrm{max}+ 1)^2$. Choosing the same maximum $\ell$ as the maximum $\ell$ for the $H_{\ell m}$ moments, we have $m=n-1$ coefficients $D_{\ell m}$ which can be stacked into an $m$-dimensional vector $\bm D$.
+
+Inserting equation \ref{eqn:harmonic-rho} into equations \ref{eqn:hlm-constraint} and \ref{eqn:b-constraint}, we get 
+\begin{equation}
+  K_{\ell', m'} = \sum_{\ell m} \frac{1}{\mu_m a_m^{\ell'}} D_{\ell m} \int_\mathcal{A} d^3 r R_{\ell m}^*(\bm r) R_{\ell' m'}(\bm r)
+\end{equation}
+This is an over-determined matrix equation $\bm K = M \bm D$, where $M$ is an $n \times m$ matrix. The Moore-Penrose inverse can therefore be used again to find an inverse $A=M^+$ which yields approximately correct $\bm D$ (approximate in that the norm of the error vector between $\bm K$ and $M \bm D$ is minimized). However, the form of the inverse changes due to the matrix now being taller than it is wide. The Moore-Penrose is now
+\begin{equation}
+  M^+ = (M^*M)^{-1} M^*
+  \label{eqn:mpi-overdetermined}
+\end{equation}
+and the model concludes with $A=M^+$.
+
+
+
+\subsection{Lump model}
+\jtd{Continue}
 
 
 \section{Conclusion}
