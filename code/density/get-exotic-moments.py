@@ -1,13 +1,11 @@
 import numpy as np
-import sys
-sys.path.append("../../code/density")
 from core import Asteroid, Indicator
 from multiprocessing import Pool
 
 division = 9
 max_radius = 1500
 am = 1000
-k22a, k20a = 0.05200629, -0.2021978
+k22a, k20a = -0.05200629, -0.2021978
 k22s, k20s = 0, -0.09766608
 b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20s - 12 * k22s)
 a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20s + 12 * k22s)

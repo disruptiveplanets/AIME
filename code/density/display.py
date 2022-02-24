@@ -3,7 +3,18 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from multiprocessing import Pool
 
-plt.style.use("jcap")
+#plt.style.use("jcap")
+
+import matplotlib as mpl
+mpl.rcParams["font.family"] = "serif"
+mpl.rcParams["font.monospace"] = "Roboto mono"
+mpl.rcParams["text.usetex"] = "true"
+mpl.rcParams["figure.figsize"] = (6.5, 4.00)
+mpl.rcParams["legend.framealpha"] = 0.5
+mpl.rcParams["lines.linewidth"] = 2
+mpl.rcParams["lines.markersize"] = 4
+mpl.rcParams["font.size"] = 16
+mpl.rcParams["legend.fontsize"] = 10
 
 VERY_SMALL = 1
 NUM_SLICES = 6
