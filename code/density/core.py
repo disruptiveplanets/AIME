@@ -210,6 +210,12 @@ class Indicator:
         c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
         return lambda x,y,z: x*x/(a*a) + y*y/(b*b) + z*z/(c*c) < 1
 
+    def ell_x_shift(am, k22, k20, x_shift):
+        b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
+        a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 + 12 * k22)
+        c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
+        return lambda x,y,z: (x - x_shift)**2/(a*a) + y*y/(b*b) + z*z/(c*c) < 1
+
     def tet(am, tet_shrink=1):
         tet_corners = 1.82688329031 * am * np.array([
             (1, 0, -1/np.sqrt(2)*tet_shrink),
@@ -224,9 +230,8 @@ class Indicator:
             normal = np.cross(v2-v1, v3-v1)
             tet_norms.append(normal / norm(normal))
         d = [np.dot(tet_norms[i], tet_corners[i]) for i in range(4)]
-        return lambda x,y,z: np.array([np.all([np.dot([xi,yi,zi], tet_norms[i]) / d[i] < 1 for i in range(4)]) for xi, yi, zi in zip(x.reshape(-1), y.reshape(-1), z.reshape(-1))]).reshape(x.shape)
+        return lambda x,y,z: np.all([np.sum(np.array([x, y, z]).transpose() * tet_norms[i], axis=-1) / d[i] < 1 for i in range(4)], axis=0)
 
     def dumbbell(am):
         db_rad = am / np.sqrt(19/20)
-        return lambda x,y,z: np.array([np.sum(([xi,yi,zi] - np.array([db_rad/2, 0, 0]))**2) < db_rad*db_rad or \
-            np.sum(([xi,yi,zi] + np.array([db_rad/2, 0, 0]))**2) < db_rad*db_rad for xi, yi, zi in zip(x.reshape(-1), y.reshape(-1), z.reshape(-1))]).reshape(x.shape)
+        return lambda x,y,z: np.minimum(np.sum(np.array([x - db_rad/2,y,z])**2, axis=0), np.sum(np.array([x + db_rad/2,y,z])**2, axis=0)) < db_rad*db_rad

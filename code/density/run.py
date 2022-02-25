@@ -4,7 +4,7 @@ from harmonic import Harmonic
 from core import Asteroid, Indicator
 
 DIVISION = 99
-MAX_RADIUS = 1500
+MAX_RADIUS = 2000
 RELOAD = False
 
 k22a, k20a = -0.05200629, -0.2021978
@@ -12,23 +12,25 @@ k22s, k20s = 0, -0.09766608
 
 
 asteroids = {
-    "sym-sph": Asteroid("samples/param-024-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
+    "sym-sph": Asteroid("samples/den-sym.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.sph(1000)),
-    "asym-sph": Asteroid("samples/param-094-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
+    "asym-sph": Asteroid("samples/den-asym.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.sph(1000)),
-    "sym-ell": Asteroid("samples/param-024-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
+    "sym-ell": Asteroid("samples/den-sym.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.ell(1000, k22s, k20s)),
-    "asym-ell": Asteroid("samples/param-094-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
+    "asym-ell": Asteroid("samples/den-asym.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.ell(1000, k22a, k20a)),
-    "tet": Asteroid("samples/param-094-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
+    "tet": Asteroid("samples/den-tet.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.tet(1000)),
-    "db": Asteroid("samples/param-094-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
+    "db": Asteroid("samples/den-db.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.dumbbell(1000)),
-    "high": Asteroid("samples/param-094-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
+    "high": Asteroid("samples/den-high.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.sph(1000)),
-    "in": Asteroid("samples/param-094-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
+    "in": Asteroid("samples/den-in.npy", 1047.477436728389, DIVISION, MAX_RADIUS,
         Indicator.ell(1000, k22a, k20a)),
-    "out": Asteroid("samples/param-094-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
+    "out": Asteroid("samples/den-out.npy", 1050.660629058438, DIVISION, MAX_RADIUS,
+        Indicator.ell(1000, k22a, k20a)),
+    "blob": Asteroid("samples/den-blob.npy", , DIVISION, MAX_RADIUS,
         Indicator.ell(1000, k22a, k20a)),
 }
 
