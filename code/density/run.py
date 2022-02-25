@@ -1,6 +1,7 @@
 import sys
 from likelihood import Likelihood
 from harmonic import Harmonic
+from lumpy import Lumpy
 from core import Asteroid, Indicator
 
 DIVISION = 99
@@ -37,6 +38,7 @@ asteroids = {
 methods = {
     "likelihood": Likelihood,
     "harmonic": Harmonic, 
+    "lumpy": Lumpy, 
 }
 
 if len(sys.argv) != 3:

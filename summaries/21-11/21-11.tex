@@ -5,6 +5,7 @@
 \usepackage{tikz}
 \usepackage{dsfont}
 \usepackage{bm}
+\usepackage{colortbl}
 
 \newcommand{\unit}[1]{\hat{\bm{#1}}}
 \newcommand{\parens}[1]{\left( #1 \right)}
@@ -983,7 +984,51 @@ and the model concludes with $A=M^+$.
 
 
 \subsection{Lump model}
-\jtd{Continue}
+The above two simple models produce smooth density distributions that generally extend non-uniformity over large regions. In this section, we define a more complicated model which identifies discrete regions differing from the overall density of the asteroid to best fit the $K_{\ell m}$ fit results.
+
+Suppose the asteroid contains $N$ `lumps' of constant mass $\mu_i$ displaced by distance $\bm x_i$ from the asteroid center of mass, and immersed in a constant density overall asteroid shape which is known in the form of $\mathds{1}(\bm r)$. For simplicity, we assume that all $N$ regions are ellipsoids with $d$ independent axis lengths. (For example, $d=3$ corresponds to an asymmetric ellipsoid, $d=2$ corresponds to a symmetric ellipsoid, and $d=1$ corresponds to a sphere.) Recall that $\mathds{1}(\bm r)$ is known in the hybrid frame where the origin is the center of mass of the asteroid. The displacement of the asteroid shape from the center of mass, which is the opposite of the net displacement of the discrete regions, is therefore observable from light curve analysis. The model therefore has $4N-3$ positional degrees of freedom and rotational degrees of freedom laid out in table \ref{tab:lump-dof}. These degrees of freedom should be compared to the known density moments, of which there is a square number $(L+1)^2$. However, three of these are the center of mass of the asteroid which is guaranteed, and one is the unconstrained total mass. So the total number of known parameters is $(L+1)^2 - 4$.
+
+
+\begin{table}
+  \centering
+  \begin{tabular}{cc|cccc}
+    \hline \hline
+        &  & \multicolumn{4}{c}{$N$} \\
+        &  & 1  & 2  & 3  & 4  \\ \hline 
+        & 1& \cellcolor{black}\color{white} 2 & \cellcolor{black}\color{white} 5 & \cellcolor{gray}\color{white} 8 & \cellcolor{gray}\color{white} 11 \\
+    $d$ & 2& \cellcolor{black}\color{white} 5 & \cellcolor{gray}\color{white} 8 & \cellcolor{gray}\color{white} 11& 14 \\
+        & 3& \cellcolor{gray}\color{white}  7 & \cellcolor{gray}\color{white} 10 & 13 & 16 \\
+    \hline \hline
+  \end{tabular}
+  \caption{Total degrees of freedom $D$ as a function of $N$, the number of lumps modeled, and $d$, the number of independent moment of inertia axes considered for each lump. The configurations with $D \leq$ the five known parameters not including $K_{3m}$ are colored black, and those including seven $K_{3m}$ parameters are colored gray.}
+  \label{tab:lump-dof}
+\end{table}
+
+The net $K_{\ell m}$ components of such an ensemble obey
+\begin{equation}
+  K_{\ell m} = K_{\ell m}'^0 + \sum_{i=1}^N K_{\ell m}'^i \qquad a_m^2 = a_0'^2 + \sum_{i=1}^N a_i'^2
+  \label{eqn:klm-stack}
+\end{equation}
+where $K_{\ell m}^i$ and $a_i^2$ obey the same definition as $K_{\ell m}$ in equation \ref{eqn:jlm} and $a_m$ in equation \ref{eqn:am} respectively. Crucially, note that the normalizing factors $1/(\mu_m a_m^\ell)$ and $1/\mu_m$ in equations \ref{eqn:jlm} and \ref{eqn:am} do not change to their counterparts for each lump; they remain the known asteroid-wide values. The zero-indexed parameters indicate the density moments of the asteroid medium surrounding the lumps.
+
+The prime in equation \ref{eqn:klm-stack} denotes that the moments are calculated in the hybrid frame. We can relate the primed moments to the moments calculated relative to each body's center of mass via the translation rules for solid spherical harmonics:
+\begin{equation}
+  K_{\ell m}'^i = \sum_{\ell' m'} (-1)^{\ell - \ell'} R_{\ell - \ell', m - m'}(\bm x_i) K_{\ell' m'}^i \qquad a_i'^2 = a_i^2 + x_i^2 K_{00}
+  \label{eqn:translate-klm}
+\end{equation}
+Here, $K_{00}^i$ is the added mass $\mu_i$ of lump $i$, while $K_{1m}=0$ and $K_{2m}$ incorporate its orientation and moment of inertia ratios. The volume is constrained by $a_i^2$. These values map directly onto an ellipsoid representation via equations \ref{eqn:ellipsoid-klm}, so that if $K_{\ell m}^i$, $a_i^2$, $\mu_i$, and $x_i$ are known, then the density distribution is known. Note that if $\bm x_i$ is known, then equation \ref{eqn:translate-klm} are linear in $K_{\ell m}^i$. Therefore, if we define $\bm D$ to contain $K_{2m}^i$ and $a_i^2$ in some order, then equations \ref{eqn:translate-klm} and \ref{eqn:klm-stack} define a matrix equation $\bm K = \bm C + M \bm D$ which can be solved by setting $A$ equal to the Moore-Penrose inverse of $M$. Henceforth, we assume that the dimensions of $\bm D$ are less than or equal to the number of known parameters (the shaded regions of table \ref{tab:lump-dof}), so that $A$ is given by equation \ref{eqn:mpi-overdetermined}). Note that the $\bm C$ term of this equation came from the expansion of $K_{\ell m}'^0$ and $a_0^2$, which is written in terms of the already-known displacement of the asteroid surface from its center of mass.
+
+This model's strategy will be to choose $\bm x_i$ and $\mu_i$ via a nonlinear process, then fit for the values $K_{\ell m}^i$ and $a_i^2$ using the linear format described in the introduction to this section. The constraints on $\bm x_i$ and $|mu_i$ are primarily
+\begin{equation}
+  \sum_{i=1}^N \bm x_i \mu_i = \mu_0 \bm x_0
+  \label{eqn:lump-constraints}
+\end{equation}
+where $\bm x_0$ is the known displacement of the centroid of the asteroid model from the center of mass. There are also additional constraints, such as that $\bm x_i$ should lie inside the asteroid which can be enforced manually. The overall mass of the asteroid is $\mu_m = \mu_0 + \sum_{i=1}^N \mu_i$, and has been set, so we may eliminate $\mu_0$ from equation \ref{eqn:lump-constraints}. The constraint is now a function of $\mu_i$ and $\bm x_i$ for $i \geq 1$. The matrix equation defining $M$ is overdetermined, but we would like it to have a solution nevertheless. We therefore solve for $\bm x_i$ and $\mu_i$ to yield an $M$ with solutions. This is done by minimizing
+\begin{equation}
+  |(M(\bm x_i, \mu_i) M^+(\bm x_i, \mu_i) - \mathds{1}) (\bm K - \bm C)|^2.\
+  \label{eqn:lump-minimize}
+\end{equation}
+If $\bm x_i$ and $\mu_i$ are chosen to minimize this function, with the constraint of \ref{eqn:lump-constraints} obeyed, then $A=M^+$ and $\bm B(\bm r)$ following from the resulting values of $K_{\ell m}^i$ and $a_i^2$ defines the model. If the resulting density distribution is somehow excluded (it predicts negative density distributions, the lumps extend outside the asteroid, etc.), then another minimum of equation \ref{eqn:lump-minimize} can be used, or another combination of $N$ and $d$ listed in table \ref{tab:lump-dof}.
 
 
 \section{Conclusion}
