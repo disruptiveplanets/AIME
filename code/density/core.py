@@ -235,3 +235,4 @@ class Indicator:
     def dumbbell(am):
         db_rad = am / np.sqrt(19/20)
         return lambda x,y,z: np.minimum(np.sum(np.array([x - db_rad/2,y,z])**2, axis=0), np.sum(np.array([x + db_rad/2,y,z])**2, axis=0)) < db_rad*db_rad
+        

@@ -2,7 +2,7 @@ import numpy as np
 from core import Asteroid, Indicator
 from multiprocessing import Pool
 
-division = 9
+division = 39
 max_radius = 2000
 am = 1000
 k22a, k20a = -0.05200629, -0.2021978
@@ -21,18 +21,18 @@ lump_shift = blob_rad * density_factor * blob_vol / (ellipsoid_vol + density_fac
 print(lump_shift)
 def lump(x, y, z):
     o = np.ones_like(x)
-    o[(x-blob_length)**2 + y**2 + z**2 < blob_rad**2] = density_factor + 1
+    o[(x-blob_length+lump_shift)**2 + y**2 + z**2 < blob_rad**2] = density_factor + 1
     return o
 
 
 asteroids = [
-    #("sph", Indicator.sph(am), lambda x,y,z: 1),
-    #("ells", Indicator.ell(am, k22s, k20s), lambda x,y,z: 1),
-    #("ella", Indicator.ell(am, k22a, k20a), lambda x,y,z: 1),
-    #("tet", Indicator.tet(am), lambda x,y,z: 1),
+    ("sph", Indicator.sph(am), lambda x,y,z: 1),
+    ("ells", Indicator.ell(am, k22s, k20s), lambda x,y,z: 1),
+    ("ella", Indicator.ell(am, k22a, k20a), lambda x,y,z: 1),
+    ("tet", Indicator.tet(am), lambda x,y,z: 1),
     ("db", Indicator.dumbbell(am), lambda x,y,z: 1),
-    #("in", Indicator.ell(am, k22a, k20a), lambda x,y,z: np.exp(-0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))),
-    #("out", Indicator.ell(am, k22a, k20a), lambda x,y,z: np.exp(0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))),
+    ("in", Indicator.ell(am, k22a, k20a), lambda x,y,z: np.exp(-0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))),
+    ("out", Indicator.ell(am, k22a, k20a), lambda x,y,z: np.exp(0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))),
     ("blob", Indicator.ell_x_shift(am, k22a, k20a, -lump_shift), lump),
 ]
 

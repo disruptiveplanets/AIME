@@ -30,8 +30,8 @@ asteroids = {
         Indicator.ell(1000, k22a, k20a)),
     "out": Asteroid("samples/den-out.npy", 1050.660629058438, DIVISION, MAX_RADIUS,
         Indicator.ell(1000, k22a, k20a)),
-    "blob": Asteroid("samples/den-blob.npy", , DIVISION, MAX_RADIUS,
-        Indicator.ell(1000, k22a, k20a)),
+    "blob": Asteroid("samples/den-blob.npy", 894.3680254454393, DIVISION, MAX_RADIUS,
+        Indicator.ell_x_shift(1000, k22a, k20a, -148.48101191304406)),
 }
 
 methods = {
