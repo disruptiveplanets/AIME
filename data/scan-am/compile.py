@@ -10,7 +10,7 @@ param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re
 percentiles = {}
 name_index = {}
 true_sigma = None
-v_excess = []
+am = []
 
 AXIS_SIZE = 12
 LEGEND_SIZE = 12
@@ -37,7 +37,7 @@ with open("percentiles.dat", 'r') as f:
 # Get true sigmas
 index = 0
 for name in percentiles.keys():
-    dir_name = name[:6]
+    dir_name = name[:5]
     with open(f"{dir_name}/{dir_name}.txt", 'r') as f:
         max_j, max_l = f.readline().split(", ")
         max_j, max_l = (int(max_j), int(max_l))
@@ -54,9 +54,9 @@ for name in percentiles.keys():
     name_index[name] = index
     index += 1
     true_sigma = sigma[0]
-    v_excess.append(speed / 1000)
+    am.append(radius)
 
-v_excess = np.array(v_excess)
+am = np.array(am)
 
 fig, axs = plt.subplots(figsize=(14, 8), ncols=3, nrows=4, sharex=True)
 axs = axs.reshape(-1)
@@ -65,22 +65,22 @@ i = 0
 for plot_index in range(N_DIM+1):
     if plot_index == 9:
         continue
-    param_data = np.zeros(len(v_excess) * N_PERCENTILES).reshape(N_PERCENTILES, len(v_excess))
+    param_data = np.zeros(len(am) * N_PERCENTILES).reshape(N_PERCENTILES, len(am))
     for f in percentiles.keys():
         param_data[:,name_index[f]] = percentiles[f][i]
     scale = 1e7 if i < 3 else 1e2
 
-    axs[plot_index].plot(v_excess, (param_data[1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].plot(v_excess, (param_data[-1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].fill_between(v_excess, (param_data[1]-param_data[0]) * scale, 
+    axs[plot_index].plot(am, (param_data[1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].plot(am, (param_data[-1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].fill_between(am, (param_data[1]-param_data[0]) * scale, 
         (param_data[-1]-param_data[0]) * scale,  color=f"C{i}", alpha=0.3)
 
-    axs[plot_index].plot(v_excess, (param_data[2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].plot(v_excess, (param_data[-2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].fill_between(v_excess, (param_data[2]-param_data[0]) * scale,
+    axs[plot_index].plot(am, (param_data[2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].plot(am, (param_data[-2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[plot_index].fill_between(am, (param_data[2]-param_data[0]) * scale,
         (param_data[-2]-param_data[0]) * scale, color=f"C{i}", alpha=0.3)
 
-    axs[plot_index].plot(v_excess, (param_data[3]-param_data[0]) * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+    axs[plot_index].plot(am, (param_data[3]-param_data[0]) * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
 
     y_min_norm = np.min((param_data[-1]-param_data[0]) * scale)
     y_max_norm = np.max((param_data[1]-param_data[0]) * scale)
@@ -95,7 +95,7 @@ for plot_index in range(N_DIM+1):
     #axs[i].set_yscale('log')
 
     if plot_index in [6, 8, 10]:
-        axs[plot_index].set_xlabel(f"$a_m$ m")
+        axs[plot_index].set_xlabel(f"$a_m$ (m)")
         
     i += 1
 

@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "scan-perigee"
+PATH = "scan-period"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1
