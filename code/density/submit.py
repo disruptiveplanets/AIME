@@ -18,11 +18,11 @@ def run_text(asteroid):
 
 # Slurm sbatsh options
 #SBATCH -o {0}.log
-#SBATCH -c 4
+#SBATCH -c 8
 
 source /etc/profile
 
-module load anaconda/2021a
+module load anaconda/2022a
 
 python run.py {0} harmonic
 python run.py {0} likelihood""".format(asteroid)

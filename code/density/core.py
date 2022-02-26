@@ -110,6 +110,7 @@ class Method:
 
 class Asteroid:
     def __init__(self, sample_file, am, division, max_radius, indicator):
+        self.max_l = None
         self.am = am
         self.division = division
         self.grid_line = np.arange(-max_radius, max_radius, division)
@@ -118,7 +119,6 @@ class Asteroid:
         if sample_file != "":
             self.data, self.sigma_data = self.load_samples(sample_file)
         self.moments = None
-        self.max_l = None
 
     def load_samples(self, fname):
         with open(fname, 'rb') as f:

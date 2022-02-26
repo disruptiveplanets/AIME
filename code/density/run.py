@@ -1,10 +1,11 @@
-import sys
+import sys, os
 from likelihood import Likelihood
 from harmonic import Harmonic
 from lumpy import Lumpy
 from core import Asteroid, Indicator
+import matplotlib.pyplot as plt
 
-DIVISION = 99
+DIVISION = 9
 MAX_RADIUS = 2000
 RELOAD = False
 
@@ -53,16 +54,18 @@ if len(sys.argv) == 2:
             new_args = [a for a in args]
             new_args[0] = ""
 
+            if not os.path.exists(f"data/{asteroid_name}/{method_name}-d.npy"):
+                print(f"Data was not present for asteroid {asteroid_name} method {method_name}")
+                continue
+            print(f"Plotting asteroid {asteroid_name} method {method_name}")
+
             asteroid = make_asteroid(new_args)
             method = method_class(asteroid)
             
-            try:
-                method.reload(f"data/{asteroid_name}/{method_name}-d.npy", f"data/{asteroid_name}/{method_name}-u.npy")
-                print(f"Plotting asteroid {asteroid_name} method {method_name}")
-            except Exception:
-                print(f"Data was not present for asteroid {asteroid_name} method {method_name}")
-                continue
+            method.reload(f"data/{asteroid_name}/{method_name}-d.npy", f"data/{asteroid_name}/{method_name}-u.npy")
             method.display(f"figs/{asteroid_name}/{method_name}")
+
+            plt.close("all")
 
 
 elif len(sys.argv) == 3:
