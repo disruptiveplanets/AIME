@@ -41,22 +41,40 @@ methods = {
     "lumpy": Lumpy, 
 }
 
-if len(sys.argv) != 3:
-    raise Exception("You must provide two arguments")
-
-if sys.argv[1] not in asteroids:
-    raise Exception("The first argument must be the asteroid type. One of {}".format(asteroids.keys()))
-
-if sys.argv[2] not in methods:
-    raise Exception("The second argument must be the method. One of {}".format(methods.keys()))
-
 def make_asteroid(args):
     return Asteroid(args[0], args[1], args[2], args[3], args[4])
+    
+if len(sys.argv) == 2:
+    if sys.argv[1] != "plot":
+        raise Exception("The only two-argument mode is 'plot'")
 
-asteroid = make_asteroid(asteroids[sys.argv[1]])
-method = methods[sys.argv[2]](asteroid)
+    for asteroid_name, args in asteroids.items():
+        for method_name, method_class in methods.items():
+            new_args = [a for a in args]
+            new_args[0] = ""
 
-if not RELOAD:
+            asteroid = make_asteroid(new_args)
+            method = method_class(asteroid)
+            
+            try:
+                method.reload(f"data/{asteroid_name}/{method_name}-d.npy", f"data/{asteroid_name}/{method_name}-u.npy")
+                print(f"Plotting asteroid {asteroid_name} method {method_name}")
+            except Exception:
+                print(f"Data was not present for asteroid {asteroid_name} method {method_name}")
+                continue
+            method.display(f"figs/{asteroid_name}/{method_name}")
+
+
+elif len(sys.argv) == 3:
+    if sys.argv[1] not in asteroids:
+        raise Exception("The first argument must be the asteroid type. One of {}".format(asteroids.keys()))
+
+    if sys.argv[2] not in methods:
+        raise Exception("The second argument must be the method. One of {}".format(methods.keys()))
+
+    asteroid = make_asteroid(asteroids[sys.argv[1]])
+    method = methods[sys.argv[2]](asteroid)
+
     print("Solving")
     method.solve()
     print("Getting densities")
@@ -66,8 +84,6 @@ if not RELOAD:
     method.map_unc()
     method.save_unc(f"data/{sys.argv[1]}/{sys.argv[2]}-u.npy")
     method.check()
-else:
-    method.reload(f"data/{sys.argv[1]}/{sys.argv[2]}-d.npy", f"data/{sys.argv[1]}/{sys.argv[2]}-u.npy")
 
-print("Plotting")
-method.display(f"figs/{sys.argv[1]}/{sys.argv[2]}")
+else:
+    raise Exception("One or two arguments must be provided.")

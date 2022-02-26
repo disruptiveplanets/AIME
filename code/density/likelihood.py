@@ -39,4 +39,4 @@ class Likelihood(Method):
         else:
             out = np.zeros(self.m)
             out[self.grid_indices[ix, iy, iz]] = 1
-        return scipy.sparse.csc_array(out)
+        return scipy.sparse.coo_matrix(out)

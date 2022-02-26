@@ -2,8 +2,7 @@ import numpy as np
 from scipy.special import lpmv, factorial
 from scipy.linalg import norm
 from display import make_gif, make_slices
-
-import warnings
+import warnings, os
 
 def rlm(l,m,x,y,z):
     r = np.sqrt(np.maximum(0, x*x + y*y + z*z))
@@ -81,6 +80,10 @@ class Method:
             print("Expected  {:.5f}\t Got {:.5f} \t Difference {:.2g}".format(self.asteroid.data[i], r, abs(self.asteroid.data[i]-r)))
 
     def display(self, fname, duration=2):
+        asteroid_name = fname.split("/")[1]
+        if not os.path.isdir(f"figs/{asteroid_name}"):
+            os.mkdir(f"figs/{asteroid_name}")
+
         warnings.filterwarnings("ignore")
 
         display_densities = np.copy(self.densities)
@@ -115,6 +118,7 @@ class Asteroid:
         if sample_file != "":
             self.data, self.sigma_data = self.load_samples(sample_file)
         self.moments = None
+        self.max_l = None
 
     def load_samples(self, fname):
         with open(fname, 'rb') as f:

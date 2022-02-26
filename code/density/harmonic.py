@@ -7,7 +7,8 @@ class Harmonic(Method):
     def __init__(self, asteroid):
         print("Harmonic model")
         super().__init__(asteroid)
-        self.m = (self.asteroid.max_l + 1)**2
+        if self.asteroid.max_l is not None:
+            self.m = (self.asteroid.max_l + 1)**2
 
     def get_a(self):
         rlms = self.asteroid.moment_field()
