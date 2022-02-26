@@ -13,25 +13,25 @@ k22s, k20s = 0, -0.09766608
 
 
 asteroids = {
-    "sym-sph": Asteroid("samples/den-sym.npy", 1000, DIVISION, MAX_RADIUS,
+    "sym-sph": ("samples/den-sym-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.sph(1000)),
-    "asym-sph": Asteroid("samples/den-asym.npy", 1000, DIVISION, MAX_RADIUS,
+    "asym-sph": ("samples/den-asym-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.sph(1000)),
-    "sym-ell": Asteroid("samples/den-sym.npy", 1000, DIVISION, MAX_RADIUS,
+    "sym-ell": ("samples/den-sym-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.ell(1000, k22s, k20s)),
-    "asym-ell": Asteroid("samples/den-asym.npy", 1000, DIVISION, MAX_RADIUS,
+    "asym-ell": ("samples/den-asym-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.ell(1000, k22a, k20a)),
-    "tet": Asteroid("samples/den-tet.npy", 1000, DIVISION, MAX_RADIUS,
+    "tet": ("samples/den-tet-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.tet(1000)),
-    "db": Asteroid("samples/den-db.npy", 1000, DIVISION, MAX_RADIUS,
+    "db": ("samples/den-db-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.dumbbell(1000)),
-    "high": Asteroid("samples/den-high.npy", 1000, DIVISION, MAX_RADIUS,
+    "high": ("samples/den-high-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.sph(1000)),
-    "in": Asteroid("samples/den-in.npy", 1047.477436728389, DIVISION, MAX_RADIUS,
+    "in": ("samples/den-in-0-samples.npy", 1047.477436728389, DIVISION, MAX_RADIUS,
         Indicator.ell(1000, k22a, k20a)),
-    "out": Asteroid("samples/den-out.npy", 1050.660629058438, DIVISION, MAX_RADIUS,
+    "out": ("samples/den-out-0-samples.npy", 1050.660629058438, DIVISION, MAX_RADIUS,
         Indicator.ell(1000, k22a, k20a)),
-    "blob": Asteroid("samples/den-blob.npy", 894.3680254454393, DIVISION, MAX_RADIUS,
+    "blob": ("samples/den-blob-0-samples.npy", 894.3680254454393, DIVISION, MAX_RADIUS,
         Indicator.ell_x_shift(1000, k22a, k20a, -148.48101191304406)),
 }
 
@@ -50,8 +50,11 @@ if sys.argv[1] not in asteroids:
 if sys.argv[2] not in methods:
     raise Exception("The second argument must be the method. One of {}".format(methods.keys()))
 
+def make_asteroid(args):
+    return Asteroid(args[0], args[1], args[2], args[3], args[4])
 
-method = methods[sys.argv[2]](asteroids[sys.argv[1]])
+asteroid = make_asteroid(asteroids[sys.argv[1]])
+method = methods[sys.argv[2]](asteroid)
 
 if not RELOAD:
     print("Solving")
