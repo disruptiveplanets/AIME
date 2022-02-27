@@ -1,6 +1,7 @@
 import numpy as np
 from core import Asteroid, Indicator
 from multiprocessing import Pool
+import matplotlib.pyplot as plt
 
 division = 39
 max_radius = 2000
@@ -20,8 +21,8 @@ density_factor = 4
 lump_shift = blob_rad * density_factor * blob_vol / (ellipsoid_vol + density_factor * blob_vol)
 print(lump_shift)
 def lump(x, y, z):
-    o = np.ones_like(x)
-    o[(x-blob_length+lump_shift)**2 + y**2 + z**2 < blob_rad**2] = density_factor + 1
+    o = np.ones_like(x, dtype=float)
+    o[(x-blob_length+lump_shift)**2 + (y)**2 + (z)**2 < blob_rad**2] = density_factor + 1
     return o
 
 
@@ -38,8 +39,11 @@ asteroids = [
 
 def get_klms(index):
     name, indicator, generator = asteroids[index]
-    asteroid = Asteroid("", am, division, max_radius, indicator)
+    asteroid = Asteroid("", am, division, max_radius, indicator, None)
     density = asteroid.map_np(generator)
+
+    plt.imshow(density[:,:,len(density)//2])
+    plt.show()
 
     rlms = asteroid.moment_field(max_l=3)
 

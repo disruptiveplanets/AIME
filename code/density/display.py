@@ -22,13 +22,13 @@ EXPAND_X=1.15 # Scale along x and y so that spheres look circular
 AXIS_LIMIT = 1000
 
 
-def make_gif(densities, pos_array, axis_name, cmap, fname, duration):
+def make_gif(densities, pos_array, axis_name, cmap, fname, duration, percentile=99, balance=False):
     imgs = []
     mins = np.min(np.where(~np.isnan(densities)), axis=1)
     maxes = np.max(np.where(~np.isnan(densities)), axis=1)
     num_frames = maxes[2] - mins[2]
     for i in range(num_frames):
-        fig = make_frame(densities, pos_array, axis_name, cmap, i + mins[2])
+        fig = make_frame(densities, pos_array, axis_name, cmap, percentile, balance, i + mins[2])
         fig.canvas.draw()
         imgs.append(Image.frombytes('RGB',
             fig.canvas.get_width_height(),fig.canvas.tostring_rgb()))
@@ -36,18 +36,22 @@ def make_gif(densities, pos_array, axis_name, cmap, fname, duration):
     imgs[0].save(fp=fname, format='GIF', append_images=imgs,
                 save_all=True, duration= int(duration * 1000 / num_frames), loop=0)
 
-def make_frame(densities, pos_array, axis_name, cmap, z_index):
+def make_frame(densities, pos_array, axis_name, cmap, percentile, balance, z_index):
     # Save imports until here for supercomputer run
     fig = plt.figure()
     csection = densities[:,:,z_index]
+    want_min, want_max = np.nanpercentile(densities, 1), np.nanpercentile(densities, percentile)
+    if balance:
+        want_max = max(want_max, -want_min)
+        want_min = -want_max
     c = plt.pcolormesh(pos_array, pos_array, csection.transpose()   , shading='auto',
-        vmin= np.nanpercentile(densities, 1),
-        vmax= np.nanpercentile(densities, 99),
+        vmin=want_min,
+        vmax=want_max,
         cmap=cmap)
     plt.colorbar(c, label=axis_name)
     plt.axis('equal')
-    plt.xlabel("$x$ (m)")
-    plt.ylabel("$y$ (m)")
+    plt.xlabel("$y$ (m)")
+    plt.ylabel("$x$ (m)")
     mins = np.min(np.where(~np.isnan(densities)), axis=1)
     maxes = np.max(np.where(~np.isnan(densities)), axis=1)
     plt.xlim(pos_array[mins[0]], pos_array[maxes[0]])
@@ -56,12 +60,12 @@ def make_frame(densities, pos_array, axis_name, cmap, z_index):
     fig.tight_layout()
     return fig
 
-def show_cross_section(densities, pos_array, axis_name, cmap, fname):
+def show_cross_section(densities, pos_array, axis_name, cmap, fname, percentile=99, balance=False):
     plt.figure()
     csection = densities[:,:,densities.shape[-1]//2]
     plt.pcolormesh(pos_array, pos_array, csection.transpose(), shading='auto',
         vmin= np.nanpercentile(densities, 1),
-        vmax= np.nanpercentile(densities, 99),
+        vmax= np.nanpercentile(densities, percentile),
         cmap=cmap)
     c = plt.colorbar()
     plt.axis('equal')
@@ -75,14 +79,19 @@ def show_cross_section(densities, pos_array, axis_name, cmap, fname):
     plt.tight_layout()
     plt.savefig(fname)
 
-def make_slices(densities, pos_array, axis_name, cmap, name):
+def make_slices(densities, pos_array, axis_name, cmap, name, percentile=99, balance=False):
     fig = plt.figure(figsize=(8,5))
     ax = fig.gca(projection='3d')
     ax.set_axis_off()
     ax.grid(False)
 
+    want_min, want_max = np.nanpercentile(densities, 1), np.nanpercentile(densities, percentile)
+    if balance:
+        want_max = max(want_max, -want_min)
+        want_min = -want_max
+
     if np.nanmin(densities) != np.nanmax(densities):
-        levels = np.linspace(np.nanmin(densities), np.nanmax(densities), 40)
+        levels = np.linspace(want_min, want_max, 40)
     else:
         levels = np.linspace(0.99, 1.01, 40)
     mins = np.min(np.where(~np.isnan(densities)), axis=1)

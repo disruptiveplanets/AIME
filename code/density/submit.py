@@ -1,13 +1,13 @@
 import sys, os
 
 names = [
-    "sym-sph", 
-    "asym-sph", 
-    "sym-ell", 
-    "asym-ell", 
-    "tet", 
-    "db", 
-    "high", 
+    #"sym-sph", 
+    #"asym-sph", 
+    #"sym-ell", 
+    #"asym-ell", 
+    #"tet", 
+    #"db", 
+    #"high", 
     "in", 
     "out", 
     "blob"
@@ -18,7 +18,7 @@ def run_text(asteroid):
 
 # Slurm sbatsh options
 #SBATCH -o {0}.log
-#SBATCH -c 8
+#SBATCH -c 16
 
 source /etc/profile
 
@@ -40,4 +40,5 @@ if len(sys.argv) > 1:
 else:
     print("Running all")
     for n in names:
+        print(n)
         run(n)

@@ -12,3 +12,9 @@ I also wrote some code in get-exotic-moments which computes the density moments 
 ## Feb 26
 
 I pulled the fits that were finished (asym, blob, in, out) and started experimenting with them. Wrote the interface to the supercomputer. But the code is a little broken; there are still some bugs to be worked out. The fit doesn't always converge.
+
+## Feb 27
+
+No more of the fits were finished, but the density extractions were done. They had a couple bugs left in them which I fixed today. The density distribution has been thoroughly checked and seems very correct; the uncertainty also seems correct and I can't find any problems
+
+The data for the asymmetric ellipsoid was made for the wrong k22; I need to redo it. I pushed all density extractions to supercloud and that k22 calc.

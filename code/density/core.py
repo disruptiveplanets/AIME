@@ -4,6 +4,8 @@ from scipy.linalg import norm
 from display import make_gif, make_slices
 import warnings, os
 
+import matplotlib.pyplot as plt
+
 def rlm(l,m,x,y,z):
     r = np.sqrt(np.maximum(0, x*x + y*y + z*z))
     return lpmv(m, l, z / r) / factorial(l + m) * r**l * np.exp(1j * m * np.arctan2(y, x))
@@ -12,42 +14,55 @@ def rlm_gen(l,m):
     return lambda x,y,z: rlm(l,m,x,y,z)
 
 class Method:
-    def __init__(self, asteroid):
+    def __init__(self, asteroid, finite_element):
         self.asteroid = asteroid
         self.unc = None
         self.d = None
         self.densities = None
         self.density_uncs = None
+        self.finite_element = finite_element
 
     def get_a(self):
         raise NotImplementedError()
         
     def get_b(self, pos):
+        # Return number for finite_element, vector otherwise
         raise NotImplementedError()
 
     def solve(self):
         if self.unc is None:
             a = self.get_a()
             self.d = a @ self.asteroid.data
-            self.unc = a @ self.asteroid.sigma_data @ a.transpose()
+
+            if self.finite_element:
+                self.unc = np.einsum('ij,jk,ik->i', a, self.asteroid.sigma_data, a.conj())# Diagonal entries
+            else:
+                self.unc = a @ self.asteroid.sigma_data @ a.transpose().conj()
 
 
     def get_density(self, x,y,z):
-        out = (self.get_b(x,y,z) @ self.d).real
-        if type(out) != np.float64:
+        if self.finite_element:
+            out = self.d[self.get_b(x,y,z)]
+        else:
+            out = np.dot(self.get_b(x,y,z), self.d)
+
+        if type(out) != np.float64 and type(out) != np.complex128:
             return out[0].real
         return out.real
 
     def get_unc(self, x,y,z):
         b = self.get_b(x,y,z)
-        if len(x.shape) > 0:
-            b = b.reshape(-1, b.shape[-1])
-            return np.array([np.sqrt(e @ self.unc @ e)[0] for e in b]).reshape(x.shape).real
+        if self.finite_element:
+            return np.sqrt(self.unc[b]).real
         else:
-            out = np.sqrt(b @ self.unc @ b.transpose()).real
-            if type(out) != np.float64:
-                return out[0].real
-            return out.real
+            if len(x.shape) > 0:
+                b = b.reshape(-1, b.shape[-1])
+                return np.array([np.sqrt(e @ self.unc @ e.conj())[0] for e in b]).reshape(x.shape).real
+            else:
+                out = np.sqrt(b @ self.unc @ b.transpose().conj()).real
+                if type(out) != np.float64:
+                    return out[0].real
+                return out.real
 
     def map_density(self):
         if self.densities is None:
@@ -56,7 +71,7 @@ class Method:
 
     def map_unc(self):
         if self.density_uncs is None:
-            self.density_uncs = self.asteroid.map(self.get_unc, dtype=float)
+            self.density_uncs = self.asteroid.map(self.get_unc, dtype=float) / np.abs(self.map_density())
         return self.density_uncs
 
     def save_density(self, fname):
@@ -69,15 +84,22 @@ class Method:
 
     def check(self):
         rlms_field = self.asteroid.moment_field()
+        calc_rlms = np.zeros((self.asteroid.max_l + 1)**2 + 1, dtype=np.complex)
         index = 0
+        densities = self.map_density()
         for l in range(0, self.asteroid.max_l + 1):
             for m in range(-l, l+1):
-                rlms_field[index] /= self.asteroid.am ** l
+                calc_rlms[index] = np.sum(rlms_field[index] * densities) / self.asteroid.am ** l * self.asteroid.division**3
                 index += 1
-        rlms_field[index] /= self.asteroid.am**2
-        rlms = np.sum(rlms_field * self.map_density() * self.asteroid.division**3, axis=(1,2,3))
-        for i, r in enumerate(rlms):
-            print("Expected  {:.5f}\t Got {:.5f} \t Difference {:.2g}".format(self.asteroid.data[i], r, abs(self.asteroid.data[i]-r)))
+        calc_rlms[index] = np.sum(rlms_field[index] * densities) / self.asteroid.am ** 2 * self.asteroid.division**3
+
+        error = 0
+        for i, r in enumerate(calc_rlms):
+            l = int(np.sqrt(i))
+            m = i - l**2 - l
+            error += np.abs(self.asteroid.data[i] - r) ** 2
+            print("({}, {})\tExpected  {:.5f}\t Got {:.5f} \t Difference {:.2g}".format(l, m, self.asteroid.data[i], r, abs(self.asteroid.data[i]-r)))
+        print("Net root mean error:", np.sqrt(error))
 
     def display(self, fname, duration=2):
         asteroid_name = fname.split("/")[1]
@@ -86,19 +108,32 @@ class Method:
 
         warnings.filterwarnings("ignore")
 
-        display_densities = np.copy(self.densities)
+        display_densities = np.copy(self.map_density())
         display_densities[~self.asteroid.indicator_map] = np.nan
-        display_uncs = np.copy(self.density_uncs)
+        display_uncs = np.copy(self.map_unc())
         display_uncs[~self.asteroid.indicator_map] = np.nan
 
-        display_uncs /= np.abs(display_densities)
         display_densities /= np.nanmean(display_densities)
 
+        true_densities = self.asteroid.get_true_densities()
+        true_densities[~self.asteroid.indicator_map] = np.nan
+        
+        if true_densities is not None:
+            print("Plotting ratio to true density")
+            true_densities /= np.nanmean(true_densities)
+            ratios = (true_densities - display_densities) / (display_densities * display_uncs)
+            print("Average ratios over body:", np.nanmean(ratios), "(absolute value: ", np.nanmean(np.abs(ratios)), ")")
+            make_slices(ratios, self.asteroid.grid_line, "$(\\Delta\\sigma$", 'coolwarm', f"{fname}-r", balance=True)
+            make_gif(ratios, self.asteroid.grid_line, "$(\\Delta\\sigma$", 'coolwarm', f"{fname}-r.gif", duration, balance=True)
+
+        print("Plotting density")
         make_slices(display_densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"{fname}-d")
         make_gif(display_densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"{fname}-d.gif", duration)
-        make_slices(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho$", 'Greys_r', f"{fname}-u")
-        make_gif(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho$", 'Greys_r', f"{fname}-u.gif", duration)
-
+        
+        print("Plotting uncertainty")
+        make_slices(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u", 90)
+        make_gif(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u.gif", duration, 90)
+        
         warnings.filterwarnings("default")
 
     def reload(self, density_name, unc_name):
@@ -109,9 +144,11 @@ class Method:
 
 
 class Asteroid:
-    def __init__(self, sample_file, am, division, max_radius, indicator):
+    def __init__(self, sample_file, am, division, max_radius, indicator, true_shape):
         self.max_l = None
         self.am = am
+        self.true_shape = true_shape
+        self.true_densities = None
         self.division = division
         self.grid_line = np.arange(-max_radius, max_radius, division)
         self.indicator = indicator
@@ -146,23 +183,33 @@ class Asteroid:
         klms[8] = samples[1]
         ms = np.array([0, -1, 0, 1, -2, -1, 0, 1, 2])
         if self.max_l > 2:
-            klms[9] = -samples[3] + 1j * samples[4]
-            klms[10] = samples[5] - 1j * samples[6]
-            klms[11] = -samples[7] + 1j * samples[8]
+            klms[15] = samples[3] + 1j * samples[4]
+            klms[14] = samples[5] + 1j * samples[6]
+            klms[13] = samples[7] + 1j * samples[8]
             klms[12] = samples[9]
-            klms[13] = klms[11].conj()
-            klms[14] = klms[10].conj()
-            klms[15] = klms[9].conj()
+            klms[11] = -klms[13].conj()
+            klms[10] = klms[14].conj()
+            klms[9] = -klms[15].conj()
             ms = np.append(ms, [-3, -2, -1, 0, 1, 2, 3])
 
         delta_gamma = samples[0] - np.mean(samples[0])
         hybrids = klms * np.exp(-1j * np.outer(ms, delta_gamma))
         klm_means = np.mean(hybrids, axis=1)
+
         klm_cov = np.cov(hybrids)
         added_one_cov = np.hstack((klm_cov, np.zeros((klm_cov.shape[0], 1))))
         added_cov = np.vstack((added_one_cov, np.zeros((1, klm_cov.shape[0]+1))))
 
         return np.append(klm_means, 1), added_cov
+
+
+    def get_true_densities(self):
+        if self.true_densities is None:
+            if self.true_shape is None:
+                return None
+            self.true_densities = self.map_np(self.true_shape)
+
+        return self.true_densities
 
 
     def get_indicator_map(self):
@@ -171,17 +218,18 @@ class Asteroid:
 
 
     def map(self, fn, dtype=np.complex):
-        result = np.zeros((len(self.grid_line), len(self.grid_line), len(self.grid_line)), dtype=dtype)
-        for nx, x in enumerate(self.grid_line):
-            for ny, y in enumerate(self.grid_line):
-                for nz, z in enumerate(self.grid_line):
-                    if self.indicator_map[nx,ny,nz]:
-                        result[nx, ny, nz] = fn(x,y,z)
+        x,y,z = np.meshgrid(self.grid_line, self.grid_line, self.grid_line)
+        result = np.zeros_like(x, dtype=dtype)
+        for ni in range(len(self.grid_line)):
+            for nj in range(len(self.grid_line)):
+                for nk in range(len(self.grid_line)):
+                    if self.indicator_map[ni,nj,nk]:
+                        result[ni, nj, nk] = fn(x[ni,nj,nk], y[ni,nj,nk], z[ni,nj,nk])
         return result
 
     def map_np(self, fn):
         x,y,z = np.meshgrid(self.grid_line, self.grid_line, self.grid_line)
-        return fn(x,y,z) * self.indicator(x,y,z)
+        return fn(x,y,z) * self.indicator_map
 
 
     def columnate(self, a):
@@ -209,14 +257,14 @@ class Indicator:
         return lambda x,y,z: x*x + y*y + z*z < am*am*5/3
 
     def ell(am, k22, k20):
-        b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
         a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 + 12 * k22)
+        b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
         c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
         return lambda x,y,z: x*x/(a*a) + y*y/(b*b) + z*z/(c*c) < 1
 
     def ell_x_shift(am, k22, k20, x_shift):
-        b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
         a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 + 12 * k22)
+        b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
         c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
         return lambda x,y,z: (x - x_shift)**2/(a*a) + y*y/(b*b) + z*z/(c*c) < 1
 
@@ -240,3 +288,35 @@ class Indicator:
         db_rad = am / np.sqrt(19/20)
         return lambda x,y,z: np.minimum(np.sum(np.array([x - db_rad/2,y,z])**2, axis=0), np.sum(np.array([x + db_rad/2,y,z])**2, axis=0)) < db_rad*db_rad
         
+
+class TrueShape:
+    def uniform():
+        return lambda x, y, z: 1.0
+
+    def in_(am, k22, k20):
+        a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 + 12 * k22)
+        b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
+        c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
+        return lambda x, y, z: np.exp(-0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))
+
+    def out(am, k22, k20):
+        a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 + 12 * k22)
+        b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
+        c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
+        return lambda x, y, z: np.exp(0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))
+
+    def blob(am, k22, k20):
+        a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 + 12 * k22)
+        b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
+        c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
+        blob_length = 500
+        blob_rad = 500
+        blob_vol = np.pi * 4 / 3 * blob_rad**3
+        ellipsoid_vol = np.pi * 4 / 3 * a * b * c
+        density_factor = 4
+        lump_shift = blob_rad * density_factor * blob_vol / (ellipsoid_vol + density_factor * blob_vol)
+        def lump(x, y, z):
+            o = np.ones_like(x, dtype=float)
+            o[(x-blob_length+lump_shift)**2 + y**2 + z**2 < blob_rad**2] = density_factor + 1
+            return o
+        return lump

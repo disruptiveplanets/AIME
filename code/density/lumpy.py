@@ -6,7 +6,7 @@ import scipy.sparse
 class Lumpy(Method):
     def __init__(self, asteroid):
         print("Lumpy model")
-        super().__init__(asteroid)
+        super().__init__(asteroid, False)
 
 
     def get_a(self):

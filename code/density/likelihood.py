@@ -1,20 +1,15 @@
 import numpy as np
 from core import Method
 from scipy.linalg import pinv
-import scipy.sparse
 
 class Likelihood(Method):
     def __init__(self, asteroid):
         print("Likelihood model")
-        super().__init__(asteroid)
-        self.grid_indices = np.zeros((len(self.asteroid.grid_line), len(self.asteroid.grid_line), len(self.asteroid.grid_line)), dtype=int)
-        self.m = 0
-        for nx, x in enumerate(self.asteroid.grid_line):
-            for ny, y in enumerate(self.asteroid.grid_line):
-                for nz, z in enumerate(self.asteroid.grid_line):
-                    if self.asteroid.indicator_map[nx,ny,nz]:
-                        self.grid_indices[nx,ny,nz] = self.m
-                        self.m += 1
+        super().__init__(asteroid, True)
+
+        self.grid_indices = np.cumsum(self.asteroid.indicator_map.reshape(-1)) # Indices in 1d row
+        self.grid_indices = self.grid_indices.reshape(self.asteroid.indicator_map.shape) - 1# 3d row
+        self.m = np.nanmax(self.grid_indices)
 
 
     def get_a(self):
@@ -33,10 +28,4 @@ class Likelihood(Method):
         ix = (x - self.asteroid.grid_line[0]) // self.asteroid.division
         iy = (y - self.asteroid.grid_line[0]) // self.asteroid.division
         iz = (z - self.asteroid.grid_line[0]) // self.asteroid.division
-        if len(x.shape) > 0:
-            out = np.zeros((x.shape[0], x.shape[0], x.shape[0], self.m))
-            out[ix, iy, iz, self.grid_indices[ix,iy,iz]] = 1
-        else:
-            out = np.zeros(self.m)
-            out[self.grid_indices[ix, iy, iz]] = 1
-        return scipy.sparse.coo_matrix(out)
+        return self.grid_indices[iy, ix, iz]
