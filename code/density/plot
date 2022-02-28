@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Slurm sbatsh options
+#SBATCH -o plot.log
+#SBATCH -c 16
+
+source /etc/profile
+
+module load anaconda/2022a
+
+python run.py plot
+

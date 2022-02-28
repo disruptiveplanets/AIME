@@ -29,10 +29,14 @@ class Method:
         # Return number for finite_element, vector otherwise
         raise NotImplementedError()
 
+    def get_c(self):
+        # Default value.
+        return np.zeros_like(self.asteroid_data)
+
     def solve(self):
         if self.unc is None:
             a = self.get_a()
-            self.d = a @ self.asteroid.data
+            self.d = a @ (self.asteroid.data - self.get_c())
 
             if self.finite_element:
                 self.unc = np.einsum('ij,jk,ik->i', a, self.asteroid.sigma_data, a.conj())# Diagonal entries
@@ -116,9 +120,9 @@ class Method:
         display_densities /= np.nanmean(display_densities)
 
         true_densities = self.asteroid.get_true_densities()
-        true_densities[~self.asteroid.indicator_map] = np.nan
         
         if true_densities is not None:
+            true_densities[~self.asteroid.indicator_map] = np.nan
             print("Plotting ratio to true density")
             true_densities /= np.nanmean(true_densities)
             ratios = (true_densities - display_densities) / (display_densities * display_uncs)

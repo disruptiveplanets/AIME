@@ -1,7 +1,7 @@
 import os
 
 names = [
-    "sym-sph", 
+    "sym-sph",
     "asym-sph", 
     "sym-ell", 
     "asym-ell", 
