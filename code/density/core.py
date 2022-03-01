@@ -4,34 +4,39 @@ from scipy.linalg import norm
 from display import make_gif, make_slices
 import warnings, os
 
-import matplotlib.pyplot as plt
+RLM_EPSILON = 1e-20
+
 
 def rlm(l,m,x,y,z):
-    r = np.sqrt(np.maximum(0, x*x + y*y + z*z))
-    return lpmv(m, l, z / r) / factorial(l + m) * r**l * np.exp(1j * m * np.arctan2(y, x))
+    r = np.sqrt(np.maximum(RLM_EPSILON, x*x + y*y + z*z))
+    return lpmv(m, l, z/r) / factorial(l + m) * r**l * np.exp(1j * m * np.arctan2(y, x))
 
 def rlm_gen(l,m):
     return lambda x,y,z: rlm(l,m,x,y,z)
 
 class Method:
-    def __init__(self, asteroid, finite_element):
+    def __init__(self, asteroid, finite_element, final_uncertainty=True):
         self.asteroid = asteroid
         self.unc = None
         self.d = None
         self.densities = None
         self.density_uncs = None
         self.finite_element = finite_element
+        self.final_uncertainty = final_uncertainty
 
     def get_a(self):
-        raise NotImplementedError()
+        raise NotImplementedError
         
     def get_b(self, pos):
         # Return number for finite_element, vector otherwise
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def get_c(self):
         # Default value.
         return np.zeros_like(self.asteroid_data)
+
+    def get_loc_density(self, k2ms, x, y, z):
+        raise NotImplementedError
 
     def solve(self):
         if self.unc is None:
@@ -47,6 +52,8 @@ class Method:
     def get_density(self, x,y,z):
         if self.finite_element:
             out = self.d[self.get_b(x,y,z)]
+        elif not self.final_uncertainty:
+            out = self.get_loc_density(self.d, x, y, z)
         else:
             out = np.dot(self.get_b(x,y,z), self.d)
 
@@ -55,18 +62,19 @@ class Method:
         return out.real
 
     def get_unc(self, x,y,z):
-        b = self.get_b(x,y,z)
-        if self.finite_element:
-            return np.sqrt(self.unc[b]).real
-        else:
-            if len(x.shape) > 0:
-                b = b.reshape(-1, b.shape[-1])
-                return np.array([np.sqrt(e @ self.unc @ e.conj())[0] for e in b]).reshape(x.shape).real
+        if self.final_uncertainty:
+            b = self.get_b(x,y,z)
+            if self.finite_element:
+                return np.sqrt(self.unc[b]).real
             else:
-                out = np.sqrt(b @ self.unc @ b.transpose().conj()).real
-                if type(out) != np.float64:
-                    return out[0].real
-                return out.real
+                if len(x.shape) > 0:
+                    b = b.reshape(-1, b.shape[-1])
+                    return np.array([np.sqrt(e @ self.unc @ e.conj())[0] for e in b]).reshape(x.shape).real
+                else:
+                    out = np.sqrt(b @ self.unc @ b.transpose().conj()).real
+                    if type(out) != np.float64:
+                        return out[0].real
+                    return out.real
 
     def map_density(self):
         if self.densities is None:
@@ -114,29 +122,31 @@ class Method:
 
         display_densities = np.copy(self.map_density())
         display_densities[~self.asteroid.indicator_map] = np.nan
-        display_uncs = np.copy(self.map_unc())
-        display_uncs[~self.asteroid.indicator_map] = np.nan
+        if self.final_uncertainty:
+            display_uncs = np.copy(self.map_unc())
+            display_uncs[~self.asteroid.indicator_map] = np.nan
 
         display_densities /= np.nanmean(display_densities)
 
         true_densities = self.asteroid.get_true_densities()
         
-        if true_densities is not None:
+        if true_densities is not None and self.final_uncertainty:
             true_densities[~self.asteroid.indicator_map] = np.nan
             print("Plotting ratio to true density")
             true_densities /= np.nanmean(true_densities)
             ratios = (true_densities - display_densities) / (display_densities * display_uncs)
             print("Average ratios over body:", np.nanmean(ratios), "(absolute value: ", np.nanmean(np.abs(ratios)), ")")
-            make_slices(ratios, self.asteroid.grid_line, "$(\\Delta\\sigma$", 'coolwarm', f"{fname}-r", balance=True)
-            make_gif(ratios, self.asteroid.grid_line, "$(\\Delta\\sigma$", 'coolwarm', f"{fname}-r.gif", duration, balance=True)
+            make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r", balance=True)
+            make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r.gif", duration, balance=True)
 
         print("Plotting density")
         make_slices(display_densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"{fname}-d")
         make_gif(display_densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"{fname}-d.gif", duration)
         
-        print("Plotting uncertainty")
-        make_slices(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u", 90)
-        make_gif(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u.gif", duration, 90)
+        if self.final_uncertainty:
+            print("Plotting uncertainty")
+            make_slices(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u", 90)
+            make_gif(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u.gif", duration, 90)
         
         warnings.filterwarnings("default")
 

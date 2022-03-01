@@ -5,7 +5,7 @@ from lumpy import Lumpy
 from core import Asteroid, Indicator, TrueShape
 import matplotlib.pyplot as plt
 
-DIVISION = 9
+DIVISION = 99
 MAX_RADIUS = 2000
 RELOAD = False
 
@@ -68,7 +68,7 @@ if len(sys.argv) == 2:
             plt.close("all")
 
 
-elif len(sys.argv) == 3:
+elif len(sys.argv) == 3:    
     if sys.argv[1] not in asteroids:
         raise Exception("The first argument must be the asteroid type. One of {}".format(asteroids.keys()))
 

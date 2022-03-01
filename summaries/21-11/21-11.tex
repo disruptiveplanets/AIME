@@ -965,14 +965,15 @@ Note that this model is fast to compute; assuming fast matrix multiplication, th
 \subsection{Harmonic model}
 We now explore a model that seeks to narrow down the space of allowed density distributions a different way than the likelihood model; we define the ``nice'' density distributions directly. They are the density distributions with zero Laplacian: $\nabla^2 \rho = 0$ inside the asteroid. The expansion of such a function in spherical coordinates is given by 
 \begin{equation}
-  \rho(\bm r) = \sum_{\ell, m} D_{\ell m} R_{\ell m}^*(\bm r)
+  \rho(\bm r) = \sum_{\ell, m} \frac{D_{\ell m}}{a_m^\ell} R_{\ell m}^*(\bm r)
   \label{eqn:harmonic-rho}
 \end{equation}
 where the terms which lead to $\rho \rightarrow \infty$ at the origin have been removed and $D_{\ell m}$ are free parameters. The complex conjugate was added for convenience. By setting a maximum on $\ell$, we restrict the number of degrees of freedom to $(\ell_\mathrm{max}+ 1)^2$. Choosing the same maximum $\ell$ as the maximum $\ell$ for the $H_{\ell m}$ moments, we have $m=n-1$ coefficients $D_{\ell m}$ which can be stacked into an $m$-dimensional vector $\bm D$.
 
 Inserting equation \ref{eqn:harmonic-rho} into equations \ref{eqn:hlm-constraint} and \ref{eqn:b-constraint}, we get 
 \begin{equation}
-  K_{\ell', m'} = \sum_{\ell m} \frac{1}{\mu_m a_m^{\ell'}} D_{\ell m} \int_\mathcal{A} d^3 r R_{\ell m}^*(\bm r) R_{\ell' m'}(\bm r)
+  K_{\ell', m'} = \sum_{\ell m} \frac{1}{\mu_m a_m^{\ell'} a_m^\ell} D_{\ell m} \int_\mathcal{A} d^3 r R_{\ell m}^*(\bm r) R_{\ell' m'}(\bm r)
+  \label{eqn:harmonic-mat}
 \end{equation}
 This is an over-determined matrix equation $\bm K = M \bm D$, where $M$ is an $n \times m$ matrix. The Moore-Penrose inverse can therefore be used again to find an inverse $A=M^+$ which yields approximately correct $\bm D$ (approximate in that the norm of the error vector between $\bm K$ and $M \bm D$ is minimized). However, the form of the inverse changes due to the matrix now being taller than it is wide. The Moore-Penrose is now
 \begin{equation}
@@ -981,6 +982,11 @@ This is an over-determined matrix equation $\bm K = M \bm D$, where $M$ is an $n
 \end{equation}
 and the model concludes with $A=M^+$.
 
+Note that, in the special case where the asteroid is a sphere of radius $R$, the matrix defined by equation \ref{eqn:harmonic-mat} is diagonal, with entries 
+\begin{equation}
+  M_{\ell m; \ell' m'} = \frac{4\pi R^3}{\mu_m} \frac{R^{2\ell}}{a_m^{2\ell}} \frac{\delta_{\ell \ell'} \delta_{m m'}}{(4\ell^2 + 8\ell + 3)(\ell - m)!(\ell+m)!}.
+\end{equation}
+A nonspherical perturbation will introduce small off-diagonal entries to $M$. This diagonal represents an interpretation of the physical meaning of $K_{\ell m}$; they are directly related through this form of $M$ and the matrix equation $\bm K = M \bm D$ to the coefficients of the spherical harmonic expansion of the asteroid in the spherical case.
 
 
 \subsection{Lump model}
@@ -1016,11 +1022,11 @@ The prime in equation \ref{eqn:klm-stack} denotes that the moments are calculate
   K_{\ell m}'^i = \sum_{\ell' m'} (-1)^{\ell - \ell'} R_{\ell - \ell', m - m'}(\bm x_i) K_{\ell' m'}^i \qquad a_i'^2 = a_i^2 + x_i^2 K_{00}
   \label{eqn:translate-klm}
 \end{equation}
-Here, $K_{00}^i$ is the added mass $\mu_i$ of lump $i$, while $K_{1m}=0$ and $K_{2m}$ incorporate its orientation and moment of inertia ratios. The volume is constrained by $a_i^2$. These values map directly onto an ellipsoid representation via equations \ref{eqn:ellipsoid-klm}, so that if $K_{\ell m}^i$, $a_i^2$, $\mu_i$, and $x_i$ are known, then the density distribution is known. Note that if $\bm x_i$ is known, then equation \ref{eqn:translate-klm} are linear in $K_{\ell m}^i$. Therefore, if we define $\bm D$ to contain $K_{2m}^i$ and $a_i^2$ in some order, then equations \ref{eqn:translate-klm} and \ref{eqn:klm-stack} define a matrix equation $\bm K = \bm C + M \bm D$ which can be solved by setting $A$ equal to the Moore-Penrose inverse of $M$. Henceforth, we assume that the dimensions of $\bm D$ are less than or equal to the number of known parameters (the shaded regions of table \ref{tab:lump-dof}), so that $A$ is given by equation \ref{eqn:mpi-overdetermined}). Note that the $\bm C$ term of this equation came from the expansion of $K_{\ell m}'^0$ and $a_0^2$, which is written in terms of the already-known displacement of the asteroid surface from its center of mass.
+The dummy indices $\ell', m'$ should only be summed over values in which $\ell-\ell' \geq 0$ and $|m-m'| \leq \ell - \ell'$. Here, $K_{00}^i$ is the added mass $\mu_i$ of lump $i$, while $K_{1m}=0$ and $K_{2m}$ incorporate its orientation and moment of inertia ratios. The volume is constrained by $a_i^2$. These values map directly onto an ellipsoid representation via equations \ref{eqn:ellipsoid-klm}, so that if $K_{\ell m}^i$, $a_i^2$, $\mu_i$, and $x_i$ are known, then the density distribution is known. Note that if $\bm x_i$ is known, then equation \ref{eqn:translate-klm} are linear in $K_{\ell m}^i$. Therefore, if we define $\bm D$ to contain $K_{2m}^i$ and $a_i^2$ in some order, then equations \ref{eqn:translate-klm} and \ref{eqn:klm-stack} define a matrix equation $\bm K = \bm C + M \bm D$ which can be solved by setting $A$ equal to the Moore-Penrose inverse of $M$. Henceforth, we assume that the dimensions of $\bm D$ are less than or equal to the number of known parameters (the shaded regions of table \ref{tab:lump-dof}), so that $A$ is given by equation \ref{eqn:mpi-overdetermined}). Note that the $\bm C$ term of this equation came from the expansion of $K_{\ell m}'^0$ and $a_0^2$, which is written in terms of the already-known displacement of the asteroid surface from its center of mass.
 
 This model's strategy will be to choose $\bm x_i$ and $\mu_i$ via a nonlinear process, then fit for the values $K_{\ell m}^i$ and $a_i^2$ using the linear format described in the introduction to this section. The constraints on $\bm x_i$ and $|mu_i$ are primarily
 \begin{equation}
-  \sum_{i=1}^N \bm x_i \mu_i = \mu_0 \bm x_0
+  \sum_{i=1}^N \bm x_i \mu_i + \mu_0 \bm x_0 = 0
   \label{eqn:lump-constraints}
 \end{equation}
 where $\bm x_0$ is the known displacement of the centroid of the asteroid model from the center of mass. There are also additional constraints, such as that $\bm x_i$ should lie inside the asteroid which can be enforced manually. The overall mass of the asteroid is $\mu_m = \mu_0 + \sum_{i=1}^N \mu_i$, and has been set, so we may eliminate $\mu_0$ from equation \ref{eqn:lump-constraints}. The constraint is now a function of $\mu_i$ and $\bm x_i$ for $i \geq 1$. The matrix equation defining $M$ is overdetermined, but we would like it to have a solution nevertheless. We therefore solve for $\bm x_i$ and $\mu_i$ to yield an $M$ with solutions. This is done by minimizing
