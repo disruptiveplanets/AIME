@@ -33,7 +33,7 @@ class Method:
 
     def get_c(self):
         # Default value.
-        return np.zeros_like(self.asteroid_data)
+        return np.zeros_like(self.asteroid.data)
 
     def get_loc_density(self, k2ms, x, y, z):
         raise NotImplementedError
@@ -113,7 +113,7 @@ class Method:
             print("({}, {})\tExpected  {:.5f}\t Got {:.5f} \t Difference {:.2g}".format(l, m, self.asteroid.data[i], r, abs(self.asteroid.data[i]-r)))
         print("Net root mean error:", np.sqrt(error))
 
-    def display(self, fname, duration=2):
+    def display(self, fname, duration=5):
         asteroid_name = fname.split("/")[1]
         if not os.path.isdir(f"figs/{asteroid_name}"):
             os.mkdir(f"figs/{asteroid_name}")

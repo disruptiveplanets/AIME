@@ -88,7 +88,7 @@ elif len(sys.argv) == 3:
     method.save_unc(f"data/{sys.argv[1]}/{sys.argv[2]}-u.npy")
     method.check()
 
-    #method.display(f"figs/{sys.argv[1]}/{sys.argv[2]}")
+    method.display(f"figs/{sys.argv[1]}/{sys.argv[2]}")
 
 else:
     raise Exception("One or two arguments must be provided.")

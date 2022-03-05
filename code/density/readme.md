@@ -26,3 +26,7 @@ I pulled the results for mapping the asteroid today. They look only slightly scr
 I also have been working on the lumpy model. I've realized one symmetric rock is too degenerate. The mass and lever arm are degenerate, so you can choose one arbitrarily, and then the radius is determined by the radius of the asteroid. There are no other free parameters. I can add more rocks, but I feel that this is a pretty bad problem. I'd like to talk to Julien about it.
 
 In the mean time, maybe it's best to take a break on the lumpy model. I pushed the asymmetric model to the supercomputer.
+
+## March 5
+
+I spent yesterday and today pushing all the fits to the plotters and generating figures. That worked today, but I sent the figs back to be re-plotted to speed up the gifs and remove a typo.
