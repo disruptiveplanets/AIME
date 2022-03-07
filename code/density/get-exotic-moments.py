@@ -3,7 +3,7 @@ from core import Asteroid, Indicator
 from multiprocessing import Pool
 import matplotlib.pyplot as plt
 
-division = 39
+division = 9
 max_radius = 2000
 am = 1000
 k22a, k20a = -0.05200629, -0.2021978
@@ -13,28 +13,31 @@ a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20a + 12 * k22a)
 c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20a)
 
 
-blob_length = 500
-blob_rad = 500
+
+blob_displacement = 500
+blob_rad = 400
 blob_vol = np.pi * 4 / 3 * blob_rad**3
 ellipsoid_vol = np.pi * 4 / 3 * a * b * c
-density_factor = 4
-lump_shift = blob_rad * density_factor * blob_vol / (ellipsoid_vol + density_factor * blob_vol)
-print(lump_shift)
+density_factor = 5
+lump_shift = blob_displacement * (blob_vol * density_factor) / ellipsoid_vol
+print("Mass fraction:", (blob_vol * density_factor) / (blob_vol * density_factor+ellipsoid_vol))
+print("Lump shift:", lump_shift)
+
 def lump(x, y, z):
     o = np.ones_like(x, dtype=float)
-    o[(x-blob_length+lump_shift)**2 + (y)**2 + (z)**2 < blob_rad**2] = density_factor + 1
+    o[(x)**2 + (y-blob_displacement)**2 + (z)**2 < blob_rad**2] += density_factor
     return o
 
 
 asteroids = [
-    ("sph", Indicator.sph(am), lambda x,y,z: 1),
-    ("ells", Indicator.ell(am, k22s, k20s), lambda x,y,z: 1),
-    ("ella", Indicator.ell(am, k22a, k20a), lambda x,y,z: 1),
-    ("tet", Indicator.tet(am), lambda x,y,z: 1),
-    ("db", Indicator.dumbbell(am), lambda x,y,z: 1),
-    ("in", Indicator.ell(am, k22a, k20a), lambda x,y,z: np.exp(-0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))),
-    ("out", Indicator.ell(am, k22a, k20a), lambda x,y,z: np.exp(0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))),
-    ("blob", Indicator.ell_x_shift(am, k22a, k20a, -lump_shift), lump),
+    #("sph", Indicator.sph(am), lambda x,y,z: 1),
+    #("ells", Indicator.ell(am, k22s, k20s), lambda x,y,z: 1),
+    #("ella", Indicator.ell(am, k22a, k20a), lambda x,y,z: 1),
+    #("tet", Indicator.tet(am), lambda x,y,z: 1),
+    #("db", Indicator.dumbbell(am), lambda x,y,z: 1),
+    #("in", Indicator.ell(am, k22a, k20a), lambda x,y,z: np.exp(-0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))),
+    #("out", Indicator.ell(am, k22a, k20a), lambda x,y,z: np.exp(0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))),
+    ("blob", Indicator.ell_y_shift(am, k22a, k20a, -lump_shift), lump),
 ]
 
 def get_klms(index):
@@ -42,19 +45,23 @@ def get_klms(index):
     asteroid = Asteroid("", am, division, max_radius, indicator, None)
     density = asteroid.map_np(generator)
 
-    plt.imshow(density[:,:,len(density)//2])
-    plt.show()
-
     rlms = asteroid.moment_field(max_l=3)
 
     i = 0
     klms = []
     for l in range(0, 4):
         for m in range(-l, l+1):
-            klms.append(np.sum(rlms[i] * density) / am**l * division**3)
+            klms.append(np.sum(rlms[i] * density) * division**3)
             i += 1
     am_this = np.sqrt(np.sum(rlms[i] * density) * division**3 / klms[0])
     klms = np.array(klms) / klms[0]
+
+    # Rescale by am
+    i = 0
+    for l in range(0, 4):
+        for m in range(-l, l+1):
+            klms[i] /= am_this**l
+            i += 1
 
     return name, np.append(klms, am_this)
 
