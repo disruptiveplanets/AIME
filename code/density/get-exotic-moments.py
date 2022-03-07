@@ -3,7 +3,7 @@ from core import Asteroid, Indicator, TrueShape
 from multiprocessing import Pool
 import matplotlib.pyplot as plt
 
-division = 49
+division = 9
 max_radius = 2000
 am = 1000
 k22a, k20a = -0.05200629, -0.2021978
@@ -15,7 +15,7 @@ c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20a)
 
 
 blob_displacement = 500
-blob_rad = 400
+blob_rad = 300
 blob_vol = np.pi * 4 / 3 * blob_rad**3
 ellipsoid_vol = np.pi * 4 / 3 * a * b * c
 density_factor = 5
