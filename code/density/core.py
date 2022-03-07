@@ -43,10 +43,11 @@ class Method:
             a = self.get_a()
             self.d = a @ (self.asteroid.data - self.get_c())
 
-            if self.finite_element:
-                self.unc = np.einsum('ij,jk,ik->i', a, self.asteroid.sigma_data, a.conj())# Diagonal entries
-            else:
-                self.unc = a @ self.asteroid.sigma_data @ a.transpose().conj()
+            if self.asteroid.sigma_data is not None:
+                if self.finite_element:
+                    self.unc = np.einsum('ij,jk,ik->i', a, self.asteroid.sigma_data, a.conj())# Diagonal entries
+                else:
+                    self.unc = a @ self.asteroid.sigma_data @ a.transpose().conj()
 
 
     def get_density(self, x,y,z):
@@ -130,14 +131,16 @@ class Method:
 
         true_densities = self.asteroid.get_true_densities()
         
-        if true_densities is not None and self.final_uncertainty:
+        if true_densities is not None:
             true_densities[~self.asteroid.indicator_map] = np.nan
-            print("Plotting ratio to true density")
             true_densities /= np.nanmean(true_densities)
-            ratios = (true_densities - display_densities) / (display_densities * display_uncs)
-            print("Average ratios over body:", np.nanmean(ratios), "(absolute value: ", np.nanmean(np.abs(ratios)), ")")
-            make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r", balance=True)
-            make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r.gif", duration, balance=True)
+            if self.final_uncertainty:
+                ratios = (true_densities - display_densities) / (display_densities * display_uncs)
+                print("Average ratios over body:", np.nanmean(ratios), "(absolute value: ", np.nanmean(np.abs(ratios)), ")")
+                make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r", balance=True)
+                make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r.gif", duration, balance=True)
+            else:
+                difference = (true_densities - display_densities) / true_densities
 
         print("Plotting density")
         make_slices(display_densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"{fname}-d")
@@ -147,6 +150,11 @@ class Method:
             print("Plotting uncertainty")
             make_slices(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u", 90)
             make_gif(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u.gif", duration, 90)
+        else:
+            print("Plotting differences")
+            make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr', f"{fname}-s", 90, balance=True)
+            make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr', f"{fname}-s.gif", duration, 90, balance=True)
+
         
         warnings.filterwarnings("default")
 
@@ -172,50 +180,54 @@ class Asteroid:
         self.moments = None
 
     def load_samples(self, fname):
-        with open(fname, 'rb') as f:
-            samples = np.load(f)
-        samples = samples.reshape(-1, samples.shape[-1]).transpose()
-        if samples.shape[0] not in [3, 10]:
-            raise Exception("Only l=2 or l=3 are supported")
-        if samples.shape[0] == 3:
-            self.max_l = 2
-        elif samples.shape[0] == 10:
-            self.max_l = 3
-        klms = np.zeros((samples.shape[0]+6, samples.shape[1]), dtype=complex)
-        #             00
-        #         1-1 10 11
-        #     2-2 2-1 20 21 22
-        # 3-3 3-2 3-1 30 31 32 33
-        klms[0] = 1
-        klms[1] = 0
-        klms[2] = 0
-        klms[3] = 0
-        klms[4] = samples[1]
-        klms[5] = 0
-        klms[6] = samples[2]
-        klms[7] = 0
-        klms[8] = samples[1]
-        ms = np.array([0, -1, 0, 1, -2, -1, 0, 1, 2])
-        if self.max_l > 2:
-            klms[15] = samples[3] + 1j * samples[4]
-            klms[14] = samples[5] + 1j * samples[6]
-            klms[13] = samples[7] + 1j * samples[8]
-            klms[12] = samples[9]
-            klms[11] = -klms[13].conj()
-            klms[10] = klms[14].conj()
-            klms[9] = -klms[15].conj()
-            ms = np.append(ms, [-3, -2, -1, 0, 1, 2, 3])
+        # with open(fname, 'rb') as f:
+        #     samples = np.load(f)
+        # samples = samples.reshape(-1, samples.shape[-1]).transpose()
+        # if samples.shape[0] not in [3, 10]:
+        #     raise Exception("Only l=2 or l=3 are supported")
+        # if samples.shape[0] == 3:
+        #     self.max_l = 2
+        # elif samples.shape[0] == 10:
+        #     self.max_l = 3
+        # klms = np.zeros((samples.shape[0]+6, samples.shape[1]), dtype=complex)
+        # #             00
+        # #         1-1 10 11
+        # #     2-2 2-1 20 21 22
+        # # 3-3 3-2 3-1 30 31 32 33
+        # klms[0] = 1
+        # klms[1] = 0
+        # klms[2] = 0
+        # klms[3] = 0
+        # klms[4] = samples[1]
+        # klms[5] = 0
+        # klms[6] = samples[2]
+        # klms[7] = 0
+        # klms[8] = samples[1]
+        # ms = np.array([0, -1, 0, 1, -2, -1, 0, 1, 2])
+        # if self.max_l > 2:
+        #     klms[15] = samples[3] + 1j * samples[4]
+        #     klms[14] = samples[5] + 1j * samples[6]
+        #     klms[13] = samples[7] + 1j * samples[8]
+        #     klms[12] = samples[9]
+        #     klms[11] = -klms[13].conj()
+        #     klms[10] = klms[14].conj()
+        #     klms[9] = -klms[15].conj()
+        #     ms = np.append(ms, [-3, -2, -1, 0, 1, 2, 3])
 
-        delta_gamma = samples[0] - np.mean(samples[0])
-        hybrids = klms * np.exp(-1j * np.outer(ms, delta_gamma))
-        klm_means = np.mean(hybrids, axis=1)
+        # delta_gamma = samples[0] - np.mean(samples[0])
+        # hybrids = klms * np.exp(-1j * np.outer(ms, delta_gamma))
+        # klm_means = np.mean(hybrids, axis=1)
 
-        klm_cov = np.cov(hybrids)
-        added_one_cov = np.hstack((klm_cov, np.zeros((klm_cov.shape[0], 1))))
-        added_cov = np.vstack((added_one_cov, np.zeros((1, klm_cov.shape[0]+1))))
+        # klm_cov = np.cov(hybrids)
+        # added_one_cov = np.hstack((klm_cov, np.zeros((klm_cov.shape[0], 1))))
+        # added_cov = np.vstack((added_one_cov, np.zeros((1, klm_cov.shape[0]+1))))
 
-        return np.append(klm_means, 1), added_cov
+        # return np.append(klm_means, 1), added_cov
 
+        self.max_l = 3
+        x, y, z, w = -0.05642647706880238, -0.20117092036848144, -0.0027448036993950225j,-0.014611047228623027j
+
+        return np.array([1, 0, 0, 0, x, 0, y, 0, x, z,0,w,0,w,0,z, 1]), None
 
     def get_true_densities(self):
         if self.true_densities is None:
@@ -276,11 +288,11 @@ class Indicator:
         c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
         return lambda x,y,z: x*x/(a*a) + y*y/(b*b) + z*z/(c*c) < 1
 
-    def ell_x_shift(am, k22, k20, x_shift):
+    def ell_y_shift(am, k22, k20, y_shift):
         a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 + 12 * k22)
         b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
         c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
-        return lambda x,y,z: (x - x_shift)**2/(a*a) + y*y/(b*b) + z*z/(c*c) < 1
+        return lambda x,y,z: (x)**2/(a*a) + (y - y_shift)**2/(b*b) + z*z/(c*c) < 1
 
     def tet(am, tet_shrink=1):
         tet_corners = 1.82688329031 * am * np.array([
@@ -320,17 +332,11 @@ class TrueShape:
         return lambda x, y, z: np.exp(0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))
 
     def blob(am, k22, k20):
-        a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 + 12 * k22)
-        b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
-        c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
-        blob_length = 500
-        blob_rad = 500
-        blob_vol = np.pi * 4 / 3 * blob_rad**3
-        ellipsoid_vol = np.pi * 4 / 3 * a * b * c
-        density_factor = 4
-        lump_shift = blob_rad * density_factor * blob_vol / (ellipsoid_vol + density_factor * blob_vol)
+        blob_displacement = 500
+        blob_rad = 400
+        density_factor = 5
         def lump(x, y, z):
             o = np.ones_like(x, dtype=float)
-            o[(x-blob_length+lump_shift)**2 + y**2 + z**2 < blob_rad**2] = density_factor + 1
+            o[(x)**2 + (y-blob_displacement)**2 + z**2 < blob_rad**2] += density_factor
             return o
         return lump
