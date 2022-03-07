@@ -1,16 +1,16 @@
 import sys, os
 
 names = [
-    #"sym-sph", 
-    #"asym-sph", 
-    #"sym-ell", 
-    #"asym-ell", 
-    #"tet", 
+    "sym-sph", 
+    "asym-sph", 
+    "sym-ell", 
+    "asym-ell", 
+    "tet", 
     "db", 
-    #"high", 
+    "high", 
     "in", 
     "out", 
-    "blob"
+    #"blob"
 ]
 
 def run_text(asteroid):
@@ -24,8 +24,8 @@ source /etc/profile
 
 module load anaconda/2022a
 
-python run.py {0} harmonic
-python run.py {0} likelihood""".format(asteroid)
+python run.py {0} lumpy
+""".format(asteroid)
 
 def run(asteroid):
     with open(f"{asteroid}.sh", 'w') as f:

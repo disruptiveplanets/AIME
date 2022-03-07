@@ -30,3 +30,15 @@ In the mean time, maybe it's best to take a break on the lumpy model. I pushed t
 ## March 5
 
 I spent yesterday and today pushing all the fits to the plotters and generating figures. That worked today, but I sent the figs back to be re-plotted to speed up the gifs and remove a typo.
+
+## March 7
+
+Today I updated the lumpy model. It works. Here are the untested components though:
+- Once an ellipsoid lump is solved for, is it inserted into the asteroid with correct orientation to get the density map?
+- Implementation bugs for N > 1 (I know these bugs exist)
+
+I will not test them until I have a use for them; I'd like to talk briefly with Julien about exactly which examples he thinks are interesting, then write and test just enough code to implement those examples.
+
+Knowing that everything works, I re-pushed the blob calculation to the supercomputer, both because I moved the blob and because I wanted to check that the K3m components, which are quite important, were precise. I also ran lumpy-1-1 for all models except blob.
+
+In case I end up testing the rotated blob case, I generated an example called rot-blob. But to find moments for it, we'd need to rotate it into the principal axis frame, which sounds deeply annoying. So I'm not going to yet.

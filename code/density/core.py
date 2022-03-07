@@ -25,6 +25,12 @@ class Method:
         self.finite_element = finite_element
         self.final_uncertainty = final_uncertainty
 
+    def get_method_name(self):
+        raise NotImplementedError
+
+    def get_bare_name(self):
+        return f"{self.asteroid.name}/{self.get_method_name()}"
+
     def get_a(self):
         raise NotImplementedError
         
@@ -88,11 +94,13 @@ class Method:
             self.density_uncs = self.asteroid.map(self.get_unc, dtype=float) / np.abs(self.map_density())
         return self.density_uncs
 
-    def save_density(self, fname):
+    def save_density(self):
+        fname = f"data/{self.get_bare_name()}-d.npy"
         with open(fname, 'wb') as f:
             np.save(f, self.map_density())
 
-    def save_unc(self, fname):
+    def save_unc(self):
+        fname = f"data/{self.get_bare_name()}-u.npy"
         with open(fname, 'wb') as f:
             np.save(f, self.map_unc())
 
@@ -115,7 +123,8 @@ class Method:
             print("({}, {})\tExpected  {:.5f}\t Got {:.5f} \t Difference {:.2g}".format(l, m, self.asteroid.data[i], r, abs(self.asteroid.data[i]-r)))
         print("Net root mean error:", np.sqrt(error))
 
-    def display(self, fname, duration=5):
+    def display(self, duration=5):
+        fname = f"figs/{self.get_bare_name()}"
         asteroid_name = fname.split("/")[1]
         if not os.path.isdir(f"figs/{asteroid_name}"):
             os.mkdir(f"figs/{asteroid_name}")
@@ -167,7 +176,8 @@ class Method:
 
 
 class Asteroid:
-    def __init__(self, sample_file, am, division, max_radius, indicator, true_shape):
+    def __init__(self, name, sample_file, am, division, max_radius, indicator, true_shape):
+        self.name = name
         self.max_l = None
         self.am = am
         self.true_shape = true_shape

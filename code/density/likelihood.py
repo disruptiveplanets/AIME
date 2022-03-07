@@ -11,6 +11,9 @@ class Likelihood(Method):
         self.grid_indices = self.grid_indices.reshape(self.asteroid.indicator_map.shape) - 1# 3d row
         self.m = np.nanmax(self.grid_indices)
 
+    
+    def get_method_name(self):
+        return "likelihood"
 
     def get_a(self):
         rlms = self.asteroid.moment_field()

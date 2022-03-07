@@ -29,10 +29,10 @@ def make_gif(densities, pos_array, axis_name, cmap, fname, duration, percentile=
     num_frames = maxes[2] - mins[2]
     max_frames = duration * 30
     skip_between = 1
-    while len(range(num_frames, skip_between)) > max_frames:
+    while len(range(0, num_frames, skip_between)) > max_frames:
         skip_between += 1
     print(f"Num frames: {num_frames}, skipping {skip_between}")
-    for i in range(num_frames, skip_between):
+    for i in range(0, num_frames, skip_between):
         fig = make_frame(densities, pos_array, axis_name, cmap, percentile, balance, i + mins[2])
         fig.canvas.draw()
         imgs.append(Image.frombytes('RGB',

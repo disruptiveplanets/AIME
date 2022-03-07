@@ -9,6 +9,9 @@ class Harmonic(Method):
         super().__init__(asteroid, False)
         if self.asteroid.max_l is not None:
             self.m = (self.asteroid.max_l + 1)**2
+    
+    def get_method_name(self):
+        return "harmonic"
 
     def get_a(self):
         rlms = self.asteroid.moment_field()

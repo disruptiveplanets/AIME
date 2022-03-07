@@ -5,7 +5,7 @@ from lumpy import Lumpy
 from core import Asteroid, Indicator, TrueShape
 import matplotlib.pyplot as plt
 
-DIVISION = 99
+DIVISION = 9
 MAX_RADIUS = 2000
 RELOAD = False
 
@@ -14,6 +14,8 @@ k22s, k20s = 0, -0.09766608
 
 
 asteroids = {
+    "test": ("samples/den-in-0-samples.npy", 1047.477436728389, DIVISION, MAX_RADIUS,
+        Indicator.ell(1000, k22a, k20a), TrueShape.in_(1000, k22a, k20a)),
     "sym-sph": ("samples/den-sym-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.sph(1000), None),
     "asym-sph": ("samples/den-asym-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
@@ -32,8 +34,10 @@ asteroids = {
         Indicator.ell(1000, k22a, k20a), TrueShape.in_(1000, k22a, k20a)),
     "out": ("samples/den-out-0-samples.npy", 1050.660629058438, DIVISION, MAX_RADIUS,
         Indicator.ell(1000, k22a, k20a), TrueShape.out(1000, k22a, k20a)),
-    "blob": ("samples/den-blob-0-samples.npy", 894.3680254454393, DIVISION, MAX_RADIUS,
-        Indicator.ell_x_shift(1000, k22a, k20a, -148.48101191304406), TrueShape.blob(1000, k22a, k20a)),
+    "blob": ("samples/den-blob-0-samples.npy", 965.2268359486612, DIVISION, MAX_RADIUS,
+        Indicator.ell_y_shift(1000, k22a, k20a, -57.02376624759285), TrueShape.blob(1000, k22a, k20a)),
+    "rot-blob": ("samples/den-blob-0-samples.npy", 966.4144167196462, DIVISION, MAX_RADIUS,
+        Indicator.ell_y_shift(1000, k22a, k20a, -57.02376624759285), TrueShape.rot_blob(1000, k22a, k20a)),
 }
 
 methods = {
@@ -43,7 +47,7 @@ methods = {
 }
 
 def make_asteroid(args):
-    return Asteroid(args[0], args[1], args[2], args[3], args[4], args[5])
+    return Asteroid(args[0], args[1], args[2], args[3], args[4], args[5], args[6])
     
 if len(sys.argv) == 2:
     if sys.argv[1] != "plot":
@@ -59,7 +63,7 @@ if len(sys.argv) == 2:
                 continue
             print(f"Plotting asteroid {asteroid_name} method {method_name}")
 
-            asteroid = make_asteroid(new_args)
+            asteroid = make_asteroid([asteroid_name]+new_args)
             method = method_class(asteroid)
             
             method.reload(f"data/{asteroid_name}/{method_name}-d.npy", f"data/{asteroid_name}/{method_name}-u.npy")
@@ -75,20 +79,20 @@ elif len(sys.argv) == 3:
     if sys.argv[2] not in methods:
         raise Exception("The second argument must be the method. One of {}".format(methods.keys()))
 
-    asteroid = make_asteroid(asteroids[sys.argv[1]])
+    asteroid = make_asteroid([sys.argv[1]] + list(asteroids[sys.argv[1]]))
     method = methods[sys.argv[2]](asteroid)
 
     print("Solving")
     method.solve()
     print("Getting densities")
     method.map_density()
-    method.save_density(f"data/{sys.argv[1]}/{sys.argv[2]}-d.npy")
+    method.save_density()
     print("Getting uncertainties")
     method.map_unc()
-    method.save_unc(f"data/{sys.argv[1]}/{sys.argv[2]}-u.npy")
+    method.save_unc()
     method.check()
 
-    method.display(f"figs/{sys.argv[1]}/{sys.argv[2]}")
+    method.display()
 
 else:
     raise Exception("One or two arguments must be provided.")
