@@ -1,9 +1,9 @@
 import numpy as np
-from core import Asteroid, Indicator
+from core import Asteroid, Indicator, TrueShape
 from multiprocessing import Pool
 import matplotlib.pyplot as plt
 
-division = 9
+division = 49
 max_radius = 2000
 am = 1000
 k22a, k20a = -0.05200629, -0.2021978
@@ -23,11 +23,6 @@ lump_shift = blob_displacement * (blob_vol * density_factor) / ellipsoid_vol
 print("Mass fraction:", (blob_vol * density_factor) / (blob_vol * density_factor+ellipsoid_vol))
 print("Lump shift:", lump_shift)
 
-def lump(x, y, z):
-    o = np.ones_like(x, dtype=float)
-    o[(x)**2 + (y-blob_displacement)**2 + (z)**2 < blob_rad**2] += density_factor
-    return o
-
 
 asteroids = [
     #("sph", Indicator.sph(am), lambda x,y,z: 1),
@@ -37,7 +32,8 @@ asteroids = [
     #("db", Indicator.dumbbell(am), lambda x,y,z: 1),
     #("in", Indicator.ell(am, k22a, k20a), lambda x,y,z: np.exp(-0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))),
     #("out", Indicator.ell(am, k22a, k20a), lambda x,y,z: np.exp(0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))),
-    ("blob", Indicator.ell_y_shift(am, k22a, k20a, -lump_shift), lump),
+    ("blob", Indicator.ell_y_shift(am, k22a, k20a, -lump_shift), TrueShape.blob(am, k22a, k20a)),
+    ("rot-blob", Indicator.ell_y_shift(am, k22a, k20a, -lump_shift), TrueShape.rot_blob(am, k22a, k20a)),
 ]
 
 def get_klms(index):

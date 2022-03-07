@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.special import lpmv, factorial
 from scipy.linalg import norm
+from scipy.spatial.transform import Rotation
 from display import make_gif, make_slices
 import warnings, os
 
@@ -180,54 +181,49 @@ class Asteroid:
         self.moments = None
 
     def load_samples(self, fname):
-        # with open(fname, 'rb') as f:
-        #     samples = np.load(f)
-        # samples = samples.reshape(-1, samples.shape[-1]).transpose()
-        # if samples.shape[0] not in [3, 10]:
-        #     raise Exception("Only l=2 or l=3 are supported")
-        # if samples.shape[0] == 3:
-        #     self.max_l = 2
-        # elif samples.shape[0] == 10:
-        #     self.max_l = 3
-        # klms = np.zeros((samples.shape[0]+6, samples.shape[1]), dtype=complex)
-        # #             00
-        # #         1-1 10 11
-        # #     2-2 2-1 20 21 22
-        # # 3-3 3-2 3-1 30 31 32 33
-        # klms[0] = 1
-        # klms[1] = 0
-        # klms[2] = 0
-        # klms[3] = 0
-        # klms[4] = samples[1]
-        # klms[5] = 0
-        # klms[6] = samples[2]
-        # klms[7] = 0
-        # klms[8] = samples[1]
-        # ms = np.array([0, -1, 0, 1, -2, -1, 0, 1, 2])
-        # if self.max_l > 2:
-        #     klms[15] = samples[3] + 1j * samples[4]
-        #     klms[14] = samples[5] + 1j * samples[6]
-        #     klms[13] = samples[7] + 1j * samples[8]
-        #     klms[12] = samples[9]
-        #     klms[11] = -klms[13].conj()
-        #     klms[10] = klms[14].conj()
-        #     klms[9] = -klms[15].conj()
-        #     ms = np.append(ms, [-3, -2, -1, 0, 1, 2, 3])
+        with open(fname, 'rb') as f:
+            samples = np.load(f)
+        samples = samples.reshape(-1, samples.shape[-1]).transpose()
+        if samples.shape[0] not in [3, 10]:
+            raise Exception("Only l=2 or l=3 are supported")
+        if samples.shape[0] == 3:
+            self.max_l = 2
+        elif samples.shape[0] == 10:
+            self.max_l = 3
+        klms = np.zeros((samples.shape[0]+6, samples.shape[1]), dtype=complex)
+        #             00
+        #         1-1 10 11
+        #     2-2 2-1 20 21 22
+        # 3-3 3-2 3-1 30 31 32 33
+        klms[0] = 1
+        klms[1] = 0
+        klms[2] = 0
+        klms[3] = 0
+        klms[4] = samples[1]
+        klms[5] = 0
+        klms[6] = samples[2]
+        klms[7] = 0
+        klms[8] = samples[1]
+        ms = np.array([0, -1, 0, 1, -2, -1, 0, 1, 2])
+        if self.max_l > 2:
+            klms[15] = samples[3] + 1j * samples[4]
+            klms[14] = samples[5] + 1j * samples[6]
+            klms[13] = samples[7] + 1j * samples[8]
+            klms[12] = samples[9]
+            klms[11] = -klms[13].conj()
+            klms[10] = klms[14].conj()
+            klms[9] = -klms[15].conj()
+            ms = np.append(ms, [-3, -2, -1, 0, 1, 2, 3])
 
-        # delta_gamma = samples[0] - np.mean(samples[0])
-        # hybrids = klms * np.exp(-1j * np.outer(ms, delta_gamma))
-        # klm_means = np.mean(hybrids, axis=1)
+        delta_gamma = samples[0] - np.mean(samples[0])
+        hybrids = klms * np.exp(-1j * np.outer(ms, delta_gamma))
+        klm_means = np.mean(hybrids, axis=1)
 
-        # klm_cov = np.cov(hybrids)
-        # added_one_cov = np.hstack((klm_cov, np.zeros((klm_cov.shape[0], 1))))
-        # added_cov = np.vstack((added_one_cov, np.zeros((1, klm_cov.shape[0]+1))))
+        klm_cov = np.cov(hybrids)
+        added_one_cov = np.hstack((klm_cov, np.zeros((klm_cov.shape[0], 1))))
+        added_cov = np.vstack((added_one_cov, np.zeros((1, klm_cov.shape[0]+1))))
 
-        # return np.append(klm_means, 1), added_cov
-
-        self.max_l = 3
-        x, y, z, w = -0.05642647706880238, -0.20117092036848144, -0.0027448036993950225j,-0.014611047228623027j
-
-        return np.array([1, 0, 0, 0, x, 0, y, 0, x, z,0,w,0,w,0,z, 1]), None
+        return np.append(klm_means, 1), added_cov
 
     def get_true_densities(self):
         if self.true_densities is None:
@@ -333,10 +329,25 @@ class TrueShape:
 
     def blob(am, k22, k20):
         blob_displacement = 500
-        blob_rad = 400
+        blob_rad = 300
         density_factor = 5
         def lump(x, y, z):
             o = np.ones_like(x, dtype=float)
             o[(x)**2 + (y-blob_displacement)**2 + z**2 < blob_rad**2] += density_factor
+            return o
+        return lump
+
+    def rot_blob(am, k22, k20):
+        blob_displacement = 500
+        blob_rad = 300
+        density_factor = 5
+        b = (4/3)**(1/3) * blob_rad # To keep volume of blob and rot blob the same
+        a = b/2
+        c = 3*b/2
+        blob_rot_mat = Rotation.from_euler('zyz', (np.pi/4, np.pi/4, np.pi/4)).as_matrix()
+        def lump(x, y, z):
+            o = np.ones_like(x, dtype=float)
+            diff = np.einsum('ij,jklm', blob_rot_mat, np.array([x,y-blob_displacement, z])) # Multiply all vectors by the rotation matrix
+            o[diff[0]**2/a**2 + diff[1]**2/b**2 + diff[2]**2/c**2 < 1] += density_factor
             return o
         return lump
