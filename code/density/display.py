@@ -22,6 +22,14 @@ EXPAND_X=1.15 # Scale along x and y so that spheres look circular
 AXIS_LIMIT = 1000
 
 
+def latexify(number):
+    string = f"{number:.1e}"
+    if 'e' in string:
+        index = string.find('e')
+        return string[:index] + "\\times 10^{" + str(int(string[index+1:])) + "}"
+    return string
+
+
 def make_gif(densities, pos_array, axis_name, cmap, fname, duration, percentile=99, balance=False):
     imgs = []
     mins = np.min(np.where(~np.isnan(densities)), axis=1)
@@ -84,8 +92,8 @@ def show_cross_section(densities, pos_array, axis_name, cmap, fname, percentile=
     plt.tight_layout()
     plt.savefig(fname)
 
-def make_slices(densities, pos_array, axis_name, cmap, name, percentile=99, balance=False):
-    fig = plt.figure(figsize=(8,5))
+def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percentile=99, balance=False):
+    fig = plt.figure(figsize=(6.5,5))
     ax = fig.gca(projection='3d')
     ax.set_axis_off()
     ax.grid(False)
@@ -94,11 +102,13 @@ def make_slices(densities, pos_array, axis_name, cmap, name, percentile=99, bala
     if balance:
         want_max = max(want_max, -want_min)
         want_min = -want_max
+        if want_max < want_min:
+            want_max, want_min = want_min, want_max
 
     if np.nanmin(densities) != np.nanmax(densities):
-        levels = np.linspace(want_min, want_max, 40)
+        levels = np.linspace(want_min, want_max, 10)
     else:
-        levels = np.linspace(0.99, 1.01, 40)
+        levels = np.linspace(0.99, 1.01, 10)
     mins = np.min(np.where(~np.isnan(densities)), axis=1)
     maxes = np.max(np.where(~np.isnan(densities)), axis=1)
 
@@ -109,7 +119,7 @@ def make_slices(densities, pos_array, axis_name, cmap, name, percentile=99, bala
         ax.contourf(pos_array, pos_array, z+densities[:,:,i]*VERY_SMALL,
             zdir='z', levels=z+VERY_SMALL*levels, cmap=cmap)
 
-    ax.view_init(elev=10, azim=45)
+    ax.view_init(elev=8, azim=45)
 
     fig2 = plt.figure()
     ax2 = fig2.gca()
@@ -130,6 +140,8 @@ def make_slices(densities, pos_array, axis_name, cmap, name, percentile=99, bala
     ax.set_xlabel("$x$")
     ax.set_ylabel("$y$")
     ax.set_zlabel("$z$")
+
+    ax.set_title(f"$\\Delta K_{{\\ell m}}={latexify(klm_error)}$", y=0.1, fontdict={'fontsize': 16})
 
     c = fig.colorbar(contour_handle, ax=ax)
     c.set_label(axis_name)

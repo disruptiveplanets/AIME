@@ -115,13 +115,13 @@ class Method:
                 index += 1
         calc_rlms[index] = np.sum(rlms_field[index] * densities) / self.asteroid.am ** 2 * self.asteroid.division**3
 
-        error = 0
+        self.klm_error = 0
         for i, r in enumerate(calc_rlms):
             l = int(np.sqrt(i))
             m = i - l**2 - l
-            error += np.abs(self.asteroid.data[i] - r) ** 2
+            self.klm_error += np.abs(self.asteroid.data[i] - r) ** 2
             print("({}, {})\tExpected  {:.5f}\t Got {:.5f} \t Difference {:.2g}".format(l, m, self.asteroid.data[i], r, abs(self.asteroid.data[i]-r)))
-        print("Net root mean error:", np.sqrt(error))
+        print("Net root mean error:", np.sqrt(self.klm_error))
 
     def display(self, duration=5):
         fname = f"figs/{self.get_bare_name()}"
@@ -147,22 +147,22 @@ class Method:
             if self.final_uncertainty:
                 ratios = (true_densities - display_densities) / (display_densities * display_uncs)
                 print("Average ratios over body:", np.nanmean(ratios), "(absolute value: ", np.nanmean(np.abs(ratios)), ")")
-                make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r", balance=True)
+                make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r", self.klm_error, balance=True)
                 make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r.gif", duration, balance=True)
             else:
                 difference = (true_densities - display_densities) / true_densities
 
         print("Plotting density")
-        make_slices(display_densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"{fname}-d")
+        make_slices(display_densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"{fname}-d", self.klm_error)
         make_gif(display_densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"{fname}-d.gif", duration)
         
         if self.final_uncertainty:
             print("Plotting uncertainty")
-            make_slices(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u", 90)
+            make_slices(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u", self.klm_error, 90)
             make_gif(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u.gif", duration, 90)
         elif true_densities is not None:
             print("Plotting differences")
-            make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr', f"{fname}-s", 90, balance=True)
+            make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr', f"{fname}-s", self.klm_error, 90, balance=True)
             make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr', f"{fname}-s.gif", duration, 90, balance=True)
 
         
