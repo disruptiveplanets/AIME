@@ -21,6 +21,11 @@ LEGEND_SIZE = 12
 N_DIM = None
 N_PERCENTILES = None
 
+def show_true_point(ax):
+    spin = [0.00006464182, 0.00012928364, -0.00012928364]
+    theta, phi = np.pi / 2 - np.arccos(spin[2] / norm(spin)), np.arctan2(spin[1], spin[0])
+    ax.scatter(phi, theta, color='tab:orange', marker='*', s=32)
+
 # Get percentiles
 with open("percentiles.dat", 'r') as f:
     for line in f.readlines():
@@ -106,6 +111,7 @@ for plot_index in range(N_DIM+1):
     else:
         cbar.set_label(f"$\sigma({param_names[i]}) / \sigma_\\theta$")
 
+    show_true_point(axs[plot_index])
     axs[plot_index].set_xticks([-3 * np.pi / 4, -np.pi / 2, -np.pi / 4, 0, np.pi / 4, np.pi / 2, 3 * np.pi / 4])
     axs[plot_index].set_yticks([np.pi/3, np.pi/6, 0, -np.pi/6, -np.pi/3])
     axs[plot_index].set_xticklabels(['']*7)
@@ -145,6 +151,7 @@ im = ax.pcolormesh(Lon, Lat, cart_array, vmin=0, cmap='Blues_r')#, vmax=np.max(d
 cbar = fig.colorbar(im, ax=ax, orientation='horizontal')
 cbar.set_label(f"$\overline{{\sigma}}$")
 ax.scatter(theta_phis[:,1], theta_phis[:,0], s=1, c='k')
+show_true_point(ax)
 ax.set_xlabel("$\\theta$")
 ax.set_ylabel("$\\phi$")
 ax.set_xticks([-3 * np.pi / 4, -np.pi / 2, -np.pi / 4, 0, np.pi / 4, np.pi / 2, 3 * np.pi / 4])
@@ -160,6 +167,7 @@ cbar = fig.colorbar(im, ax=ax)
 cbar.set_label(f"$\overline{{\sigma}}$")
 fig.tight_layout()
 ax.scatter(theta_phis[:,1], theta_phis[:,0], s=1, c='k')
+show_true_point(ax)
 ax.set_yticklabels(['']*5)
 ax.grid(True)
 plt.savefig("avg-pole-polar.pdf")

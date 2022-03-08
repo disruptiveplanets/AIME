@@ -42,3 +42,5 @@ I will not test them until I have a use for them; I'd like to talk briefly with 
 Knowing that everything works, I re-pushed the blob calculation to the supercomputer, both because I moved the blob and because I wanted to check that the K3m components, which are quite important, were precise. I also ran lumpy-1-1 for all models except blob.
 
 In case I end up testing the rotated blob case, I generated an example called rot-blob. But to find moments for it, we'd need to rotate it into the principal axis frame, which sounds deeply annoying. So I'm not going to yet.
+
+I also learned of a mistake in my in and out density distributions, so I recalculated those and pushed the fits to the supercomputer again. Now blob, in, and out are running.

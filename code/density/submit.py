@@ -10,7 +10,7 @@ names = [
     "high", 
     "in", 
     "out", 
-    #"blob"
+    "blob"
 ]
 
 def run_text(asteroid):
@@ -24,6 +24,8 @@ source /etc/profile
 
 module load anaconda/2022a
 
+python run.py {0} harmonic
+python run.py {0} likelihood
 python run.py {0} lumpy
 """.format(asteroid)
 
