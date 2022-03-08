@@ -24,6 +24,7 @@ class Method:
         self.density_uncs = None
         self.finite_element = finite_element
         self.final_uncertainty = final_uncertainty
+        self.klm_error = None
 
     def get_method_name(self):
         raise NotImplementedError
@@ -104,7 +105,7 @@ class Method:
         with open(fname, 'wb') as f:
             np.save(f, self.map_unc())
 
-    def check(self):
+    def check(self, display=True):
         rlms_field = self.asteroid.moment_field()
         calc_rlms = np.zeros((self.asteroid.max_l + 1)**2 + 1, dtype=np.complex)
         index = 0
@@ -120,14 +121,18 @@ class Method:
             l = int(np.sqrt(i))
             m = i - l**2 - l
             self.klm_error += np.abs(self.asteroid.data[i] - r) ** 2
-            print("({}, {})\tExpected  {:.5f}\t Got {:.5f} \t Difference {:.2g}".format(l, m, self.asteroid.data[i], r, abs(self.asteroid.data[i]-r)))
-        print("Net root mean error:", np.sqrt(self.klm_error))
+            if display:
+                print("({}, {})\tExpected  {:.5f}\t Got {:.5f} \t Difference {:.2g}".format(l, m, self.asteroid.data[i], r, abs(self.asteroid.data[i]-r)))
+        if display:
+            print("Net root mean error:", np.sqrt(self.klm_error))
 
     def display(self, duration=5):
         fname = f"figs/{self.get_bare_name()}"
         asteroid_name = fname.split("/")[1]
         if not os.path.isdir(f"figs/{asteroid_name}"):
             os.mkdir(f"figs/{asteroid_name}")
+        if self.klm_error is None:
+            self.check(False)
 
         warnings.filterwarnings("ignore")
 
