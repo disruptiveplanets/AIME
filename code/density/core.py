@@ -160,7 +160,7 @@ class Method:
             print("Plotting uncertainty")
             make_slices(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u", 90)
             make_gif(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u.gif", duration, 90)
-        else:
+        elif true_densities is not None:
             print("Plotting differences")
             make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr', f"{fname}-s", 90, balance=True)
             make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr', f"{fname}-s.gif", duration, 90, balance=True)
@@ -329,13 +329,21 @@ class TrueShape:
         a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 + 12 * k22)
         b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
         c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
-        return lambda x, y, z: np.exp(-0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))
+        return lambda x, y, z: np.exp(-0.5 * (x*x/(a*a) + y*y/(b*b) + z*z/(c*c)))
 
     def out(am, k22, k20):
         a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 + 12 * k22)
         b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
         c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
-        return lambda x, y, z: np.exp(0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))
+        return lambda x, y, z: np.exp(0.5 * (x*x/(a*a) + y*y/(b*b) + z*z/(c*c)))
+
+    def in_sph(am):
+        r2 = 5/3 * am * am
+        return lambda x, y, z: np.exp(-0.5 * (x*x + y*y + z*z)/r2)
+
+    def out_sph(am):
+        r2 = 5/3 * am * am
+        return lambda x, y, z: np.exp(0.5 * (x*x + y*y + z*z)/r2)
 
     def blob(am, k22, k20):
         blob_displacement = 500

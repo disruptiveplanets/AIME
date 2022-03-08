@@ -5,7 +5,7 @@ from lumpy import Lumpy
 from core import Asteroid, Indicator, TrueShape
 import matplotlib.pyplot as plt
 
-DIVISION = 9
+DIVISION = 99
 MAX_RADIUS = 2000
 RELOAD = False
 
@@ -34,6 +34,10 @@ asteroids = {
         Indicator.ell(1000, k22a, k20a), TrueShape.in_(1000, k22a, k20a)),
     "out": ("samples/den-out-0-samples.npy", 1050.660629058438, DIVISION, MAX_RADIUS,
         Indicator.ell(1000, k22a, k20a), TrueShape.out(1000, k22a, k20a)),
+    "in-sph": ("samples/den-tet-0-samples.npy", 970.7040463235109, DIVISION, MAX_RADIUS,
+        Indicator.sph(1000), TrueShape.in_sph(1000)),
+    "out-sph": ("samples/den-tet-0-samples.npy", 1027.798098640552, DIVISION, MAX_RADIUS,
+        Indicator.sph(1000), TrueShape.out_sph(1000)),
     "blob": ("samples/den-blob-0-samples.npy", 965.2268359486612, DIVISION, MAX_RADIUS,
         Indicator.ell_y_shift(1000, k22a, k20a, -57.02376624759285), TrueShape.blob(1000, k22a, k20a)),
     "rot-blob": ("samples/den-blob-0-samples.npy", 966.4144167196462, DIVISION, MAX_RADIUS,
@@ -92,7 +96,7 @@ elif len(sys.argv) == 3:
     method.save_unc()
     method.check()
 
-    method.display()
+    #method.display()
 
 else:
     raise Exception("One or two arguments must be provided.")

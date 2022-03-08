@@ -30,15 +30,17 @@ asteroids = [
     #("ella", Indicator.ell(am, k22a, k20a), lambda x,y,z: 1),
     #("tet", Indicator.tet(am), lambda x,y,z: 1),
     #("db", Indicator.dumbbell(am), lambda x,y,z: 1),
-    #("in", Indicator.ell(am, k22a, k20a), lambda x,y,z: np.exp(-0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))),
-    #("out", Indicator.ell(am, k22a, k20a), lambda x,y,z: np.exp(0.5 * x*x/(a*a) + y*y/(b*b) + z*z/(c*c))),
-    ("blob", Indicator.ell_y_shift(am, k22a, k20a, -lump_shift), TrueShape.blob(am, k22a, k20a)),
-    ("rot-blob", Indicator.ell_y_shift(am, k22a, k20a, -lump_shift), TrueShape.rot_blob(am, k22a, k20a)),
+    ("in", Indicator.ell(am, k22a, k20a), TrueShape.in_(am, k22a, k20a)),
+    ("out", Indicator.ell(am, k22a, k20a), TrueShape.out(am, k22a, k20a)),
+    #("in-sph", Indicator.sph(am), TrueShape.in_sph(am)),
+    #("out-sph", Indicator.sph(am), TrueShape.out_sph(am)),
+    #("blob", Indicator.ell_y_shift(am, k22a, k20a, -lump_shift), TrueShape.blob(am, k22a, k20a)),
+    #("rot-blob", Indicator.ell_y_shift(am, k22a, k20a, -lump_shift), TrueShape.rot_blob(am, k22a, k20a)),
 ]
 
 def get_klms(index):
     name, indicator, generator = asteroids[index]
-    asteroid = Asteroid("", am, division, max_radius, indicator, None)
+    asteroid = Asteroid(name, "", am, division, max_radius, indicator, None)
     density = asteroid.map_np(generator)
 
     rlms = asteroid.moment_field(max_l=3)
