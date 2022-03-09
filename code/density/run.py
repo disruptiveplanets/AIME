@@ -60,7 +60,7 @@ if len(sys.argv) == 2:
     for asteroid_name, args in asteroids.items():
         for method_name, method_class in methods.items():
             new_args = [a for a in args]
-            new_args[0] = ""
+            #new_args[0] = ""
 
             if not os.path.exists(f"data/{asteroid_name}/{method_name}-d.npy"):
                 print(f"Data was not present for asteroid {asteroid_name} method {method_name}")
@@ -71,7 +71,7 @@ if len(sys.argv) == 2:
             method = method_class(asteroid)
             
             method.reload(f"data/{asteroid_name}/{method_name}-d.npy", f"data/{asteroid_name}/{method_name}-u.npy")
-            method.display(f"figs/{asteroid_name}/{method_name}")
+            method.display()
 
             plt.close("all")
 

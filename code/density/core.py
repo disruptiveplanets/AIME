@@ -153,7 +153,7 @@ class Method:
                 ratios = (true_densities - display_densities) / (display_densities * display_uncs)
                 print("Average ratios over body:", np.nanmean(ratios), "(absolute value: ", np.nanmean(np.abs(ratios)), ")")
                 make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r", self.klm_error, balance=True)
-                make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r.gif", duration, balance=True)
+                make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r.gif", duration=duration, balance=True)
             else:
                 difference = (true_densities - display_densities) / true_densities
 
