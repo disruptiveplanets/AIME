@@ -44,3 +44,7 @@ Knowing that everything works, I re-pushed the blob calculation to the supercomp
 In case I end up testing the rotated blob case, I generated an example called rot-blob. But to find moments for it, we'd need to rotate it into the principal axis frame, which sounds deeply annoying. So I'm not going to yet.
 
 I also learned of a mistake in my in and out density distributions, so I recalculated those and pushed the fits to the supercomputer again. Now blob, in, and out are running.
+
+## March 9
+
+Pulled data from supercomputer. Learned that the ellipsoid radii are imaginary for negative mass (like out example) but I'll have to fix it later because I'm in Caltech and sleepy.

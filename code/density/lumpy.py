@@ -133,6 +133,8 @@ class Lumpy(Method):
             self.intersection = []
             for i in range(1, self.N + 1):
                 rot_mat, k22, k20 = self.unrotate(k2ms[:-1])
+                print(k2ms, self.shell_lms[-1] * self.masses_result[0],
+                (self.xs_result[1,0]**2 + self.xs_result[1,1]**2 + self.xs_result[1,2]**2) * self.masses_result[i] / self.asteroid.am**2)
                 k22 /= k2ms[-1]
                 k20 /= k2ms[-1]
                 a = np.sqrt(5/3 * k2ms[-1]) * np.sqrt(1 - 2 * k20 + 12 * k22) * self.asteroid.am
