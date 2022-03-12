@@ -105,13 +105,12 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
         if want_max < want_min:
             want_max, want_min = want_min, want_max
 
-    if np.nanmin(densities) != np.nanmax(densities):
+    if want_min != want_max:
         levels = np.linspace(want_min, want_max, 10)
     else:
         levels = np.linspace(0.99, 1.01, 10)
     mins = np.min(np.where(~np.isnan(densities)), axis=1)
     maxes = np.max(np.where(~np.isnan(densities)), axis=1)
-
 
     for i in np.linspace(mins[2]+1, maxes[2]-1, NUM_SLICES):
         i = int(i)

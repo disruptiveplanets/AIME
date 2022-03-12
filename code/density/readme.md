@@ -48,3 +48,7 @@ I also learned of a mistake in my in and out density distributions, so I recalcu
 ## March 9
 
 Pulled data from supercomputer. Learned that the ellipsoid radii are imaginary for negative mass (like out example) but I'll have to fix it later because I'm in Caltech and sleepy.
+
+## March 12
+
+I fixed the problem with asteroid dimensions. Rerunning out.
