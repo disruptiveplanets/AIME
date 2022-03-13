@@ -52,3 +52,7 @@ Pulled data from supercomputer. Learned that the ellipsoid radii are imaginary f
 ## March 12
 
 I fixed the problem with asteroid dimensions. Rerunning out.
+
+## March 13
+
+I pulled the figure and now neither in nor out has a lump, but I think that's OK because the COM is not affected by the presense of a lump at the origin. If it were an axial lump (d=3) then the ratios a/c, b/c would be constrained but still not c because the COM is not affected?
