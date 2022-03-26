@@ -15,6 +15,8 @@ probe-space-ab-ab.pdf data/probe-space/compile-figs/corrab.pdf
 scan-product.pdf data/probe-sigma/sigmas.pdf
 scan-ratio.pdf data/probe-ratio-prod/ratios-prod.pdf
 
+scan-period.pdf data/scan-period/period.pdf
+
 oblateness.pdf data/oblateness/oblateness.pdf
 oblateness-differ.pdf data/oblateness-differ/oblateness-differ.pdf
 

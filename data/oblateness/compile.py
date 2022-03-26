@@ -16,7 +16,6 @@ oblateness_markers = {
 
 percentiles = {}
 name_index = {}
-true_sigma = []
 j2s = []
 
 AXIS_SIZE = 12
@@ -62,7 +61,6 @@ for name in percentiles.keys():
         theta_low = [float(x) for x in f.readline().split(',')]
         sigma = [float(d) for d in f.readline().split(',')]
     name_index[name] = int(dir_name[-2:])
-    true_sigma = sigma[0]
     j2s.append(jlms[-1])
 
 oblatenesses = -np.array(j2s) / 2
