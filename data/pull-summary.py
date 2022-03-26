@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "scan-am"
+PATH = "scan-eq-spin"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1

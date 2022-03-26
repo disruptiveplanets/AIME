@@ -20,8 +20,10 @@ N_PERCENTILES = None
 
 SCALE_Y = 1.1
 
+TYPE = 'off'
+
 # Get percentiles
-with open("percentiles.dat", 'r') as f:
+with open(f"percentiles{TYPE}.dat", 'r') as f:
     for line in f.readlines():
         if line == '': continue
         elements = line.split(':')
@@ -108,5 +110,5 @@ custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=1, linestyle='dashed')]
 fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='upper center', prop={'size': LEGEND_SIZE}, bbox_to_anchor=(0.5,0.91))
 
-plt.savefig("eq-spins.pdf", bbox_inches="tight")
-plt.savefig("eq-spins.png", bbox_inches="tight")
+plt.savefig(f"eq-spins{TYPE}.pdf", bbox_inches="tight")
+plt.savefig(f"eq-spins{TYPE}.png", bbox_inches="tight")
