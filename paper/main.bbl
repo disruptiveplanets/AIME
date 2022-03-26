@@ -1,0 +1,48 @@
+\begin{thebibliography}{}
+\makeatletter
+\relax
+\def\mn@urlcharsother{\let\do\@makeother \do\$\do\&\do\#\do\^\do\_\do\%\do\~}
+\def\mn@doi{\begingroup\mn@urlcharsother \@ifnextchar [ {\mn@doi@}
+  {\mn@doi@[]}}
+\def\mn@doi@[#1]#2{\def\@tempa{#1}\ifx\@tempa\@empty \href
+  {http://dx.doi.org/#2} {doi:#2}\else \href {http://dx.doi.org/#2} {#1}\fi
+  \endgroup}
+\def\mn@eprint#1#2{\mn@eprint@#1:#2::\@nil}
+\def\mn@eprint@arXiv#1{\href {http://arxiv.org/abs/#1} {{\tt arXiv:#1}}}
+\def\mn@eprint@dblp#1{\href {http://dblp.uni-trier.de/rec/bibtex/#1.xml}
+  {dblp:#1}}
+\def\mn@eprint@#1:#2:#3:#4\@nil{\def\@tempa {#1}\def\@tempb {#2}\def\@tempc
+  {#3}\ifx \@tempc \@empty \let \@tempc \@tempb \let \@tempb \@tempa \fi \ifx
+  \@tempb \@empty \def\@tempb {arXiv}\fi \@ifundefined
+  {mn@eprint@\@tempb}{\@tempb:\@tempc}{\expandafter \expandafter \csname
+  mn@eprint@\@tempb\endcsname \expandafter{\@tempc}}}
+
+\bibitem[\protect\citeauthoryear{Ashenberg}{Ashenberg}{2007}]{ashenberg07}
+Ashenberg J.,  2007, \mn@doi [Celestial Mechanics and Dynamical Astronomy]
+  {10.1007/s10569-007-9092-7}, 99, 149
+
+\bibitem[\protect\citeauthoryear{Boué \& Laskar}{Boué \&
+  Laskar}{2009}]{BOUE2009750}
+Boué G.,  Laskar J.,  2009, \mn@doi [Icarus]
+  {https://doi.org/10.1016/j.icarus.2009.02.001}, 201, 750
+
+\bibitem[\protect\citeauthoryear{Hou, Scheeres  \& Xin}{Hou
+  et~al.}{2017}]{HouMar2017}
+Hou X.,  Scheeres D.~J.,   Xin X.,  Mar 2017, Celestial Mechanics and Dynamical
+  Astronomy, 127, 369
+
+\bibitem[\protect\citeauthoryear{Moskovitz et~al.,}{Moskovitz
+  et~al.}{2020}]{MOSKOVITZ2020113519}
+Moskovitz N.~A.,  et~al., 2020, \mn@doi [Icarus]
+  {https://doi.org/10.1016/j.icarus.2019.113519}, 340, 113519
+
+\bibitem[\protect\citeauthoryear{Paul}{Paul}{1988}]{paul88}
+Paul M.~K.,  1988, \mn@doi [Celestial mechanics] {10.1007/BF01230706}, 44, 49
+
+\bibitem[\protect\citeauthoryear{van Gelderen}{van
+  Gelderen}{1998}]{Gelderen1998TheSO}
+van Gelderen M.,  1998, in The shift operators and translations of spherical
+  harmonics.
+
+\makeatother
+\end{thebibliography}

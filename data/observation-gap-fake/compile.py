@@ -59,7 +59,7 @@ for name in percentiles.keys():
 
 gaps = np.array(gaps)
 
-fig, axs = plt.subplots(figsize=(14, 8), ncols=3, nrows=4, sharex=True)
+fig, axs = plt.subplots(figsize=(14, 7), ncols=3, nrows=4, sharex=True)
 axs = axs.reshape(-1)
 i = 0
 

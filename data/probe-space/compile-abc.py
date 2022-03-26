@@ -105,7 +105,7 @@ def covariance():
                         arrays = convert(arrays.transpose()).transpose()
 
                         diffs = np.mean(arrays, axis=1) - points[index]
-                        cov = np.cov(arrays) / SIGMA[0]**2
+                        cov = np.cov(arrays)
                     data.append((file, diffs, cov))
 
                 weights = [np.sum((data_row[1] / DIFF_EXPECTED_FACTOR) ** 2 ) for data_row in data]
@@ -151,8 +151,9 @@ def covariance():
         Y.append(Y_line)
 
     NUM_LEVELS = 21
+    corr12_max = max(np.nanmax(corr12_data), -np.nanmin(corr12_data))
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, corr12_data, levels=NUM_LEVELS-1, cmap="Oranges_r")
+    c = plt.contourf(X, Y, corr12_data, levels=np.linspace(-corr12_max, corr12_max, NUM_LEVELS), cmap="BrBG_r")
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Corr}(a/c, b/c)$")
     plot_pt()
@@ -163,8 +164,9 @@ def covariance():
     plt.tight_layout()
     plt.savefig("compile-figs/corrab.pdf")
 
+    corr01_max = max(np.nanmax(corr01_data), -np.nanmin(corr01_data))
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, corr01_data, levels=NUM_LEVELS-1, cmap="Oranges_r")
+    c = plt.contourf(X, Y, corr01_data, levels=np.linspace(-corr01_max, corr01_max, NUM_LEVELS), cmap="BrBG_r")
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Corr}(\\gamma_0 ,a/c)$")
     plot_pt()
@@ -175,8 +177,9 @@ def covariance():
     plt.tight_layout()
     plt.savefig("compile-figs/corr1a.pdf")
 
+    corr02_max = max(np.nanmax(corr02_data), -np.nanmin(corr02_data))
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, corr02_data, levels=NUM_LEVELS-1, cmap="Oranges_r")
+    c = plt.contourf(X, Y, corr02_data, levels=np.linspace(-corr02_max, corr02_max, NUM_LEVELS), cmap="BrBG_r")
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Corr}(\\gamma_0, b/c)$")
     plot_pt()
@@ -191,7 +194,7 @@ def covariance():
     flat_sig_0 = np.array(sigma0_data).reshape(-1) * 1e4
     c = plt.contourf(X, Y, np.array(sigma0_data) * 1e4, levels=np.linspace(0, np.max(np.sort(flat_sig_0[np.isfinite(flat_sig_0)])[:-7]), NUM_LEVELS), cmap='Purples_r')
     axc = plt.colorbar(c)
-    axc.set_label("$\\sigma(\\gamma_0)/\\sigma_\\theta$ ($\\times 10^{-3}$)")
+    axc.set_label("$\\sigma(\\gamma_0)$ ($\\times 10^{-3}$)")
     plot_pt()
     plt.xlabel("$a/c$")
     plt.ylabel("$b/c$")
@@ -203,7 +206,7 @@ def covariance():
     plt.figure(figsize=FIG_SIZE)
     c = plt.contourf(X, Y, np.array(sigma1_data) * 10**3, levels=20, cmap="Purples_r")
     axc = plt.colorbar(c)
-    axc.set_label("$\\sigma(a/c)/\\sigma_\\theta$ ($\\times 10^{-4}$)")
+    axc.set_label("$\\sigma(a/c)$ ($\\times 10^{-4}$)")
     plot_pt()
     plt.xlabel("$a/c$")
     plt.ylabel("$b/c$")
@@ -215,7 +218,7 @@ def covariance():
     plt.figure(figsize=FIG_SIZE)
     c = plt.contourf(X, Y, np.array(sigma2_data) * 10**3, levels=20, cmap="Purples_r")
     axc = plt.colorbar(c)
-    axc.set_label("$\\sigma(b/c)/\\sigma_\\theta$ ($\\times 10^{-3}$)")
+    axc.set_label("$\\sigma(b/c)$ ($\\times 10^{-3}$)")
     plot_pt()
     plt.xlabel("$a/c$")
     plt.ylabel("$b/c$")

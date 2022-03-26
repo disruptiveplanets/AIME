@@ -54,64 +54,60 @@ for name in percentiles.keys():
 
 true_sigmas = np.array(true_sigmas)
 
-fig, axs = plt.subplots(figsize=(14, 8), ncols=3, nrows=4, sharex=True)
-axs = axs.reshape(-1)
-i = 0
+fig = plt.figure(figsize=(6.6, 19))
 
-for plot_index in range(N_DIM+1):
-    if plot_index == 9:
-        continue
+for plot_index in range(N_DIM):
+    offset = 1 if plot_index > 2 else 0
+    ax = plt.subplot2grid((31, 1), (plot_index * 3 + offset, 0), rowspan=3)
+
     product = true_sigmas**2 * ratio
     param_data = np.zeros(len(product) * N_PERCENTILES).reshape(N_PERCENTILES, len(product))
     for f in percentiles.keys():
-        param_data[:,name_index[f]] = percentiles[f][i]
-    scale = 10**5 if i < 3 else 1
+        param_data[:,name_index[f]] = percentiles[f][plot_index]
+    scale = 10**5 if plot_index < 3 else 1
 
-    axs[plot_index].plot(product, (param_data[1]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].plot(product, (param_data[-1]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].fill_between(product, (param_data[1]-param_data[0]) / true_sigmas * scale, 
-        (param_data[-1]-param_data[0]) / true_sigmas * scale,  color=f"C{i}", alpha=0.3)
+    ax.plot(product, (param_data[1]-param_data[0]) / true_sigmas * scale, color=f"C{plot_index}", linewidth=1)
+    ax.plot(product, (param_data[-1]-param_data[0]) / true_sigmas * scale, color=f"C{plot_index}", linewidth=1)
+    ax.fill_between(product, (param_data[1]-param_data[0]) / true_sigmas * scale, 
+        (param_data[-1]-param_data[0]) / true_sigmas * scale,  color=f"C{plot_index}", alpha=0.3)
 
-    axs[plot_index].plot(product, (param_data[2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].plot(product, (param_data[-2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].fill_between(product, (param_data[2]-param_data[0]) / true_sigmas * scale,
-        (param_data[-2]-param_data[0]) / true_sigmas * scale, color=f"C{i}", alpha=0.3)
+    ax.plot(product, (param_data[2]-param_data[0]) / true_sigmas * scale, color=f"C{plot_index}", linewidth=1)
+    ax.plot(product, (param_data[-2]-param_data[0]) / true_sigmas * scale, color=f"C{plot_index}", linewidth=1)
+    ax.fill_between(product, (param_data[2]-param_data[0]) / true_sigmas * scale,
+        (param_data[-2]-param_data[0]) / true_sigmas * scale, color=f"C{plot_index}", alpha=0.3)
 
-    axs[plot_index].plot(product, (param_data[3]-param_data[0]) / true_sigmas * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+    ax.plot(product, (param_data[3]-param_data[0]) / true_sigmas * scale, color=f"C{plot_index}", linewidth=1, linestyle='dashed')
 
-    if i < 3:
-        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta\\ (\\times 10^{{-5}})$", size=AXIS_SIZE)
+    if plot_index < 3:
+        ax.set_ylabel(f"$\sigma({param_names[plot_index]}) / \sigma_\\theta\\ (\\times 10^{{-5}})$", size=AXIS_SIZE)
     else:
-        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\theta$", size=AXIS_SIZE)
+        ax.set_ylabel(f"$\sigma({param_names[plot_index]}) / \sigma_\\theta$", size=AXIS_SIZE)
 
-    axs[plot_index].set_xscale('log')
+    ax.set_xscale('log')
 
-    constant_val = (param_data[1]-param_data[0])[0] * scale / true_sigmas**2
-    axs[plot_index].plot(product, np.ones_like(param_data[1]) * constant_val * true_sigmas, color='k', linewidth=1, linestyle='dotted')
+    #constant_val = (param_data[1]-param_data[0])[0] * scale / true_sigmas**2
+    #ax.plot(product, np.ones_like(param_data[1]) * constant_val * true_sigmas, color='k', linewidth=1, linestyle='dotted')
+
+    ax.axvline(x=1e-7, color='k', linewidth=1, linestyle='dashed')
+    ax.set_xlim(np.min(product), np.max(product))
     
-    if plot_index in [6, 8, 10]:
-        axs[plot_index].set_xlabel(f"$\sigma_\\theta\sigma_\\rho$")
+    if plot_index == 9:
+        ax.set_xlabel(f"$\sigma_\\theta\sigma_\\rho$")
+    else:
+        ax.set_xticks([])
 
-    print(f"{param_names[i]}:\t mean:{np.mean((param_data[3]-param_data[0]) / true_sigmas)}\t"+
+    print(f"{param_names[plot_index]}:\t mean:{np.mean((param_data[3]-param_data[0]) / true_sigmas)}\t"+
         f"95\% high: {np.mean((param_data[1]-param_data[0]) / true_sigmas)}\t 95\% low: {np.mean((param_data[-1]-param_data[0]) / true_sigmas)}\t"+
         f"68\% high: {np.mean((param_data[2]-param_data[0]) / true_sigmas)}\t 68\% low: {np.mean((param_data[-2]-param_data[0]) / true_sigmas)}")
-    i += 1
-
-axs[9].remove()
-axs[11].remove()
 
 custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=4, alpha=0.6),
                 Line2D([0], [0], color='k', lw=1, linestyle='dashed'),
                 Line2D([0], [0], color='k', lw=1, linestyle='dotted')]
-fig.legend(custom_lines, ['95\%', '68\%', '50\%', "Constant $\sigma K_{\ell m}$"], ncol=3, loc='lower right', prop={'size': LEGEND_SIZE})
-fig.tight_layout()
+fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='upper center', prop={'size': LEGEND_SIZE}, bbox_to_anchor=(0.5,0.91))
 
-line = plt.Line2D([0,1],[0.77, 0.77], transform=fig.transFigure, color="black")
-fig.add_artist(line)
-
-plt.savefig("sigmas.pdf")
-plt.savefig("sigmas.png")
+plt.savefig("sigmas.pdf", bbox_inches="tight")
+plt.savefig("sigmas.png", bbox_inches="tight")
 plt.show()
 
 print()

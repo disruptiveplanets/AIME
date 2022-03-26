@@ -1,0 +1,41 @@
+probe-space-theta-1-sigma.pdf data/probe-space/compile-figs/theta-1-sigma.pdf
+probe-space-theta-2-sigma.pdf data/probe-space/compile-figs/theta-2-sigma.pdf
+probe-space-theta-3-sigma.pdf data/probe-space/compile-figs/theta-3-sigma.pdf
+probe-space-corr12.pdf data/probe-space/compile-figs/corr12.pdf
+probe-space-corr13.pdf data/probe-space/compile-figs/corr13.pdf
+probe-space-corr23.pdf data/probe-space/compile-figs/corr23.pdf
+
+probe-space-ab-1-sigma.pdf data/probe-space/compile-figs/theta-1-ab-sigma.pdf
+probe-space-ab-a-sigma.pdf data/probe-space/compile-figs/theta-a-sigma.pdf
+probe-space-ab-b-sigma.pdf data/probe-space/compile-figs/theta-b-sigma.pdf
+probe-space-ab-1a.pdf data/probe-space/compile-figs/corr1a.pdf
+probe-space-ab-1b.pdf data/probe-space/compile-figs/corr1b.pdf
+probe-space-ab-ab.pdf data/probe-space/compile-figs/corrab.pdf
+
+scan-product.pdf data/probe-sigma/sigmas.pdf
+scan-ratio.pdf data/probe-ratio-prod/ratios-prod.pdf
+
+oblateness.pdf data/oblateness/oblateness.pdf
+oblateness-differ.pdf data/oblateness-differ/oblateness-differ.pdf
+
+nominal-data-sym.pdf code/other-figs/model-spread/spin-chaos-sym.pdf
+nominal-data-asym.pdf code/other-figs/model-spread/spin-chaos-asym.pdf
+
+example-residuals.pdf code/other-figs/example-corner/sigma-1-28-0-compare.pdf
+example-corner.pdf code/other-figs/example-corner/sigma-1-28-0-corner.pdf
+
+nominal-covariance.pdf code/fit_resolved/random-figs/random-vector-unc.pdf
+nominal-norm.pdf code/fit_resolved/random-figs/random-vector-norm.pdf
+
+scan-cadence.pdf data/scan-cadence/cadences.pdf
+cadence-accuracy.pdf data/scan-cadence/differ.pdf
+
+observation-gap.pdf data/observation-gap/gap.pdf
+
+spin-pole.pdf data/scan-spin-pole/pole.pdf
+spin-pole-avg-mollweide.pdf data/scan-spin-pole/avg-pole-mollweide.pdf
+spin-pole-avg-polar.pdf data/scan-spin-pole/avg-pole-polar.pdf
+
+scan-vex.pdf data/scan-vex/vex.pdf
+
+scan-perigee.pdf data/scan-perigee/perigee.pdf

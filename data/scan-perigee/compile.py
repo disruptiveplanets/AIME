@@ -59,79 +59,84 @@ for name in percentiles.keys():
 
 perigees = np.array(perigees)
 
-fig, axs = plt.subplots(figsize=(14, 8), ncols=3, nrows=4, sharex=True)
-axs = axs.reshape(-1)
-i = 0
+fig = plt.figure(figsize=(6.6, 19))
 
-for plot_index in range(N_DIM+1):
-    if plot_index == 9:
-        continue
+for plot_index in range(N_DIM):
+    offset = 1 if plot_index > 2 else 0
+    ax = plt.subplot2grid((31, 1), (plot_index * 3 + offset, 0), rowspan=3)
     param_data = np.zeros(len(perigees) * N_PERCENTILES).reshape(N_PERCENTILES, len(perigees))
     for f in percentiles.keys():
-        param_data[:,name_index[f]] = percentiles[f][i]
-    scale = 1e5 if i < 1 else 1e2
+        param_data[:,name_index[f]] = percentiles[f][plot_index]
+    if plot_index < 1:
+        scale = 1e5
+    elif plot_index < 3:
+        scale = 1e3
+    else:
+        scale = 1
 
-    axs[plot_index].plot(perigees, (param_data[1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].plot(perigees, (param_data[-1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].fill_between(perigees, (param_data[1]-param_data[0]) * scale, 
-        (param_data[-1]-param_data[0]) * scale,  color=f"C{i}", alpha=0.3)
+    ax.plot(perigees, (param_data[1]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+    ax.plot(perigees, (param_data[-1]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+    ax.fill_between(perigees, (param_data[1]-param_data[0]) * scale, 
+        (param_data[-1]-param_data[0]) * scale,  color=f"C{plot_index}", alpha=0.3)
 
-    axs[plot_index].plot(perigees, (param_data[2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].plot(perigees, (param_data[-2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].fill_between(perigees, (param_data[2]-param_data[0]) * scale,
-        (param_data[-2]-param_data[0]) * scale, color=f"C{i}", alpha=0.3)
+    ax.plot(perigees, (param_data[2]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+    ax.plot(perigees, (param_data[-2]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+    ax.fill_between(perigees, (param_data[2]-param_data[0]) * scale,
+        (param_data[-2]-param_data[0]) * scale, color=f"C{plot_index}", alpha=0.3)
 
-    axs[plot_index].plot(perigees, (param_data[3]-param_data[0]) * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+    ax.plot(perigees, (param_data[3]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1, linestyle='dashed')
 
     def fit_func(x, power, slope):
         m = x[:len(x)//2]**power * slope
         return np.append(m, -m)
     model = lmfit.Model(fit_func)
     params = lmfit.Parameters()
-    params.add('power', min=0.1, max=5, value=3)
+    params.add('power', min=1, max=8, value=3)
     params.add('slope', min=0, max=100, value=1)
-    data = np.append((param_data[1]-param_data[0]) * scale, (param_data[-1]-param_data[0]) * scale)
-    result = model.fit(data, params, x=np.append(perigees, perigees), weights=np.ones(len(perigees)*2))
+
+    # Mask all the data that is after the first point with sigma2 > 0.7
+    overages = np.where(param_data[1]-param_data[0] > 0.7)[0]
+    if len(overages) == 0:
+        data_mask = np.arange(len(param_data[1]))
+    else:
+        data_mask = np.arange(overages[0])
+
+    data = np.append((param_data[1]-param_data[0])[data_mask] * scale, (param_data[-1]-param_data[0])[data_mask] * scale)
+    result = model.fit(data, params, x=np.append(perigees[data_mask], perigees[data_mask]), weights=np.ones(len(perigees[data_mask])*2))
     power, slope = result.params["power"].value, result.params["slope"].value
     power_unc, slope_unc = result.params["power"].stderr, result.params["slope"].stderr
-    print(param_names[i])
-    print(power, "+/-", power_unc)
-    print(slope, "+/-", slope_unc)
-    print()
+    print(f"${param_names[plot_index]}$ & ${power} \pm {power_unc}$ \\\\")
+    #print(slope, "+/-", slope_unc)
 
-    if i != 9:
-        axs[plot_index].plot(perigees, perigees**power * slope, color="k", linewidth=1, linestyle='dotted')
-        axs[plot_index].plot(perigees, -perigees**power * slope, color="k", linewidth=1, linestyle='dotted')
+    ax.plot(perigees, perigees**power * slope, color="k", linewidth=1, linestyle='dotted')
+    ax.plot(perigees, -perigees**power * slope, color="k", linewidth=1, linestyle='dotted')
 
     y_min_norm = np.min((param_data[-1]-param_data[0]) * scale)
     y_max_norm = np.max((param_data[1]-param_data[0]) * scale)
-    axs[plot_index].set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
+    ax.set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
 
-    if i < 1:
-        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) (\\times 10^{{-5}})$", size=AXIS_SIZE)
+    if plot_index < 1:
+        ax.set_ylabel(f"$\sigma({param_names[plot_index]}) (\\times 10^{{-5}})$", size=AXIS_SIZE)
+    elif plot_index < 3:
+        ax.set_ylabel(f"$\sigma({param_names[plot_index]}) (\\times 10^{{-3}})$", size=AXIS_SIZE)
     else:
-        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]}) (\\times 10^{{-2}})$", size=AXIS_SIZE)
+        ax.set_ylabel(f"$\sigma({param_names[plot_index]})$", size=AXIS_SIZE)
 
-    #axs[i].set_xscale('log')
-    #axs[i].set_yscale('log')
+    #ax.set_xscale('log')
+    #ax.set_yscale('log')
+    ax.set_xlim(np.min(perigees), np.max(perigees))
+    ax.axvline(x=5, color='k', linewidth=1, linestyle='dashed')
 
-    if plot_index in [6, 8, 10]:
-        axs[plot_index].set_xlabel(f"$r_p$ (Earth radii)")
+    if plot_index == 9:
+        ax.set_xlabel(f"$r_p$ (Earth radii)")
+    else:
+        ax.set_xticks([])
         
-    i += 1
-
-axs[9].remove()
-axs[11].remove()
-
 custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=4, alpha=0.6),
                 Line2D([0], [0], color='k', lw=1, linestyle='dashed')]
-fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='lower right', prop={'size': LEGEND_SIZE})
-fig.tight_layout()
+fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='upper center', prop={'size': LEGEND_SIZE}, bbox_to_anchor=(0.5,0.91))
 
-line = plt.Line2D([0,1],[0.77, 0.77], transform=fig.transFigure, color="black")
-fig.add_artist(line)
-
-plt.savefig("perigee.pdf")
-plt.savefig("perigee.png")
+plt.savefig("perigee.pdf", bbox_inches="tight")
+plt.savefig("perigee.png", bbox_inches="tight")
 plt.show()

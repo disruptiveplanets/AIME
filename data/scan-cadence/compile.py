@@ -58,59 +58,53 @@ for name in percentiles.keys():
 
 cadences = np.array(cadences)
 
-fig, axs = plt.subplots(figsize=(14, 8), ncols=3, nrows=4, sharex=True)
-axs = axs.reshape(-1)
-i = 0
+fig = plt.figure(figsize=(6.6, 19))
 
-for plot_index in range(N_DIM + 1):
-    if plot_index == 9:
-        continue
+for plot_index in range(N_DIM):
+    offset = 1 if plot_index > 2 else 0
+    ax = plt.subplot2grid((31, 1), (plot_index * 3 + offset, 0), rowspan=3)
     param_data = np.zeros(len(cadences) * N_PERCENTILES).reshape(N_PERCENTILES, len(cadences))
     for f in percentiles.keys():
-        param_data[:,name_index[f]] = percentiles[f][i]
-    scale = 1e2 if i >= 3 else 1e6
+        param_data[:,name_index[f]] = percentiles[f][plot_index]
+    scale = 1e2 if plot_index >= 3 else 1e6
 
-    axs[plot_index].plot(cadences, (param_data[1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].plot(cadences, (param_data[-1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].fill_between(cadences, (param_data[1]-param_data[0]) * scale, 
-        (param_data[-1]-param_data[0]) * scale,  color=f"C{i}", alpha=0.3)
+    ax.plot(cadences, (param_data[1]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+    ax.plot(cadences, (param_data[-1]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+    ax.fill_between(cadences, (param_data[1]-param_data[0]) * scale, 
+        (param_data[-1]-param_data[0]) * scale,  color=f"C{plot_index}", alpha=0.3)
 
-    axs[plot_index].plot(cadences, (param_data[2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].plot(cadences, (param_data[-2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
-    axs[plot_index].fill_between(cadences, (param_data[2]-param_data[0]) * scale,
-        (param_data[-2]-param_data[0]) * scale, color=f"C{i}", alpha=0.3)
+    ax.plot(cadences, (param_data[2]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+    ax.plot(cadences, (param_data[-2]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+    ax.fill_between(cadences, (param_data[2]-param_data[0]) * scale,
+        (param_data[-2]-param_data[0]) * scale, color=f"C{plot_index}", alpha=0.3)
 
-    axs[plot_index].plot(cadences, (param_data[3]-param_data[0]) * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+    ax.plot(cadences, (param_data[3]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1, linestyle='dashed')
 
     y_min_norm = np.min((param_data[-1]-param_data[0]) * scale)
     y_max_norm = np.max((param_data[1]-param_data[0]) * scale)
-    axs[plot_index].set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
+    ax.set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
 
-    if i >= 3:
-        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]})$ ($\\times 10^{{-2}}$)", size=AXIS_SIZE)
+    ax.set_xlim(np.min(cadences), np.max(cadences))
+    #ax.axvline(x=6, color='k', linewidth=1, linestyle='dashed')
+
+    if plot_index >= 3:
+        ax.set_ylabel(f"$\sigma({param_names[plot_index]})$ ($\\times 10^{{-2}}$)", size=AXIS_SIZE)
     else:
-        axs[plot_index].set_ylabel(f"$\sigma({param_names[i]})$ ($\\times 10^{{-6}}$)", size=AXIS_SIZE)
+        ax.set_ylabel(f"$\sigma({param_names[plot_index]})$ ($\\times 10^{{-6}}$)", size=AXIS_SIZE)
 
-    #axs[i].set_xscale('log')
-    #axs[i].set_yscale('log')
+    #ax.set_xscale('log')
+    #ax.set_yscale('log')
 
-    if plot_index in [6, 8, 10]:
-        axs[plot_index].set_xlabel(f"$\Delta t$ (min)")
-
-    i += 1
-
-axs[9].remove()
-axs[11].remove()
+    if plot_index == 9:
+        ax.set_xlabel(f"$\Delta t$ (min)")
+    else:
+        ax.set_xticks([])
 
 custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=4, alpha=0.6),
                 Line2D([0], [0], color='k', lw=1, linestyle='dashed')]
-fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='lower right', prop={'size': LEGEND_SIZE})
-fig.tight_layout()
+fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='upper center', prop={'size': LEGEND_SIZE}, bbox_to_anchor=(0.5,0.91))
 
-line = plt.Line2D([0,1],[0.77, 0.77], transform=fig.transFigure, color="black")
-fig.add_artist(line)
-
-plt.savefig("cadences.pdf")
-plt.savefig("cadences.png")
+plt.savefig("cadences.pdf", bbox_inches="tight")
+plt.savefig("cadences.png", bbox_inches="tight")
 plt.show()

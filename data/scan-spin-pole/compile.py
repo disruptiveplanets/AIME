@@ -11,7 +11,6 @@ param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re
 
 percentiles = {}
 name_index = {}
-true_sigma = None
 xyzs = []
 theta_phis = []
 
@@ -76,8 +75,8 @@ net_data = np.zeros(len(percentiles))
 for i in range(N_DIM):
     data_line = []
     for f in percentiles.keys():
-        scale = 1 if i >= 3 else 1e5;
-        data_line.append(np.abs(percentiles[f][i][2] - percentiles[f][i][0]) * scale / sigma_theta)
+        scale = 1e3 if i >= 3 else 1e7;
+        data_line.append(np.abs(percentiles[f][i][2] - percentiles[f][i][0]) * scale)
     data.append(data_line)
     net_data += np.array(data_line) / np.mean(data_line) / N_DIM
 
@@ -107,9 +106,9 @@ for plot_index in range(N_DIM+1):
     im = axs[plot_index].pcolormesh(Lon, Lat, cart_array, vmin=0, cmap='Blues_r', vmax=vmax)#, vmax=np.max(data), vmin=np.min(data))
     cbar = fig.colorbar(im, ax=axs[plot_index])
     if i < 3:
-        cbar.set_label(f"$\sigma({param_names[i]}) / \sigma_\\theta$ ($\\times 10^{{-5}})$")
+        cbar.set_label(f"$\sigma({param_names[i]})$ ($\\times 10^{{-7}})$")
     else:
-        cbar.set_label(f"$\sigma({param_names[i]}) / \sigma_\\theta$")
+        cbar.set_label(f"$\sigma({param_names[i]})$ ($\\times 10^{{-3}})$")
 
     show_true_point(axs[plot_index])
     axs[plot_index].set_xticks([-3 * np.pi / 4, -np.pi / 2, -np.pi / 4, 0, np.pi / 4, np.pi / 2, 3 * np.pi / 4])

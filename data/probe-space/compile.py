@@ -149,7 +149,7 @@ def covariance():
                         arrays = arrays.reshape(arrays.shape[0], arrays.shape[1] * arrays.shape[2])
 
                         diffs = np.mean(arrays, axis=1) - points[index]
-                        cov = np.cov(arrays) / SIGMA[0]**2
+                        cov = np.cov(arrays)
                     data.append((file, diffs, cov))
 
                 weights = [np.sum((data_row[1] / DIFF_EXPECTED_FACTOR) ** 2 ) for data_row in data]
@@ -194,9 +194,10 @@ def covariance():
         Y.append(Y_line)
 
 
+    corr12_max = max(np.nanmax(corr12_data), -np.nanmin(corr12_data))
     NUM_LEVELS = 21
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, corr12_data, levels=NUM_LEVELS-1, cmap='Oranges_r')
+    c = plt.contourf(X, Y, corr12_data, levels=np.linspace(-corr12_max, corr12_max, NUM_LEVELS), cmap='BrBG_r')
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Corr}(K_{22}, K_{20})$")
     plot_pt()
@@ -207,8 +208,9 @@ def covariance():
     plt.tight_layout()
     plt.savefig("compile-figs/corr23.pdf")
 
+    corr01_max = max(np.nanmax(corr01_data), -np.nanmin(corr01_data))
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, np.array(corr01_data), levels=NUM_LEVELS-1, cmap='Oranges_r')
+    c = plt.contourf(X, Y, np.array(corr01_data), levels=np.linspace(-corr01_max, corr01_max, NUM_LEVELS), cmap='BrBG_r')
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Corr}(\\gamma_0, K_{22})$")
     plot_pt()
@@ -219,8 +221,9 @@ def covariance():
     plt.tight_layout()
     plt.savefig("compile-figs/corr12.pdf")
 
+    corr02_max = max(np.nanmax(corr02_data), -np.nanmin(corr02_data))
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, np.array(corr02_data), levels=NUM_LEVELS-1, cmap='Oranges_r')
+    c = plt.contourf(X, Y, np.array(corr02_data), levels=np.linspace(-corr02_max, corr02_max, NUM_LEVELS), cmap='BrBG_r')
     axc = plt.colorbar(c)
     axc.set_label("$\\textrm{Corr}(\\gamma_0, K_{20})$")
     plot_pt()
@@ -238,7 +241,7 @@ def covariance():
     plt.xlim(-0.11, 0.11)
     plot_pt()
     plt.ylim(-0.24, -0.03)
-    axc.set_label("$\\sigma(\\gamma_0)/\\sigma_\\theta$ ($\\times 10^{-4}$)")
+    axc.set_label("$\\sigma(\\gamma_0)$ ($\\times 10^{-4}$)")
     plt.xlabel("$K_{22}$")
     plt.ylabel("$K_{20}$")
     plt.tight_layout()
@@ -250,7 +253,7 @@ def covariance():
     plt.xlim(-0.11, 0.11)
     plot_pt()
     plt.ylim(-0.24, -0.03)
-    axc.set_label("$\\sigma(K_{22})/\\sigma_\\theta$ ($\\times 10^{-6}$)")
+    axc.set_label("$\\sigma(K_{22})$ ($\\times 10^{-6}$)")
     plt.xlabel("$K_{22}$")
     plt.ylabel("$K_{20}$")
     plt.tight_layout()
@@ -262,7 +265,7 @@ def covariance():
     plt.xlim(-0.11, 0.11)
     plot_pt()
     plt.ylim(-0.24, -0.03)
-    axc.set_label("$\\sigma(K_{20})/\\sigma_\\theta$ ($\\times 10^{-6}$)")
+    axc.set_label("$\\sigma(K_{20})$ ($\\times 10^{-6}$)")
     plt.xlabel("$K_{22}$")
     plt.ylabel("$K_{20}$")
     plt.tight_layout()
