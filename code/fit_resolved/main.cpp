@@ -8,7 +8,8 @@
 std::vector<double> simulate(double cadence, const std::vector<double> jlms_raw,
     const std::vector<double> parameters,  double radius, double spinx, double spiny, double spinz,
     double perigee, double speed, double central_mu, double central_radius,
-    double distance_ratio_cut=0, double enforce_drc=false) {
+    double distance_ratio_cut=0, double enforce_drc=false,
+    double velocity_mul=1) {
 
     std::vector<cdouble> halfjlms;
     auto jlm_raw_iter = jlms_raw.begin();
@@ -71,8 +72,9 @@ std::vector<double> simulate(double cadence, const std::vector<double> jlms_raw,
     }
 
 
-    Asteroid asteroid(jlms, klms, radius, Vector3({spinx, spiny, spinz}), initial_roll, perigee,
-        speed, central_mu, central_radius, distance_ratio_cut, enforce_drc);
+    Asteroid asteroid(jlms, klms, radius, Vector3({spinx, spiny, spinz}),
+        initial_roll, perigee, speed, central_mu, central_radius,
+        distance_ratio_cut, enforce_drc, velocity_mul);
 
     // Run asteroid
     std::vector<double> resolved_data;

@@ -35,7 +35,7 @@ class Asteroid {
 public:
     Asteroid(const cdouble* jlms, const cdouble* klms, const double asteroid_radius,
         Vector3 spin, double initial_roll, double perigee, double speed,
-        double central_mu, double central_radius, double distance_ratio_cut, bool enforce_drc);
+        double central_mu, double central_radius, double distance_ratio_cut, bool enforce_drc, double velocity_mul);
 
     int simulate(double cadence, std::vector<double>& resolved_data);
 
@@ -46,7 +46,7 @@ private:
     void calculate_moi(double initial_roll);
     Vector3 get_torque();
     void get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, Vector3& dspin, Quaternion& dquat);
-    void calculate_poses();
+    void calculate_poses(double velocity_mul);
     bool extract_pos(double time, Vector3& position, Vector3& velocity);
     Vector3 extract_spin(Vector3 angles, Vector3 momenta);
     void compute_coefficient(int l, int m, int lp, int mp, int mpp, 

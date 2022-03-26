@@ -1,5 +1,7 @@
 TEST = False
 
+VELOCITY_MUL = 1
+
 import numpy as np
 import matplotlib.pyplot as plt
 import emcee, time, sys, logging
@@ -30,7 +32,7 @@ except:
 logging.basicConfig(level=logging.INFO)
 
 PLOT_POSES = True
-NUM_MINIMIZE_POINTS_PER = 8
+NUM_MINIMIZE_POINTS_PER = 4 # Used to be 8
 NUM_L3_MINIMIZATIONS = 2
 DISTANCE_RATIO_CUTS = [
     [2.0, None],
@@ -99,6 +101,7 @@ logging.info("Theta high {}".format(theta_high))
 logging.info("Theta low {}".format(theta_low))
 logging.info("Sigma {}".format(sigma))
 logging.info("Name {}".format(output_name))
+logging.info("Velocity multiplier {}".format(VELOCITY_MUL))
 N_DIM = len(theta_true)
 
 reload = False
@@ -110,23 +113,23 @@ def fit_function(theta, target_length=None):
     if ASTEROIDS_MAX_K == 3:
         if ASTEROIDS_MAX_J == 0:
             resolved_data = asteroids_0_3.simulate(cadence, jlms, theta, radius,
-                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False)
+                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False, VELOCITY_MUL)
         elif ASTEROIDS_MAX_J == 2:
             resolved_data = asteroids_2_3.simulate(cadence, jlms, theta, radius,
-                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False)
+                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False, VELOCITY_MUL)
         elif ASTEROIDS_MAX_J == 3:
             resolved_data = asteroids_3_3.simulate(cadence, jlms, theta, radius,
-                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False)
+                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False, VELOCITY_MUL)
     elif ASTEROIDS_MAX_K == 2:
         if ASTEROIDS_MAX_J == 0:
             resolved_data = asteroids_0_2.simulate(cadence, jlms, theta, radius,
-                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False)
+                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False, VELOCITY_MUL)
         elif ASTEROIDS_MAX_J == 2:
             resolved_data = asteroids_2_2.simulate(cadence, jlms, theta, radius,
-                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False)
+                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False, VELOCITY_MUL)
         elif ASTEROIDS_MAX_J == 3:
             resolved_data = asteroids_3_2.simulate(cadence, jlms, theta, radius,
-                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False)
+                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False, VELOCITY_MUL)
     if target_length is not None:
         while len(resolved_data)//3 < target_length:
             resolved_data.append(resolved_data[-3])
@@ -179,15 +182,15 @@ def get_data_cut(drc):
     if ASTEROIDS_MAX_J == 0:
         return len(asteroids_0_2.simulate(cadence, jlms, theta_true, radius,
             spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS,
-            drc, enforce_drc))//3
+            drc, enforce_drc, VELOCITY_MUL))//3
     elif ASTEROIDS_MAX_J == 2:
         return len(asteroids_2_2.simulate(cadence, jlms, theta_true, radius,
             spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS,
-            drc, enforce_drc))//3
+            drc, enforce_drc, VELOCITY_MUL))//3
     elif ASTEROIDS_MAX_J == 3:
         return len(asteroids_3_2.simulate(cadence, jlms, theta_true, radius,
             spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS,
-            drc, enforce_drc))//3
+            drc, enforce_drc, VELOCITY_MUL))//3
     raise Exception("Cannot handle this J.")
 
 data_cuts = [[get_data_cut(drc) for drc in tier] for tier in DISTANCE_RATIO_CUTS]
@@ -220,7 +223,7 @@ def minimize_function(theta, simulate_func, l_index, cut_index):
 
     drc = 0 if drc is None else drc
     resolved_data = simulate_func(cadence, jlms, theta, radius,
-        spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, drc, enforce_drc)
+        spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, drc, enforce_drc, VELOCITY_MUL)
     
     want_length = data_cuts[l_index][cut_index]
     while len(resolved_data)//3 < want_length:

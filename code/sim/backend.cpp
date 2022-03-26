@@ -6,8 +6,9 @@ const int max_k = (ASTEROIDS_MAX_K + 1) * (ASTEROIDS_MAX_K + 1);
 const int max_j = (ASTEROIDS_MAX_J + 1) * (ASTEROIDS_MAX_J + 1);
 
 Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms, double asteroid_radius,
-    Vector3 spin, double initial_roll, double perigee, double speed, double central_mu,
-    double central_radius, double distance_ratio_cut, bool enforce_drc) :
+    Vector3 spin, double initial_roll, double perigee, double speed,
+    double central_mu, double central_radius, double distance_ratio_cut,
+    bool enforce_drc, double velocity_mul) :
     jlms(jlms), klms(klms), asteroid_radius(asteroid_radius), distance_ratio_cut(distance_ratio_cut),
     enforce_drc(enforce_drc), mu(central_mu), central_radius(central_radius), pericenter_pos(perigee),
     excess_vel(speed), initial_spin(spin), initial_roll(initial_roll) {
@@ -17,7 +18,7 @@ Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms, double asteroid_rad
     }
 
     calculate_moi(initial_roll);
-    calculate_poses();
+    calculate_poses(velocity_mul);
 
     /*#ifdef TEXT_DEBUG
     std::cout<< "Klms: " << std::endl;
@@ -122,7 +123,7 @@ void Asteroid::get_coefficients(int l, int m, int lp, int mp, int mpp, cdouble m
     torque_z += mul * coeffs_z[index];
 }
 
-void Asteroid::calculate_poses() {
+void Asteroid::calculate_poses(double velocity_mul) {
     #ifdef TEXT_DEBUG
     auto start = std::chrono::high_resolution_clock::now();
     #endif
@@ -144,7 +145,7 @@ void Asteroid::calculate_poses() {
         velocity += POSITION_DT * accel;
         position += POSITION_DT * velocity;
         positions.push_back(position);
-        velocities.push_back(velocity);
+        velocities.push_back(velocity * velocity_mul);
     }
     
     // Add one extra position data point for the sake of interpolation
@@ -152,7 +153,7 @@ void Asteroid::calculate_poses() {
     velocity += POSITION_DT * accel;
     position += POSITION_DT * velocity;
     positions.push_back(position);
-    velocities.push_back(velocity);
+    velocities.push_back(velocity * velocity_mul);
 
     expire_time = time;
 
@@ -290,7 +291,6 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
     Quaternion dquat1, dquat2, dquat3, dquat4;
     Vector3 dspin1, dspin2, dspin3, dspin4, position, velocity;
 
-
     double alpha = atan2(initial_spin[1], initial_spin[0]);
     double beta = acos(initial_spin[2] / initial_spin.mag());
     double gamma = initial_roll;
@@ -337,6 +337,7 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
             resolved_data.push_back(global_spin[0]);
             resolved_data.push_back(global_spin[1]);
             resolved_data.push_back(global_spin[2]);
+
             #ifdef PRINT_MOMENTUM_ENERGY
             Vector3 local_momentum = Matrix3({moi[0], 0, 0, 0, moi[1], 0, 0, 0, moi[2]}) * spin;
             Vector3 global_momentum = quat.rotate(local_momentum);

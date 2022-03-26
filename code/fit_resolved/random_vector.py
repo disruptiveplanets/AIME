@@ -33,7 +33,7 @@ def like_rotate_uniform(y, model, length, sigma):
     trimmed_y = y[:length]
     trimmed_model = model[:length]
     rhos = scipy.linalg.norm(trimmed_y, axis=1) / scipy.linalg.norm(trimmed_model, axis=1)
-    thetas = np.arccos(np.sum(trimmed_y * trimmed_model, axis=1) / np.sum(trimmed_y**2, axis=1) * rhos)
+    thetas = np.arccos(0.999999999*np.sum(trimmed_y * trimmed_model, axis=1) / np.sum(trimmed_y**2, axis=1) * rhos)
     prob_theta = -0.5 * thetas**2 / sigma_theta**2
     prob_rho = -0.5 * np.log(rhos)**2 / (ratio * sigma_theta)**2 - np.log(rhos)
     return np.sum(prob_theta + prob_rho)
