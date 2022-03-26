@@ -15,6 +15,8 @@
 \usepackage{amssymb}	% Extra maths symbols
 \usepackage{xcolor}
 \usepackage{tikz}
+\usepackage{colortbl}
+\usepackage{dsfont}
 \usepackage{bm}
 \usetikzlibrary{arrows.meta}
 
@@ -660,31 +662,159 @@ The most severe effect of period on $\sigma$ is in the low-period regime ($P_\om
 \section{Density distributions}
 \label{sec:distros}
 
+Hitherto, we have only discussed the density moments $K_{\ell m}$ of the asteroid rather than the true density distribution $\rho(\bm r)$. This is because only the density moments are observable by tidal torque interactions. However, by making assumptions about the density distribution, we can nevertheless estimate $\rho(\bm r)$ from $K_{\ell m}$.
 
+In this section, we outline three different assumptions which yield different types of density distributions for the same $K_{\ell m}$. One of them can be chosen, or a fourth created, depending on what features are desired to be represented in the density distribution. All three of these models assume that the asteroid shape is known (for example, by light curve or radar data). Uncertainty on this shape estimate is assumed to be small. The models then produce a density distribution $\rho(\bm r)$ with uncertainty from $K_{\ell m}$ propagated to uncertainty in $\rho$.
+
+Note that, since the overall mass of the asteroid is not observable from tidal torque, we do not expect to measure $\rho$ in an absolute sense. Only the differences in $\rho$ across the body are measurable.
+
+In section \ref{sec:general-density}, we describe the general form our three models must take. Then we lay out each individually and compare them in section \ref{sec:density-compare}. In appendix \ref{app:find-surface}, we do not assume that the asteroid shape is known and instead assume that the density is constant. This allows us to compute the asteroid shape from $K_{\ell m}$.
 
 
 \subsection{General density model design}
+\label{sec:general-density}
 
+To set the shape of the asteroid, we assume that an indicator function $\mathds{1}(\bm r)$ has been determined such that $\mathds{1}(\bm r) = 1$ inside the asteroid and 0 outside, where $\mathds{1}(\bm r)$ is defined in some frame whose orientation with respect to Earth is known. Since the asteroid rotates around its center of mass during observations, we assume that the location of the center of mass is also known in this frame, so that we can set it to be the origin.
+
+We define a new coordinate system, the ``hybrid frame,'' which coincides exactly with the initial orientation of the asteroid assuming that the fit result for $\gamma_0$ is perfectly accurate. The orientation of the hybrid frame with respect to the inertial frame is therefore exactly known, so that $\mathds{1}$ is also exactly in the hybrid frame, and the $K_{\ell m}$ components are known in the local frame which aligns with the hybrid frame up to uncertainty in $\gamma_0$. We will solve for $\rho(\bm r)$ in the hybrid frame given fit results $K_{\ell m}$ and the known $a_m$.
+
+The density moments defined in equation \ref{eqn:klm} are not linear in $\rho(\bm r)$, but we may fix $a_m$ at the value assumed during the fit, removing the non-linearity induced by division by $a_m$. Furthermore, since the system is independent of the total asteroid mass, we set $\mu_m$ equal to an arbitrary constant which makes equation \ref{eqn:klm} linear in $\rho(\bm r)$. Similarly, the form of equation \ref{eqn:am} guarantees that $a_m^2$ is linear in $\rho(\bm r)$. Equation \ref{eqn:am} and equation \ref{eqn:klm} applied to $K_{00}=1$ can be used to enforce the choices of $\mu_m$ and $a_m^2$.
+
+Suppose that we restrict the number of degrees of freedom of $\rho(\bm r)$ from infinity to $m$ by explicitly defining some function $\rho(\bm r, \bm D)$ for an $m$-dimensional vector $\bm D$ which controls the free parameters of $\rho$. We will leave the explicit definition of $\rho(\bm r, \bm D)$ to the model descriptions below, but for now we assume that $\rho$ is linear in $\bm D$; i.e.,
+\begin{equation}
+  \rho(\bm r, \bm D) = \bm B(\bm r) \cdot \bm D
+  \label{eqn:density-distro}
+\end{equation}
+for a $m$-dimensional vector $\bm B(\bm r)$. Thus, the defining equations of $a_m^2$ and $K_{\ell m}$ represent a linear function that give the parameters in terms of $\bm D$. We further assume that the model describes a way to reverse this equation, to write
+\begin{equation}
+  \bm D = A \bm K
+  \label{eqn:density-model}
+\end{equation}
+where $A$ is a matrix. Here, we have arranged $a_m^2$ and the known components of $K_{\ell m}$ into a vector $K$, which we say has $n$ dimensions. The order of this arrangement is irrelevant, as long as it is kept consistent.
+
+To propagate uncertainties from $\bm K$ to $\bm D$ and therefore $\rho(\bm r)$, we first need the covariance matrix $\Sigma_K$ for $\bm K$. First, assume that the hybrid frame is offset from the local frame by some small angle $\Delta \gamma$, which results from uncertainty in $\gamma_0$. Then
+\begin{equation}
+  K_{\ell m}^\mathrm{hybrid} = e^{-im\Delta \gamma}K_{\ell m}^\mathrm{local}.
+  \label{eqn:local-to-hybrid}
+\end{equation}
+Since $K_{\ell m}^\mathrm{local}$ was obtained by an MCMC fit, a large set of posterior-distributed samples are available for $\Delta \gamma$ and $K_{\ell m}^\mathrm{local}$, and the covariance matrix $\Sigma_K$ can be computed statistically by applying equation \ref{eqn:local-to-hybrid} to the samples. Then, propagation of uncertainty guarantees that the covariance matrix of $\bm D$ is $\Sigma_D = A \Sigma_K A^T$
+and the density distribution and uncertainty on density distribution are equal to
+\begin{equation}
+  \rho(\bm r) = \bm B(\bm r)^T A\bm K \qquad \sigma^2_\rho(\bm r) = \bm B(\bm r)^T A \Sigma_K A^T \bm B(\bm r).
+  \label{eqn:unc-rho}
+\end{equation}
+
+The job of a model is therefore to restrict the space of valid density distributions by defining the $m\times n$-dimensional constant matrix $A$ and the $m$-dimensional vector $\bm B(\bm r)$ such that equations \ref{eqn:density-model} and \ref{eqn:density-distro} are true. Then the density distribution and its uncertainty are given by equation \ref{eqn:unc-rho}.
 
 
 
 \subsection{The Likelihood model}
+For the likelihood model, we restrict the degrees of freedom of $\rho(\bm r)$ by defining a likelihood function $\mathcal{L}$ on the density distribution, and choosing the one distribution which maximizes likelihood and exactly reproduces $\bm K$. This likelihood should not be confused with the likelihood of equation \ref{eqn:log-likelihood}, which was a function of the spin data, not the density distribution. The choice of the density $\mathcal{L}$ is arbitrary, but the linearity of the model design outlined in the previous section will require an uncorrelated Gaussian likelihood.
+
+To employ this likelihood method, we divide the asteroid into a square grid of $m \gg n$ elements, each of which is assumed to have uniform density $\rho_0$ plus some deviation $D_i$, where $\rho_0$ is constant across the asteroid. This defines the model function $\bm B(\bm r)$, which is zeroed in all components except for the $i$th, where $i$ is the index of the grid element that contains $\bm r$.
+
+We use a likelihood of 
+\begin{equation}
+  \mathcal{L}(\bm D) = \prod_{i=1}^m \frac{1}{\sqrt{2\pi \sigma^2}} \exp\parens{-\frac{D_i^2}{2 \sigma^2}}
+\end{equation}
+with free parameters $\mu$ and $\sigma$. These parameters do not affect the location of the maximum, so we do not define them. Given this likelihood, the log likelihood is proportional to $-|\bm D|^2$. Minimizing the norm of $\bm D$ is therefore equivalent to finding the maximum likelihood.
+
+Putting aside the problem of minimizing the norm for a moment, we use the linearity of equations \ref{eqn:klm} and \ref{eqn:am} to write $\bm K = M \bm D$, where the $i$th entry of every row of the $n\times m$ matrix $M$ is the integral presented in equation \ref{eqn:jlm} or \ref{eqn:am}, evaluated over the $i$th finite element. We want to solve $\bm K = M \bm D$ for $\bm D$ to match equation \ref{eqn:density-model}, which we do via the Moore-Penrose inverse. Since $m>n$, the Moore-Penrose inverse of $M$ is
+\begin{equation}
+  A=M^+ = M^*(MM^*)^{-1}
+  \label{eqn:mpi-underdetermined}
+\end{equation}
+where $M^*$ is the adjoint of $M$. The vector $\bm D=M^+\bm K$ is guaranteed to solve $\bm K = M \bm D$, and by the properties of the Moore-Penrose inverse, this $\bm D$ also happens to minimize the norm of all possible $\bm D$ that satisfy the equation. Thus, we define $A=M^+$, which fully defines the model.
+
+Note that this model is fast to compute; assuming fast matrix multiplication, the most time-consuming step is the matrix inversion of equation \ref{eqn:mpi-underdetermined}. But $MM^*$ is an $n$-dimensional square matrix, which is very small compared to the number of finite elements $m$.
 
 
 
 
 \subsection{The Harmonic model}
+We now explore a model that seeks to restrict the space of allowed density distributions a different way: we allow only the density distributions with zero Laplacian: $\nabla^2 \rho = 0$ inside the asteroid (the harmonic distributions). The expansion of such a function in spherical coordinates is given by 
+\begin{equation}
+  \rho(\bm r) = \sum_{\ell, m} \frac{D_{\ell m}}{a_m^\ell} R_{\ell m}^*(\bm r)
+  \label{eqn:harmonic-rho}
+\end{equation}
+where the terms which lead to $\rho \rightarrow \infty$ at the origin have been removed and $D_{\ell m}$ are free (complex) parameters. By setting a maximum on $\ell$, we restrict the number of degrees of freedom to $(\ell_\mathrm{max}+ 1)^2$. Choosing the same maximum $\ell$ as the maximum $\ell$ for the $K_{\ell m}$ moments, we have $m=n-1$ coefficients $D_{\ell m}$ which can be stacked into an $m$-dimensional vector $\bm D$.
 
+Inserting equation \ref{eqn:harmonic-rho} into equations \ref{eqn:klm} and \ref{eqn:am}, we get 
+\begin{equation}
+  K_{\ell', m'} = \sum_{\ell m} \frac{1}{\mu_m a_m^{\ell'} a_m^\ell} D_{\ell m} \int_\mathcal{A} d^3 r R_{\ell m}^*(\bm r) R_{\ell' m'}(\bm r).
+  \label{eqn:harmonic-mat}
+\end{equation}
+This is an over-determined matrix equation $\bm K = M \bm D$, where $M$ is an $n \times m$ matrix. The Moore-Penrose inverse can therefore be used again to find an inverse $A=M^+$ which yields approximately correct $\bm D$ (approximate in that the norm of the error vector between $\bm K$ and $M \bm D$ is minimized). However, the form of the inverse changes due to the equation being overdetermined:
+\begin{equation}
+  A=M^+ = (M^*M)^{-1} M^*
+  \label{eqn:mpi-overdetermined}
+\end{equation}
+
+In the special case where the asteroid is a sphere of radius $R$, the matrix defined by equation \ref{eqn:harmonic-mat} is diagonal, with entries 
+\begin{equation}
+  M_{\ell m; \ell' m'} = \frac{4\pi R^3}{\mu_m} \frac{R^{2\ell}}{a_m^{2\ell}} \frac{\delta_{\ell \ell'} \delta_{m m'}}{(4\ell^2 + 8\ell + 3)(\ell - m)!(\ell+m)!}.
+\end{equation}
+A nonspherical perturbation will introduce small off-diagonal entries to $M$. This diagonal represents an interpretation of the physical meaning of $K_{\ell m}$; they are directly related through this form of $M$ and the matrix equation $\bm K = M \bm D$ to the coefficients of the spherical harmonic expansion of the asteroid in the case of a spherical asteroid.
 
 
 
 \subsection{The Lumpy model}
 
+The above two simple models produce smooth density distributions that generally extend non-uniformity over large regions. In this section, we define a more complicated model which identifies discrete regions differing from the overall density of the asteroid to best fit the measured density moments.
+
+Suppose the asteroid contains $N$ `lumps' of constant mass $\mu_i$ displaced by distance $\bm x_i$ from the asteroid center of mass, and immersed in a constant-density overall asteroid shape which is known in the form of $\mathds{1}(\bm r)$. For simplicity, we assume that all $N$ regions are ellipsoids with $d$ independent axis lengths. (For example, $d=3$ corresponds to an asymmetric ellipsoid, $d=2$ corresponds to a symmetric ellipsoid, and $d=1$ corresponds to a sphere.) Recall that $\mathds{1}(\bm r)$ is known in the hybrid frame where the origin is the center of mass of the asteroid. The displacement of the shape centroid from the center of mass, which is the opposite of the net displacement of the discrete regions, is therefore observable from light curve analysis. The model therefore has $3(N-1)$ positional degrees of freedom, along with $N$ degrees of freedom for $\mu_i$, $Nd$ shape degrees of freedom, and 0, $2N$, or $3N$ rotational degrees of freedom for $d=1$, 2, or 3. The sum of these degrees of freedom are displayed in table \ref{tab:lump-dof}. These degrees of freedom should be compared to the known density moments, of which there is a square number $(L+1)^2$. However, three of these are the center of mass of the asteroid which is guaranteed to be correct, and one is the unconstrained total mass. One is then added, representing $a_m$. So the total number of known parameters is $(L+1)^2 - 3$, which is 13 when the second-order density moments are known. We assume that the degrees of freedom of this lumpy model are always fewer than the number of $\bm K$ known, so that the model is overdetermined.
+
+\begin{table}
+  \centering
+  \begin{tabular}{cc|ccc}
+    \hline \hline
+        &  & & $N$ &  \\
+        &  & 1  & 2  & 3  \\ \hline 
+        & 1& \cellcolor{black}\color{white} 2 & \cellcolor{gray}\color{white} 7 & \cellcolor{gray}\color{white} 12\\
+    $d$ & 2& \cellcolor{black}\color{white} 5 & \cellcolor{gray}\color{white} 13 & 21 \\
+        & 3& \cellcolor{gray}\color{white}  7 &  17 &  27 \\
+    \hline \hline
+  \end{tabular}
+  \caption{Total degrees of freedom $D$ as a function of $N$, the number of lumps modeled, and $d$, the number of independent moment of inertia axes considered for each lump. The configurations with $D \leq$ the six known parameters not including $K_{3m}$ are colored black, and with $D \leq$ the 13 parameters including $K_{3m}$ parameters are colored gray.}
+  \label{tab:lump-dof}
+\end{table}
+
+The net $K_{\ell m}$ components of such an ensemble obey
+\begin{equation}
+  K_{\ell m} = K_{\ell m}'^0 + \sum_{i=1}^N K_{\ell m}'^i \qquad a_m^2 = a_0'^2 + \sum_{i=1}^N a_i'^2
+  \label{eqn:klm-stack}
+\end{equation}
+where $K_{\ell m}^i$ and $a_i^2$ obey the same definition as $K_{\ell m}$ in equation \ref{eqn:jlm} and $a_m$ in equation \ref{eqn:am} respectively. Crucially, note that we set normalizing factors $1/(\mu_m a_m^\ell)$ and $1/\mu_m$ in equations \ref{eqn:jlm} and \ref{eqn:am} equal to the values for the entire asteroid, not their counterparts for each lump. The zero-indexed parameters indicate the density moments of the asteroid medium surrounding the lumps. The prime in equation \ref{eqn:klm-stack} denotes that the moments are calculated in the hybrid frame.
+
+We can relate the primed moments to the moments calculated relative to each body's center of mass via the translation rules for solid spherical harmonics:
+\begin{equation}
+  \begin{split}
+  & K_{\ell m}'^i = \sum_{\ell' m'} (-1)^{\ell - \ell'} R_{\ell - \ell', m - m'}(\bm x_i) K_{\ell' m'}^i\\
+  & a_i'^2 = a_i^2 + x_i^2 K_{00}
+  \end{split}
+  \label{eqn:translate-klm}
+\end{equation}
+The dummy indices $\ell', m'$ should only be summed over values in which $\ell-\ell' \geq 0$ and $|m-m'| \leq \ell - \ell'$. Here, $K_{00}^i$ is the added mass $\mu_i$ of lump $i$, while $K_{1m}=0$ and $K_{2m}$ incorporate its orientation and moment of inertia ratios. Its volume is constrained by $a_i^2$. These values map directly onto an ellipsoid shape via equations \ref{eqn:ellipsoid-axes}, so that if $K_{\ell m}^i$, $a_i^2$, $\mu_i$, and $x_i$ are known, then the density distribution of the asteroid is known.
+
+Note that if $\bm x_i$ is known, then equation \ref{eqn:translate-klm} are linear in $K_{\ell m}^i$. Therefore, if we define $\bm D$ to contain $K_{2m}^i$ and $a_i^2$ for all $i$ in some order, then equations \ref{eqn:translate-klm} and \ref{eqn:klm-stack} define a matrix equation $\bm K = \bm C + M \bm D$ which can be solved by setting $A$ equal to the Moore-Penrose inverse of $M$ (equation \ref{eqn:mpi-overdetermined}, since $\bm D$ is overdetermined). Henceforth, we assume that the dimensions of $\bm D$ are less than or equal to the number of known parameters (the shaded regions of table \ref{tab:lump-dof}), so that $A$ is given by equation \ref{eqn:mpi-overdetermined}). Note that the $\bm C$ term of this equation came from the expansion of $K_{\ell m}'^0$ and $a_0^2$, which is written in terms of the already-known displacement of the asteroid surface from its center of mass.
+
+This model's strategy will be to choose $\bm x_i$ and $\mu_i$ via a nonlinear process, then fit for the values $K_{\ell m}^i$ and $a_i^2$ using the linear format described in section \ref{sec:general-density}. The constraints on $\bm x_i$ and $\mu_i$ are primarily
+\begin{equation}
+  \sum_{i=1}^N \bm x_i \mu_i + \mu_0 \bm x_0 = 0
+  \label{eqn:lump-constraints}
+\end{equation}
+where $\bm x_0$ is the known displacement of the centroid of the asteroid model from the center of mass. There are also additional constraints, such as that $\bm x_i$ should lie inside the asteroid which can be enforced manually. The overall mass of the asteroid is $\mu_m = \mu_0 + \sum_{i=1}^N \mu_i$, and has been set, so we may eliminate $\mu_0$ from equation \ref{eqn:lump-constraints}. The constraint is now a function of $\mu_i$ and $\bm x_i$ for $i \geq 1$. The matrix equation defining $M$ is overdetermined, but we would like it to have a solution nevertheless. We therefore solve for $\bm x_i$ and $\mu_i$ to yield an $M$ with solutions. This is done by minimizing
+\begin{equation}
+  |(M(\bm x_i, \mu_i) M^+(\bm x_i, \mu_i) - \mathds{1}) (\bm K - \bm C)|^2.\
+  \label{eqn:lump-minimize}
+\end{equation}
+Then $A=M^+$ and $\bm B(\bm r)$ following from the resulting values of $K_{\ell m}^i$ and $a_i^2$ defines the model. If the resulting density distribution is somehow excluded (it predicts negative density distributions, the lumps extend outside the asteroid, etc.), then another minimum of equation \ref{eqn:lump-minimize} can be used, or another combination of $N$ and $d$ listed in table \ref{tab:lump-dof}.
+
 
 
 
 \subsection{Comparisons between density models.}
-
+\label{sec:density-compare}
 
 
 
@@ -739,6 +869,12 @@ The inclusion of a Data Availability Statement is a requirement for articles pub
 
 \section{Similarity between cadence and lack of perigee data.}
 \label{app:cadence-perigee-test}
+
+
+
+
+\section{Computing asteroid shape from density moments}
+\label{app:find-surface}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
