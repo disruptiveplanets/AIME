@@ -879,6 +879,7 @@ In short, severely incorrect shape estimates can be caught for all three models 
 
 
 \subsubsection{Nonuniformity test}
+\label{sec:non-uniform-density}
 
 We also test several non-uniform density asteroids and compare the generated density distributions for all three models to see if the non-uniformities are recovered. We consider two asteroids, one with mass concentrated in the middle, and one with mass concentrated symmetrically around the edges. (Specifically, the mass distribution follows a Gaussian which falls to a fraction $e^{\pm 0.5}$ of the central density on the surface of the asteroid.) To prevent the problems seen in previous sections when a symmetric asteroid is simulated, we set the shape of the asteroids to the asymmetric reference asteroid. The extracted density distributions are shown in figure \ref{fig:non-uniform-density}
 
@@ -932,10 +933,9 @@ the final conclusions which the authors draw from their work.
 
 \section*{Acknowledgements}
 
-\jtd{Write}
-The Acknowledgements section is not numbered. Here you can thank helpful
-colleagues, acknowledge funding agencies, telescopes and facilities used etc.
-Try to keep it short.
+We warmly thank Emmanuel Jehin, Maxime Devogele, and Marin \jtd{What's Marin's last name?} for meeting with the authors to discuss this work, and pointing out possible future directions to take it. JTD would like to thank the Massachusetts Institute of Technology Undergraduate Research Opportunities Program (MIT UROP) office for funding his work for many semesters, and their flexibility in funding students from departments other than the source of funding. The work of JdW was funded by \textit{Who funds Julien?}. Much of the computation shown in this paper was executed on MIT Supercloud's facilities.
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Data Availability}
@@ -957,6 +957,18 @@ The code used to generate data, fit density moments to it, and extract density d
 
 \section{Reference asteroid configurations}
 \label{app:reference-configs}
+
+Except when otherwise mentioned, we use the following asteroid encounter parameters. Many of the parameter choices are made to maximize the quality of observations (a close orbit, large asteroid, etc.) This is so that our uncertainties have room to grow; if the reference asteroid has low uncertainty,
+
+\begin{enumerate}
+  \item An orbit around Earth with $6$ km s$^{-1}$ excess velocity and perigee at 5 Earth radii. This orbit was chosen to roughly match that of \jtd{Number} Apophi s\jtd{Cite Apophis close approach}
+  \item An initial roll of $\gamma_0=\pi/8$.
+  \item A cadence of 2 minutes and observational uncertainty of $\sigma_\theta = 0.01$ and $\sigma_\rho / \sigma_\theta = 10^{-5}$.
+  \item A rotational period of 9 hours, with the rotational velocity vector distributed between the $\unit X$, $\unit Y$, and $\unit Z$ axes in a $1:2:-2$ ratio.
+  \item An asteroid with radius $a_m = 1$ km and $K_{3m}=0$. For $K_{22}$ and $K_{20}$, we use two standard values. One with $(K_{22}, K_{20}) = (0, -0.097)$ and one with $(0.052, -0.202)$. Including the third point obtained by reflection $K_{22}\rightarrow -K_{22}$, these are the three points that minimize the mean distance between an arbitrary point in the allowed parameter space (equation \ref{eqn:parameter-bounds}) and these reference values. The first point is called the symmetric case because the corresponding uniform-density-ellipsoid model is rotationally symmetric around $\unit z$. The second case and its reflection are called the asymmetric cases. Values of $(0.052, -0.202)$ have $a < b$ in the ellipsoid model, and the reflected value has $a > b$. If not specified, we use the $a < b$ case. Specifically, the asymmetric case has $a=1140$ m, $b=1839$ m, and $c=565$ m, while the symmetric case has $a=b=1411$ m and $c=1008$ m.
+\end{enumerate}
+
+We use the asymmetric ellipsoid in nearly all runs, do to the degeneracy induced in our model when $K_{22} = 0$.
 
 
 \section{What sets the cadence cutoff?}
@@ -982,6 +994,77 @@ The code used to generate data, fit density moments to it, and extract density d
 
 \section{Computing asteroid shape from density moments}
 \label{app:find-surface}
+
+In section \ref{sec:distros}, we mention that the shape of the asteroid can be computed from observations of the density moments and $a_m$ if a uniform density distribution is assumed. We do not further describe the model in the main text because it is unlike the other three models in the nature of its assumptions, and in the fact that it is nonlinear. However, it may be a useful technique so it is mentioned here. A similar model was also studied in \jtd{Cite that paper}.
+
+Suppose our asteroid has constant density $\rho_0$ and known parameters $K_{\ell m}$ and $a_m^2$, and that the asteroid is ``star shaped'' in that every ray passing through the center of mass of the asteroid (the origin of the local frame) passes through the surface of the asteroid exactly once, at distance $r(\theta, \phi)$ written in spherical coordinates. By the divergence theorem, we write
+\begin{equation}
+  K_{\ell m} = \frac{\rho_0}{\mu_m a_m^\ell} \oint_{\partial \mathcal{A}} d^2 \bm r \cdot \bm v (\bm r)
+\end{equation}
+where $\bm v (\bm r) = \unit r R_{\ell m} (\bm r) r / (3+\ell) $ so that $\nabla \cdot \bm v(\bm r) = R_{\ell m}(\bm r)$. The integral is carried out over the surface of the asteorid. We know the area element satisfies $d^2 \bm r = \partial \bm r / \partial \theta \times \partial \bm r / \partial \phi$ in our coordinates, and when dotted with $\bm v \propto \unit r$, this gives
+\begin{equation}
+  K_{\ell m} = \frac{\rho_0 }{\mu_m a_m^\ell (3 + \ell)} \int d\Omega r(\theta, \phi)^3 R_{\ell m}(r(\theta, \phi), \theta, \phi).
+  \label{eqn:surface-klm}
+\end{equation}
+where the integral is carried out over the unit sphere. Note that the integrand of each $K_{\ell m}$ is proportional to $r(\theta, \phi)^{(3+\ell)}$ times constants and a spherical harmonic.
+
+We write 
+\begin{equation}
+  r(\theta, \phi) = \sum_{\ell m} Y_{\ell m}^* C_{\ell m}
+\end{equation}
+without loss of generality. To keep $r(\theta, \phi) \in \mathds{R}$, we require $C_{\ell m}^* = (-1)^m (\ell-m)!/(\ell+m) C_{l,-m}$. With this definition, equation \ref{eqn:surface-klm} becomes a polynomial of degree $3+\ell$ in terms of $C_{\ell' m'}$ and integrals of products of spherical harmonics. These integrals can be pre-computed so that equation \ref{eqn:surface-klm} can then be numerically solved via standard polynomial solution methods to find $C_{\ell m}$. A similar equation to equation \ref{eqn:surface-klm} can be written for $a_m$
+\begin{equation}
+  a_m^2 = \frac{\rho_0}{5\mu_m}\int d\Omega r(\theta, \phi)^5
+  \label{eqn:surface-am}
+\end{equation}
+which can also be solved via polynomial methods.
+
+Equations \ref{eqn:surface-klm} and \ref{eqn:surface-am} form a set of $n+1$ constraints, where $n$ is the number of density moments known. I.e., $n=(\ell_\text{max}+1)^2$, where $\ell_\text{max}$ is the maximum degree of $K_{\ell m}$ known. By setting the same maximum degree on $C_\ell m$, we also have $n$ variables plus one for $\rho_0$. The system is therefore well-determined and will yield finitely many solutions. These solutions can be further refined by removing those that produce $r(\theta, \phi) < 0$ for any $\theta, \phi$, which is unphysical. The result shapes consistent with the fitted $K_{\ell m}$. We do not attempt to model uncertainty on the shape.
+
+To test the model, this process was run for an asteroid with $K_{1m}=K_{2m'}=0$, but randomly chosen $K_{3m}$. The resulting surface is shown in figure \ref{fig:surface-density}. The figure shows a near-spherical asteroid, which is expected for $K_{\ell m} = 0$ for $\ell > 0$. However, the additional $K_{3m}$ components clearly induce non-sphericity in the asteroid which is captured by the surface model.
+
+\begin{figure*}
+  \centering
+  \hfill
+  \includegraphics[width=0.4\textwidth]{figs/high-surface.pdf}\hfill
+  \includegraphics[width=0.4\textwidth]{figs/high-likelihood.pdf}\hfill
+  \caption{\textit{Left}: the surface of a near-spherical asteroid with uniform density distribution extracted via the surface method. \textit{Right}: the density distribution extracted via the likelihood model for the same density moments but a spherical surface. The same length scale is used in both figures.}
+  \label{fig:surface-density}
+\end{figure*}
+
+To give an alternate view of the non-sphericities found via this new surface model, figure \ref{fig:surface-density} also displays the density distribution extracted via the likelihood model assuming a spherical asteroid shape, but with the same density moments. (Uncertainty in the moments is not modeled in this figure, to better compare the two.) Where the likelihood model displays low density, the surface model clearly retreats into the asteroid. Where the likelihood model yields high density, the surface model extends. Thus, the connection made in section \ref{sec:non-uniform-density} between non-uniformities in the densities of the likelihood and harmonic models at the asteroid surface and inaccuracies in the surface is more firmly represented.
+
+This surface model could, in principle, be used to improve estimates of the surface of an asteroid made by light curve analysis, since it connects rotational data to the asteroid surface. Thus, uncertainties either in the density moments or the asteroid surface (or both), could be reduced. We only suggest this as a possibility, however, since it is beyond the scope of this paper.
+
+
+\section{Example fit results}
+\label{app:example}
+
+Here, we present example results of the MCMC fit described in section \ref{sec:fit}, applied to flyby data of the asymmetric reference asteroid. The fit results were consistent with the true density moments, and produced consistent data.
+
+Figure \ref{fig:example-residuals} shows the spin data with the best-fit overlaid and the residuals in the bottom pane. Uncertainties are plotted on the residuals corresponding to the square root of the diagonal entries of the covariance matrix --- i.e., 1-$\sigma$ uncertainties (correlations are not included).
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.7\textwidth]{figs/example-residuals.pdf}
+  \caption{Data, best fit results, and residuals for a fit to synthetic data simulated for an asymmetric reference asteroid with $\sigma_\theta = 9.5 \times 10^{-3}$. The standard deviation of the data is plotted as an uncertainty band in the residuals plot, but these do not capture covariance between data points, so that the fact that many residuals lie outside the band does not disqualify the fit, which has a reduced $\chi^2$ value of 0.68.}
+  \label{fig:example-residuals}
+\end{figure*}
+
+Figure \ref{fig:example-corner} shows a corner plot of the ten fitted parameters' posterior distributions, both marginalized to be a function of one variable and of two. The true parameters are shown as lines. Note that the true parameters always lie within 1- or 2-$\sigma$ of the $\Delta K_{\ell m} = 0$, where $\Delta K_{\ell m}$ is the difference between the posterior $K_{\ell m}$ and the true $K_{\ell m}$.
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=\textwidth]{figs/example-corner.pdf}
+  \caption{A corner plot for the fit results ten parameters to synthetic data simulated for an asymmetric reference asteroid with $\sigma_\theta = 9.5 \times 10^{-3}$. Marginal posterior PDFs for each parameter are shown (histograms) along with two-dimensional PDFs (contours). Individual points in the contours are samples from the MCMC fit, and the contours enclose 1-, 2-, and 3-$\sigma$ of them. True values (which are zero here due to the parameters being displayed relative to the true values) are also shown (blue lines).}
+  \label{fig:example-corner}
+\end{figure*}
+
+\jtd{Pull the correct plots from supercloud.}
+
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

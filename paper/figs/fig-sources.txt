@@ -23,8 +23,8 @@ oblateness-differ.pdf data/oblateness-differ/oblateness-differ.pdf
 nominal-data-sym.pdf code/other-figs/model-spread/spin-chaos-sym.pdf
 nominal-data-asym.pdf code/other-figs/model-spread/spin-chaos-asym.pdf
 
-example-residuals.pdf code/other-figs/example-corner/sigma-1-28-0-compare.pdf
-example-corner.pdf code/other-figs/example-corner/sigma-1-28-0-corner.pdf
+example-residuals.pdf code/other-figs/example-corner/cad-00-0-compare.pdf
+example-corner.pdf code/other-figs/example-corner/cad-00-0-corner.pdf
 
 nominal-covariance.pdf code/fit_resolved/random-figs/random-vector-unc.pdf
 nominal-norm.pdf code/fit_resolved/random-figs/random-vector-norm.pdf
@@ -80,3 +80,7 @@ out-lumpy.pdf code/density/figs/out/lumpy-1-1-d.pdf
 blob-harmonic.pdf code/density/figs/blob/harmonic-d.pdf
 blob-likelihood.pdf code/density/figs/blob/likelihood-d.pdf
 blob-lumpy.pdf code/density/figs/blob/lumpy-1-1-d.pdf
+
+
+high-surface.pdf code/density/old/figs/high-surface-slice.pdf
+high-likelihood.pdf code/density/old/figs/high-likelihood-slice.pdf
