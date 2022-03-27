@@ -816,8 +816,113 @@ Then $A=M^+$ and $\bm B(\bm r)$ following from the resulting values of $K_{\ell 
 \subsection{Comparisons between density models.}
 \label{sec:density-compare}
 
-\jtd{Write}
+To test the properties of the three density models defined above, we simulate several asteroids with different shapes and density distributions on a close Earth encounter, with the reference asteroid orbital and observational parameters. Density moments are extracted via our fit process and density distributions by the three methods. Below, we compare them.
 
+\subsubsection{Uniform density test asteroids}
+
+First, we simulate several asteroids with uniform density distributions and ask whether a distribution is recovered. The shapes we use are the symmetric and asymmetric reference ellipsoids, a ``dumbbell'' (two spheres of equal radius conjoined such that the surface of one intersects the center of the other), and a tetrahedron. The extracted distributions for all three models are shown in figure \ref{fig:uniform-density}. Also in each figure is $\Delta K_{\ell m}$, the magnitude of difference between the fitted density moments and the density moments of the final distribution. This difference is nonzero due to numerical error in the likelihood model case, but for the harmonic and the lumpy models (which are not guaranteed to exactly reproduce the input density moments), they express the inability of the density model to exactly reproduce the density moments.
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.33\textwidth]{figs/asym-ell-likelihood.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/asym-ell-harmonic.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/asym-ell-lumpy.pdf}
+
+  \includegraphics[width=0.33\textwidth]{figs/sym-ell-likelihood.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/sym-ell-harmonic.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/sym-ell-lumpy.pdf}
+
+  \includegraphics[width=0.33\textwidth]{figs/db-likelihood.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/db-harmonic.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/db-lumpy.pdf}
+
+  \includegraphics[width=0.33\textwidth]{figs/tet-likelihood.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/tet-harmonic.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/tet-lumpy.pdf}
+  \caption{Density distributions extracted by the likelihood (\textit{left}), harmonic (\textit{middle}), and lumpy with $d=N=1$ (\textit{right}) models from data generated for a uniform-density asteroid. The asteroid shapes are, from top to bottom, the reference asymmetric ellipsoid, the reference symmetric asteroid, the dumbbell model, and a tetrahedron. Density is normalized so that mean density is one. The same distance scale is used in all figures.}
+  \label{fig:uniform-density}
+\end{figure*}
+
+From figure \ref{fig:uniform-density}, it can be seen that the likelihood and harmonic models produce mostly the same density distributions. This is generally true for uniform density asteroids. This is a useful property because it lends confidence that the models produced are truly representative of the asteorid. The fact that the harmonic model produces very little density moment error ($\Delta K_{\ell m}$) also lends confidence to the distribution; the harmonic model is overdetermined and is not guaranteed to perfectly match the fit-extracted moments.
+
+The asymmetric and dumbbell asteroids produce distributions whose non-uniformity is limited to a factor of 2 or less for the harmonic and likelihood models. This non-uniformity is driven by error in the estimates of the density moments. Note that most of the asteroid does indeed have density close to one in both cases. The lumpy model yields a much more uniform distribution, but only because it is designed to produce uniform lumps. Note that its uncertainty $\Delta K_{\ell m}$ is usually large, both because the model is severely overdetermined (it has 2 degrees of freedom) and because the lump found extends outside the asteroid, violating the assumptions of the model. This is a sign that the lump found does not really exist inside the asteroid.
+
+The symmetric and tetrahedral asteroids are less-well represented. In both cases, the likelihood and harmonic models produce sometimes-negative distributions, and non-uniformity is especially large in the tetrahedral case. This is not the fault of the density models, but rather because both of these asteroids have $K_{22} = 0$ and (as discussed in section \ref{sec:scan-shape}), this leads to degeneracy and inflated uncertainty in the model. Estimates of $K_{\ell m}$ are therefore incorrect. In the tetrahedral case, the problem is worsened because $K_{20}=0$ as well, so that torque is dominated by the ill-constrained $K_{3m}$ components.
+
+Uncertainty in each distribution was calculated but not shown. The size of uncertainty is such that the density distribution is consistent with uniform at all points (within 1-2$\sigma$), except for the tetrahedron model, which contains a small number of points with very small uncertainty that exclude uniform density to $5\sigma$. In general, uncertainty is greater towards the edge of the asteroid. \jtd{Why do these low-uncertainty points exist in tet?}
+
+From these examples, we may draw the conclusions that all three models produce density distributions consistent with uniform for uniform asteroids. The most likely distributions are themselves mostly uniform, but can still produce non-uniformities as large as a factor of 2 in certain regions due to uncertainty in $K_{\ell m}$. Asymmetric asteroids such as the dumbbell and the asymmetric reference asteroids yield the best results because they have $K_{22} \neq 0$ and therefore do not suffer from degeneracy in initial orientation. Finally, the lumpy model can generally be ruled out in these cases because it produces nonphysical results.
+
+\subsubsection{Spherical shape test}
+We test the sensitivity of the density distributions to incorrect estimates for the shape of the asteroid by obtaining density moments from an ellipsoidal asteroid encounter and attempting to extract density distributions assuming a spherical shape. We do this for the asymmetric and symmetric reference asteroids, with density distributions shown in figure \ref{fig:sphere-density}.
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.33\textwidth]{figs/asym-sph-likelihood.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/asym-sph-harmonic.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/asym-sph-lumpy.pdf}
+
+  \includegraphics[width=0.33\textwidth]{figs/sym-sph-likelihood.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/sym-sph-harmonic.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/sym-sph-lumpy.pdf}\
+
+  \caption{Density distributions extracted by the likelihood (\textit{left}), harmonic (\textit{middle}), and lumpy with $d=N=1$ (\textit{right}) models from data generated for a uniform-density asteroid. The original asteroid shapes were the reference asymmetric (\textit{top}) and symmetric (\textit{bottom}) ellipsoids. In both cases, the density distributions have been extracted assuming a spherical shape. Density is normalized so that mean density is one. The same distance scale is used in all figures.}
+  \label{fig:sphere-density}
+\end{figure*}
+
+Both the likelihood and harmonic models are accurate in that $\Delta K_{\ell m}$ is low, and they produce similar distributions as in the previous section. Before, we took this fact as a signal that the distributions are likely to be correct. However, now they both produce negative density distributions for both asteroid shapes. This is a signal that the shape model is incorrect, and indeed the density distribution allows us to determine exactly how the shape model is wrong. In the asymmetric ellipsoid case, the density distribution is small (even negative) at large $|z|$ (up in the figure). The density is large at large $|y|$ (front right in the figure). Comparison with the asymmetric reference asteroid depicted in figure \ref{fig:uniform-density} shows that the low-density region is outside the true asteroid shape, and the high-density region is inside. In other words, the shape can be corrected by extending it where density is large and retracting it where density is low.
+
+A similar statement is true for the symmetric ellipsoid case in that density is low near the poles, but this time the regions with large density are evenly distributed around the equator, indicating the symmetry of the original asteroid.
+
+The lumpy model produces zero-mass lumps in this case, and produces very small $\Delta K_{\ell m}$. \jtd{What are the exact parameters of the lump? Look at log files}.
+
+In short, severely incorrect shape estimates can be caught for all three models by negative predicted densities or by the failure of the density distribution model to match the extracted density moments. The shape can be corrected by extending it where the density distribution is high and retracting it where the density distribution is low.
+
+
+\subsubsection{Nonuniformity test}
+
+We also test several non-uniform density asteroids and compare the generated density distributions for all three models to see if the non-uniformities are recovered. We consider two asteroids, one with mass concentrated in the middle, and one with mass concentrated symmetrically around the edges. (Specifically, the mass distribution follows a Gaussian which falls to a fraction $e^{\pm 0.5}$ of the central density on the surface of the asteroid.) To prevent the problems seen in previous sections when a symmetric asteroid is simulated, we set the shape of the asteroids to the asymmetric reference asteroid. The extracted density distributions are shown in figure \ref{fig:non-uniform-density}
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.33\textwidth]{figs/in-likelihood.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/in-harmonic.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/in-lumpy.pdf}
+
+  \includegraphics[width=0.33\textwidth]{figs/out-likelihood.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/out-harmonic.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/out-lumpy.pdf}\
+
+  \caption{Density distributions extracted by the likelihood (\textit{left}), harmonic (\textit{middle}), and lumpy with $d=N=1$ (\textit{right}) models from data generated for non-uniform-density asteroids with mass concentrated in the middle (\textit{top}) and the edges (\textit{bottom}).Density is normalized so that mean density is one. The same distance scale is used in all figures.}
+  \label{fig:non-uniform-density}
+\end{figure*}
+
+For these non-uniform asteroids, the likelihood and harmonic model do not coincide, as can be seen by comparing the density distributions and the fact that $\Delta K_{\ell m}$ is much larger for the harmonic distribution (indicating that the true density distribution is not harmonic). However, the two models do give similar results. Comparing the center-weighted asteroid and the edge-weighted asteroid distributions, one can see that the center-weighted case does indeed place more mass in the center of the asteroid shape for the harmonic and likelihood models. The edge-weighted asteroid does not have as clear high-density at its surface, due to the fact that uncertainty is generally greater near the edges (where $R_{\ell m}$ is large).
+
+\jtd{Why do the densities go negative?}
+
+\jtd{What's wrong with the lumpy model? Wasn't it giving really good results before?}
+
+
+
+\subsubsection{Lump test}
+
+Finally, we test an asteroid with a discrete change in density distribution (for example, a boulder), of the kind that the lumpy model is designed to detect. We place a spherical mass of density six times the density of the surrounding medium inside the asymmetric reference asteroid, slightly displaced along $\unit y$. The rest of the asteroid we set to uniform density. The density distributions found by the three model for this asteroid are shown in figure \ref{fig:blob-density}.
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.33\textwidth]{figs/blob-likelihood.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/blob-harmonic.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/blob-lumpy.pdf}
+
+  \caption{Density distributions extracted by the likelihood (\textit{left}), harmonic (\textit{middle}), and lumpy with $d=N=1$ (\textit{right}) models from data generated for an asteroid with an off-center lump. Density is normalized so that mean density is one. The same distance scale is used in all figures.}
+  \label{fig:blob-density}
+\end{figure*}
+
+We see from figure \ref{fig:blob-density} that the harmonic and likelihood model fail completely to recover the presence or location of the lump. There appears to be a slight increase of density in roughly the correct location for both models, but this is not a statistically significant effect, and can be seen in other asteroid such as the center-weighted asteroid of figure \ref{fig:non-uniform-density}. Also like figure \ref{fig:non-uniform-density}, we see that the harmonic and likelihood models do not agree exactly, and the failure of the harmonic model to exactly reproduce $K_{\ell m}$ suggests that the true distribution is not harmonic.
+
+The failure of these models to find lumps is expected, since $K_{\ell m}$ is most sensitive to non-uniformities of characteristic size $\pi/(\ell + 1)$ radians in the polar direction, and $2\pi / (|m|+1)$ in the azimuthal direction by the definition of $Y_{\ell m}$. This lump is too small to be resolvable by $K_{3m}$, so we do not expect most models to find it.
+
+However, the lumpy model exactly computes the location and density of the mass. \jtd{But it's not quite exact. Why?}. \jtd{Would like to say that there's no error in klm.} We see therefore that the lumpy model is capable of recreating the location of lumps accurately (in simple cases such as this). But the ability of the lumpy model to place a lump does not guarantee the lump to actually exist, as was seen in all the other asteroid distributions analyzed here.
 
 \section{Conclusions}
 
@@ -852,8 +957,6 @@ The code used to generate data, fit density moments to it, and extract density d
 
 \section{Reference asteroid configurations}
 \label{app:reference-configs}
-
-\jtd{Write}
 
 
 \section{What sets the cadence cutoff?}

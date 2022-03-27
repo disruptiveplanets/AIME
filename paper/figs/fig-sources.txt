@@ -41,3 +41,42 @@ spin-pole-avg-polar.pdf data/scan-spin-pole/avg-pole-polar.pdf
 scan-vex.pdf data/scan-vex/vex.pdf
 
 scan-perigee.pdf data/scan-perigee/perigee.pdf
+
+asym-ell-harmonic.pdf code/density/figs/asym-ell/harmonic-d.pdf
+asym-ell-likelihood.pdf code/density/figs/asym-ell/likelihood-d.pdf
+asym-ell-lumpy.pdf code/density/figs/asym-ell/lumpy-1-1-d.pdf
+
+sym-ell-harmonic.pdf code/density/figs/sym-ell/harmonic-d.pdf
+sym-ell-likelihood.pdf code/density/figs/sym-ell/likelihood-d.pdf
+sym-ell-lumpy.pdf code/density/figs/sym-ell/lumpy-1-1-d.pdf
+
+db-harmonic.pdf code/density/figs/db/harmonic-d.pdf
+db-likelihood.pdf code/density/figs/db/likelihood-d.pdf
+db-lumpy.pdf code/density/figs/db/lumpy-1-1-d.pdf
+
+tet-harmonic.pdf code/density/figs/tet/harmonic-d.pdf
+tet-likelihood.pdf code/density/figs/tet/likelihood-d.pdf
+tet-lumpy.pdf code/density/figs/tet/lumpy-1-1-d.pdf
+
+
+asym-sph-harmonic.pdf code/density/figs/asym-sph/harmonic-d.pdf
+asym-sph-likelihood.pdf code/density/figs/asym-sph/likelihood-d.pdf
+asym-sph-lumpy.pdf code/density/figs/asym-sph/lumpy-1-1-d.pdf
+
+sym-sph-harmonic.pdf code/density/figs/sym-sph/harmonic-d.pdf
+sym-sph-likelihood.pdf code/density/figs/sym-sph/likelihood-d.pdf
+sym-sph-lumpy.pdf code/density/figs/sym-sph/lumpy-1-1-d.pdf
+
+
+in-harmonic.pdf code/density/figs/in/harmonic-d.pdf
+in-likelihood.pdf code/density/figs/in/likelihood-d.pdf
+in-lumpy.pdf code/density/figs/in/lumpy-1-1-d.pdf
+
+out-harmonic.pdf code/density/figs/out/harmonic-d.pdf
+out-likelihood.pdf code/density/figs/out/likelihood-d.pdf
+out-lumpy.pdf code/density/figs/out/lumpy-1-1-d.pdf
+
+
+blob-harmonic.pdf code/density/figs/blob/harmonic-d.pdf
+blob-likelihood.pdf code/density/figs/blob/likelihood-d.pdf
+blob-lumpy.pdf code/density/figs/blob/lumpy-1-1-d.pdf
