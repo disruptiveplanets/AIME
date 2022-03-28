@@ -33,7 +33,7 @@ logging.basicConfig(level=logging.INFO)
 
 PLOT_POSES = True
 NUM_MINIMIZE_POINTS_PER = 4 # Used to be 8
-NUM_L3_MINIMIZATIONS = 2
+NUM_L3_MINIMIZATIONS = 1# Changed to 1 to decrease time.
 DISTANCE_RATIO_CUTS = [
     [2.0, None],
     [-2.0, None]

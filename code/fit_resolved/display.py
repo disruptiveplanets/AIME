@@ -1,4 +1,7 @@
 TEST = False
+VELOCITY_MUL = 1
+
+SAVE_PDFS = False
 
 import corner, emcee
 if not TEST:
@@ -172,6 +175,8 @@ class Display:
         #corner.overplot_lines(fig, (transpose_res[0] - transpose_res[2]) * 10**param_exps, color='C1', linestyle='dotted')
 
         plt.savefig(self.h5_name+"-corner.png")
+        if SAVE_PDFS:
+            plt.savefig(self.h5_name+"-corner.pdf")
         return len(self.true_results)
 
     def get_params(self):
@@ -253,7 +258,7 @@ class Display:
         try:
             resolved_data = self.module.simulate(self.cadence, self.jlms, theta,
                 self.radius, self.spin[0], self.spin[1], self.spin[2],
-                self.impact_parameter, self.speed, CENTRAL_MU, CENTRAL_RADIUS, 0, False)
+                self.impact_parameter, self.speed, CENTRAL_MU, CENTRAL_RADIUS, 0, False, VELOCITY_MUL)
         except:
             print("Coordinates are invalid ({})".format(theta))
             return None
@@ -329,6 +334,8 @@ class Display:
         plt.tight_layout()
 
         plt.savefig(self.h5_name+"-compare.png")
+        if SAVE_PDFS:
+            plt.savefig(self.h5_name+"-compare.pdf")
 
 
 if __name__ == "__main__":
