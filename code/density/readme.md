@@ -62,3 +62,5 @@ I pulled the figure and now neither in nor out has a lump, but I think that's OK
 Today I learned that the reason why the radius of the lump for the in and out models is unconstrained is because the shell has Klm proportional to the true Klm, by virtue of the density being foliated. The shell's mass therefore is set via this proportionality constant and the radius of the lump is set to zero to avoid error in the am estimate.
 
 Therefore, I'm changing the in and out definition from a foliated distribution to a spherically symmetric one. Hopefully this will yield better results.
+
+Submitted the simulation for the new in and out moments

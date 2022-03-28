@@ -63,7 +63,7 @@ def get_klms(index):
 
     return name, np.append(klms, am_this)
 
-with Pool(4) as pool:
+with Pool() as pool:
     results = pool.map(get_klms, range(len(asteroids)))
 
 for name, klms in results:
