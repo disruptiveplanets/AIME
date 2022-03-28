@@ -330,17 +330,11 @@ class TrueShape:
     def uniform():
         return lambda x, y, z: 1.0
 
-    def in_(am, k22, k20):
-        a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 + 12 * k22)
-        b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
-        c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
-        return lambda x, y, z: np.exp(-0.5 * (x*x/(a*a) + y*y/(b*b) + z*z/(c*c)))
+    def in_(am):
+        return lambda x, y, z: np.exp(-(x*x + y*y + z*z)/am**2)
 
-    def out(am, k22, k20):
-        a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 + 12 * k22)
-        b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
-        c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
-        return lambda x, y, z: np.exp(0.5 * (x*x/(a*a) + y*y/(b*b) + z*z/(c*c)))
+    def out(am):
+        return lambda x, y, z: np.exp((x*x + y*y + z*z)/am**2)
 
     def in_sph(am):
         r2 = 5/3 * am * am

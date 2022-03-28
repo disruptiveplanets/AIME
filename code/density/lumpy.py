@@ -30,6 +30,9 @@ class Lumpy(Method):
             raise Exception("You have as many or more more degrees of freedom than data points")
 
         self.shell_lms = self.calc_shell()
+
+        print("Shell lms", self.shell_lms)
+
         self.x0 = np.array([
             (self.shell_lms[1]-self.shell_lms[3]).real,
             (1j*(self.shell_lms[1]+self.shell_lms[3])).real,
@@ -150,7 +153,7 @@ class Lumpy(Method):
         
 
     def get_a(self):
-        #print("M:", self.get_m(self.xs_result, self.masses_result))
+        print("M:", self.get_m(self.xs_result, self.masses_result))
         return pinv(self.get_m(self.xs_result, self.masses_result))
 
 
@@ -165,7 +168,7 @@ class Lumpy(Method):
 
     
     def get_c(self):
-        #print("C:", self._get_c(self.xs_result, self.masses_result))
+        print("C:", self._get_c(self.xs_result, self.masses_result))
         return self._get_c(self.xs_result, self.masses_result)
 
 

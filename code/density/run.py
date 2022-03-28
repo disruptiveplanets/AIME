@@ -15,7 +15,7 @@ k22s, k20s = 0, -0.09766608
 
 asteroids = {
     "test": ("samples/den-in-0-samples.npy", 1047.477436728389, DIVISION, MAX_RADIUS,
-        Indicator.ell(1000, k22a, k20a), TrueShape.in_(1000, k22a, k20a)),
+        Indicator.ell(1000, k22a, k20a), TrueShape.in_(1000)),
     "sym-sph": ("samples/den-sym-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.sph(1000), None),
     "asym-sph": ("samples/den-asym-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
@@ -31,9 +31,9 @@ asteroids = {
     "high": ("samples/den-high-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.sph(1000), TrueShape.uniform()),
     "in": ("samples/den-in-0-samples.npy", 970.438343413496, DIVISION, MAX_RADIUS,
-        Indicator.ell(1000, k22a, k20a), TrueShape.in_(1000, k22a, k20a)),
+        Indicator.ell(1000, k22a, k20a), TrueShape.in_(1000)),
     "out": ("samples/den-out-0-samples.npy", 1027.486410666387, DIVISION, MAX_RADIUS,
-        Indicator.ell(1000, k22a, k20a), TrueShape.out(1000, k22a, k20a)),
+        Indicator.ell(1000, k22a, k20a), TrueShape.out(1000)),
     "in-sph": ("samples/den-tet-0-samples.npy", 970.7040463235109, DIVISION, MAX_RADIUS,
         Indicator.sph(1000), TrueShape.in_sph(1000)),
     "out-sph": ("samples/den-tet-0-samples.npy", 1027.798098640552, DIVISION, MAX_RADIUS,
@@ -91,9 +91,9 @@ elif len(sys.argv) == 3:
     print("Getting densities")
     method.map_density()
     method.save_density()
-    print("Getting uncertainties")
-    method.map_unc()
-    method.save_unc()
+    #print("Getting uncertainties")
+    #method.map_unc()
+    #method.save_unc()
     method.check()
 
     method.display()

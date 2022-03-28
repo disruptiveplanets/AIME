@@ -56,3 +56,9 @@ I fixed the problem with asteroid dimensions. Rerunning out.
 ## March 13
 
 I pulled the figure and now neither in nor out has a lump, but I think that's OK because the COM is not affected by the presense of a lump at the origin. If it were an axial lump (d=3) then the ratios a/c, b/c would be constrained but still not c because the COM is not affected?
+
+## March 28
+
+Today I learned that the reason why the radius of the lump for the in and out models is unconstrained is because the shell has Klm proportional to the true Klm, by virtue of the density being foliated. The shell's mass therefore is set via this proportionality constant and the radius of the lump is set to zero to avoid error in the am estimate.
+
+Therefore, I'm changing the in and out definition from a foliated distribution to a spherically symmetric one. Hopefully this will yield better results.
