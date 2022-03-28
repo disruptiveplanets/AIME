@@ -10,7 +10,8 @@ NUM_DIVISIONS = 48 # Run with 16 cores per process.
 LOW_ORDER = [(0.39269908169, 0, -0.09766608), (0.39269908169, 0.05200629, -0.2021978)][LOW_ORDER_INDEX]
 HIGH_ORDER = [0, 0, 0, 0, 0, 0, 0]
 
-PERIODS = [0.1, 0.5, 1]
+#PERIODS = [0.1, 0.5, 1, 5]
+PERIODS = [5]
 
 def get_text(cadence, period):
     return """0, 3
