@@ -46,6 +46,8 @@ def show_plot(percentiles, label):
     for name in percentiles.keys():
         if "-1-" in name or '-5-' in name:
             dir_name = name[:8]
+        if "-20-" in name:
+            dir_name = name[:9]
         else:
             dir_name = name[:10]
         with open(f"{dir_name}/{dir_name}.txt", 'r') as f:
@@ -117,7 +119,7 @@ def show_plot(percentiles, label):
     plt.savefig(f"cad-{label}.png", bbox_inches="tight")
     plt.show()
 
-PERIODS = [0.1, 0.5, 1]
+PERIODS = [0.1, 0.5, 1, 5, 20]
 
 for period in PERIODS:
     show_plot(get_percentiles(str(period)), str(period))

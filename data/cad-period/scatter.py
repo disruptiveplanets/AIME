@@ -11,7 +11,7 @@ LOW_ORDER = [(0.39269908169, 0, -0.09766608), (0.39269908169, 0.05200629, -0.202
 HIGH_ORDER = [0, 0, 0, 0, 0, 0, 0]
 
 #PERIODS = [0.1, 0.5, 1, 5]
-PERIODS = [5]
+PERIODS = [20]
 
 def get_text(cadence, period):
     return """0, 3

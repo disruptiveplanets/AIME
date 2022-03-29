@@ -1,6 +1,6 @@
 TEST = False
 
-VELOCITY_MUL = 1
+VELOCITY_MUL = 0.5
 
 import numpy as np
 import matplotlib.pyplot as plt

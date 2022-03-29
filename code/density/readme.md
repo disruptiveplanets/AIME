@@ -64,3 +64,9 @@ Today I learned that the reason why the radius of the lump for the in and out mo
 Therefore, I'm changing the in and out definition from a foliated distribution to a spherically symmetric one. Hopefully this will yield better results.
 
 Submitted the simulation for the new in and out moments
+
+## March 29
+
+The new in and out fits finished, so now I'm executing all three models on them. I also pulled the data locally and executed with a very sparse grid; you do get the correct lump. So it should work.
+
+I'd like to test whether the K3m moments are throwing off the lump for the blob asteroid.
