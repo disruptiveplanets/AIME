@@ -20,10 +20,10 @@ N_PERCENTILES = None
 
 SCALE_Y = 1.1
 
-TYPE = 'off'
+TYPE = "on"
 
 # Get percentiles
-with open(f"percentiles{TYPE}.dat", 'r') as f:
+with open(f"percentiles-{TYPE}.dat", 'r') as f:
     for line in f.readlines():
         if line == '': continue
         elements = line.split(':')
@@ -39,7 +39,10 @@ with open(f"percentiles{TYPE}.dat", 'r') as f:
 # Get true sigmas
 index = 0
 for name in percentiles.keys():
-    dir_name = name[:6]
+    if TYPE == 'off':
+        dir_name = name[:10]
+    else:
+        dir_name = name[:12]
     with open(f"{dir_name}/{dir_name}.txt", 'r') as f:
         max_j, max_l = f.readline().split(", ")
         max_j, max_l = (int(max_j), int(max_l))
@@ -56,7 +59,8 @@ for name in percentiles.keys():
     name_index[name] = index
     index += 1
     true_sigma = sigma[0]
-    phis.append(np.atan2(spin[1], spin[0]))
+    phi = np.arctan2(spin[1], spin[0])
+    phis.append(phi % (2 * np.pi))
 
 phis = np.array(phis)
 
@@ -98,10 +102,9 @@ for plot_index in range(N_DIM):
     #axs[plot_index].set_yscale('log')
 
     ax.set_xlim(np.min(phis), np.max(phis))
-    ax.axvline(x=6, color='k', linewidth=1, linestyle='dashed')
 
     if plot_index == 9:
-        ax.set_xlabel("$\\phi$")
+        ax.set_xlabel(f"$\phi$")
     else:
         ax.set_xticks([])
         
@@ -110,5 +113,7 @@ custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=1, linestyle='dashed')]
 fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='upper center', prop={'size': LEGEND_SIZE}, bbox_to_anchor=(0.5,0.91))
 
-plt.savefig(f"eq-spins{TYPE}.pdf", bbox_inches="tight")
-plt.savefig(f"eq-spins{TYPE}.png", bbox_inches="tight")
+plt.savefig(f"eq-spin-{TYPE}.pdf", bbox_inches="tight")
+plt.savefig(f"eq-spin-{TYPE}.png", bbox_inches="tight")
+
+plt.show()

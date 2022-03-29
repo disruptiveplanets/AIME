@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "cad-speed"
+PATH = "scan-eq-spin"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1

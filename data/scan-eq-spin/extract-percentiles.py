@@ -47,7 +47,7 @@ for bare in file_names:
 
     #if min_text is None:
     #    continue
-    if '-0-' in file:
+    if 'eq-spin-0-' in file:
         pf_on.write(min_text)
     else:
         pf_off.write(min_text)
