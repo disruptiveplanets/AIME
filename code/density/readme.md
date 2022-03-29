@@ -72,3 +72,5 @@ The new in and out fits finished, so now I'm executing all three models on them.
 I pulled in and out data today. Looks correct.
 
 I realized that the blob data may be for an old distribution, since the text file is out of date, so I'm rerunning.
+
+I confirmed by directly plugging in the Klms that the density distribution is indeed correct for lumpy blob if there are no high order K3ms, and happens to be true for exactly accurate K3ms too. Simulating the run on the sc then running the solver for blob.

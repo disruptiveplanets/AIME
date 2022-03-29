@@ -91,9 +91,9 @@ elif len(sys.argv) == 3:
     print("Getting densities")
     method.map_density()
     method.save_density()
-    #print("Getting uncertainties")
-    #method.map_unc()
-    #method.save_unc()
+    print("Getting uncertainties")
+    method.map_unc()
+    method.save_unc()
     method.check()
 
     method.display()
