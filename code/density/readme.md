@@ -69,4 +69,6 @@ Submitted the simulation for the new in and out moments
 
 The new in and out fits finished, so now I'm executing all three models on them. I also pulled the data locally and executed with a very sparse grid; you do get the correct lump. So it should work.
 
-I'd like to test whether the K3m moments are throwing off the lump for the blob asteroid.
+I pulled in and out data today. Looks correct.
+
+I realized that the blob data may be for an old distribution, since the text file is out of date, so I'm rerunning.
