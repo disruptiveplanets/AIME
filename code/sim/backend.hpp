@@ -46,7 +46,7 @@ private:
     void calculate_moi(double initial_roll);
     Vector3 get_torque();
     void get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, Vector3& dspin, Quaternion& dquat);
-    void calculate_poses(double velocity_mul);
+    void calculate_poses();
     bool extract_pos(double time, Vector3& position, Vector3& velocity);
     Vector3 extract_spin(Vector3 angles, Vector3 momenta);
     void compute_coefficient(int l, int m, int lp, int mp, int mpp, 
@@ -81,6 +81,7 @@ private:
     Vector3 initial_spin;
     double expire_time;
     double initial_roll;
+    double velocity_mul;
 
     //double max_quat_mag;
 };

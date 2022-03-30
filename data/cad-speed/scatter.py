@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 LOW_ORDER_INDEX = 1
-BASE_NAME = f"cad-0.5"
+BASE_NAME = f"cad-2"
 LOW_CADENCE= 2 * 60
 HIGH_CADENCE = 60 * 60
 NUM_DIVISIONS = 48 # Run with 16 cores per process.

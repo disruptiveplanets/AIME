@@ -11,14 +11,14 @@ Asteroid::Asteroid(const cdouble* jlms, const cdouble* klms, double asteroid_rad
     bool enforce_drc, double velocity_mul) :
     jlms(jlms), klms(klms), asteroid_radius(asteroid_radius), distance_ratio_cut(distance_ratio_cut),
     enforce_drc(enforce_drc), mu(central_mu), central_radius(central_radius), pericenter_pos(perigee),
-    excess_vel(speed), initial_spin(spin), initial_roll(initial_roll) {
+    excess_vel(speed), initial_spin(spin), initial_roll(initial_roll), velocity_mul(velocity_mul) {
 
     for (int i = 0; i < (ASTEROIDS_MAX_K + 1) * (ASTEROIDS_MAX_K + 1); i++) {
         klmcs[i] = klms[i].conj();
     }
 
     calculate_moi(initial_roll);
-    calculate_poses(velocity_mul);
+    calculate_poses();
 
     /*#ifdef TEXT_DEBUG
     std::cout<< "Klms: " << std::endl;
@@ -123,7 +123,7 @@ void Asteroid::get_coefficients(int l, int m, int lp, int mp, int mpp, cdouble m
     torque_z += mul * coeffs_z[index];
 }
 
-void Asteroid::calculate_poses(double velocity_mul) {
+void Asteroid::calculate_poses() {
     #ifdef TEXT_DEBUG
     auto start = std::chrono::high_resolution_clock::now();
     #endif
@@ -145,7 +145,7 @@ void Asteroid::calculate_poses(double velocity_mul) {
         velocity += POSITION_DT * accel;
         position += POSITION_DT * velocity;
         positions.push_back(position);
-        velocities.push_back(velocity * velocity_mul);
+        velocities.push_back(velocity);
     }
     
     // Add one extra position data point for the sake of interpolation
@@ -153,9 +153,9 @@ void Asteroid::calculate_poses(double velocity_mul) {
     velocity += POSITION_DT * accel;
     position += POSITION_DT * velocity;
     positions.push_back(position);
-    velocities.push_back(velocity * velocity_mul);
+    velocities.push_back(velocity);
 
-    expire_time = time;
+    expire_time = time / velocity_mul;
 
     #ifdef TEXT_DEBUG
     auto stop = std::chrono::high_resolution_clock::now();
@@ -171,11 +171,11 @@ bool Asteroid::extract_pos(double time, Vector3& position, Vector3& velocity) {
         flip = true;
         time *= -1;
     }
-    int time_index = time / POSITION_DT;
+    int time_index = time * velocity_mul / POSITION_DT;
     if (time > expire_time) {
         return false;
     }
-    double mixer = (time - time_index * POSITION_DT) / POSITION_DT;
+    double mixer = (time * velocity_mul - time_index * POSITION_DT) / POSITION_DT;
 
     #ifdef SEGFAULT_DEBUG
     if (time_index + 1 >= (int)positions.size()) {
@@ -337,6 +337,8 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
             resolved_data.push_back(global_spin[0]);
             resolved_data.push_back(global_spin[1]);
             resolved_data.push_back(global_spin[2]);
+
+            std::cout << time << '\t' << position << '\t' << velocity << std::endl;
 
             #ifdef PRINT_MOMENTUM_ENERGY
             Vector3 local_momentum = Matrix3({moi[0], 0, 0, 0, moi[1], 0, 0, 0, moi[2]}) * spin;
