@@ -28,7 +28,7 @@ def get_texts(theta, phi, dk=D_K):
 1.0 # J00 (must be 1)
 1.0 # K00 (must be 1)
 0 0 0 # K1 (must be 0)
-{0.05200629}, 0, 0, 0, {-0.2029789-dk} # K2 (must be x 0 0 0 y)
+{0.05200629-dk}, 0, 0, 0, {-0.2029789} # K2 (must be x 0 0 0 y)
 1000.0 # radius (remember it's not really the radius)
 {spin[0]}, {spin[1]}, {spin[2]}
 {0.39269908169} # Initial roll
