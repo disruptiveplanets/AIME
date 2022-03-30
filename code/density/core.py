@@ -1,7 +1,7 @@
 from re import L
 import numpy as np
 from scipy.special import lpmv, factorial
-from scipy.linalg import norm
+from scipy.linalg import norm, eigh
 from scipy.spatial.transform import Rotation
 from display import make_gif, make_slices
 import warnings, os
@@ -72,16 +72,23 @@ class Method:
         return out.real
 
     def get_unc(self, x,y,z):
+
+
+        mean = np.nanmean(self.map_density())
+
+
         if self.final_uncertainty:
             b = self.get_b(x,y,z)
             if self.finite_element:
-                return np.sqrt(self.unc[b]).real
+                out = np.sqrt(self.unc[b].real).real
+                return out
+
             else:
                 if len(x.shape) > 0:
                     b = b.reshape(-1, b.shape[-1])
                     return np.array([np.sqrt(e @ self.unc @ e)[0] for e in b]).reshape(x.shape).real
                 else:
-                    out = np.sqrt(b @ self.unc @ b.transpose()).real
+                    out = np.sqrt((b @ self.unc @ b.transpose()).real)
                     if type(out) != np.float64:
                         return out[0].real
                     return out.real
