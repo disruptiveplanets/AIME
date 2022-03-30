@@ -1,15 +1,15 @@
 import sys, os
 
 names = [
-    #"sym-sph", 
-    #"asym-sph", 
-    #"sym-ell", 
-    #"asym-ell", 
-    #"tet", 
-    #"db", 
-    #"high", 
-    #"in", 
-    #"out", 
+    "sym-sph", 
+    "asym-sph", 
+    "sym-ell", 
+    "asym-ell", 
+    "tet", 
+    "db", 
+    "high", 
+    "in", 
+    "out", 
     "blob"
 ]
 

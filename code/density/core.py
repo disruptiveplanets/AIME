@@ -1,3 +1,4 @@
+from re import L
 import numpy as np
 from scipy.special import lpmv, factorial
 from scipy.linalg import norm
@@ -53,9 +54,9 @@ class Method:
 
             if self.asteroid.sigma_data is not None:
                 if self.finite_element:
-                    self.unc = np.einsum('ij,jk,ik->i', a, self.asteroid.sigma_data, a.conj())# Diagonal entries
+                    self.unc = np.einsum('ij,jk,ik->i', a, self.asteroid.sigma_data, a)# Diagonal entries
                 else:
-                    self.unc = a @ self.asteroid.sigma_data @ a.transpose().conj()
+                    self.unc = a @ self.asteroid.sigma_data @ a.transpose()
 
 
     def get_density(self, x,y,z):
@@ -78,9 +79,9 @@ class Method:
             else:
                 if len(x.shape) > 0:
                     b = b.reshape(-1, b.shape[-1])
-                    return np.array([np.sqrt(e @ self.unc @ e.conj())[0] for e in b]).reshape(x.shape).real
+                    return np.array([np.sqrt(e @ self.unc @ e)[0] for e in b]).reshape(x.shape).real
                 else:
-                    out = np.sqrt(b @ self.unc @ b.transpose().conj()).real
+                    out = np.sqrt(b @ self.unc @ b.transpose()).real
                     if type(out) != np.float64:
                         return out[0].real
                     return out.real
@@ -151,9 +152,11 @@ class Method:
             true_densities /= np.nanmean(true_densities)
             if self.final_uncertainty:
                 ratios = (true_densities - display_densities) / (display_densities * display_uncs)
-                print("Average ratios over body:", np.nanmean(ratios), "(absolute value: ", np.nanmean(np.abs(ratios)), ")")
                 make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r", self.klm_error, balance=True)
                 make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r.gif", duration=duration, balance=True)
+
+                for p in 10 * np.arange(11):
+                    print(f"Ratio percentile {p} = {np.nanpercentile(ratios, p)}")
             else:
                 difference = (true_densities - display_densities) / true_densities
 

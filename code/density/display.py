@@ -100,7 +100,7 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
 
     want_min, want_max = np.nanpercentile(densities, 1), np.nanpercentile(densities, percentile)
     if balance:
-        want_max = max(want_max, -want_min)
+        want_max = min(want_max, -want_min)
         want_min = -want_max
         if want_max < want_min:
             want_max, want_min = want_min, want_max

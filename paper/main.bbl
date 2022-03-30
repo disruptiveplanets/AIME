@@ -31,6 +31,11 @@ Baxansky A.,  Kiryati N.,  2007, \mn@doi [Pattern Recognition]
 Boué G.,  Laskar J.,  2009, \mn@doi [Icarus]
   {https://doi.org/10.1016/j.icarus.2009.02.001}, 201, 750
 
+\bibitem[\protect\citeauthoryear{Giorgini, Benner, Nolan  \& Ostro}{Giorgini
+  et~al.}{2005}]{giorgini2005recent}
+Giorgini J.,  Benner L.,  Nolan M.,   Ostro S.,  2005, in AAS/Division of
+  Dynamical Astronomy Meeting\# 36. pp 02--01
+
 \bibitem[\protect\citeauthoryear{Hou, Scheeres  \& Xin}{Hou
   et~al.}{2017}]{HouMar2017}
 Hou X.,  Scheeres D.~J.,   Xin X.,  Mar 2017, Celestial Mechanics and Dynamical
@@ -48,6 +53,12 @@ Cambridge University Press
 
 \bibitem[\protect\citeauthoryear{Paul}{Paul}{1988}]{paul88}
 Paul M.~K.,  1988, \mn@doi [Celestial mechanics] {10.1007/BF01230706}, 44, 49
+
+\bibitem[\protect\citeauthoryear{Smalley, Garradd, Benner, Nolan, Giorgini,
+  Chesley, Ostro  \& Scheeres}{Smalley et~al.}{2005}]{smalley20052004}
+Smalley K.,  Garradd G.,  Benner L.,  Nolan M.,  Giorgini J.,  Chesley S.,
+  Ostro S.,   Scheeres D.,  2005, International Astronomical Union Circular,
+  8477, 1
 
 \bibitem[\protect\citeauthoryear{van Gelderen}{van
   Gelderen}{1998}]{Gelderen1998TheSO}

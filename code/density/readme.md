@@ -74,3 +74,9 @@ I pulled in and out data today. Looks correct.
 I realized that the blob data may be for an old distribution, since the text file is out of date, so I'm rerunning.
 
 I confirmed by directly plugging in the Klms that the density distribution is indeed correct for lumpy blob if there are no high order K3ms, and happens to be true for exactly accurate K3ms too. Simulating the run on the sc then running the solver for blob.
+
+I also learned that the uncertainty equation was slightly wrong, so I'm rerunning all the figures so that it can be redone.
+
+Uncertainty can be very low sometimes, when a certain point depends only on Klm components which are not uncertain. The equatorial plane seems to be an example, but I don't understand why; they depend on both inertial axes, right?
+
+Maybe this doesn't matter. I'm just going to run the figs tomorrow.
