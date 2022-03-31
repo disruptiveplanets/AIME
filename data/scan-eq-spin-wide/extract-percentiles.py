@@ -11,8 +11,7 @@ plt.style.use("jcap")
 file_names = os.listdir()
 file_names.sort()
 
-pf_off = open("percentiles-off.dat", 'w')
-pf_on = open("percentiles-on.dat", 'w')
+pf = open("percentiles.dat", 'w')
 
 for bare in file_names:
     if not os.path.isdir(bare):
@@ -47,11 +46,7 @@ for bare in file_names:
 
     #if min_text is None:
     #    continue
-    if 'eq-spin-0-' in file:
-        pf_on.write(min_text)
-    else:
-        pf_off.write(min_text)
+    pf.write(min_text)
     print(bare, min_dist)
 
-pf_off.close()
-pf_on.close()
+pf.close()

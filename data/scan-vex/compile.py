@@ -110,3 +110,5 @@ fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='upper center', p
 
 plt.savefig("vex.pdf", bbox_inches="tight")
 plt.savefig("vex.png", bbox_inches="tight")
+
+plt.show()

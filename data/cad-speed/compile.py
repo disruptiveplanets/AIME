@@ -117,7 +117,7 @@ def show_plot(percentiles, label):
     plt.savefig(f"cad-{label}.png", bbox_inches="tight")
     plt.show()
 
-VELS = [0.5, 2]
+VELS = [2]
 
 for vel in VELS:
     show_plot(get_percentiles(str(vel)), str(vel))

@@ -338,8 +338,6 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
             resolved_data.push_back(global_spin[1]);
             resolved_data.push_back(global_spin[2]);
 
-            std::cout << time << '\t' << position << '\t' << velocity << std::endl;
-
             #ifdef PRINT_MOMENTUM_ENERGY
             Vector3 local_momentum = Matrix3({moi[0], 0, 0, 0, moi[1], 0, 0, 0, moi[2]}) * spin;
             Vector3 global_momentum = quat.rotate(local_momentum);

@@ -80,3 +80,8 @@ I also learned that the uncertainty equation was slightly wrong, so I'm rerunnin
 Uncertainty can be very low sometimes, when a certain point depends only on Klm components which are not uncertain. The equatorial plane seems to be an example, but I don't understand why; they depend on both inertial axes, right?
 
 Maybe this doesn't matter. I'm just going to run the figs tomorrow.
+
+
+## March 30
+
+I fixed a bug with square rooting a complex number and redrew the shapes in the Sc.

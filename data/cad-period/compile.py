@@ -26,7 +26,7 @@ def get_percentiles(include):
             if line == '': continue
             elements = line.split(':')
             name = elements[0]
-            if f"-{include}-" not in name:
+            if f"cad-{include}-" not in name:
                 continue
             perc_array = []
             for percs in elements[1:]:
@@ -46,7 +46,7 @@ def show_plot(percentiles, label):
     for name in percentiles.keys():
         if "-1-" in name or '-5-' in name:
             dir_name = name[:8]
-        if "-20-" in name:
+        elif "-20-" == name[3:7]:
             dir_name = name[:9]
         else:
             dir_name = name[:10]
@@ -119,7 +119,7 @@ def show_plot(percentiles, label):
     plt.savefig(f"cad-{label}.png", bbox_inches="tight")
     plt.show()
 
-PERIODS = [0.1, 0.5, 1, 5, 20]
+PERIODS = [ 20, 0.1, 0.5, 1, 5,]
 
 for period in PERIODS:
     show_plot(get_percentiles(str(period)), str(period))
