@@ -102,9 +102,9 @@ for plot_index in range(N_DIM+1):
             cart_line.append(interp(p[0], p[1], p[2]))
         cart_array.append(cart_line)
 
-    vmax=np.mean(cart_array) * 3
-    im = axs[plot_index].pcolormesh(Lon, Lat, cart_array, vmin=0, cmap='Blues_r', vmax=vmax)#, vmax=np.max(data), vmin=np.min(data))
-    cbar = fig.colorbar(im, ax=axs[plot_index])
+    vmax = np.percentile(cart_array, 95)
+    im = axs[plot_index].pcolormesh(Lon, Lat, cart_array, vmin=np.min(cart_array), vmax=vmax, cmap='Blues_r')
+    cbar = fig.colorbar(im, ax=axs[plot_index], extend='max')
     if i < 3:
         cbar.set_label(f"$\sigma({param_names[i]})$ ($\\times 10^{{-7}})$")
     else:
@@ -146,7 +146,7 @@ for i, lat in enumerate(lats):
     cart_array.append(np.array(cart_line))
 
 fig, ax = plt.subplots(figsize=(6,5), ncols=1, nrows=1, subplot_kw=dict(projection="mollweide"))
-im = ax.pcolormesh(Lon, Lat, cart_array, vmin=0, cmap='Blues_r')#, vmax=np.max(data), vmin=np.min(data))
+im = ax.pcolormesh(Lon, Lat, cart_array, vmin=0, cmap='Blues_r')
 cbar = fig.colorbar(im, ax=ax, orientation='horizontal')
 cbar.set_label(f"$\overline{{\sigma}}$")
 ax.scatter(theta_phis[:,1], theta_phis[:,0], s=1, c='k')
@@ -161,7 +161,7 @@ plt.savefig("avg-pole-mollweide.pdf")
 plt.savefig("avg-pole-mollweide.png")
 
 fig, ax = plt.subplots(figsize=(6,5), ncols=1, nrows=1, subplot_kw=dict(projection="polar"))
-im = ax.pcolormesh(Lon, Lat, cart_array, vmin=0, cmap='Blues_r')#, vmax=np.max(data), vmin=np.min(data))
+im = ax.pcolormesh(Lon, Lat, cart_array, vmin=0, cmap='Blues_r')
 cbar = fig.colorbar(im, ax=ax)
 cbar.set_label(f"$\overline{{\sigma}}$")
 fig.tight_layout()

@@ -213,8 +213,8 @@ In practice, we also observe that $|K_{3m}| < 1$; typically, $|K_{3m}| < 0.1$ ev
 
 
 
-\subsection{Equations of motion}
-\label{sec:eom}
+\subsection{Tidal torque}
+\label{sec:tidal-torque}
 
 Derivations for the tidal torque experienced by a rigid body in the gravitational field of a larger mass have been computed by several previous studies \cite{paul88,HouMar2017,BOUE2009750, ashenberg07}, often in terms of the moment of inertia of the rigid body (or higher order moments of inertia), and to varying degrees of precision. We present a novel derivation of the tidal torque to arbitrary orders in terms of the density moments of an asteroid defined in section \ref{sec:moments}. This formulation of the problem will be more useful for this study.
 
@@ -275,9 +275,15 @@ tidal torque can now be expressed as a function only of $J_{\ell m}$, $K_{\ell m
 
 Equation \ref{eqn:tidal-torque} possesses a few explicit properties which we discuss before writing the asteroid equations of motion. Firstly, $K_{00}$ does not appear, so that $\bm \tau$ is independent of asteroid mass. The mean density of the asteroid is therefore not constrained by tidal torque analysis. Secondly, torque is largest when $D$ is small (as expected). Thirdly, each $J_{\ell m}K_{\ell' m'}$ term is multiplied by $(D/a_M)^\ell (D/a_m)^{\ell'}$, the latter of which especially is a small number in most cases. Equation \ref{eqn:tidal-torque} can therefore be computed approximately by removing terms of large $\ell$. For our analysis, we remove $\ell > 3$.
 
-Further insight can be gained by asking when $\bm \tau = 0$. This occurs to first order when (1) $\alpha=\phi$ (or  $\alpha=\phi+\pi$) and $\beta =\pi/2$, and (2) when $\alpha=\phi\pm\pi/2$ and $\gamma$ is an integer multiple of $\pi/2$. Here, $\phi$ is the angle between perigee and $\bm D$. At perigee ($\phi=0$), these correspond to (1) $\unit z \parallel \unit X$ and (2) $\unit z$ is in the $\unit{Y}\unit{Z}$-plane with an additional condition on $\gamma$.
+Further insight can be gained by remarking the value of the first order of $\bm \tau$ for particular Euler angle cases. Setting $\beta = 0$ produces diagonal Wigner-$D$ matrices, and hence $\bm \tau \parallel \unit z$ to first order. Further, the component $\tau_z$ oscillates, so that for certain values of $\alpha$ and $\gamma$, $\bm \tau = 0.$ This $\beta=0$ condition is equivalent to $\unit z \parallel \unit Z$.
 
-Also important is when $\bm \tau \parallel \unit z$; this case has special meaning because for a non-tumbling asteroid, $\omega \parallel \unit z$, and $\tau \parallel \unit z$ ensures that the asteroid will continue not to tumble. Setting $\beta = 0$ produces diagonal Wigner-$D$ matrices, and hence $\bm \tau \parallel \unit z$ to first order. Setting $\alpha = \phi \pm \pi/2$ also forces $\bm \tau \parallel \unit z$ to first order.
+For $\beta = \pi/2$, there are two interesting cases. One is for $\alpha = \phi$ or $\alpha = \pi + \phi$, where $\phi$ is the angle between the asteroid and the perigee. In this case, $\tau = 0$ to first order. The second case is $\alpha = \phi \pm \pi/2$, when again $\bm \tau \parallel \unit z$ and $\tau_z$ oscillates. At perigee ($\phi=0$), these conditions are equivalent to $\unit z \parallel \unit X$ and $\unit z \parallel \unit Y$ respectively.
+
+The $\bm \tau \parallel \unit z$ cases are interesting because they do not induce tumbling. If velocity is $\bm \omega \parallel \unit z$ (a non-tumbling state), then $\bm \omega \parallel \bm L$ and $\bm \tau = \dot{\bm L} \parallel \dot{\bm \omega}$ so that $\bm \omega$ remains parallel to $\unit z$ and non-tumbling. These cases of torque are additionally significant because not as many terms contribute to $\tau_z$ as to $\tau_x$ and $\tau_y$, and in general we see that $|\tau_z|$ is the smallest of the torque components.
+
+\subsection{Equations of motion}
+\label{sec:eom}
+
 
 The equations of motion of the asteroid position $\bm D$ are given by Newton's law of gravitation:
 \begin{equation}
@@ -424,7 +430,7 @@ Figure \ref{fig:scan-vex} demonstrates that parameter precision does not depend 
   \label{fig:scan-perigee}
 \end{figure}
 
-Figure \ref{fig:scan-perigee} shows much stronger dependence of parameter uncertainty on perigee distance, as expected by the factor of $(a_m/D)^{\ell'}$ present in equation \ref{eqn:tidal-torque} and mentioned in section \ref{sec:eom}. For $r_p \approx 10$ Earth radii, the most uncertain parameter $K_{30}$ fills the prior distribution, with uncertainty ranging from -1 to 1. Near $r_p \approx 40$ Earth radii, the $K_{32}$ and $K_{31}$ components also fill the prior. However, the width of the prior was arbitrarily chosen, and all the physical density distributions have $|K_{3m}| < 0.1$ \jtd{Check}, so the actual Earth radii cutoff at which the $K_{3m}$ parameter estimates become too imprecise to be usable likely occurs at lower $r_p$. The exact value depends on the shape of the asteroid, but \jtd{When is it 0.1?}
+Figure \ref{fig:scan-perigee} shows much stronger dependence of parameter uncertainty on perigee distance, as expected by the factor of $(a_m/D)^{\ell'}$ present in equation \ref{eqn:tidal-torque} and mentioned in section \ref{sec:tidal-torque}. For $r_p \approx 10$ Earth radii, the most uncertain parameter $K_{30}$ fills the prior distribution, with uncertainty ranging from -1 to 1. Near $r_p \approx 40$ Earth radii, the $K_{32}$ and $K_{31}$ components also fill the prior. However, the width of the prior was arbitrarily chosen, and all the physical density distributions have $|K_{3m}| < 0.1$ \jtd{Check}, so the actual Earth radii cutoff at which the $K_{3m}$ parameter estimates become too imprecise to be usable likely occurs at lower $r_p$. The exact value depends on the shape of the asteroid, but \jtd{When is it 0.1?}
 
 \begin{table}
   \centering
@@ -576,7 +582,7 @@ Qualitatively, \ref{fig:observation-gap} shows similar dependence of $\sigma$ on
 \subsection{Initial spin pole}
 \label{sec:scan-spin}
 
-The tidal torque experienced by the asteroid is affected by the initial direction of asteroid spin $\bm \omega_0$ both because spin sets the initial asteroid orientation (up to $\gamma_0$) and because of the spin-dependence of the rotational equations of motion (equation \ref{eqn:omega-eom}). As an example, in section \ref{sec:eom}, we noted that $\bm \omega_0 \parallel \unit Z$ leads to $\bm \tau = 0$ and therefore all parameters are unconstrained.
+The tidal torque experienced by the asteroid is affected by the initial direction of asteroid spin $\bm \omega_0$ both because spin sets the initial asteroid orientation (up to $\gamma_0$) and because of the spin-dependence of the rotational equations of motion (equation \ref{eqn:omega-eom}). As an example, in section \ref{sec:tidal-torque}, we noted that $\bm \omega_0 \parallel \unit Z$ leads to $\bm \tau = 0$ and therefore all parameters are unconstrained.
 
 In figure \ref{fig:scan-spin}, we display 1-$\sigma$ uncertainties for all parameters as a function of the direction of $\bm \omega_0$, mapped onto the sky in the inertial frame. Our samples for $\bm \omega_0$ were laid out on a Fibonacci sphere to ensure they were evenly spaced (marked in figure \ref{fig:scan-spin-avg}). To highlight common features across the parameters, we also display the average 1-$\sigma$ sensitivity in figure \ref{fig:scan-spin-avg}. The average is weighted such that the uncertainty map for each parameter contributes an equal amount
 (the weight of each map is set to one-tenth of the map's mean). This average map is presented in two different projections to allow data at $\unit Z$ to be read.
@@ -584,7 +590,7 @@ In figure \ref{fig:scan-spin}, we display 1-$\sigma$ uncertainties for all param
 \begin{figure*}
   \centering
   \includegraphics[width=\textwidth]{figs/spin-pole.pdf}
-  \caption{$1-\sigma$ uncertainties for the first-order parameters (\textit{top}) and second-order (\textit{bottom}) as a function of the initial direction of spin. All maps are made in the Mollweide projection and shown in the inertial $\unit X-\unit Y-\unit Z$ frame. The orange star indicates the reference spin pole.}
+  \caption{$1-\sigma$ uncertainties for the first-order parameters (\textit{top}) and second-order (\textit{bottom}) as a function of the initial direction of spin in the inertial frame. All maps are made in the Mollweide projection and shown in the inertial $\unit X-\unit Y-\unit Z$ frame. The orange star indicates the reference spin pole.}
   \label{fig:scan-spin}
 \end{figure*}
 
@@ -596,16 +602,11 @@ In figure \ref{fig:scan-spin}, we display 1-$\sigma$ uncertainties for all param
   \label{fig:scan-spin-avg}
 \end{figure*}
 
-Figure \ref{fig:scan-spin-avg} confirms our expectation that the fit parameters would be uncertain near $\bm \omega \propto \unit Z$, where $\bm \tau \parallel \unit z$. The $\unit z \parallel \unit X$ zero-torque setting doesn't appear in the figure however, likely because torque is large enough at $\phi \neq 0$ that the fact that $\unit z \parallel \unit X$ provides $\bm \tau = 0$ at $\phi = 0$ is not enough.
+The characteristics of tidal torque discussed in section \ref{sec:tidal-torque} indicate that certain alignments of the body-fixed frame to the inertial frame lead to special conditions on torque: $\bm z \parallel \unit Z$ and $\bm z \parallel \unit Y$ at perigee lead to $\bm \tau \parallel \unit z$ to first order, and $\bm \tau \parallel \unit X$ at perigee leads to $\bm \tau = 0$ to first order. We relate this to the initial direction of $\bm \omega_0$, via the crude assumption that $\bm \tau$ is small until perigee. Then, since $\bm \omega_0 \parallel \unit z$ by assumption that the asteroid is not tumbling, we have that $\bm \omega_0 \parallel \unit Y$ and $\bm \omega_0 \parallel \unit Z$ lead to $\bm \tau \parallel \unit z$, and $\bm \omega_0 \parallel \unit X$ leads to $\bm \tau = 0$.
 
-The other predicted $\bm \omega_0$ resulting in lack of precision were for $\alpha = \phi \pm \pi/2$, which causes $\bm \tau \propto \unit z$ and $\bm \tau = 0$ when $\gamma$ is an integer multiple of $\pi/2$. There does appear to be an associated lack of precision at $\bm \omega_0 \propto \unit Y$ (the $\phi=0$ case) \jtd{Why?}
+Figure \ref{fig:scan-spin-avg} shows area of increased uncertainty for $\bm \omega_0 \parallel \unit Z$ and $\bm \omega_0 \parallel \unit Y$, but not the $\unit X$ case. This indicates that $\bm \tau \parallel \unit z$ causes increased uncertainty. Physically, $\bm \tau \parallel \unit z$ only changes an asteroid's rotational period and does not cause it to tumble, eliminating the ability to discern moment of inertia ratios from zero-torque precession after the flyby. Also, $\tau_z$ is small and affected by fewer parameters than $\tau_x$ or $\tau_y$.  Both of these are reasons why $\bm \tau \parallel z$ might inhibit precise fits to spin data. If $\bm \tau = 0$ to first order, then second-order $\tau$ and non-perigee $\bm \tau$ will dominate, and these may indeed induce precession.
 
-\jtd{To figure this out, I'm running some searches for spins along the equator. Hope to see the same peak at Y, and I'll see if it goes away for an iteration when gamma zero changes.}
-
-\jtd{Tomorrow, I plan to do the rest of this paper and skip this section. If I can't figure it out, I'll remove it.}
-
-\jtd{Remember to include the changes when a fast rotator comes in.}
-
+It is important to note, however, that uncertainty does not vary by much more than a factor of two outside the imprecise regions of $\bm \omega_0 \parallel \unit Z$ and $\bm \omega_0 \parallel \unit Y$, though these regions are wide for some parameters. Within the imprecise regions, uncertainty can grow up to four times the uncertainty at other $\bm \omega_0$ values, and possibly higher. The trends for are roughly consistent across parameters (figure \ref{fig:scan-spin}), leading to clearly visible imprecise regions in figure \ref{fig:scan-spin-avg}
 
 
 \subsection{Oblateness}

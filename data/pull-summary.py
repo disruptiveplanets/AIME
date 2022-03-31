@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "scan-eq-spin-wide"
+PATH = "cad-period"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1
