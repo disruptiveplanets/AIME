@@ -17,3 +17,7 @@ Pulled last two data points, made display prettier, and wrote text. However, I h
 ## Feb 4
 
 In generate, I did some bug testing. I believe that the bald spot at +- Y is a balancing effect over the orbit, choosing an alpha that minimizes total torque. Looking at one point in the orbit is not valid. Wrote up the paper and I'm counting this issue as finally finished. I also made the symmetric plot for the display of dependence on initial conditions.
+
+## March 31
+
+I finally resolved the problem of why the data is more uncertain at Y. It's because here tau propto z, whereas at x it is zero and third order and non-perigee effects dominate. Propto z is bad for certainty because some klm are poorly constrained and because it induces no tumbling. The section is now done.

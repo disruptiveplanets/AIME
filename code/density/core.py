@@ -73,10 +73,6 @@ class Method:
 
     def get_unc(self, x,y,z):
 
-
-        mean = np.nanmean(self.map_density())
-
-
         if self.final_uncertainty:
             b = self.get_b(x,y,z)
             if self.finite_element:

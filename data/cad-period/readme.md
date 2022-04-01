@@ -13,3 +13,7 @@ No bulge is visible. I'm thinking that I'll run another one with larger period l
 ## March 29
 
 Pulled data today. Bulge appears in same place, but still a little chunky. I'm going to add a 20 hour period.
+
+## March 31
+
+I pulled the last data point today and have enough data to assess period. Tomorrow I will also have enough data to assess the speed at encounter, and that should be enough.
