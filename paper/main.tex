@@ -81,9 +81,15 @@ $^{2}$Department of Earth, Atmospheric, and Planetary Science, Massachusetts Ins
 
 \section{Introduction}
 
-\jtd{Write}
+The recent increase in the quantity and quality of high-sensitivity, all-sky surveys, such as the Wide-field Infrared Survey Explorer (WISE) mission \cite{wright2010wide} has prompted the discovery of numerous asteroids, some kilometer-sized, and some predicted to encounter Earth or other planets closely in the near future. Theoretical work has demonstrated that many of these asteroids incur altered rotational velocities due to tidal torque \cite{paul88, SCHEERES2000106, ashenberg07, BOUE2009750, HouMar2017}; this two-body generalized system has been studied to several orders and with several different methods. The angular velocity changes induced by tidal torque occur both in asteroid binaries \cite{Naidu_2015}, and during planetary encounters \cite{RICHARDSON199847, scheeres2004evolution}. Such asteroids need not be tidally disrupted for their rotation state to be perturbed by tidal torque. Some examples of altered rotational velocity have recently been observed, including for (367943) Duende \cite{MOSKOVITZ2020113519, benson2020spin}, and have been predicted for the 2029 encounter of (99942) Apophis with Earth \cite{SCHEERES2005281}. Altered rotational states have been excluded for 1I/2017 U1 'Oumuamua \cite{KWIECINSKI2018170}. 
 
-In this paper, \jtd{Etc.} Section \ref{sec:methods} describes the coordinates and parameters we use to model the encounter and gives the equation of motion and simulation design used to generate synthetic encounter data. Section \ref{sec:fit} describes how density moments are re-extracted from synthetic data and the sensitivity of the precision of re-extracted moments on various system parameters. Section \ref{sec:results} describes how our posterior uncertainties on density moments depend on various physical parameters of the system. Finally, we provide several models to extract density distributions from the density moments in section \ref{sec:distros} and compare their accuracy and precision.
+Such asteroid encounters have further been shown to reveal the physical properties of the encountering asteroid. Refs.~\cite{MOSKOVITZ2020113519, benson2020spin} extract best-fit dimensions for a triaxial ellipsoid model of Duende from light-curve data, and Refs.~\cite{DESCAMPS2020113726} and \cite{BERTHIER2020113990} extract bulk densities and rotational periods for asteroid binaries (3905) Doppler and (617) Patroclus respectively.
+
+More encounter candidates are likely to be discovered in the future --- for Earth or other planets --- potentially by the James Webb Space Telescope (JWST) or Large-aperture Synoptic Survey Telescope (LSST), and general methods for assessing whether an asteroid's encounter properties are conducive to the extraction physical asteroid characteristics from light-curve data is necessary. However, such general statements are not very well studied, since much of previous research has focused on specific encounters.
+
+Additionally, asteroid properties which are constrained only by beyond-leading-order tidal torque effects have not yet been extracted, and more research is needed to study whether these effects are, in fact, observable.
+
+In this paper, we address these two topics by deriving a new equation of motion for an asteroid encounter system in section \ref{sec:methods}. This equation is simple and exact to arbitrary order, given assumptions reasonable for a planetary encounter (and many binary systems). It is also fast in that it allows volume integrals over the asteroid to be pre-computed. We use this equation of motion to simulate a generic asteroid flyby of Earth, and extract physical characteristics of the asteroid (specifically, density moments) from synthetic data via a Markov Chain Monte Carlo (MCMC) fit, described in section \ref{sec:fit}. We measure the uncertainties in the posterior distribution of density moments as a function of various encounter parameters such as the observational uncertainty, cadence of observation, encounter orbital parameters, and more. We express which parameters most affect the precision of fit results in section \ref{sec:results}. Finally, we propose methods to extract full density distributions with uncertainties from these density moments in section \ref{sec:distros}.
 
 \section{Methods}
 \label{sec:methods}
@@ -145,16 +151,18 @@ These spherical harmonics obey many useful identities summarized in Ref.~\cite{G
 
 The density moments of an asteroid are defined as
 \begin{equation}
-  K_{\ell m} \frac{1}{\mu_m a_m^\ell} \int_\mathcal{A} d^3 r \rho_m(\bm r) R_{\ell m}(\bm r).
+  K_{\ell m} - \frac{1}{\mu_m a_m^\ell} \int_\mathcal{A} d^3 r \rho_m(\bm r) R_{\ell m}(\bm r).
   \label{eqn:klm}
 \end{equation}
-Here, $\mathcal{A}$ indicates the volume of the asteroid, $\mu_m$ is the mass of the asteroid, $\rho_m(\bm r)$ is the density distribution, and $a_m$ is a length scale defined (for reasons covered later) as 
+Note that these are complex. Here, $\mathcal{A}$ indicates the volume of the asteroid, $\mu_m$ is the mass of the asteroid, $\rho_m(\bm r)$ is the density distribution, and $a_m$ is a real length scale defined (for reasons covered later) as 
 \begin{equation}
   a_m^2 = \frac{1}{\mu_m} \int_\mathcal{A} d^3 r \rho(\bm r) r^2.
   \label{eqn:am}
 \end{equation}
-This length scale can be thought of as akin to the radius of the asteroid (although a spherical asteroid has radius $\sqrt{5/3} a_m$).
-Both of these equations should be computed in the body-fixed axes. These equations can be extended to the central body:
+This length scale can be thought of as akin to the radius of the asteroid (although a spherical, uniform-density asteroid has radius $\sqrt{5/3} a_m$).
+Both of these equations should be computed in the body-fixed axes.
+
+Equations \ref{eqn:klm} and \ref{eqn:am} can be extended to the central body:
 \begin{equation}
   \begin{split}
     &J_{\ell m} = \frac{1}{\mu_M a_M^\ell} \int_\mathcal{B} d^3 r \rho_M(\bm r) R_{\ell m}(\bm r)\\
@@ -162,9 +170,11 @@ Both of these equations should be computed in the body-fixed axes. These equatio
   \label{eqn:jlm}
   \end{split}
 \end{equation}
-which should be computed in the inertial axes. Note that both $J_{\ell m}$ and $K_{\ell m}$ are unitless. We call them ``moments'' because the $R_{\ell m}(\bm r)$ contains an $r^\ell$ dependence so that $K_{\ell m}$ is the $\ell$th mass moment of the asteroid.
+which should be computed in the inertial axes.
 
-These moments share several key properties which we discuss before continuing. Firstly, for real mass density, properties of the spherical harmonics imply that $K_{\ell m} = (-1)^m K_{\ell, -m}^*$. Therefore, the set of $K_{\ell m}$ for $\ell < L$ provides $L^2$ degrees of freedom. However, some of these degrees of freedom should be removed as discussed below.
+Note that both $J_{\ell m}$ and $K_{\ell m}$ are unitless. We call them ``moments'' because the $R_{\ell m}(\bm r)$ contains an $r^\ell$ dependence so that $K_{\ell m}$ is the $\ell$th mass moment of the asteroid.
+
+These moments share several key properties which we discuss before continuing. Firstly, for real mass density, properties of the spherical harmonics imply that $K_{\ell m} = (-1)^m K_{\ell, -m}^*$. Therefore, the set of $K_{\ell m}$ for $\ell < \ell_\text{max}$ provides $\ell_\text{max}^2$ degrees of freedom. However, some of these degrees of freedom are additionally constrained as discussed below.
 
 By definition, $K_{00}=1$. Furthermore, $K_{1m} = 0$ since the body-fixed frame is centered on the asteroid center of mass. Further calculation reveals that the alignment of the body-fixed frame with the asteroid principal axes also forces $K_{21}=K_{2,-1} = 0$ and $\Im K_{22}=0$. The only physical density moments for $\ell \leq 2$ are therefore $K_{22}$ and $K_{20}$, which are related to the moment of inertia around each principal axis by
 \begin{equation}
@@ -187,7 +197,8 @@ The physical meaning of $K_{22}$ and $K_{20}$ can be made even more clear in the
   \end{split}
 \end{equation}
 
-The physical meaning of the higher-order moments $K_{3m}$ can be gleaned by assessing their symmetry properties. An asteroid that is mirror-symmetric along the $\unit{x}$ axis (meaning $\rho_m(x,y,z)=\rho_m(-x,y,z)$) necessarily sets certain density moments to zero. Which density moments are zeroed by which mirror symmetries is outlined in table \ref{tab:klm-symmetries}. Note that, while no mirror symmetries set $K_{00}$, $K_{20}$, or $K_{22}=0$, mirror symmetries exist which zero all the other moments, including $K_{3m}$. $\Re K_{32}$, $K_{31}$, and $K_{30}$ are the only $K_{3m}$ components zeroed by only one axis. We will see later that \jtd{see what?}.
+The physical meaning of the higher-order moments $K_{3m}$ can be gleaned by assessing their symmetry properties. An asteroid that is mirror-symmetric along the $\unit{x}$ axis (meaning $\rho_m(x,y,z)=\rho_m(-x,y,z)$) necessarily sets certain density moments to zero. Which density moments are zeroed by which mirror symmetries is outlined in table \ref{tab:klm-symmetries}. Note that, while no mirror symmetries set $K_{00}$, $K_{20}$, or $K_{22}=0$, mirror symmetries exist which zero all the other moments, including $K_{3m}$. $\Re K_{32}$, $K_{31}$, and $K_{30}$ are the only $K_{3m}$ components zeroed by only one axis. This will not affect our fit results for $K_{3m}$, but when we extract density distributions from $K_{3m}$, we will see that our sample shapes have most $K_{3m}=0$.
+
 \begin{table}
   \centering
   \begin{tabular}{c|ccccccc}
@@ -207,7 +218,7 @@ We make one final observation about $K_{\ell m}$: the requirement that $\rho_m(\
   -\frac{1}{4} \leq K_{20} \leq 0, \qquad |K_{22}| \leq -\frac{K_{20}}{2}.
   \label{eqn:parameter-bounds}
 \end{equation}
-In practice, we also observe that $|K_{3m}| < 1$; typically, $|K_{3m}| < 0.1$ even.
+In practice, we also observe that $|K_{3m}| < 1$; often, $|K_{3m}| < 0.01$ even.
 
 
 
@@ -216,11 +227,11 @@ In practice, we also observe that $|K_{3m}| < 1$; typically, $|K_{3m}| < 0.1$ ev
 \subsection{Tidal torque}
 \label{sec:tidal-torque}
 
-Derivations for the tidal torque experienced by a rigid body in the gravitational field of a larger mass have been computed by several previous studies \cite{paul88,HouMar2017,BOUE2009750, ashenberg07}, often in terms of the moment of inertia of the rigid body (or higher order moments of inertia), and to varying degrees of precision. We present a novel derivation of the tidal torque to arbitrary orders in terms of the density moments of an asteroid defined in section \ref{sec:moments}. This formulation of the problem will be more useful for this study.
+Derivations for the tidal torque experienced by a rigid body in the gravitational field of a larger mass have been computed by several previous studies \cite{paul88,HouMar2017,BOUE2009750, ashenberg07}, often in terms of the moment of inertia of the rigid body (or higher order moments of inertia), and to varying degrees of precision. 
+
+We present a novel derivation of the tidal torque to arbitrary orders in terms of the density moments of an asteroid defined in section \ref{sec:moments}. These density moments can be pre-computed and do not have to be re-evaluated every time step. This formulation of the problem will be more useful for this study.
 
 Throughout this paper, we assume that the asteroid remains rigid throughout the encounter. We also assume no third-body perturbations from other Solar System objects. (More precisely, we assume that all third-body perturbing objects are closer to the central body's center of mass than the asteroid perigee distance. Thus, their density moments can be included in the density moments of the central body.) For the sake of simplicity, we also assume that the density moments of the central body are known and do not evolve with time.
-
-Below follows a derivation of the tidal torque experienced by an asteroid, followed by the system equations of motion.
 
 The gravitational potential energy of the central body is, in its most general form,
 \begin{equation}
@@ -233,7 +244,7 @@ where $\rho_M$ is the density distribution of the central body and $\mathcal{B}$
   \label{eqn:ylm-expansion}
 \end{equation}
 where the sum is shorthand for $\sum_{\ell, m} = \sum_{\ell = 0}^\infty \sum_{m=-\ell}^\ell$.
-We are interested in translating the potential energy of equation \ref{eqn:first-pe} to the body-fixed frame. To do this, we let $\bm{R'} = \bm D + \bm U$, where $\bm D$ is the location of the asteroid in the inertial frame. We further define $\bm U = M\bm u$, where $\bm u$ is in the body-fixed frame and $M$ is a rotation matrix given by the Euler angles $\alpha$, $\beta$, and $\gamma$ (see section \ref{sec:coordinates}). The translation from $\bm {R'}$ to $\bm U$ is then attained by the identity 
+We are interested in translating the potential energy of equation \ref{eqn:first-pe} to the body-fixed frame. To do this, we let $\bm{R'} = \bm D + \bm U$, where $\bm D$ is the location of the asteroid in the inertial frame. We further define $\bm U = M\bm u$, where $\bm u$ is in the body-fixed frame and $M$ is the rotation matrix given by the Euler angles $\alpha$, $\beta$, and $\gamma$ (see section \ref{sec:coordinates}). The translation from $\bm {R'}$ to $\bm U$ is then attained by the identity 
 \begin{equation}
   S_{\ell m}(\bm R') = \sum_{\ell', m'} (-1)^{\ell'}R^*_{\ell' m'}(\bm U)S_{\ell+\ell', m + m'} (\bm D),
   \label{eqn:ylm-translation}
@@ -273,7 +284,7 @@ tidal torque can now be expressed as a function only of $J_{\ell m}$, $K_{\ell m
   \label{eqn:tidal-torque}
 \end{equation}
 
-Equation \ref{eqn:tidal-torque} possesses a few explicit properties which we discuss before writing the asteroid equations of motion. Firstly, $K_{00}$ does not appear, so that $\bm \tau$ is independent of asteroid mass. The mean density of the asteroid is therefore not constrained by tidal torque analysis. Secondly, torque is largest when $D$ is small (as expected). Thirdly, each $J_{\ell m}K_{\ell' m'}$ term is multiplied by $(D/a_M)^\ell (D/a_m)^{\ell'}$, the latter of which especially is a small number in most cases. Equation \ref{eqn:tidal-torque} can therefore be computed approximately by removing terms of large $\ell$. For our analysis, we remove $\ell > 3$.
+Equation \ref{eqn:tidal-torque} possesses a few explicit properties which we discuss before writing the asteroid equations of motion. Firstly, $K_{00}$ does not appear, so that $\bm \tau$ is independent of asteroid mass. The mean density of the asteroid is therefore not constrained by tidal torque analysis. Secondly, torque is largest when $D$ is small (as expected). Thirdly, each $J_{\ell m}K_{\ell' m'}$ term is multiplied by $(D/a_M)^\ell (D/a_m)^{\ell'}$, the latter of which especially is a small number in most cases. Equation \ref{eqn:tidal-torque} can therefore be computed approximately by removing terms of large $\ell$ and $\ell'$. For our analysis, we remove $\ell' > 3$ and we usually keep only $\ell=0$.
 
 Further insight can be gained by remarking the value of the first order of $\bm \tau$ for particular Euler angle cases. Setting $\beta = 0$ produces diagonal Wigner-$D$ matrices, and hence $\bm \tau \parallel \unit z$ to first order. Further, the component $\tau_z$ oscillates, so that for certain values of $\alpha$ and $\gamma$, $\bm \tau = 0.$ This $\beta=0$ condition is equivalent to $\unit z \parallel \unit Z$.
 
@@ -306,21 +317,23 @@ for angular velocity $\bm \omega$ given in the body-fixed frame. The equations o
 \end{equation}
 Equations \ref{eqn:pos-eom} to \ref{eqn:omega-eom} and \ref{eqn:tidal-torque} form a set of nonlinear, first-order coupled differential equations which can be numerically integrated. They are expressed in terms of the physical parameters $\mu_{M/m}$, $a_{M/m}$, $J_{\ell m}$ and $K_{\ell m}$ given the density moment-moment of inertia relations given by equation \ref{eqn:moi}.
 
+Note that equation \ref{eqn:omega-eom} is independent of $a_m$ to first order in $\bm \tau$, because $I_{j} \propto a_m^2$ for all $j$ and $\bm \tau \propto a_m^2$. Therefore, scaling $a_m$ merely scales the value of the sub-leading-order contributions to $\bm \tau$.
+
 
 \subsection{Simulation design}
 \label{sec:sim}
 
-We built a simulation to produce angular velocity data (in the inertial frame) as a function of time. This simulation requires as input (1) the orbital parameters of the asteroid; (2) the cadence of angular velocity observation; (3) the central body moments, mass, and $a_m$; (4) the initial asteroid angular velocity in the inertial frame; (5) the asteroid radius $a_m$, and (6) the asteroid's density moments and initial Euler angle $\gamma_0$. All parameters except (6) are assumed to be known to high accuracy. One can imagine that $a_m$ is determined by light-curve analysis, but if not, it is still necessary to fix $a_m$ or else the values of $K_{\ell m}$ are degenerate with $a_m$.
+We built a simulation to produce angular velocity data (in the inertial frame) as a function of time. This simulation requires as input (1) the orbital parameters of the asteroid $r_p$ (perigee distance) and $v_\infty$ (hyperbolic excess velocity); (2) the cadence of angular velocity observation $\Delta t$; (3) the central body moments $J_{\ell m}$, mass $\mu_M$, and $a_m$; (4) the initial asteroid angular velocity in the inertial frame $\bm \omega_0$; (5) the asteroid radius $a_m$; and (6) the asteroid's density moments $K_{\ell m}$ and initial Euler angle $\gamma_0$. All parameters except (6) are assumed to be known to high accuracy. One can imagine that $a_m$ is determined by light-curve analysis, but if not, it is still necessary to fix $a_m$ or else the values of $K_{\ell m}$ are degenerate with $a_m$.
 
-We further assume that the asteroid is initially not tumbling. Thus, the rotational velocity is aligned with a principal axis (assumed to be $\unit z$, which maximizes moment of inertia). This sets $\beta = 0$ and we can further choose $\alpha = 0$. Thus, only one Euler angle $\gamma = 0$ is necessary to provide initial data for the simulation.
+We further assume that the asteroid is initially not tumbling. Thus, the rotational velocity is aligned with a principal axis (assumed to be $\unit z$, which maximizes moment of inertia). This sets $\beta = 0$ and we can further choose $\alpha = 0$. Thus, only Euler angle $\gamma_0$ is necessary to provide initial data for the simulation.
 
-We begin our simulation at $D = 10 r_p$. Since the leading order of the equations of motion is $\ell' = 2, \ell = 0$, this corresponds roughly to a torque of $10^{-3}$ times the maximum torque at perigee. Unless otherwise indicated, the simulation is terminated at $D=10 r_p$ as well.
+We begin our simulation at $D = 10 r_p$, with velocity predicted by Kepler's laws given by the orbital parameters. Since the leading order of the equations of motion is $\ell' = 2, \ell = 0$, this corresponds roughly to a torque of $10^{-3}$ times the maximum torque at perigee. Unless otherwise indicated, the simulation is terminated at $D=10 r_p$ as well.
 
 With the simulation inputs specified, the equations of motion were integrated via the Runge-Kutta fourth order method, with a variable time step
 \begin{equation}
-  \Delta t = \Delta t_\text{min} + 10^{-3}(\Delta t_\text{max} - \Delta t_\text{min}) \brackets{\parens{\frac{D}{r_p}}^3 - 1}.
+  dt = dt_\text{min} + 10^{-3}(dt_\text{max} - dt_\text{min}) \brackets{\parens{\frac{D}{r_p}}^3 - 1}.
 \end{equation}
-The parameters $\Delta t_\text{max}$ and $\Delta t_\text{min}$ (20 and 10 seconds respectively) were chosen such that the finite-integration error \jtd{Is this the correct name?} was ~100 times the numerical error, and that neighboring values of $K_{\ell m}$ yielded significantly different spin pole data.
+The parameters $dt_\text{max}$ and $dt_\text{min}$ (20 and 10 seconds respectively) were chosen such that the error was ~100 times the floating point error, and that neighboring values of $K_{\ell m}$ yielded significantly different spin pole data.
 
 
 
@@ -333,9 +346,9 @@ In this section, we discuss how the simulation presented in the previous section
 
 \subsection{Fit process}
 \label{sec:fit}
-Given synthetic data, a Markov Chain Monte Carlo (MCMC) \jtd{find the Ensemble full name and cite} method was used to generate posterior distributions based on flat priors. \jtd{How detailed about the MCMC do I need to be?} Our parameters were $\gamma_0$, $K_{20}$, $K_{22}$, and $K_{3m}$ (10 in total), and were bounded by $|\gamma_0| < \pi/4$, and bounds on $K_{\ell m}$ given in section \ref{sec:moments}. Note that $\gamma_0$ is degenerate with $\gamma_0 + \pi/2$ since this is equivalent to relabeling $\unit y$ as $\unit x$ and $\unit x$ as $-\unit y$.
+Given synthetic data, an Affine Invariant Markov Chain Monte Carlo (MCMC) Ensemble sampler was used to generate posterior distributions based on flat priors. We use the Python implementation \texttt{emcee} \cite{foreman2013emcee}. \jtd{How detailed about the MCMC do I need to be?} Our parameters were $\gamma_0$, $K_{20}$, $K_{22}$, and $K_{3m}$ (10 in total), and were bounded by $|\gamma_0| < \pi/4$, and bounds on $K_{\ell m}$ given in section \ref{sec:moments}. Note that $\gamma_0$ is degenerate with $\gamma_0 + \pi/2$ since this is equivalent to relabeling $\unit y$ as $\unit x$ and $\unit x$ as $-\unit y$. The other bounds were $|K_{3m}| < 1$.
 
-Before the MCMC was run, local minima in the likelihood were found via the Nelder-Mead algorithm implemented in \texttt{scipy} \jtd{Cite?}. It was found that only one local minimum existed, except when $K_{22}=0$ in which case rotational symmetry caused multiple values of $\gamma_0$ to be degenerate. Walkers were initialized near this local minimum, with spread given by the inverse Hessian of the likelihood at that point. Due to the high sensitivity of the angular velocity data to density moments, the minimization procedure sometimes failed to isolate the minimum likelihood. Therefore, a simpler simulation with the $K_{3m}$ terms of equation \ref{eqn:tidal-torque} was first used to minimize likelihood as a function of $\gamma_0$ and $K_{2m}$, and then the full simulation was used to find $K_{3m}$, with $\gamma_0$ and $K_{2m}$ fixed. This tiered miniimzation process motivates us to call $\gamma_0$ and $K_{2m}$ the ``first-order parameters'' and $K_{3m}$ the ``higher order parameters.''
+Before the MCMC was run, local minima in the likelihood were found via the Nelder-Mead algorithm implemented in \texttt{scipy} \cite{Gao2012}. It was found that only one local minimum existed, except when $K_{22}=0$ in which case rotational symmetry caused multiple values of $\gamma_0$ to be degenerate. Walkers were initialized near this local minimum, with spread given by the inverse Hessian of the likelihood at that point. Due to the high sensitivity of the angular velocity data to density moments, the minimization procedure sometimes failed to isolate the minimum likelihood. Therefore, a simpler simulation with the $K_{3m}$ terms of equation \ref{eqn:tidal-torque} was first used to minimize likelihood as a function of $\gamma_0$ and $K_{2m}$, and then the full simulation was used to find $K_{3m}$, with $\gamma_0$ and $K_{2m}$ fixed. This tiered miniimzation process motivates us to call $\gamma_0$ and $K_{2m}$ the ``first-order parameters'' and $K_{3m}$ the ``higher order parameters.''
 
 We further subdivided the minimization process by first minimizing with respect to data truncated at the point after perigee where $D=fr_p$ for some manually-set fraction $f$. In practice, $f=2$ often led to success. The minimum was then further refined by minimizing based on the full data, with the previous minimum as the initial guess.
 
@@ -430,7 +443,7 @@ Figure \ref{fig:scan-vex} demonstrates that parameter precision does not depend 
   \label{fig:scan-perigee}
 \end{figure}
 
-Figure \ref{fig:scan-perigee} shows much stronger dependence of parameter uncertainty on perigee distance, as expected by the factor of $(a_m/D)^{\ell'}$ present in equation \ref{eqn:tidal-torque} and mentioned in section \ref{sec:tidal-torque}. For $r_p \approx 10$ Earth radii, the most uncertain parameter $K_{30}$ fills the prior distribution, with uncertainty ranging from -1 to 1. Near $r_p \approx 40$ Earth radii, the $K_{32}$ and $K_{31}$ components also fill the prior. However, the width of the prior was arbitrarily chosen, and all the physical density distributions have $|K_{3m}| < 0.1$ \jtd{Check}, so the actual Earth radii cutoff at which the $K_{3m}$ parameter estimates become too imprecise to be usable likely occurs at lower $r_p$. The exact value depends on the shape of the asteroid, but \jtd{When is it 0.1?}
+Figure \ref{fig:scan-perigee} shows much stronger dependence of parameter uncertainty on perigee distance, as expected by the factor of $(a_m/D)^{\ell'}$ present in equation \ref{eqn:tidal-torque} and mentioned in section \ref{sec:tidal-torque}. For $r_p \approx 10$ Earth radii, the most uncertain parameter $K_{30}$ fills the prior distribution, with uncertainty ranging from -1 to 1. Near $r_p \approx 40$ Earth radii, the $K_{32}$ and $K_{31}$ components also fill the prior. However, the width of the prior was arbitrarily chosen, and all the physical density distributions have $|K_{3m}|$ smaller, so the actual Earth radii cutoff at which the $K_{3m}$ parameter estimates become too imprecise to be usable likely occurs at lower $r_p$. The exact value depends on the shape of the asteroid, but \jtd{When is it 0.01?}
 
 \begin{table}
   \centering
