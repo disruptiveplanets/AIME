@@ -9,45 +9,45 @@ Warning--I'm ignoring HouMar2017's extra "note" field
 --line 133 of file asteroids.bib
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
-You've used 22 entries,
+You've used 23 entries,
             2881 wiz_defined-function locations,
-            893 strings with 12340 characters,
-and the built_in function-call counts, 10471 in all, are:
-= -- 869
-> -- 752
-< -- 53
-+ -- 328
-- -- 110
-* -- 1224
-:= -- 1655
+            902 strings with 12782 characters,
+and the built_in function-call counts, 11050 in all, are:
+= -- 905
+> -- 815
+< -- 55
++ -- 353
+- -- 124
+* -- 1298
+:= -- 1757
 add.period$ -- 0
-call.type$ -- 22
-change.case$ -- 45
-chr.to.int$ -- 22
-cite$ -- 22
-duplicate$ -- 512
-empty$ -- 523
-format.name$ -- 182
-if$ -- 1829
+call.type$ -- 23
+change.case$ -- 47
+chr.to.int$ -- 23
+cite$ -- 23
+duplicate$ -- 535
+empty$ -- 545
+format.name$ -- 198
+if$ -- 1925
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 23
-newline$ -- 80
-num.names$ -- 154
-pop$ -- 112
+missing$ -- 24
+newline$ -- 83
+num.names$ -- 162
+pop$ -- 117
 preamble$ -- 1
-purify$ -- 88
+purify$ -- 92
 quote$ -- 0
-skip$ -- 310
+skip$ -- 323
 stack$ -- 0
-substring$ -- 621
-swap$ -- 251
-text.length$ -- 89
+substring$ -- 643
+swap$ -- 265
+text.length$ -- 93
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 195
+type$ -- 204
 warning$ -- 0
-while$ -- 166
+while$ -- 174
 width$ -- 0
-write$ -- 232
+write$ -- 242
 (There were 2 warnings)
