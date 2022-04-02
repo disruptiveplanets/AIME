@@ -12,10 +12,13 @@ sigma_theta = None
 AXIS_SIZE = 12
 LEGEND_SIZE = 12
 
-N_DIM = None
+N_DIM = 10
 N_PERCENTILES = None
 
 SCALE_Y = 1.1
+SPEEDS = [0.5, 9, 2]
+
+cadences = []
 
 # Get percentiles
 def get_percentiles(include):
@@ -26,7 +29,7 @@ def get_percentiles(include):
             if line == '': continue
             elements = line.split(':')
             name = elements[0]
-            if f"-{include}-" not in name:
+            if f"cad-{include}-" not in name:
                 continue
             perc_array = []
             for percs in elements[1:]:
@@ -37,87 +40,103 @@ def get_percentiles(include):
             percentiles[name] = perc_array
     return percentiles
 
-def show_plot(percentiles, label):
+
+def select_styles(speed):
+    if speed == 9:
+        return 'solid'
+    if speed == 2:
+        return 'dashed'
+    return 'dotted'
+
+
+def show_plot(percentiles, axs, speed):
+    global cadences
     # Get true sigmas
-    cadences = []
+    new_cadences = []
     name_index = {}
 
     index = 0
     for name in percentiles.keys():
-        if "-2-" in name:
+        name_index[name] = index
+        index += 1
+
+        if "-2-" in name or '-9-' in name:
             dir_name = name[:8]
         else:
             dir_name = name[:10]
+
+        if '-9-' in name:
+            continue # There is no file; don't bother to open it
+
+
         with open(f"{dir_name}/{dir_name}.txt", 'r') as f:
             max_j, max_l = f.readline().split(", ")
             max_j, max_l = (int(max_j), int(max_l))
             cadence = int(float(f.readline()))
             perigee = int(f.readline())
             radius = float(f.readline())
-            speed = float(f.readline())
+            v_excess = float(f.readline())
             spin = [float(x) for x in f.readline().split(',')]
             jlms = [float(x) for x in f.readline().split(',')]
             theta_true = [float(x) for x in f.readline().split(',')]
             theta_high = [float(x) for x in f.readline().split(',')]
             theta_low = [float(x) for x in f.readline().split(',')]
             sigma = [float(d) for d in f.readline().split(',')]
-        name_index[name] = index
-        index += 1
-        sigma_theta = sigma[0]
-        cadences.append(cadence / 60)
+            sigma_theta = sigma[0]
+            new_cadences.append(cadence / 60)
 
-    cadences = np.array(cadences)
+    if len(new_cadences) > 0:
+        cadences = np.array(new_cadences)
+    else:
+        # Do not replace the cadence array with an empty one, in the case of scan-cadence.
+        pass
 
+    assert(len(cadences) > 0)
 
-    fig = plt.figure(figsize=(6.6, 19))
 
     for plot_index in range(N_DIM):
-        offset = 1 if plot_index > 2 else 0
-        ax = plt.subplot2grid((31, 1), (plot_index * 3 + offset, 0), rowspan=3)
         param_data = np.zeros(len(cadences) * N_PERCENTILES).reshape(N_PERCENTILES, len(cadences))
         for f in percentiles.keys():
             param_data[:,name_index[f]] = percentiles[f][plot_index]
-        scale = 1e2 if plot_index >= 3 else 1e6
+        scale = 1/np.max(np.abs(param_data[1]-param_data[0]))
 
-        ax.plot(cadences, (param_data[1]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
-        ax.plot(cadences, (param_data[-1]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
-        ax.fill_between(cadences, (param_data[1]-param_data[0]) * scale, 
-            (param_data[-1]-param_data[0]) * scale,  color=f"C{plot_index}", alpha=0.3)
+        linestyle = select_styles(speed)
+        color = f"C{plot_index}" if speed == 9 else 'k'
 
-        ax.plot(cadences, (param_data[2]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
-        ax.plot(cadences, (param_data[-2]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
-        ax.fill_between(cadences, (param_data[2]-param_data[0]) * scale,
-            (param_data[-2]-param_data[0]) * scale, color=f"C{plot_index}", alpha=0.3)
+        axs[plot_index].plot(cadences, (param_data[1]-param_data[0]) * scale, color=color, linestyle=linestyle, linewidth=2)
+        axs[plot_index].plot(cadences, (param_data[-1]-param_data[0]) * scale, color=color, linestyle=linestyle, linewidth=2)
 
-        ax.plot(cadences, (param_data[3]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1, linestyle='dashed')
+        axs[plot_index].set_ylim(-SCALE_Y, SCALE_Y)
 
-        y_min_norm = np.min((param_data[-1]-param_data[0]) * scale)
-        y_max_norm = np.max((param_data[1]-param_data[0]) * scale)
-        ax.set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
-
-        if plot_index >= 3:
-            ax.set_ylabel(f"$\sigma({param_names[plot_index]})$ ($\\times 10^{{-2}}$)", size=AXIS_SIZE)
-        else:
-            ax.set_ylabel(f"$\sigma({param_names[plot_index]})$ ($\\times 10^{{-6}}$)", size=AXIS_SIZE)
-
-        #axs[i].set_xscale('log')
-        #axs[i].set_yscale('log')
+        axs[plot_index].set_ylabel(f"$\sigma({param_names[plot_index]})$", size=AXIS_SIZE)
 
         if plot_index == 9:
-            ax.set_xlabel(f"$\Delta t$ (min)")
+            axs[plot_index].set_xlabel(f"$\Delta t$ (min)")
         else:
-            ax.set_xticks([])
+            axs[plot_index].set_xticks([])
 
-    custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
-                    Line2D([0], [0], color='k', lw=4, alpha=0.6),
-                    Line2D([0], [0], color='k', lw=1, linestyle='dashed')]
-    fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='upper center', prop={'size': LEGEND_SIZE}, bbox_to_anchor=(0.5,0.91))
+    custom_lines = []
+    labels = []
+    for speed in SPEEDS:
+        linestyle = select_styles(speed)
+        custom_lines.append(Line2D([0], [0], color='k', lw=1, linestyle=linestyle))
+        labels.append(f"$t/t_0={speed}$ hr")
 
-    plt.savefig(f"cad-{label}.pdf", bbox_inches="tight")
-    plt.savefig(f"cad-{label}.png", bbox_inches="tight")
-    plt.show()
 
-VELS = [2]
+    fig.legend(custom_lines, labels, ncol=3, loc='upper center', prop={'size': LEGEND_SIZE}, bbox_to_anchor=(0.5,0.91))
 
-for vel in VELS:
-    show_plot(get_percentiles(str(vel)), str(vel))
+
+
+fig = plt.figure(figsize=(6.6, 19))
+axes = []
+for plot_index in range(N_DIM):
+    offset = 1 if plot_index > 2 else 0
+    axes.append(plt.subplot2grid((31, 1), (plot_index * 3 + offset, 0), rowspan=3))
+
+for p in SPEEDS:
+    show_plot(get_percentiles(p), axes, p)
+
+plt.savefig(f"cad-speed.pdf", bbox_inches="tight")
+plt.savefig(f"cad-speed.png", bbox_inches="tight")
+
+plt.show()

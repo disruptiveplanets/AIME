@@ -12,10 +12,13 @@ sigma_theta = None
 AXIS_SIZE = 12
 LEGEND_SIZE = 12
 
-N_DIM = None
+N_DIM = 10
 N_PERCENTILES = None
 
 SCALE_Y = 1.1
+PERIODS = [20, 9, 5]
+
+cadences = []
 
 # Get percentiles
 def get_percentiles(include):
@@ -37,19 +40,38 @@ def get_percentiles(include):
             percentiles[name] = perc_array
     return percentiles
 
-def show_plot(percentiles, label):
+
+def select_styles(period):
+    if period == 9:
+        return 'solid'
+    if period == 5:
+        return 'dashed'
+    else:
+        return 'dotted'
+
+
+def show_plot(percentiles, axs, period):
+    global cadences
     # Get true sigmas
-    cadences = []
+    new_cadences = []
     name_index = {}
 
     index = 0
     for name in percentiles.keys():
-        if "-1-" in name or '-5-' in name:
+        name_index[name] = index
+        index += 1
+
+        if "-1-" in name or '-5-' in name or '-9-' in name:
             dir_name = name[:8]
         elif "-20-" == name[3:7]:
             dir_name = name[:9]
         else:
             dir_name = name[:10]
+
+        if '-9-' in name:
+            continue # There is no file; don't bother to open it
+
+
         with open(f"{dir_name}/{dir_name}.txt", 'r') as f:
             max_j, max_l = f.readline().split(", ")
             max_j, max_l = (int(max_j), int(max_l))
@@ -63,63 +85,60 @@ def show_plot(percentiles, label):
             theta_high = [float(x) for x in f.readline().split(',')]
             theta_low = [float(x) for x in f.readline().split(',')]
             sigma = [float(d) for d in f.readline().split(',')]
-        name_index[name] = index
-        index += 1
-        sigma_theta = sigma[0]
-        cadences.append(cadence / 60)
+            sigma_theta = sigma[0]
+            new_cadences.append(cadence / 60)
 
-    cadences = np.array(cadences)
+    if len(new_cadences) > 0:
+        cadences = np.array(new_cadences)
+    else:
+        # Do not replace the cadence array with an empty one, in the case of scan-cadence.
+        pass
 
-
-    fig = plt.figure(figsize=(6.6, 19))
+    assert(len(cadences) > 0)
 
     for plot_index in range(N_DIM):
-        offset = 1 if plot_index > 2 else 0
-        ax = plt.subplot2grid((31, 1), (plot_index * 3 + offset, 0), rowspan=3)
         param_data = np.zeros(len(cadences) * N_PERCENTILES).reshape(N_PERCENTILES, len(cadences))
         for f in percentiles.keys():
             param_data[:,name_index[f]] = percentiles[f][plot_index]
-        scale = 1e2 if plot_index >= 3 else 1e6
+        scale = 1/np.max(np.abs(param_data[1]-param_data[0]))
 
-        ax.plot(cadences, (param_data[1]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
-        ax.plot(cadences, (param_data[-1]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
-        ax.fill_between(cadences, (param_data[1]-param_data[0]) * scale, 
-            (param_data[-1]-param_data[0]) * scale,  color=f"C{plot_index}", alpha=0.3)
+        linestyle = select_styles(period)
+        color = f"C{plot_index}" if period == 9 else 'k'
 
-        ax.plot(cadences, (param_data[2]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
-        ax.plot(cadences, (param_data[-2]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
-        ax.fill_between(cadences, (param_data[2]-param_data[0]) * scale,
-            (param_data[-2]-param_data[0]) * scale, color=f"C{plot_index}", alpha=0.3)
+        axs[plot_index].plot(cadences, (param_data[1]-param_data[0]) * scale, color=color, linestyle=linestyle, linewidth=2)
+        axs[plot_index].plot(cadences, (param_data[-1]-param_data[0]) * scale, color=color, linestyle=linestyle, linewidth=2)
 
-        ax.plot(cadences, (param_data[3]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1, linestyle='dashed')
+        axs[plot_index].set_ylim(-SCALE_Y, SCALE_Y)
 
-        y_min_norm = np.min((param_data[-1]-param_data[0]) * scale)
-        y_max_norm = np.max((param_data[1]-param_data[0]) * scale)
-        ax.set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
-
-        if plot_index >= 3:
-            ax.set_ylabel(f"$\sigma({param_names[plot_index]})$ ($\\times 10^{{-2}}$)", size=AXIS_SIZE)
-        else:
-            ax.set_ylabel(f"$\sigma({param_names[plot_index]})$ ($\\times 10^{{-6}}$)", size=AXIS_SIZE)
-
-        #axs[i].set_xscale('log')
-        #axs[i].set_yscale('log')
+        axs[plot_index].set_ylabel(f"$\sigma({param_names[plot_index]})$", size=AXIS_SIZE)
 
         if plot_index == 9:
-            ax.set_xlabel(f"$\Delta t$ (min)")
+            axs[plot_index].set_xlabel(f"$\Delta t$ (min)")
         else:
-            ax.set_xticks([])
+            axs[plot_index].set_xticks([])
 
-    custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
-                    Line2D([0], [0], color='k', lw=4, alpha=0.6),
-                    Line2D([0], [0], color='k', lw=1, linestyle='dashed')]
-    fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='upper center', prop={'size': LEGEND_SIZE}, bbox_to_anchor=(0.5,0.91))
+    custom_lines = []
+    labels = []
+    for period in PERIODS:
+        linestyle = select_styles(period)
+        custom_lines.append(Line2D([0], [0], color='k', lw=1, linestyle=linestyle))
+        labels.append(f"$T={period}$ hr")
 
-    plt.savefig(f"cad-{label}.pdf", bbox_inches="tight")
-    plt.savefig(f"cad-{label}.png", bbox_inches="tight")
-    plt.show()
 
-PERIODS = [ 20, 0.1, 0.5, 1, 5,]
+    fig.legend(custom_lines, labels, ncol=3, loc='upper center', prop={'size': LEGEND_SIZE}, bbox_to_anchor=(0.5,0.91))
 
-for period in PERIODS:
-    show_plot(get_percentiles(str(period)), str(period))
+
+
+fig = plt.figure(figsize=(6.6, 19))
+axes = []
+for plot_index in range(N_DIM):
+    offset = 1 if plot_index > 2 else 0
+    axes.append(plt.subplot2grid((31, 1), (plot_index * 3 + offset, 0), rowspan=3))
+
+for p in PERIODS:
+    show_plot(get_percentiles(p), axes, p)
+
+plt.savefig(f"cad-period.pdf", bbox_inches="tight")
+plt.savefig(f"cad-period.png", bbox_inches="tight")
+
+plt.show()

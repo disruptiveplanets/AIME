@@ -49,4 +49,8 @@ for bare in file_names:
     pf.write(min_text)
     print(bare, min_dist)
 
+
+with open("../scan-cadence/percentiles.dat", 'r') as true_f:
+    pf.write(true_f.read().replace("cad-", "cad-9-"))
+
 pf.close()

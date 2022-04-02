@@ -17,3 +17,7 @@ I pulled the results, but realize that doubling the velocity doesn't do anything
 ## March 31
 
 Vel times 2 worked today, and times 0.5 will likely be tomorrow. Uncertainty is bad, but hopefully it will get better.
+
+## April 1
+
+Compiled last cadence test today. Should be able to write the cadence section and appendix.
