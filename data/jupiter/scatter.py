@@ -26,7 +26,6 @@ print(f"New a {-JUPITER_MASS / new_vel**2}\t new e {eccentricity}")
 
 def get_text(vel):
     return f"""0, 3
-0, 3
 120
 {new_perigee / EARTH_RADIUS}
 1000
