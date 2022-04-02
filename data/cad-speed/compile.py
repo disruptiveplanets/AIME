@@ -120,7 +120,7 @@ def show_plot(percentiles, axs, speed):
     for speed in SPEEDS:
         linestyle = select_styles(speed)
         custom_lines.append(Line2D([0], [0], color='k', lw=1, linestyle=linestyle))
-        labels.append(f"$t/t_0={speed}$ hr")
+        labels.append(f"$t_\\mathrm{{spin}}/t_\\mathrm{{orbit}}={speed}$ hr")
 
 
     fig.legend(custom_lines, labels, ncol=3, loc='upper center', prop={'size': LEGEND_SIZE}, bbox_to_anchor=(0.5,0.91))

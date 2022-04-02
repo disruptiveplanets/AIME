@@ -122,7 +122,7 @@ def show_plot(percentiles, axs, period):
     for period in PERIODS:
         linestyle = select_styles(period)
         custom_lines.append(Line2D([0], [0], color='k', lw=1, linestyle=linestyle))
-        labels.append(f"$T={period}$ hr")
+        labels.append(f"$P_\omega={period}$ hr")
 
 
     fig.legend(custom_lines, labels, ncol=3, loc='upper center', prop={'size': LEGEND_SIZE}, bbox_to_anchor=(0.5,0.91))

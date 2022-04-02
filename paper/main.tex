@@ -980,7 +980,7 @@ The code used to generate data, fit density moments to it, and extract density d
 Except when otherwise mentioned, we use the following asteroid encounter parameters. Many of the parameter choices are made to maximize the quality of observations (a close orbit, large asteroid, etc.) This is so that our uncertainties have room to grow; if the reference asteroid has low uncertainty,
 
 \begin{enumerate}
-  \item An orbit around Earth with $6$ km s$^{-1}$ excess velocity and perigee at 5 Earth radii. This orbit was chosen to roughly match that of 99942 Apophis \cite{giorgini2005recent, smalley20052004}.
+  \item An orbit around Earth with $6$ km s$^{-1}$ excess velocity and perigee at 5 Earth radii. This orbit was chosen to roughly match that of 99942 Apophis \cite{giorgini2005recent, smalley20052004}. These orbital parameters correspond to an eccentricity of 3.88.
   \item An initial roll of $\gamma_0=\pi/8$.
   \item A cadence of 2 minutes and observational uncertainty of $\sigma_\theta = 0.01$ and $\sigma_\rho / \sigma_\theta = 10^{-5}$.
   \item A rotational period of 9 hours, with the rotational velocity vector distributed between the $\unit X$, $\unit Y$, and $\unit Z$ axes in a $1:2:-2$ ratio.
@@ -990,15 +990,12 @@ Except when otherwise mentioned, we use the following asteroid encounter paramet
 We use the asymmetric ellipsoid in nearly all runs, do to the degeneracy induced in our model when $K_{22} = 0$.
 
 
-\section{What sets the cadence cutoff?}
+\section{The cadence cutoff}
 \label{app:cadence-tests}
 
-In section \ref{sec:scan-cadence}, we noted that posterior uncertainty as a function of observation cadence $\Delta t$ appears to increase suddenly near $\Delta t \sim 30-40$ min. We mentioned that this cadence cutoff is likely a function both of the period of the asteroid and the time spent near perigee. We study this cutoff in closer detal in this appendix.
+In section \ref{sec:scan-cadence}, we noted that posterior uncertainty as a function of observation cadence $\Delta t$ appears to increase suddenly near $\Delta t \sim T_\text{cad}=30-40$ min. We mentioned that this cadence cutoff is likely a function both of the rotational period of the asteroid and the time spent near perigee. We study this cutoff in closer detal in this appendix.
 
-\jtd{Write}
-
-\ref{fig:cad-period} 
-\ref{fig:cad-speed}
+We measure the dependence of the cadence cutoff on rotational period by varying the period $P_\omega$ and reproducing figure \ref{fig:scan-cadence}; i.e., we run many simulations of the changed $P_\omega$ with different cadences and plot the posterior fit uncertainty $\sigma$ as a function of cadence $\Delta t$. Specifically, we use $P_\omega = 5$ hr and 20 hr, roughly double and half of the reference 9 hr. The resulting curves of $\sigma(\Delta t)$ are shown in figure \ref{fig:cad-period}, with each normalized so that their maximum values is 1 so that changes to $\sigma$ induced by the change in $P_\omega$ that are not a function of $\Delta t$ and therefore irrelevant here (i.e., those studied in section \ref{sec:scan-period}), are removed.
 
 \begin{figure}
   \centering
@@ -1007,24 +1004,24 @@ In section \ref{sec:scan-cadence}, we noted that posterior uncertainty as a func
   \label{fig:cad-period}
 \end{figure}
 
+We also wish to capture dependence on the time spent by the asteroid near perigee, but we do not wish to change the orbit shape or central body, because this may induce other effects that could also affect the cadence plot. Instead, we adjust the speed at which the asteroid moves through the orbit. In one instance, the asteroid's path is artificially slowed by a factor of 2, which we denote as $t_\text{spin}/t_\text{orbit}=0.5$; in the other instance, $t_\text{spin}/t_\text{orbit}=2$, meaning that the orbit is sped up. This approach of changing the speed of the orbit is meant to approximate changes to $T_p$ defined in equation \ref{eqn:tp}. The posterior uncertainties for these two cases and the original case are shown in figure \ref{fig:cad-speed}. Again, $\sigma$ is normalized so that $\Delta t$-independent variations are removed. However, the $t_\text{spin}/t_\text{orbit}=2$ uncertainties begin to fill the prior distribution for large $\Delta t$ for some parameters, which can be seen by discontinuous variation in the dotted line of figure \ref{fig:cad-speed}.
+
 \begin{figure}
   \centering
   \includegraphics[height=0.89\textheight]{figs/cad-speed.pdf}
-  \caption{1-$\sigma$ confidence intervals plotted as a function of the orbit time scaling $t/t_0$ for no scaling (the reference asteroid, solid colored lines), time doubling (dotted lines), and halving (dashed lines). See text for the definition of $t/t_0$. Confidence intervals have been normalized for the sake of comparison, so that the maximum for each curve is 1.}
+  \caption{1-$\sigma$ confidence intervals plotted as a function of the orbit time scaling $t_\text{spin}/t_\text{orbit}$ for no scaling (the reference asteroid, solid colored lines), time doubling (dotted lines), and halving (dashed lines). See text for the definition of $t_\text{spin}/t_\text{orbit}$. Confidence intervals have been normalized for the sake of comparison, so that the maximum for each curve is 1.}
   \label{fig:cad-speed}
 \end{figure}
 
+Many of the curves in figures \ref{fig:cad-period} and \ref{fig:cad-speed} show a cadence cutoff at $T_\text{cad} \sim 30-60$ min. Those that show no cutoff (i.e., they merely smoothly increase over $\Delta t$) may in fact exhibit a cutoff $T_\text{cad} > 60$ min, which is off the plot. By comparing $\sigma(\Delta t)$ for a specific parameter, we see that the dotted lines often (but not always) reach the cadence cutoff before the solid line. For example, in figure \ref{fig:cad-period}, this effect is especially clear for $K_{22}$, $K_{33}$, $\Im K_{22}$, and $\Re K_{31}$, but the opposite appears for $\Re K_{32}$. The dotted curves are significant in both figures because they represent smaller $\sigma$ cases. Section \ref{sec:scan-period} reveals that long-rotational-period asteroids lead to smaller $\sigma$, and $t_\text{spin}/t_\text{orbit} < 1$ leads to smaller $\sigma$ because of the presence of more perigee data. It therefore appears that large $P_\omega$ and large times spent at perigee move the cadence cutoff to larger $\Delta t$.
+
+The dependence of the exact location of the cadence cutoff is likely more complicated than the above analysis indicates. However, large uncertainties induced by small $P_\omega$ or large $t_\text{spin}/t_\text{orbit}$ makes it difficult to produce data which are not affected by the finite size of the prior (as figure \ref{fig:scan-speed} was) to study these regimes. Computation time and random variation in $\sigma$ also limits us. We therefore do not attempt to explore the dependence between $T_\text{cad}$ and the encounter parameters further. If a future analysis does require a detailed understanding of how cadence affects uncertainty for a specific encounter, our simulation and fit process can be run given the parameters of the encounter in question in a similar manner to section \ref{sec:scan-cadence}. 
 
 
 \section{Comparison of Jupiter and Earth flyby}
 \label{app:jupiter-earth}
 
-\jtd{Write}
-
-
-
-\section{Similarity between cadence and lack of perigee data.}
-\label{app:cadence-perigee-test}
+Note: $v_\infty^2 = \sqrt{\mu/r_p (e-1)}$.
 
 \jtd{Write}
 
