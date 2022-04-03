@@ -115,6 +115,10 @@ for plot_index in range(N_DIM):
     y_max_norm = np.max((param_data[1]-param_data[0]) * scale)
     ax.set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
 
+    thresh = perigees[(np.abs(param_data[2]-param_data[0]) > 0.01) | np.abs((param_data[-2]-param_data[0]) > 0.01)]
+    if len(thresh) > 0:
+        ax.axvline(x=thresh[0], color='r', linewidth=1)
+
     if plot_index < 1:
         ax.set_ylabel(f"$\sigma({param_names[plot_index]}) (\\times 10^{{-5}})$", size=AXIS_SIZE)
     elif plot_index < 3:

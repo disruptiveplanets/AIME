@@ -88,8 +88,15 @@ for plot_index in range(N_DIM):
     #constant_val = (param_data[1]-param_data[0])[0] * scale / true_sigmas**2
     #ax.plot(product, np.ones_like(param_data[1]) * constant_val * true_sigmas, color='k', linewidth=1, linestyle='dotted')
 
-    ax.axvline(x=1e-7, color='k', linewidth=1, linestyle='dashed')
+    ax.axvline(x=1e-9, color='k', linewidth=1, linestyle='dashed')
     ax.set_xlim(np.min(product), np.max(product))
+
+    thresh = product[(np.abs(param_data[2]-param_data[0]) > 0.01) | np.abs((param_data[-2]-param_data[0]) > 0.01)]
+    #print(product)
+    if len(thresh) > 0 and thresh[0] == product[0]:
+        thresh = product[(np.abs(param_data[2]-param_data[0]) < 0.01) & np.abs((param_data[-2]-param_data[0]) < 0.01)]
+    if len(thresh) > 0:
+        ax.axvline(x=thresh[0], color='r', linewidth=1)
     
     if plot_index == 9:
         ax.set_xlabel(f"$\sigma_\\theta\sigma_\\rho$")

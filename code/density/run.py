@@ -11,6 +11,7 @@ RELOAD = False
 
 k22a, k20a = -0.05200629, -0.2021978
 k22s, k20s = 0, -0.09766608
+lump_shift = 57.02376624759285
 
 
 asteroids = {
@@ -39,9 +40,9 @@ asteroids = {
     "out-sph": ("samples/den-tet-0-samples.npy", 1264.373369575561, DIVISION, MAX_RADIUS,
         Indicator.sph(1000), TrueShape.out_sph(1000)),
     "blob": ("samples/den-blob-0-samples.npy", 965.2268359486612, DIVISION, MAX_RADIUS,
-        Indicator.ell_y_shift(1000, k22a, k20a, -57.02376624759285), TrueShape.blob(1000, k22a, k20a)),
+        Indicator.ell_y_shift(1000, k22a, k20a, -lump_shift), TrueShape.blob(1000, k22a, k20a)),
     "rot-blob": ("samples/den-blob-0-samples.npy", 966.4144167196462, DIVISION, MAX_RADIUS,
-        Indicator.ell_y_shift(1000, k22a, k20a, -57.02376624759285), TrueShape.rot_blob(1000, k22a, k20a)),
+        Indicator.ell_y_shift(1000, k22a, k20a, -lump_shift), TrueShape.rot_blob(1000, k22a, k20a)),
 }
 
 methods = {

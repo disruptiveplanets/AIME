@@ -72,7 +72,6 @@ class Method:
         return out.real
 
     def get_unc(self, x,y,z):
-
         if self.final_uncertainty:
             b = self.get_b(x,y,z)
             if self.finite_element:

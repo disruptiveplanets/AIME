@@ -80,6 +80,12 @@ for plot_index in range(N_DIM):
 
     ax.plot(sigma_rat, (param_data[3]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1, linestyle='dashed')
 
+    thresh = sigma_rat[(np.abs(param_data[2]-param_data[0]) > 0.01) | np.abs((param_data[-2]-param_data[0]) > 0.01)]
+    if len(thresh) > 0 and thresh[0] == sigma_rat[0]:
+        thresh = sigma_rat[(np.abs(param_data[2]-param_data[0]) < 0.01) & np.abs((param_data[-2]-param_data[0]) < 0.01)]
+    if len(thresh) > 0:
+        ax.axvline(x=thresh[0], color='r', linewidth=1)
+
     if plot_index < 3:
         ax.set_ylabel(f"$\sigma({param_names[plot_index]}) (\\times 10^{{-5}})$", size=AXIS_SIZE)
     else:

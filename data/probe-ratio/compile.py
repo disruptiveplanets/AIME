@@ -84,6 +84,12 @@ for i in range(N_DIM):
     y_max_norm = np.max((param_data[1]-param_data[0]) / sigma_rho * scale)
     axs[i].set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
 
+    thresh = sigma_rho[(np.abs(param_data[2]-param_data[0]) > 0.01) | np.abs((param_data[-2]-param_data[0]) > 0.01)]
+    if len(thresh) > 0 and thresh[0] == sigma_rho[0]:
+        thresh = sigma_rho[(np.abs(param_data[2]-param_data[0]) < 0.01) & np.abs((param_data[-2]-param_data[0]) < 0.01)]
+    if len(thresh) > 0:
+        axs[i].axvline(x=thresh[0], color='r', linewidth=1)
+
     axs[i].set_ylabel(f"$\sigma({param_names[i]}) / \sigma_\\rho$", size=AXIS_SIZE)
 
     axs[i].set_xscale('log')

@@ -85,7 +85,11 @@ for plot_index in range(N_DIM):
     ax.set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
 
     ax.set_xlim(np.min(cadences), np.max(cadences))
-    #ax.axvline(x=6, color='k', linewidth=1, linestyle='dashed')
+    #ax.axvline(x=1/30, color='k', linewidth=1, linestyle='dashed')
+
+    thresh = cadences[(np.abs(param_data[2]-param_data[0]) > 0.01) | np.abs((param_data[-2]-param_data[0]) > 0.01)]
+    if len(thresh) > 0:
+        ax.axvline(x=thresh[0], color='r', linewidth=1)
 
     if plot_index >= 3:
         ax.set_ylabel(f"$\sigma({param_names[plot_index]})$ ($\\times 10^{{-2}}$)", size=AXIS_SIZE)

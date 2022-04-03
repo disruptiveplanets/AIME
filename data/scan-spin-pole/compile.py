@@ -104,6 +104,10 @@ for plot_index in range(N_DIM+1):
 
     vmax = np.percentile(cart_array, 95)
     im = axs[plot_index].pcolormesh(Lon, Lat, cart_array, vmin=np.min(cart_array), vmax=vmax, cmap='Blues_r')
+
+    if plot_index > 2:
+        axs[plot_index].contour(Lon, Lat, np.array(cart_array), levels=[10], colors=['r'], linewidths=[1])
+    
     cbar = fig.colorbar(im, ax=axs[plot_index], extend='max')
     if i < 3:
         cbar.set_label(f"$\sigma({param_names[i]})$ ($\\times 10^{{-7}})$")
