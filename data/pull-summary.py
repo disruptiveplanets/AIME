@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "cad-speed"
+PATH = "jupiter"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1
