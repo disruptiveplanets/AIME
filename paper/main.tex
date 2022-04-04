@@ -284,7 +284,7 @@ tidal torque can now be expressed as a function only of $J_{\ell m}$, $K_{\ell m
   \label{eqn:tidal-torque}
 \end{equation}
 
-Equation \ref{eqn:tidal-torque} possesses a few explicit properties which we discuss before writing the asteroid equations of motion. Firstly, $K_{00}$ does not appear, so that $\bm \tau$ is independent of asteroid mass. The mean density of the asteroid is therefore not constrained by tidal torque analysis. Secondly, torque is largest when $D$ is small (as expected). Thirdly, each $J_{\ell m}K_{\ell' m'}$ term is multiplied by $(D/a_M)^\ell (D/a_m)^{\ell'}$, the latter of which especially is a small number in most cases. Equation \ref{eqn:tidal-torque} can therefore be computed approximately by removing terms of large $\ell$ and $\ell'$. For our analysis, we remove $\ell' > 3$ and we usually keep only $\ell=0$.
+Equation \ref{eqn:tidal-torque} possesses a few explicit properties which we discuss before writing the asteroid equations of motion. Firstly, $K_{00}$ does not appear, so that $\bm \tau$ is independent of asteroid mass. The mean density of the asteroid is therefore not constrained by tidal torque analysis. Secondly, torque is largest when $D$ is small (as expected), with the leading order of $\bm \tau$ proportional to $D^{-3}$. Thirdly, each $J_{\ell m}K_{\ell' m'}$ term is multiplied by $(a_M/D)^\ell (a_m/D)^{\ell'}$, the latter of which especially is a small number in most cases. Equation \ref{eqn:tidal-torque} can therefore be computed approximately by removing terms of large $\ell$ and $\ell'$. For our analysis, we remove $\ell' > 3$ and we usually keep only $\ell=0$.
 
 Further insight can be gained by remarking the value of the first order of $\bm \tau$ for particular Euler angle cases. Setting $\beta = 0$ produces diagonal Wigner-$D$ matrices, and hence $\bm \tau \parallel \unit z$ to first order. Further, the component $\tau_z$ oscillates, so that for certain values of $\alpha$ and $\gamma$, $\bm \tau = 0.$ This $\beta=0$ condition is equivalent to $\unit z \parallel \unit Z$.
 
@@ -1022,11 +1022,38 @@ The dependence of the exact location of the cadence cutoff is likely more compli
 \section{Comparison of Jupiter and Earth flyby}
 \label{app:jupiter-earth}
 
-Note: $v_\infty^2 = \sqrt{\mu/r_p (e-1)}$.
+If sufficiently accurate spin pole data can be detected for non-Earth encounters, it may be possible to extract density moments for encounters with larger planets. In this appendix, we run our reference asteroid through a Jupiter encounter to analyze the differences in uncertainty.
+
+The physical parameters of the asteroid are kept the same as the Earth encounter case (listed in appendix \ref{app:reference-configs}), as are the observational uncertainty and cadence. The orbit is adjusted for the Jupiter case by setting a perijove distance of $r_p=5$ Jupiter radii (compared to perigee radius $r_p=5$ Earth radii for the Earth encounter). We perform two fits for two different values of $v_\infty$: in one case we keep the Earth-encounter value of $v_\infty = 6$ km s$^{-1}$, and in the other case we increase the velocity such that the eccentricity (and therefore the angle between the orbits' hyperbolic asymptotes) are the same for both encounters. The latter requires $v_\infty = \sqrt{G\mu_M/r_p (e-1)}=32$ km s$^{-1}$. The rationale for these excess velocity values is that, for $v_\infty = 6$ km s$^{-1}$, we keep a physically typical encounter excess velocity at the expense of changing the orbit shape, whereas for $v_\infty =32$ km s$^{-1}$ the orbit shape is unchagned, although the asteroid speed is dramatically increased.
 
 \jtd{Write}
 
+\begin{table}
+  \centering
+  \begin{tabular}{c|cc}
+    \hline 
+    $K_{\ell m}$ & $v_\infty=6$ km $s^{-1}$ & $v_\infty = 32$ km s$^{-1}$\\ \hline 
+    $\gamma_0$ & & 1.58 \\
+    $K_{22}$ & & 2.32 \\
+    $K_{20}$ & & 11.2 \\
+    $\Re K_{33}$ & & 17.5 \\
+    $\Im K_{33}$ & & 18.0 \\
+    $\Re K_{32}$ & & 17.7 \\
+    $\Im K_{32}$ & & 18.3 \\
+    $\Re K_{31}$ & & 24.9 \\
+    $\Im K_{31}$ & & 10.4 \\
+    $K_{30}$ & & 51.8 \\ \hline
+  \end{tabular}
+  \caption{Ratio of posterior uncertainty for all density moments $K_{\ell m}$ between an Earth encounter and a Jupiter encounter with identical properties except for an increased perigee and an excess velocity $v_\infty$ given as the column headers.}
+  \label{tab:jupiter-uncertainty}
+\end{table}
 
+There are additional effects of central body mass which are not captured in this analysis. For example, encounters with massive planets are more plentiful, so that observation for a fixed period of time will lead to a larger number of observed encounters conducive to low-uncertainty moment extraction (large $a_m$, small $r_p$, etc.). The distribution of $r_p$ in this encounter sample will also change; the ratio of the orbit impact parameter (the distance between the orbit asymptotes and the central body) to perigee distance is 
+\begin{equation}
+  \frac{b}{r_p} = \sqrt{1+2\frac{G\mu_M}{r_p v_\infty^2}}.
+\end{equation}
+It was mentioned above that the observable perigee distance $r_p$ increases with $a_M \sim \mu_M^{1/3}$, so that $\frac{b}{r_p}$ is larger for more massive planets and therefore the same impact parameter leads to lower periapse. Other effects, such as a change in the physical properties of the encountering asteroids, may also affect the fit uncertainties. However, the two effects we mention here both increase the number of encounters with properties conducive to accurate density moment extraction.
+  
 
 \section{Computing asteroid shape from density moments}
 \label{app:find-surface}
