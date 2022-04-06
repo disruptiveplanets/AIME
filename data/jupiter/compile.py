@@ -25,3 +25,4 @@ def show_ratios(name):
         print(f"{p}\t{r}")
 
 show_ratios("jupiter-same-orbit-0-samples.npy")
+show_ratios("jupiter-same-vel-0-samples.npy")
