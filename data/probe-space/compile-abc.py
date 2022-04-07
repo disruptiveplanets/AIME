@@ -191,10 +191,10 @@ def covariance():
     plt.savefig("compile-figs/corr1b.pdf")
 
     plt.figure(figsize=FIG_SIZE)
-    flat_sig_0 = np.array(sigma0_data).reshape(-1) * 1e4
-    c = plt.contourf(X, Y, np.array(sigma0_data) * 1e4, levels=np.linspace(0, np.max(np.sort(flat_sig_0[np.isfinite(flat_sig_0)])[:-7]), NUM_LEVELS), cmap='Purples_r')
+    flat_sig_0 = np.array(sigma0_data).reshape(-1) * 1e6
+    c = plt.contourf(X, Y, np.array(sigma0_data) * 1e6, levels=np.linspace(0, np.max(np.sort(flat_sig_0[np.isfinite(flat_sig_0)])[:-7]), NUM_LEVELS), cmap='Purples_r')
     axc = plt.colorbar(c)
-    axc.set_label("$\\sigma(\\gamma_0)$ ($\\times 10^{-3}$)")
+    axc.set_label("$\\sigma(\\gamma_0)$ ($\\times 10^{-6}$)")
     plot_pt()
     plt.xlabel("$a/c$")
     plt.ylabel("$b/c$")
@@ -204,9 +204,9 @@ def covariance():
     plt.savefig("compile-figs/theta-1-ab-sigma.pdf")
 
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, np.array(sigma1_data) * 10**3, levels=20, cmap="Purples_r")
+    c = plt.contourf(X, Y, np.array(sigma1_data) * 10**6, levels=20, cmap="Purples_r")
     axc = plt.colorbar(c)
-    axc.set_label("$\\sigma(a/c)$ ($\\times 10^{-4}$)")
+    axc.set_label("$\\sigma(a/c)$ ($\\times 10^{-6}$)")
     plot_pt()
     plt.xlabel("$a/c$")
     plt.ylabel("$b/c$")
@@ -216,9 +216,9 @@ def covariance():
     plt.savefig("compile-figs/theta-a-sigma.pdf")
 
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, np.array(sigma2_data) * 10**3, levels=20, cmap="Purples_r")
+    c = plt.contourf(X, Y, np.array(sigma2_data) * 10**6, levels=20, cmap="Purples_r")
     axc = plt.colorbar(c)
-    axc.set_label("$\\sigma(b/c)$ ($\\times 10^{-3}$)")
+    axc.set_label("$\\sigma(b/c)$ ($\\times 10^{-6}$)")
     plot_pt()
     plt.xlabel("$a/c$")
     plt.ylabel("$b/c$")

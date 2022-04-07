@@ -76,7 +76,7 @@ for i in range(N_DIM):
     param_data = np.zeros(len(oblatenesses) * N_PERCENTILES).reshape(N_PERCENTILES, len(oblatenesses))
     for f in percentiles.keys():
         param_data[:,name_index[f]] = percentiles[f][i]
-    scale = 1e3
+    scale = 1e5
     axs[i].plot(oblatenesses, abs(param_data[1] - THETA_TRUE[i]) * scale, color=f"C{i}", linewidth=1)
     axs[i].plot(oblatenesses, abs(param_data[-1] - THETA_TRUE[i]) * scale, color=f"C{i}", linewidth=1)
     axs[i].fill_between(oblatenesses, abs(param_data[1]-THETA_TRUE[i]) * scale, 
@@ -91,14 +91,14 @@ for i in range(N_DIM):
 
     axs[i].set_xscale('log')
     axs[i].set_yscale('log')
-    axs[i].set_ylabel(f"$|\Delta {param_names[i]}|\ (\\times 10^{{-3}})$", size=AXIS_SIZE)
+    axs[i].set_ylabel(f"$|\Delta {param_names[i]}|\ (\\times 10^{{-5}})$", size=AXIS_SIZE)
 
     for ob in oblateness_markers.values():
         axs[i].axvline(x=ob, color='k', linewidth=1)
 
     if i == 0:
         for name, ob in oblateness_markers.items():
-            axs[i].text(x=ob, y=6, verticalalignment='bottom', horizontalalignment='center', s=name, fontsize=12)
+            axs[i].text(x=ob, y=650, verticalalignment='bottom', horizontalalignment='center', s=name, fontsize=12)
 
     if i == 2:
         axs[i].set_xlabel("$\epsilon_\\textrm{true}$")

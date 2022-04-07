@@ -65,15 +65,41 @@ Gao F.,  Han L.,  2012, \mn@doi [Computational Optimization and Applications]
 Giorgini J.,  Benner L.,  Nolan M.,   Ostro S.,  2005, in AAS/Division of
   Dynamical Astronomy Meeting\# 36. pp 02--01
 
+\bibitem[\protect\citeauthoryear{Giorgini, Benner, Ostro, Nolan  \&
+  Busch}{Giorgini et~al.}{2008}]{giorgini2008predicting}
+Giorgini J.~D.,  Benner L.~A.,  Ostro S.~J.,  Nolan M.~C.,   Busch M.~W.,
+  2008, Icarus, 193, 1
+
+\bibitem[\protect\citeauthoryear{Hirabayashi, Kim  \& Brozovi{\'c}}{Hirabayashi
+  et~al.}{2021}]{hirabayashi2021finite}
+Hirabayashi M.,  Kim Y.,   Brozovi{\'c} M.,  2021, Icarus, 365, 114493
+
 \bibitem[\protect\citeauthoryear{Hou, Scheeres  \& Xin}{Hou
   et~al.}{2017}]{HouMar2017}
 Hou X.,  Scheeres D.~J.,   Xin X.,  Mar 2017, Celestial Mechanics and Dynamical
   Astronomy, 127, 369
 
+\bibitem[\protect\citeauthoryear{Kaiser et~al.,}{Kaiser
+  et~al.}{2002}]{kaiser2002pan}
+Kaiser N.,  et~al., 2002, in Survey and Other Telescope Technologies and
+  Discoveries. pp 154--164
+
 \bibitem[\protect\citeauthoryear{Kwiecinski, Krause  \& {Van
   Gorder}}{Kwiecinski et~al.}{2018}]{KWIECINSKI2018170}
 Kwiecinski J.~A.,  Krause A.~L.,   {Van Gorder} R.~A.,  2018, \mn@doi [Icarus]
   {https://doi.org/10.1016/j.icarus.2018.04.005}, 311, 170
+
+\bibitem[\protect\citeauthoryear{Larson, Brownlee, Hergenrother  \&
+  Spahr}{Larson et~al.}{1998}]{larson1998catalina}
+Larson S.,  Brownlee J.,  Hergenrother C.,   Spahr T.,  1998, in Bulletin of
+  the American Astronomical Society. p.~1037
+
+\bibitem[\protect\citeauthoryear{Lee et~al.}{Lee et~al.}{2022}]{Lee2022Apophis}
+Lee H.-J.,  et~al., 2022.
+
+\bibitem[\protect\citeauthoryear{Makarov, Goldin, Tkachenko, Veras  \&
+  Noyelles}{Makarov et~al.}{2022}]{Makarov2022ChaosOO}
+Makarov V.~V.,  Goldin A.,  Tkachenko A.~V.,  Veras D.,   Noyelles B.,  2022.
 
 \bibitem[\protect\citeauthoryear{Moskovitz et~al.,}{Moskovitz
   et~al.}{2020}]{MOSKOVITZ2020113519}
@@ -92,6 +118,11 @@ Cambridge University Press
 
 \bibitem[\protect\citeauthoryear{Paul}{Paul}{1988}]{paul88}
 Paul M.~K.,  1988, \mn@doi [Celestial mechanics] {10.1007/BF01230706}, 44, 49
+
+\bibitem[\protect\citeauthoryear{Pravec et~al.,}{Pravec
+  et~al.}{2014}]{PRAVEC201448}
+Pravec P.,  et~al., 2014, \mn@doi [Icarus]
+  {https://doi.org/10.1016/j.icarus.2014.01.026}, 233, 48
 
 \bibitem[\protect\citeauthoryear{Richardson, Bottke  \& Love}{Richardson
   et~al.}{1998}]{RICHARDSON199847}
@@ -119,9 +150,34 @@ Smalley K.,  Garradd G.,  Benner L.,  Nolan M.,  Giorgini J.,  Chesley S.,
   Ostro S.,   Scheeres D.,  2005, International Astronomical Union Circular,
   8477, 1
 
+\bibitem[\protect\citeauthoryear{Souchay, Souami, Lhotka, Puente  \&
+  Folgueira}{Souchay et~al.}{2014}]{souchay2014rotational}
+Souchay J.,  Souami D.,  Lhotka C.,  Puente V.,   Folgueira M.,  2014,
+  Astronomy \& Astrophysics, 563, A24
+
+\bibitem[\protect\citeauthoryear{Souchay, Lhotka, Heron, Herve, Puente  \&
+  Lopez}{Souchay et~al.}{2018}]{souchay2018changes}
+Souchay J.,  Lhotka C.,  Heron G.,  Herve Y.,  Puente V.,   Lopez M.~F.,  2018,
+  Astronomy \& Astrophysics, 617, A74
+
+\bibitem[\protect\citeauthoryear{Stokes, Evans, Viggh, Shelly  \&
+  Pearce}{Stokes et~al.}{2000}]{stokes2000lincoln}
+Stokes G.~H.,  Evans J.~B.,  Viggh H.~E.,  Shelly F.~C.,   Pearce E.~C.,  2000,
+  Icarus, 148, 21
+
+\bibitem[\protect\citeauthoryear{Valvano, Winter, Sfair, Machado~Oliveira,
+  Borderes-Motta  \& Moura}{Valvano et~al.}{2022}]{valvano2022apophis}
+Valvano G.,  Winter O.~C.,  Sfair R.,  Machado~Oliveira R.,  Borderes-Motta G.,
+    Moura T.,  2022, Monthly Notices of the Royal Astronomical Society, 510, 95
+
 \bibitem[\protect\citeauthoryear{Wright et~al.,}{Wright
   et~al.}{2010}]{wright2010wide}
 Wright E.~L.,  et~al., 2010, The Astronomical Journal, 140, 1868
+
+\bibitem[\protect\citeauthoryear{Yu, Richardson, Michel, Schwartz  \&
+  Ballouz}{Yu et~al.}{2014}]{yu2014numerical}
+Yu Y.,  Richardson D.~C.,  Michel P.,  Schwartz S.~R.,   Ballouz R.-L.,  2014,
+  Icarus, 242, 82
 
 \bibitem[\protect\citeauthoryear{van Gelderen}{van
   Gelderen}{1998}]{Gelderen1998TheSO}

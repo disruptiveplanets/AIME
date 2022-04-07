@@ -101,7 +101,7 @@ for i in range(N_DIM):
 
     if i == 0:
         for name, ob in oblateness_markers.items():
-            axs[i].text(x=ob, y=17, verticalalignment='bottom', horizontalalignment='center', s=name, fontsize=12)
+            axs[i].text(x=ob, y=18, verticalalignment='bottom', horizontalalignment='center', s=name, fontsize=12)
 
     if i == 2:
         axs[i].set_xlabel(f"$\epsilon$")

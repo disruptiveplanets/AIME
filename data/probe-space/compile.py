@@ -235,13 +235,13 @@ def covariance():
     plt.savefig("compile-figs/corr13.pdf")
 
     plt.figure(figsize=FIG_SIZE)
-    flat_sig_0 = np.array(sigma0_data).reshape(-1) * 1e4
-    c = plt.contourf(X, Y, np.array(sigma0_data) * 1e4, levels=np.linspace(0, np.max(np.sort(flat_sig_0[np.isfinite(flat_sig_0)])[:-7]), NUM_LEVELS), cmap='Purples_r')
+    flat_sig_0 = np.array(sigma0_data).reshape(-1) * 1e6
+    c = plt.contourf(X, Y, np.array(sigma0_data) * 1e6, levels=np.linspace(0, np.max(np.sort(flat_sig_0[np.isfinite(flat_sig_0)])[:-7]), NUM_LEVELS), cmap='Purples_r')
     axc = plt.colorbar(c)
     plt.xlim(-0.11, 0.11)
     plot_pt()
     plt.ylim(-0.24, -0.03)
-    axc.set_label("$\\sigma(\\gamma_0)$ ($\\times 10^{-4}$)")
+    axc.set_label("$\\sigma(\\gamma_0)$ ($\\times 10^{-6}$)")
     plt.xlabel("$K_{22}$")
     plt.ylabel("$K_{20}$")
     plt.tight_layout()
@@ -260,7 +260,7 @@ def covariance():
     plt.savefig("compile-figs/theta-2-sigma.pdf")
 
     plt.figure(figsize=FIG_SIZE)
-    c = plt.contourf(X, Y, np.array(sigma2_data) * 1e5, levels=np.linspace(0, np.nanmax(sigma2_data) * 1e5, NUM_LEVELS), cmap='Purples_r')
+    c = plt.contourf(X, Y, np.array(sigma2_data) * 1e6, levels=np.linspace(0, np.nanmax(sigma2_data) * 1e6, NUM_LEVELS), cmap='Purples_r')
     axc = plt.colorbar(c)
     plt.xlim(-0.11, 0.11)
     plot_pt()
