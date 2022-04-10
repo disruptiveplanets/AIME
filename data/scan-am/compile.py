@@ -97,8 +97,22 @@ for plot_index in range(N_DIM):
     #ax.set_xscale('log')
     ax.set_yscale('log')
 
+    def model_fn(x, p, a):
+        y0 = np.interp(1000, x, (param_data[2]-param_data[0])*scale)
+        return y0 * np.exp(a * (1000**p-x**p))
+
+    import lmfit
+    model = lmfit.Model(model_fn)
+    params = lmfit.Parameters()
+    params.add("p", min=0, max=1, value=0.25)
+    params.add("a", min=0, value=1)
+    res = model.fit(x=am, data=(param_data[2]-param_data[0])*scale, params=params, weights=np.ones_like(am))
+    #print(res.fit_report())
+    print(f"{res.params['p'].value} +/- {res.params['p'].stderr}\t{res.params['a'].value} +/- {res.params['a'].stderr}")
+    #ax.plot(am, model_fn(am, res.params["p"].value, res.params["a"].value), color='k', linestyle='dotted', linewidth=1)
+
     ax.set_xlim(np.min(am), np.max(am))
-    #ax.axvline(x=6, color='k', linewidth=1, linestyle='dashed')
+    ax.axvline(x=1000, color='k', linewidth=1, linestyle='dashed')
 
     if plot_index == 9:
         ax.set_xlabel(f"$a_m$ (m)")

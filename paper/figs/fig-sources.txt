@@ -41,6 +41,7 @@ spin-pole-avg-mollweide.pdf data/scan-spin-pole/avg-pole-mollweide.pdf
 spin-pole-avg-polar.pdf data/scan-spin-pole/avg-pole-polar.pdf
 
 scan-vex.pdf data/scan-vex/vex.pdf
+scan-am.pdf data/scan-am/am.pdf
 
 scan-perigee.pdf data/scan-perigee/perigee.pdf
 

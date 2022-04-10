@@ -550,6 +550,20 @@ Figure \ref{fig:scan-space-corr} displays the correlation between the first-orde
 
 Overall, the variation in the uncertainties on $K_{20}$ and $K_{22}$ (the first order density moments) is present but largely smooth across their allowed parameter space, as is their correlation (except the large $K_{22}$ corner). It therefore seems reasonable to use the asymmetric asteroid shape as a stand-in for an unknown's asteroid shape when simulating an encounter, as we do in this paper. The uncertainty then can be expected to differ across other shapes by a factor of about two or less, as long as the degenerate, symmetric asteroid regime is avoided.
 
+On the other hand, the posterior uncertainty of $K_{3m}$ is much more strongly dependent on asteroid ``radius'' $a_m$. Figure \ref{fig:scan-am} displays posterior uncertainty $\sigma$ as a function of $a_m$, defined in equation \ref{eqn:am}. The vertical axis is shown in log space, meaning that the average of the upper and lower error bars of $\sigma$ is shown instead of showing both as is done in other figures.
+
+\begin{figure}
+  \centering
+  \includegraphics[height=0.89\textheight]{figs/scan-am.pdf}
+  \caption{1- and 2-$\sigma$ confidence intervals for the first-order parameter posteriors (\textit{top}) and second-order parameters (\textit{bottom}) as a function of asteroid ``radius'' $a_m$. The reference cadence is 2 minutes. The red vertical lines indicate when $\sigma = 0.01$. The black dashed line indicates the reference value of $a_m=1000$ m.}
+  \label{fig:scan-am}
+\end{figure}
+
+As was mentioned in section \ref{sec:tidal-torque}, the $K_{2m}$ parameters are insensitive to $a_m$ since the $a_m^2$ term in $\bm \tau$ (equation \ref{eqn:tidal-torque}) is canceled by the $a_m^2$ in the moment of inertia (equation \ref{eqn:moi}). The $K_{3m}$ uncertainty is strongly dependent on $a_m$ for the same reason that uncertainty is strongly dependent on $r_p$: the $(a_m/D)^{\ell'}$ dependence of equation \ref{eqn:tidal-torque}. At $a_m \lesssim 700$ m, $K_{30}$ becomes unresolved. The other parameters become unresolved for $a_m \lesssim 300$ m, with the cut-off for $K_{33}$ being less than 100 meters. This $a_m$ cut-off is quite sharp; figure \ref{fig:scan-am} shows steep decrease in $\sigma(a_m)$ for low $a_m$, with an approximate functional form of $\sigma(a_m) \sim e^{(a_m/C)^p}$ for a scaling constant $C$ and some power $p < 1$. (In figure \ref{fig:scan-am}, the best fitting values are $p < 0.07$.) This sharpness indicates that the cut-off value of $a_m$ is unlikely to change significantly if other parameters of the flyby are altered in a way that slightly increases or decreases $\sigma$. It therefore appears that extracting precise $K_{30}$ from asteroids with $a_m \lesssim 700$ m is very unlikely with this analysis, and for $a_m \lesssim 100$ m, all $K_{3m}$ will likely be unresolved.
+
+For uniform density asteroids, large $a_m$ is equivalent to large asteroid radius, which was mentioned in section \ref{sec:moments} and explicitly shown in equation \ref{eqn:ellipsoid-axes}. In non-uniform density asteroids, large $a_m$ can also be achieved by distributing the mass of the asteroid near the surface, because the $r^2$ term in the integrand of the definition of $a_m$ causes the density of regions distant from the asteroid center of mass to dominate $a_m$.
+
+
 
 
 \subsection{Cadence}
