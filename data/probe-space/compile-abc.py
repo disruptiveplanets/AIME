@@ -38,8 +38,9 @@ def plot_pt():
     asym1 = get_ratios(0.05200629, -0.2021978)
     asym2 = get_ratios(-0.05200629, -0.2021978)
     plt.scatter([sym[0]], [sym[1]], color='k', marker='o')
-    plt.scatter([asym1[0]], [asym1[1]], color='k', marker='s')
-    plt.scatter([asym2[0]], [asym2[1]], color='k', marker='s')
+    plt.scatter([asym1[0]], [asym1[1]], color='k', marker='*', s=24)
+    plt.scatter([asym2[0]], [asym2[1]], color='k', marker='*', s=24)
+
 # Fill points
 for bare in file_names:
     if not os.path.isdir(bare):

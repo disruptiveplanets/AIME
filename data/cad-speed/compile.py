@@ -107,6 +107,7 @@ def show_plot(percentiles, axs, speed):
         axs[plot_index].plot(cadences, (param_data[-1]-param_data[0]) * scale, color=color, linestyle=linestyle, linewidth=2)
 
         axs[plot_index].set_ylim(-SCALE_Y, SCALE_Y)
+        axs[plot_index].set_xlim(np.min(cadences), np.max(cadences))
 
         axs[plot_index].set_ylabel(f"$\sigma({param_names[plot_index]})$", size=AXIS_SIZE)
 

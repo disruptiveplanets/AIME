@@ -87,6 +87,7 @@ for i in range(N_DIM):
 
     axs[i].set_xscale('log')
     axs[i].set_ylabel(f"$\sigma({param_names[i]})\\ (\\times 10^{{-7}})$", size=AXIS_SIZE)
+    axs[i].set_xlim(np.min(oblatenesses), np.max(oblatenesses))
 
     s1n = plot_best_fit(axs[i], oblatenesses, (param_data[-1]-param_data[0]), scale)
     s1 = plot_best_fit(axs[i], oblatenesses, (param_data[1]-param_data[0]), scale)
