@@ -1,0 +1,55 @@
+This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: mnras.bst
+Database file #1: asteroids.bib
+Warning--I'm ignoring HouMar2017's extra "note" field
+--line 132 of file asteroids.bib
+Warning--I'm ignoring HouMar2017's extra "note" field
+--line 133 of file asteroids.bib
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Warning--empty booktitle in Lee2022Apophis
+Warning--empty booktitle in Makarov2022ChaosOO
+You've used 35 entries,
+            2881 wiz_defined-function locations,
+            975 strings with 15730 characters,
+and the built_in function-call counts, 17241 in all, are:
+= -- 1353
+> -- 1337
+< -- 79
++ -- 577
+- -- 216
+* -- 2003
+:= -- 2757
+add.period$ -- 0
+call.type$ -- 35
+change.case$ -- 71
+chr.to.int$ -- 35
+cite$ -- 37
+duplicate$ -- 843
+empty$ -- 861
+format.name$ -- 320
+if$ -- 3009
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 36
+newline$ -- 119
+num.names$ -- 250
+pop$ -- 207
+preamble$ -- 1
+purify$ -- 140
+quote$ -- 0
+skip$ -- 507
+stack$ -- 0
+substring$ -- 939
+swap$ -- 429
+text.length$ -- 143
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 312
+warning$ -- 2
+while$ -- 264
+width$ -- 0
+write$ -- 358
+(There were 4 warnings)

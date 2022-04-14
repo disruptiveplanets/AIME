@@ -30,26 +30,10 @@ Baxansky A.,  Kiryati N.,  2007, \mn@doi [Pattern Recognition]
   et~al.}{2020}]{benson2020spin}
 Benson C.~J.,  Scheeres D.~J.,   Moskovitz N.~A.,  2020, Icarus, 340, 113518
 
-\bibitem[\protect\citeauthoryear{Berthier et~al.,}{Berthier
-  et~al.}{2020}]{BERTHIER2020113990}
-Berthier J.,  et~al., 2020, \mn@doi [Icarus]
-  {https://doi.org/10.1016/j.icarus.2020.113990}, 352, 113990
-
 \bibitem[\protect\citeauthoryear{Boué \& Laskar}{Boué \&
   Laskar}{2009}]{BOUE2009750}
 Boué G.,  Laskar J.,  2009, \mn@doi [Icarus]
   {https://doi.org/10.1016/j.icarus.2009.02.001}, 201, 750
-
-\bibitem[\protect\citeauthoryear{DeMartini, Richardson, Barnouin, Schmerr,
-  Plescia, Scheirich  \& Pravec}{DeMartini et~al.}{2019}]{DEMARTINI201993}
-DeMartini J.~V.,  Richardson D.~C.,  Barnouin O.~S.,  Schmerr N.~C.,  Plescia
-  J.~B.,  Scheirich P.,   Pravec P.,  2019, \mn@doi [Icarus]
-  {https://doi.org/10.1016/j.icarus.2019.03.015}, 328, 93
-
-\bibitem[\protect\citeauthoryear{Descamps et~al.,}{Descamps
-  et~al.}{2020}]{DESCAMPS2020113726}
-Descamps P.,  et~al., 2020, \mn@doi [Icarus]
-  {https://doi.org/10.1016/j.icarus.2020.113726}, 345, 113726
 
 \bibitem[\protect\citeauthoryear{Foreman-Mackey, Hogg, Lang  \&
   Goodman}{Foreman-Mackey et~al.}{2013}]{foreman2013emcee}
@@ -137,12 +121,6 @@ Scheeres D.,  Ostro S.,  Werner R.,  Asphaug E.,   Hudson R.,  2000, \mn@doi
 \bibitem[\protect\citeauthoryear{Scheeres, Marzari  \& Rossi}{Scheeres
   et~al.}{2004}]{scheeres2004evolution}
 Scheeres D.~J.,  Marzari F.,   Rossi A.,  2004, Icarus, 170, 312
-
-\bibitem[\protect\citeauthoryear{Scheeres, Benner, Ostro, Rossi, Marzari  \&
-  Washabaugh}{Scheeres et~al.}{2005}]{SCHEERES2005281}
-Scheeres D.,  Benner L.,  Ostro S.,  Rossi A.,  Marzari F.,   Washabaugh P.,
-  2005, \mn@doi [Icarus] {https://doi.org/10.1016/j.icarus.2005.06.002}, 178,
-  281
 
 \bibitem[\protect\citeauthoryear{Smalley, Garradd, Benner, Nolan, Giorgini,
   Chesley, Ostro  \& Scheeres}{Smalley et~al.}{2005}]{smalley20052004}

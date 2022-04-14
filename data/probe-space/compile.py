@@ -18,9 +18,9 @@ KEY_INDICES = [24, 94, 101]
 FIG_SIZE = (5.333, 4)
 
 def plot_pt():
-    plt.scatter([0], [-0.09766608], color='k', marker='o')
-    plt.scatter([0.05200629], [-0.2021978], color='k', marker='*', s=24)
-    plt.scatter([-0.05200629], [-0.2021978], color='k', marker='*', s=24)
+    plt.scatter([0], [-0.09766608], color='r', marker='o')
+    plt.scatter([0.05200629], [-0.2021978], color='k', marker='^')
+    plt.scatter([-0.05200629], [-0.2021978], color='k', marker='^')
 
 # Fill points
 for bare in file_names:
