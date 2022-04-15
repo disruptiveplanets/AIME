@@ -54,6 +54,9 @@ def make_frame(densities, pos_array, axis_name, cmap, percentile, balance, z_ind
     fig = plt.figure()
     csection = densities[:,:,z_index]
     want_min, want_max = np.nanpercentile(densities, 1), np.nanpercentile(densities, percentile)
+    if cmap == 'Greys_r': # Uncertainty
+        want_min = 0
+        
     if balance:
         want_max = max(want_max, -want_min)
         want_min = -want_max
@@ -99,6 +102,10 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
     ax.grid(False)
 
     want_min, want_max = np.nanpercentile(densities, 1), np.nanpercentile(densities, percentile)
+
+    if cmap == 'Greys_r': # Uncertainty
+        want_min = 0
+
     if balance:
         want_max = min(want_max, -want_min)
         want_min = -want_max

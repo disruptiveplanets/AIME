@@ -21,11 +21,6 @@
 Ashenberg J.,  2007, \mn@doi [Celestial Mechanics and Dynamical Astronomy]
   {10.1007/s10569-007-9092-7}, 99, 149
 
-\bibitem[\protect\citeauthoryear{Baxansky \& Kiryati}{Baxansky \&
-  Kiryati}{2007}]{BAXANSKY2007756}
-Baxansky A.,  Kiryati N.,  2007, \mn@doi [Pattern Recognition]
-  {https://doi.org/10.1016/j.patcog.2006.06.001}, 40, 756
-
 \bibitem[\protect\citeauthoryear{Benson, Scheeres  \& Moskovitz}{Benson
   et~al.}{2020}]{benson2020spin}
 Benson C.~J.,  Scheeres D.~J.,   Moskovitz N.~A.,  2020, Icarus, 340, 113518
@@ -43,16 +38,6 @@ Foreman-Mackey D.,  Hogg D.~W.,  Lang D.,   Goodman J.,  2013, Publications of
 \bibitem[\protect\citeauthoryear{Gao \& Han}{Gao \& Han}{2012}]{Gao2012}
 Gao F.,  Han L.,  2012, \mn@doi [Computational Optimization and Applications]
   {10.1007/s10589-010-9329-3}, 51, 259
-
-\bibitem[\protect\citeauthoryear{Giorgini, Benner, Nolan  \& Ostro}{Giorgini
-  et~al.}{2005}]{giorgini2005recent}
-Giorgini J.,  Benner L.,  Nolan M.,   Ostro S.,  2005, in AAS/Division of
-  Dynamical Astronomy Meeting\# 36. pp 02--01
-
-\bibitem[\protect\citeauthoryear{Giorgini, Benner, Ostro, Nolan  \&
-  Busch}{Giorgini et~al.}{2008}]{giorgini2008predicting}
-Giorgini J.~D.,  Benner L.~A.,  Ostro S.~J.,  Nolan M.~C.,   Busch M.~W.,
-  2008, Icarus, 193, 1
 
 \bibitem[\protect\citeauthoryear{Hirabayashi, Kim  \& Brozovi{\'c}}{Hirabayashi
   et~al.}{2021}]{hirabayashi2021finite}
@@ -103,11 +88,6 @@ Cambridge University Press
 \bibitem[\protect\citeauthoryear{Paul}{Paul}{1988}]{paul88}
 Paul M.~K.,  1988, \mn@doi [Celestial mechanics] {10.1007/BF01230706}, 44, 49
 
-\bibitem[\protect\citeauthoryear{Pravec et~al.,}{Pravec
-  et~al.}{2014}]{PRAVEC201448}
-Pravec P.,  et~al., 2014, \mn@doi [Icarus]
-  {https://doi.org/10.1016/j.icarus.2014.01.026}, 233, 48
-
 \bibitem[\protect\citeauthoryear{Richardson, Bottke  \& Love}{Richardson
   et~al.}{1998}]{RICHARDSON199847}
 Richardson D.~C.,  Bottke W.~F.,   Love S.~G.,  1998, \mn@doi [Icarus]
@@ -121,12 +101,6 @@ Scheeres D.,  Ostro S.,  Werner R.,  Asphaug E.,   Hudson R.,  2000, \mn@doi
 \bibitem[\protect\citeauthoryear{Scheeres, Marzari  \& Rossi}{Scheeres
   et~al.}{2004}]{scheeres2004evolution}
 Scheeres D.~J.,  Marzari F.,   Rossi A.,  2004, Icarus, 170, 312
-
-\bibitem[\protect\citeauthoryear{Smalley, Garradd, Benner, Nolan, Giorgini,
-  Chesley, Ostro  \& Scheeres}{Smalley et~al.}{2005}]{smalley20052004}
-Smalley K.,  Garradd G.,  Benner L.,  Nolan M.,  Giorgini J.,  Chesley S.,
-  Ostro S.,   Scheeres D.,  2005, International Astronomical Union Circular,
-  8477, 1
 
 \bibitem[\protect\citeauthoryear{Souchay, Souami, Lhotka, Puente  \&
   Folgueira}{Souchay et~al.}{2014}]{souchay2014rotational}

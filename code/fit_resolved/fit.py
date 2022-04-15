@@ -1,7 +1,5 @@
 TEST = False
 
-VELOCITY_MUL = 1
-
 import numpy as np
 import matplotlib.pyplot as plt
 import emcee, time, sys, logging
@@ -80,8 +78,10 @@ jlms = [float(x) for x in f.readline().split(',')]
 theta_true = [float(x) for x in f.readline().split(',')]
 theta_high = np.asarray([float(x) for x in f.readline().split(',')])
 theta_low = np.asarray([float(x) for x in f.readline().split(',')])
-
 sigma = [float(d) for d in f.readline().split(", ")]# theta, ratio
+last_line = f.readline()
+VELOCITY_MUL = 1 if last_line == '' else float(last_line)
+
 while output_name[-1] == '\n':
     output_name = output_name[:-1]
 f.close()

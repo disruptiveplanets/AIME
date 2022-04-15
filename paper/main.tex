@@ -119,7 +119,7 @@ both of which are constant and only need to be computed once to generate data. H
 \end{equation}
 where $\bm D$ is the position of the asteroid; $\alpha$, $\beta$, and $\gamma$ are Euler angles expressing the orientation of the asteroid; and  $\mu_\mathcal{B}$ and $J_{\ell m}$ are the mass and density moments of the central body respectively; and $S_{\ell m}$ are the irregular solid spherical harmonics.
 
-In section \ref{sec:sim}, we describe the simulation used to integrate the equations of motion and ins section 
+In section \ref{sec:sim}, we describe the simulation used to integrate the equations of motion. In section \ref{sec:uncertainty}, we define the uncertainty model used to add noise to the data, and we describe how PPDs for density moments were extracted from spin-pole data in section \ref{sec:fit}. Finally, we outline a general model to extract density distributions from density moments in section \ref{sec:general-density} and define specific model implementations in section \ref{sec:specific-density}
 
 
 \subsection{Simulation design}
@@ -186,7 +186,7 @@ This model was chosen because it separates spin pole and period uncertainty. The
 
 
 
-\subsection{Fit process}
+\subsection{Extracting density moments from spin data}
 \label{sec:fit}
 Given synthetic data, an Affine Invariant Markov Chain Monte Carlo (MCMC) Ensemble sampler was used to generate PPDs from flat priors. We use the Python implementation \texttt{emcee} \cite{foreman2013emcee}. Our parameters were $\gamma_0$, $K_{20}$, $K_{22}$, and $K_{3m}$ (10 in total), and were bounded by $|\gamma_0| < \pi/4$, and bounds on $K_{2 m}$ given in equation \ref{eqn:parameter-bounds}. Note that $\gamma_0$ is degenerate with $\gamma_0 + \pi/2$ since this is equivalent to re-labeling $\unit y$ as $\unit x$ and $\unit x$ as $-\unit y$. The other bounds were $|K_{3m}| < 1$.
 
@@ -197,372 +197,14 @@ Before the MCMC was run, local minima in the likelihood were found via the Nelde
 We further subdivided the minimization process by first minimizing with respect to data truncated at the point after perigee where $D=fr_p$ for some manually-set fraction $f$. In practice, $f=2$ often led to success. The minimum was then further refined by minimizing based on the full data, with the previous minimum as the initial estimate.
 
 
+\subsection{Extracting density distributions from density moments: general model design}
+\label{sec:general-density}
 
+The asteroid density distribution $\rho_\mathcal{A}(\bm r)$ is not uniquely constrained via tidal torque interactions because only the density moments $K_{\ell m}$ contribute to equation \ref{eqn:tidal-torque}. However, by making sufficient assumptions about the density distribution, we can nevertheless estimate $\rho(\bm r)$ from $K_{\ell m}$. Here, we outline three different assumptions which constitute three models for extracting density distributions from density moments. One of them can be chosen, or another created, depending on what features are desired to be represented in the density distribution.
 
-
-\section{Results}
-\label{sec:results}
-
-\subsection{Spin evolution}
-
-In figure \ref{fig:example-data}, we present example spin data generated via our simulation. A population of one thousand asteroids with identical initial conditions except for $\gamma_0$, $K_{20}$, and $K_{22}$ were simulated on a close Earth encounter. The exact parameters used were the symmetric and asymmetric cases described in appendix \ref{app:reference-configs}. Bands containing 68.3\%, 95.5\%, and 99.7\% of the population's spin are shown, as is the spin of the reference asteroids in black.
-
-\begin{figure*}
-  \centering
-  \includegraphics[width=0.7\linewidth]{figs/nominal-data-sym.pdf}
-  \includegraphics[width=0.7\linewidth]{figs/nominal-data-asym.pdf}
-  \caption{Angular velocity data simulated for the symmetric (above) and asymmetric (below) reference asteroids. The true angular velocity evolution is shown as a black line. Also plotted is the deviation of the data for PPD-distributed perturbations to the asteroid shape (bands). Bands contain 68.3\%, 95.5\%, and 99.7\% of the 1000 simulations run.}
-  \label{fig:example-data}
-\end{figure*}
-
-\begin{figure*}
-  \centering
-  \includegraphics[width=0.7\textwidth]{figs/example-residuals.pdf}
-  \caption{Data, best fit results, and residuals for a fit to synthetic data simulated for an asymmetric reference asteroid. The standard deviation of the data is plotted as an uncertainty band in the residuals plot, but these do not capture covariance between data points.}
-  \label{fig:example-residuals}
-\end{figure*}
-
-To choose the initial values of $\gamma_0$, $K_{20}$, and $K_{22}$, spin data for the reference asteroids of appendix \ref{app:reference-configs} was first generated. Then $\gamma_0$, $K_{20}$, and $K_{22}$ were re-extracted via the fit described in section \ref{sec:fit}. The population's values for these parameters were PPD-distributed. However, the PPD distribution was widened by a factor of 1000 to make the band widths visible. Therefore, the scale of the bands in figure \ref{fig:example-data} have little meaning in an absolute sense, but they are meaningful when comparing two bands or two times in the same band.
-
-The figure illustrates the sensitivity of spin data to asteroid density moments and $\gamma_0$; Before perigee, all asteroids had similar angular velocities, but after perigee the angular velocities of the population diverged. The oscillation periods observable during the torque-free precession phase of the spin data (about 5 hours after perigee) vary within the population, showing that they can be used to constrain $K_{22}$ and $K_{20}$.
-
-\subsection{Example fit results}
-
-Here, we present example results of the MCMC fit described in section \ref{sec:fit}, applied to encounter data of the asymmetric reference asteroid. The fit results were consistent with the true density moments, and produced consistent data.
-
-Figure \ref{fig:example-residuals} shows the spin data with the best-fit overlaid in the top pane and the residuals in the bottom pane. Uncertainties are plotted on the residuals corresponding to the square root of the diagonal entries of the covariance matrix (correlations not included).
-
-
-Figure \ref{fig:example-corner} shows a corner plot of the ten fitted parameters' posterior distributions, marginalized to functions of one or two variables. The true parameters are shown as lines. Note that the true parameters usually lie within 1- or 2$\sigma$ of the $\Delta K_{\ell m} = 0$, where $\Delta K_{\ell m}$ is the difference between the posterior $K_{\ell m}$ and the true $K_{\ell m}$.
-
-\begin{figure*}
-  \centering
-  \includegraphics[width=\textwidth]{figs/example-corner.pdf}
-  \caption{A corner plot for the fit results ten parameters to synthetic data simulated for an asymmetric reference asteroid. Marginal posterior PDFs for each parameter are shown (histograms) along with two-dimensional PDFs (contours). Individual points in the contours are samples from the MCMC fit, and the contours enclose 1-, 2-, and 3-$\sigma$ of them. True values (which are zero here due to the parameters being displayed relative to the true values) are also shown (blue lines).}
-  \label{fig:example-corner}
-\end{figure*}
-
-\subsection{Density stuff?}
-
-
-
-
-\section{Discussion}
-\label{sec:discussion}
-
-
-% \afterpage{
-%   \begin{landscape}
-%     \begin{figure}
-%     \centering
-%     \includegraphics[height=0.89\textheight]{figs/scan-period.pdf}
-%     \caption{caption}
-%     \label{fig:label}
-%     \end{figure}
-%   \end{landscape}
-% }
-% PLOTS THAT COULD BE HERE
-% rp
-% vp
-
-
-In this section, we assess the sensitivity of the PPDs for the first-order parameters ($\gamma_0$, $K_{20}$, and $K_{22}$), and the second-order parameters ($K_{3m}$) to many possible close encounter configurations. Specifically, we test sensitivity to the encounter's orbital parameters, the degree of observational uncertainty, the asteroid's radius, the cadence of observation, the amount of data collected at perigee, the direction of the initial spin pole, the asteroid period, and the central body oblateness. These effects are presented roughly in order of how much they affect the parameter precision, from highest to lowest.
-
-Parameter precision of 1$\sigma$ is defined such that 68.27\% of the PPD lies within 1$\sigma$ of the mean of the PPD. 2$\sigma$ is defined likewise for 95.45\% of the PPD. The PPDs are usually roughly Gaussian, so that the upper and lower error bars are usually roughly equal and 1$\sigma$ is approximately the standard deviation of the PPD.
-
-In all cases, we use the configuration of the asymmetric reference asteroid (appendix \ref{app:reference-configs}) unless otherwise stated. We further present a test of how precision depends on cadence, asteroid period, and the duration of the encounter in appendix \ref{app:cadence-tests}, and we compare precision for a Jupiter and an Earth encounter in appendix \ref{app:jupiter-earth}.
-
-
-\subsection{Orbital elements}
-\label{sec:scan-orbit}
-A Keplerian orbit is completely described by five parameters, but three describe the orbit's orientation with respect to the central body. The orbit can be rotated to the $\unit X \unit Y$-plane, as mandated by our coordinate definitions, by changing the density moments of the central body. Since $J_{00}$ is unchanged by this rotation and $J_{1m}=0$, the orbit orientation is irrelevant until the $J_{2m}$ terms of equation \ref{eqn:tidal-torque}, and we do not investigate them here.
-
-We parametrize the shape of the orbit by the perigee distance $r_p$ and excess velocity $v_\infty$. Fits of the type described in section \ref{sec:fit} were run for many values of $r_p$ and $v_\infty$ and the 1 and 2$\sigma$ confidence intervals are displayed in figures \ref{fig:scan-vex} for $v_\infty$ and \ref{fig:scan-perigee} for $r_p$.
-
-
-
-\begin{figure}
-  \centering
-  \includegraphics[height=0.89\textheight]{figs/scan-vex.pdf}
-  \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of orbital excess velocity $v_\infty$. The vertical dashed line indicates the reference asteroid value of 6 km s$^{-1}$. The red vertical lines indicate when $\sigma = 0.01$.}
-  \label{fig:scan-vex}
-\end{figure}
-
-Figure \ref{fig:scan-vex} demonstrates that parameter precision does not depend strongly on excess velocity, aside from a slight trend especially in the higher order parameters for uncertainty to increase with $v_\infty$. This is likely due to the fact that larger $v_\infty$ leads to a faster and flatter orbit with less time spent close to the planet, where tidal torque is strongest. There are also smaller-scale oscillations in the uncertainty, due to the orientation of the asteroid at perigee varying. The asteroid is always simulated to start at the same orientation, but increasing $v_\infty$ decreases the time to perigee, so that the asteroid enters this region of high torque at different orientations depending on $v_\infty$. This effect explains why these small-scale oscillations have the same period for all parameters. Note that these oscillations are sometimes large enough to raise $\sigma > 0.01$, shown by the red vertical line.
-
-\begin{figure}
-  \centering
-  \includegraphics[height=0.89\textheight]{figs/scan-perigee.pdf}
-  \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of perigee distance $r_p$. The vertical dashed line indicates the reference asteroid value of 5 Earth radii. The dotted curve indicates a power-law fit (see text). The red vertical lines indicate when $\sigma = 0.01$.}
-  \label{fig:scan-perigee}
-\end{figure}
-
-Figure \ref{fig:scan-perigee} shows much stronger dependence of parameter uncertainty on perigee distance, as expected by the factor of $(a_\mathcal{A}/D)^{\ell'}$ present in equation \ref{eqn:tidal-torque} and mentioned in section \ref{sec:tidal-torque}. For $r_p \approx 6$ or 7 Earth radii, $\sigma(K_{30})$ reaches the reference 0.01 limit. At slightly higher $r_p$, $K_{31}$ and $K_{32}$ become similarly unresolved, and at $r_p \approx 20$ Earth radii, $K_{33}$, the last second-order component, becomes unresolved. Even before this, at $r_p \approx 10$ Earth radii, the most uncertain parameter $K_{30}$ fills the prior distribution with uncertainty ranging from -1 to 1, visible by the sudden cut-off in uncertainty increase and the discontinuity of the $\sigma$ curve there. The location of these limits will change if different encounter properties are used, but this is still an illustrative example.
-
-\begin{table}
-  \centering
-  \begin{tabular}{l|c}
-    \hline
-    Parameter & $\alpha$ \\ \hline
-    $\gamma_0$ & $2.05$ \\
-    $K_{22}$ & $5.47$ \\
-    $K_{20}$ & $5.47$ \\ \hline
-    $\Re K_{33}$ & $3.35$ \\
-    $\Im K_{33}$ & $3.37$ \\
-    $\Re K_{32}$ & $3.05$ \\
-    $\Im K_{32}$ & $3.27$ \\
-    $\Re K_{31}$ & $3.53$ \\
-    $\Im K_{31}$ & $4.02$ \\
-    $K_{30}$ & $5.75$ \\ \hline
-  \end{tabular}
-  \caption{Power law slope values for the dependence of parameter uncertainty on perigee distance $r_p$. Slope is defined by $\sigma \propto r_p^\alpha$.}
-  \label{tab:scan-perigee-alpha}
-\end{table}
-
-Fitted to each of the curves in figure \ref{fig:scan-perigee} are power law uncertainties $\sigma \propto r_p^\alpha$. These fits were performed via the method of least squares, and all data with $\sigma > 0.7$ was removed due to its sensitivity to the arbitrarily-chosen boundary of the prior. The values of $\alpha$ are shown in table \ref{tab:scan-perigee-alpha}. These slope values express how much each parameter is dependent on $r_p$. It is observed that $\gamma_0$ is least dependent on $r_p$, with $\sigma(\gamma_0) \sim r_p^2$. The other two first-order parameters are much more strongly dependent, with $\sigma \sim r_p^{5.5}$. The second-order parameters have milder slopes between 3 and 4 (except for $K_{30}$) which is fortunate from the perspective of making precise observations, since lower $\alpha$ renders larger values of $r_p$ accessible to measuring $K_{3m}$.
-
-The axes of figure \ref{fig:scan-perigee} show that parameters with large $m$ are more precisely determined than parameters with small $m$, as can be seen by comparing $K_{22}$ to $K_{20}$ and comparing $K_{33}$ to other $K_{3m}$ values. Large $m$ moments correspond to moments that control higher frequency fluctuations in density at the asteroid equator. This pattern of large $m$ corresponding to low uncertainty is a general trend and will be seen in the following sections as well.
-
-The very strong dependence of $\sigma$ on $r_p$ makes this analysis only to extract second-order moments on close encounters. Fortunately, in the case of Earth, these encounters are also likely to have the best associated observational uncertainty when above the horizon due to their proximity. The first-order moments can still be extracted at much larger perigee distances in our model.
-
-
-\subsection{Observational Uncertainty}
-\label{sec:scan-uncertainty}
-There are two parameters, $\sigma_\theta$ and $\sigma_\rho$, which govern the observational uncertainty of the data set (defined in section \ref{sec:uncertainty}). Rather than explore the full space spanned by these two values, we measure how parameter uncertainties depend on the product of uncertainties $\sigma_\theta\sigma_\rho$ (with the radio fixed), and the ratio $\sigma_\rho / \sigma_\theta$ (with the product fixed).
-
-We choose these metrics because we generally expect that the parameter uncertainty $\sigma$ be proportional to the observational uncertainty, but whether the dependence is stronger on $\sigma_\theta$ or $\sigma_\rho$ is not immediately clear. We get around this problem by varying $\sigma_\theta$ and $\sigma_\rho$ together and fixing their ratio, and measuring the posterior uncertainty $\sigma$, with $\sigma/\sigma_\theta$ shown in figure \ref{fig:scan-product}. Indeed, we find that $\sigma \propto \sigma_\theta$ almost exactly, and since $\sigma_\rho / \sigma_\theta$ is fixed, we also have $\sigma \propto \sigma_\rho$. For large $\sigma_\theta \sigma_\rho$, the proportionality fails, but this is because $\sigma(K_{30}) \approx 1$ which fills the prior. Uncertainty cannot increase beyond this value.
-
-\begin{figure}
-  \centering
-  \includegraphics[height=0.89\textheight]{figs/scan-product.pdf}
-  \caption{1 and 2$\sigma$ confidence intervals divided by $\sigma_\theta$ for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of observational uncertainty product $\sigma_\theta \sigma_\rho$. The vertical dashed line indicates the reference asteroid value of $10^{-9}$. The red vertical lines indicate when $\sigma =0.01$.}
-  \label{fig:scan-product}
-\end{figure}
-
-We also investigate the dependence of posterior uncertainty on $\sigma_\rho / \sigma_\theta$ with $\sigma_\theta \sigma_\rho$ fixed in figure \ref{fig:scan-ratio}. If we simply had $\sigma \propto \sigma_\theta \sigma_\rho$, then $\sigma$ would have no dependence on $\sigma_\rho / \sigma_\theta$. Any deviation from constant $\sigma$ shown in the figure therefore reveals some additional dependence in the model on one of the observational uncertainties.
-
-\begin{figure}
-  \centering
-  \includegraphics[height=0.89\textheight]{figs/scan-ratio.pdf}
-  \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of observational uncertainty ratios $\sigma_\rho / \sigma_\theta$. The reference asteroid value is $\sigma_\rho/ \sigma_\theta =10^{-5}$. The red vertical lines indicate when $\sigma = 0.01$. (Lines are not shown for $K_{3m}$, $m < 3$ because they coincide with the vertical axis.)}
-  \label{fig:scan-ratio}
-\end{figure}
-
-Indeed, figure  \ref{fig:scan-ratio} shows increased uncertainty when $\sigma_\rho/\sigma_\theta$ is large, so that $\sigma$ depends more on $\sigma_\rho$ than on $\sigma_\theta$. We summarize this pattern by stating that, if the observer had to choose between better precision on the period or on the spin pole of the data, they should choose period. This is fortunate for observers since, \jtd{I want to say that precision on the period is better constrained by light curve analysis, but I do not know enough about light curve analysis to be sure.}
-
-Another conclusion that can be drawn from figure \ref{fig:scan-ratio} is that $\sigma(\sigma_\rho/\sigma_\theta)$ is proportional for all $K_{\ell m}$. The proportionality constant shows the same dependence on $\ell$ and $m$ mentioned previously. The proportionality is broken near $\sigma \approx \pm 1$, where $\sigma$ fills the prior.
-
-The location of the $\sigma > 0.01$ limit demonstrates the great influence of observational precision on fit uncertainty; increasing $\sigma_\theta \sigma_\rho$ or $\sigma_\rho / \sigma_\theta$ by even a small amount raises $\sigma(K_{3m}) > 0.01$ in most cases.
-
-
-
-\subsection{Asteroid shape}
-\label{sec:scan-shape}
-
-The true values of $K_{\ell m}$, $\gamma_0$, and $a_\mathcal{A}$ affect the uncertainties in extracted density moments $\sigma$. Here, we only investigate the sensitivity of $\sigma$ to the first-order parameters and $a_\mathcal{A}$. The $K_{2m}$ moments can therefore also be viewed as the axes of a uniform density triaxial ellipsoid (equation \ref{eqn:ellipsoid-axes}).
-
-In figure \ref{fig:scan-space-sigma}, we show the 1$\sigma$ confidence intervals as a function of $K_{20}$ and $K_{22}$, or alternatively $a/c$ and $b/c$. We use axis ratios rather than the values of $a$, $b$, and $c$ to remove the $a_\mathcal{A}$ dependence of equation \ref{eqn:ellipsoid-axes}. The figure shows large uncertainty in $\gamma_0$ for $K_{22}=0$, or $a/c=b/c$, because $K_{20}$ is rotationally symmetric around $\unit z$, and $\gamma_0$ is the initial orientation with respect to the $\unit z$ axis. The data then have no physical dependence on $\gamma_0$ when $K_{22}=0$. This induces degeneracy in the model which inflates uncertainties, not only in $\gamma_0$ but also the other components.
-
-\begin{figure*}
-  \includegraphics[width=0.33\textwidth]{figs/probe-space-theta-1-sigma.pdf}\hfill
-  \includegraphics[width=0.33\textwidth]{figs/probe-space-theta-2-sigma.pdf}\hfill
-  \includegraphics[width=0.33\textwidth]{figs/probe-space-theta-3-sigma.pdf}
-
-  \includegraphics[width=0.33\textwidth]{figs/probe-space-ab-1-sigma.pdf}\hfill
-  \includegraphics[width=0.33\textwidth]{figs/probe-space-ab-a-sigma.pdf}\hfill
-  \includegraphics[width=0.33\textwidth]{figs/probe-space-ab-b-sigma.pdf}
-
-  \caption{1$\sigma$ confidence interval for fit parameters $\gamma_0$, $K_{22}$, and $K_{20}$ (\textit{top row}) and $\gamma_0$, $a/c$, and $b/c$ (\textit{bottom row}). Also shown as black points are the reference asteroid shapes; the symmetric case is marked with a red circle and the asymmetric with a black triangle.}
-  \label{fig:scan-space-sigma}
-\end{figure*}
-
-To remove the inflated uncertainty, one could assume a rotationally symmetric asteroid, remove $\gamma_0$ as a parameter, and run a fit. For a nearly rotationally symmetric asteroid however, a new parametrization is necessary which does not contain the ill-constrained $\gamma_0$ parameter. This task is beyond the scope of this paper, so we mostly consider asymmetric asteroids throughout.
-
-Figure \ref{fig:scan-space-sigma} also shows low uncertainty for highly asymmetric asteroids, where $b/c$ and $a/c$ are very different (i.e., when $|K_{22}|$ is large). Additionally, $\sigma(K_{20})$ and $\sigma(K_{22})$ decrease for large $|K_{20}|$, which corresponds to large axis ratios in the ellipsoid case.
-
-Figure \ref{fig:scan-space-corr} displays the correlation between the first-order parameters for reference. They show that $\gamma_0$ and $K_{22}$ are often correlated for asymmetric asteroids, while $\gamma_0$ and $K_{20}$ are usually not. This is expected as $K_{22}$ is dependent on the orientation of the asteroid and $K_{20}$ is not. They also show that $K_{22}$ and $K_{20}$ are usually correlated, and that $a/c$ and $b/c$ are highly correlated. The latter is expected due to the $1/c$ dependence. As for the former, this correlation could likely be removed by an alternate parametrization, reducing uncertainties in the shape parameters.
-
-\begin{figure*}
-  \includegraphics[width=0.33\textwidth]{figs/probe-space-corr12.pdf}\hfill
-  \includegraphics[width=0.33\textwidth]{figs/probe-space-corr13.pdf}\hfill
-  \includegraphics[width=0.33\textwidth]{figs/probe-space-corr23.pdf}
-
-  \includegraphics[width=0.33\textwidth]{figs/probe-space-ab-1b.pdf}\hfill
-  \includegraphics[width=0.33\textwidth]{figs/probe-space-ab-1a.pdf}\hfill
-  \includegraphics[width=0.33\textwidth]{figs/probe-space-ab-ab.pdf}
-  
-  \caption{Correlations between PPDs for fit parameters $\gamma_0$, $K_{22}$, and $K_{20}$ (\textit{top row}) and $\gamma_0$, $a/c$, and $b/c$ (\textit{bottom row}).  Also shown as black points are the reference asteroid shapes; the symmetric case is marked with a red circle and the asymmetric with a black triangle.}
-  \label{fig:scan-space-corr}
-\end{figure*}
-
-Overall, the variation in the uncertainties on $K_{20}$ and $K_{22}$ (the first-order density moments) is present but largely smooth across their allowed parameter space, as is their correlation (except the large $K_{22}$ corner). It therefore seems reasonable to use the asymmetric asteroid shape as a stand-in for an unknown's asteroid shape when simulating an encounter, as we do in this paper. The uncertainty then can be expected to differ across other shapes by a factor of about two or less, as long as the degenerate, symmetric asteroid regime is avoided.
-
-On the other hand, the posterior uncertainty of $K_{3m}$ is much more strongly dependent on asteroid length $a_\mathcal{A}$. Figure \ref{fig:scan-am} displays posterior uncertainty $\sigma$ as a function of $a_\mathcal{A}$, defined in equation \ref{eqn:am}. The vertical axis is shown in log space, meaning that the average of the upper and lower error bars of $\sigma$ is shown instead of showing both as is done in other figures.
-
-\begin{figure}
-  \centering
-  \includegraphics[height=0.89\textheight]{figs/scan-am.pdf}
-  \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of asteroid length $a_\mathcal{A}$. The reference cadence is 2 minutes. The red vertical lines indicate when $\sigma = 0.01$. The black dashed line indicates the reference value of $a_\mathcal{A}=1000$ m.}
-  \label{fig:scan-am}
-\end{figure}
-
-As was mentioned in section \ref{sec:tidal-torque}, the $K_{2m}$ parameters are insensitive to $a_\mathcal{A}$ since the $a_\mathcal{A}^2$ term in $\bm \tau$ (equation \ref{eqn:tidal-torque}) is canceled by the $a_\mathcal{A}^2$ in the moment of inertia (equation \ref{eqn:moi}). The $K_{3m}$ uncertainty is strongly dependent on $a_\mathcal{A}$ for the same reason that uncertainty is strongly dependent on $r_p$: the $(a_\mathcal{A}/D)^{\ell'}$ dependence of equation \ref{eqn:tidal-torque}. At $a_\mathcal{A} \lesssim 700$ m, $K_{30}$ becomes unresolved. The other parameters become unresolved for $a_\mathcal{A} \lesssim 300$ m, with the cut-off for $K_{33}$ being less than 100 meters. This $a_\mathcal{A}$ cut-off is quite sharp; figure \ref{fig:scan-am} shows steep decrease in $\sigma(a_\mathcal{A})$ for low $a_\mathcal{A}$, with an approximate functional form of $\sigma(a_\mathcal{A}) \sim e^{(a_\mathcal{A}/C)^p}$ for a scaling constant $C$ and some power $p < 1$. (In figure \ref{fig:scan-am}, the best fitting values are $p < 0.1$.) This sharpness indicates that the cut-off value of $a_\mathcal{A}$ is unlikely to change significantly if other parameters of the flyby are altered in a way that slightly increases or decreases $\sigma$. It therefore appears that extracting precise $K_{30}$ from asteroids with $a_\mathcal{A} \lesssim 700$ m is very unlikely with this analysis, and for $a_\mathcal{A} \lesssim 50$ m, all $K_{3m}$ will likely be unresolved.
-
-For uniform density asteroids, large $a_\mathcal{A}$ is equivalent to large asteroid radius, which was mentioned in section \ref{sec:moments} and explicitly shown in equation \ref{eqn:ellipsoid-axes}. In non-uniform density asteroids, large $a_\mathcal{A}$ can also be achieved by distributing the mass of the asteroid near the surface, because the $r^2$ term in the integrand of the definition of $a_\mathcal{A}$ causes the density of regions distant from the asteroid centre of mass to dominate $a_\mathcal{A}$.
-
-
-
-
-\subsection{Cadence}
-\label{sec:scan-cadence}
-
-The time between observations of asteroid angular velocity, or cadence, may vary depending on the observational schedule of the observing telescopes and the path of the asteroid through the sky.  We measure how the posterior uncertainty $\sigma$ varies with cadence ranging from two minutes to one hour in figure \ref{fig:scan-cadence}.
-
-\begin{figure}
-  \centering
-  \includegraphics[height=0.89\textheight]{figs/scan-cadence.pdf}
-  \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of observational cadence $\Delta t$ The reference cadence is 2 minutes. The red vertical lines indicate when $\sigma = 0.01$.}
-  \label{fig:scan-cadence}
-\end{figure}
-
-Figure \ref{fig:scan-cadence} displays little dependence of uncertainty on cadence $\Delta t$ for $\Delta t \lesssim 40$ min. We also see flaring of uncertainty for very large cadence, largely driven by the paucity of data points. However, uncertainty dramatically increases for many parameters at about $\Delta t = 30-40$ min, a time scale which is likely characteristic of the asteroid system. We name this rough cadence limit $T_\text{cad}$.
-
-We expect $T_\text{cad}$ to be a function of two dynamical time scales of the system: the rotational period of the asteroid $P_\omega$ and the time spent near perigee $T_p$. The latter can be estimated by
-\begin{equation}
-  T_p \sim \frac{r_p}{v_\infty}\brackets{2\frac{\mu_\mathcal{B}}{r_pv_\infty^2}+1}^{-\frac{1}{2}}
-  \label{eqn:tp}
-\end{equation}
-which is the ratio of the perigee radius to velocity at perigee. The exact choice of the formula of $T_p$ not obvious, and alternatives to equation \ref{eqn:tp} are possible. For the simulated asteroid, $P_\omega = 9$ hr and $T_p = 42$ min by this definition.
-
-We further study the effect of $P_\omega$ and $T_p$ on $T_\text{cad}$ in appendix \ref{app:cadence-tests}, and find that both affect $T_\text{cad}$ by roughly the same amount.
-
-Figure \ref{fig:scan-cadence} shows that as long as $\Delta t < T_\text{cad}$ is achieved, the influence of cadence on $\sigma$ is minimal (except for $K_{30}$ where the $\sigma<0.01$ limit is slightly exceeded). However, shorter cadence almost always leads to lower uncertainties.
-
-
-
-\subsection{Perigee gap}
-\label{sec:scan-gap}
-In certain circumstances, spin data might not be able to be captured for a close encounter at perigee. The asteroid might dip below the horizon, or it might pass too close to the sun to be observed. Generally, angular velocity data can be collected when the asteroid is distant from the central body, where torque is low. There, the angular velocity evolution is dominated by torque-free precession dictated by the moment of inertia components. That zero-torque data can still be used to fix $K_{20}$ and $K_{22}$ as in \cite{MOSKOVITZ2020113519}. However, $K_{3m}$ are not extractable from precession data alone. We are therefore curious as to how our posterior uncertainties change due to lack of data during the encounter perigee.
-
-To test this, we mask the perigee of the counter by removing a duration $T$ of data centred on the perigee, where $T$ ranges from 0 to 3 hours. To prevent lack of precision on $K_{\ell m}$ induced by lower amounts of data for high $T$, we always cut 3 hr$-T$ from the data set, half from the beginning and half from the end, so that each data set produced for all $T$ has the same length of data before and after the perigee. We then fit the same asteroid model to the cut data for all $T$ and plot posterior uncertainties $\sigma$ in figure \ref{fig:observation-gap}.
-
-\begin{figure}
-  \centering
-  \includegraphics[height=0.89\textheight]{figs/observation-gap.pdf}
-  \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of a data gap of width $T$ at perigee. The red vertical lines indicate when $\sigma = 0.01$.}
-  \label{fig:observation-gap}
-\end{figure}
-
-Since torque is greatest at perigee, we expect that region of the data to contain the most information about $K_{\ell m}$, and therefore uncertainty should increase monotonically with $T$, which is seen in figure \ref{fig:observation-gap}. We also see that the first-order parameters are not as sensitive to $T$ as the second-order parameters, because $K_{2m}$ are additionally constrained by torque-free precession after perigee.
-
-Most parameters show dramatically increased uncertainty in the $T \sim 1-2$ hr range. On the other hand, none of the uncertainties increase noticeably for $T < 30$ min. Thirty minutes of dropped data is equivalent to fifteen dropped points for the simulated cadence of $\Delta t = 2$ minutes, showing that many data points can dropped from the data set at perigee before the uncertainty starts to increase.
-
-Qualitatively, \ref{fig:observation-gap} shows similar dependence of $\sigma$ on $T$ as \ref{fig:scan-cadence} showed for $\sigma$ on cadence $\Delta t$. They also both have cut-offs where uncertainty markedly increases, and both the $T$ and $\Delta t$ cut-offs have qualitatively similar shapes although they occur at different values of $\Delta t$ and $T$. This suggests that the factors that govern uncertainty due to cadence (appendix \ref{app:cadence-tests}) also may govern sensitivity to lack of data at perigee in a similar way.
-
-
-\subsection{Initial spin pole}
-\label{sec:scan-spin}
-
-The tidal torque experienced by the asteroid is affected by the initial direction of asteroid spin $\bm \Omega_0$ both because spin sets the initial asteroid orientation up to $\gamma_0$ and because of the spin-dependence of the rotational equations of motion (equation \ref{eqn:omega-eom}).
-
-In figure \ref{fig:scan-spin}, we display 1$\sigma$ uncertainties for all parameters as a function of the direction of $\bm \Omega_0$, mapped onto the unit sphere in the inertial frame. Our samples for $\bm \Omega_0$ were laid out on a Fibonacci sphere to ensure they were roughly evenly spaced (marked in figure \ref{fig:scan-spin-avg}). To highlight common features across the parameters, we also display the average 1$\sigma$ sensitivity in figure \ref{fig:scan-spin-avg}. The average is weighted such that the uncertainty map for each parameter contributes an equal amount
-(the weight of each map is set to one-tenth of the map's mean). This average map is presented in two different projections to allow data at $\unit Z$ to be read.
-
-\begin{figure*}
-  \centering
-  \includegraphics[width=\textwidth]{figs/spin-pole.pdf}
-  \caption{$1\sigma$ uncertainties for the first-order parameters (\textit{top}) and second-order (\textit{bottom}) as a function of the initial direction of spin in the inertial frame. All maps are made in the Mollweide projection. The orange star indicates the reference spin pole. The red contours enclose regions where $\sigma \geq 0.01$.}
-  \label{fig:scan-spin}
-\end{figure*}
-
-\begin{figure*}
-  \centering
-  \includegraphics[width=0.45\textwidth]{figs/spin-pole-avg-mollweide.pdf}
-  \includegraphics[width=0.45\textwidth]{figs/spin-pole-avg-polar.pdf}
-  \caption{The weighted average of the uncertainties shown in figure \ref{fig:scan-spin}, in Mollweide (\textit{left}) and polar (\textit{right}) projections in the inertial frame. See text for a description of how the average was computed. Black dots indicate the Fibonacci-sphere-distributed locations of sample spin poles, and the orange star indicates the reference spin pole. The polar projection is centred at the south pole, or $-\unit Z$.}
-  \label{fig:scan-spin-avg}
-\end{figure*}
-
-Certain alignments of the body-fixed frame to the inertial frame lead to special conditions on torque, as discussed in section \ref{sec:tidal-torque}. For example, $\bm z \parallel \unit Z$ and $\bm z \parallel \unit Y$ at perigee lead to $\bm \tau \parallel \unit z$ to first-order, and $\bm \tau \parallel \unit X$ at perigee leads to $\bm \tau = 0$ to first-order. We relate this to the initial direction of $\bm \Omega_0$, via the approximation that $\bm \tau$ is small until perigee. Then, since $\bm \omega_0 \parallel \unit z$ in the body-fixed frame as an initial condition (section \ref{sec:sim}), we have that $\bm \Omega_0 \parallel \unit Y$ and $\bm \Omega_0 \parallel \unit Z$ both lead to $\bm \tau \parallel \unit z$, and $\bm \Omega_0 \parallel \unit X$ leads to $\bm \tau = 0$.
-
-Figure \ref{fig:scan-spin-avg} shows area of increased uncertainty for $\bm \Omega_0 \parallel \unit Z$ and $\bm \Omega_0 \parallel \unit Y$, but not the $\unit X$ case. This indicates that $\bm \tau \parallel \unit z$ causes increased uncertainty. Physically, $\bm \tau \parallel \unit z$ only changes an asteroid's rotational period and does not cause it to tumble, eliminating the ability to discern moment of inertia ratios from zero-torque precession after the encounter. Also, $\tau_z$ affected by fewer parameters than $\tau_x$ or $\tau_y$.  Both of these are reasons why $\bm \tau \parallel \unit z$ might inhibit precise fits to spin data. If $\bm \tau = 0$ to first-order, then second-order $\bm \tau$ and non-perigee $\bm \tau$ will dominate, which may increase precision to these usually non-dominant parameters and therefore not have the same increasing effect on $\sigma$.
-
-It is important to note, however, that uncertainty does not vary by much more than a factor of two outside the imprecise regions of $\bm \Omega_0 \parallel \unit Z$ and $\bm \Omega_0 \parallel \unit Y$, though these regions are wide for some parameters. Within the imprecise regions, uncertainty can grow up to four times or more the uncertainty at other $\bm \Omega_0$ values, and can exceed the $\sigma ~0.01$ benchmark. The trends for are roughly consistent across parameters (figure \ref{fig:scan-spin}), leading to clearly visible imprecise regions in the average $\sigma$ (figure \ref{fig:scan-spin-avg}).
-
-
-
-
-\subsection{Rotational period}
-\label{sec:scan-period}
-
-We also study the effect of the initial rotational period of the asteroid $P_\omega$ on posterior uncertainty $\sigma$. The dynamical time scales $r_p/v_\infty$ and $\mu_\mathcal{B} / (r_p v_\infty)$ have already been mentioned in the context of the cadence cut-off (section \ref{sec:scan-cadence}), and the ratio between them and $P_\omega$ in principal may affect $\sigma$. In figure \ref{fig:scan-period}, we show $\sigma$ as a function of $P_\omega$ for a range of periods typical of NEOs.
-
-\begin{figure}
-  \centering
-  \includegraphics[height=0.89\textheight]{figs/scan-period.pdf}
-  \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of initial rotational period $P_\omega$. The reference value of 9 hr is shown as a vertical dotted line. The red vertical lines indicate when $\sigma = 0.01$.}
-  \label{fig:scan-period}
-\end{figure}
-
-Like figure \ref{fig:scan-vex}, depicting the dependence of $\sigma$ on $v_\infty$, figure \ref{fig:scan-period} shows small-scale variation in uncertainty due to the fact that varying the initial period changes the value of $\gamma$ at perigee, which affects uncertainty to a factor of about two. But a large-scale trend is also visible in many parameters. $K_{20}$ and $K_{22}$ show very large uncertainty for $P_\omega \lesssim 4$ hr because these fast-rotators tumble very little after perigee. This increases uncertainty on the $K_{2m}$ parameters, which are constrained by tumbling.
-
-We expect that quickly rotating asteroids would not tumble because, for small $P_\omega$, the dynamical variables $\bm D$, $\bm \omega$, $\alpha$, and $\beta$ vary much smaller than $\gamma$. Approximating each variable as constant over one full rotation of $\gamma$, we can integrate the first-order contribution of $\bm \tau$ over $\gamma \in (0, 2\pi)$ and reveal that each rotation has zero average first-order torque. Since the first-order torque over each rotational period cancels out, there is no secular torque to force the asteroid to tumble. However, this effect does not apply to the second-order parameters, since the integral over the second-order term of $\bm \tau$ does not vanish, as seen in the figure.
-
-Another feature of figure \ref{fig:scan-period} is that $K_{\ell 0}$ is more uncertain at low $P_\omega$ than the other parameters. This is most visible in the figure for $K_{30}$. The cause is likely that $K_{\ell 0}$ cannot contribute to $\tau_z$ as shown in equation \ref{eqn:tidal-torque}. We already discussed that asteroids with small $P_\omega$ do not tumble, and since $\tau_x$ and $\tau_y$ are what induces tumbling, the most observable component of torque is therefore $\tau_z$, which $K_{\ell 0}$ do not affect.
-
-The most severe effect of period on $\sigma$ is in the low-period regime ($P_\omega \lesssim 5$ hr), but in this case, the most strongly affected parameters are $K_{2m}$, which are generally known better than $K_{3m}$. The effect on the imprecise parameters $K_{3m}$ is small, except for $K_{30}$. It therefore seems as though small-period asteroids are still candidates for observation, although high-period asteroids still have better uncertainty.
-
-
-\subsection{Central body oblateness}
-\label{sec:scan-oblateness}
-
-In all the above studies, we assumed a spherical planet ($J_{\ell m} = 0$ for $\ell \geq 1$). By assumption that $\mu_\mathcal{B} \gg \mu_\mathcal{A}$ (so that the asteroid orbit's focus is the centre of mass of the central body), we have $J_{1m} = 0$. The effect of central body oblateness, then, is limited to the $J_{2m}$ terms, and therefore damped by a factor of $(a_\mathcal{B} / D)^2$. We expect these parameters to have little effect on the asteroid.
-
-Here, we define oblateness as $\epsilon = (I_z - I_x)/(\mu_\mathcal{B} R_M^2)$, where $I_{x,y,z}$ are the central body moments of inertia along the principal axes, and $I_x = I_y$. $R_M$ is the true radius of the body (not $a_\mathcal{B}$ from equation \ref{eqn:jlm}). 
-
-$J_{\ell m}$ is defined in equation \ref{eqn:jlm} with respect to the asteroid orbit, not the principal axes of the central body. However, for an equatorial orbit, the central body principal axes coincide with the asteroid orbit frame and we may express $\epsilon$ simply in terms of $J_{\ell m}$ as $\epsilon = -2J_{20}$ and $J_{22} = 0$. (Some sources such as Ref.~\cite{paterLissauer2015} take $\epsilon=J_{20}$ as their definition of $J_{20}$). For simplicity, we use this equatorial orbit case. If the orbit is non-equatorial, the other $J_{2m}$ terms will be non-zero. Since an oblate ellipsoid is mirror-symmetric around all three axes, table \ref{tab:klm-symmetries} indicates that $J_{3m}$ are all zero. The next order of precision after this oblateness approximation is therefore $J_{4m}$, damped by an additional $(a_\mathcal{B}/D)^2$ factor, and  non-ellipsoid corrections to the central body shape.
-
-Given this conversion between $\epsilon$ and $J_{20}$, we analyze posterior uncertainty $\sigma$ of the first-order parameters as a function of $\epsilon$ across a reasonable range of central body oblatenesses based on those of Solar System planets \cite{paterLissauer2015}. These uncertainties are shown in the top pane of figure \ref{fig:scan-oblateness}, together with linear best-fitting curves for $\sigma(\epsilon)$.
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.88\columnwidth]{figs/oblateness.pdf}
-  \vfill
-  \includegraphics[width=0.88\columnwidth]{figs/oblateness-differ.pdf}
-  \caption{\textit{Top}: 1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs as a function of oblateness $\epsilon$ . Linear best-fitting lines to $\sigma$ (black, dotted) are plotted. \textit{Bottom}: The difference between PPD means extracted from a zero-oblateness model and the true parameters given data with true oblateness $\epsilon_\text{true} \neq 0$. Also shown in both figures are the oblatenesses of reference Solar System bodies.}
-  \label{fig:scan-oblateness}
-\end{figure}
-
-The figure demonstrates a small dependence of $\sigma$ on oblateness $\epsilon$, but the effect is far from important compared to the other factors studied above. Most Solar System bodies do not reach the oblateness necessary to significantly increase precision on the first-order parameters. The best-fitting lines match the uncertainties well, and they have slope of $(\Delta \sigma / \sigma_{\epsilon=0}) / \Delta \epsilon = -0.26$ for $\gamma_0$, $-0.94$ for $K_{22}$, and $-1.2$ for $K_{20}$. The second-order parameters $K_{3m}$ likely depend on oblateness similarly, but fitting these parameters is computationally more expensive and we do not study them here.
-
-Note that if an encounter is executed around one of the non-Earth objects noted in figure \ref{fig:scan-oblateness}, $a_\mathcal{B}$ and $\mu_\mathcal{B}$ will change in addition to $\epsilon$. These two parameters also affect the precision of the fit parameters (appendix \ref{app:jupiter-earth}), so the figure does not show that encounters with other bodies have the same precision as encounters with Earth; only that the difference in oblateness between the two bodies is of little concern.
-
-Given the small effect of $\epsilon$ on $K_{\ell m}$, it might be tempting to neglect the planetary oblateness when fitting $K_{\ell m}$ to data. However, the bottom pane of figure \ref{fig:scan-oblateness} demonstrates that doing so is invalid. This figure displays $K_{\ell m}$ as extracted by a fit assuming $\epsilon = 0$, but run on data generated with non-zero $\epsilon$. The difference between the PPD means and true parameters are shown. Posterior uncertainties are also shown as bands. The figure shows that even for low (Moon-scale) oblateness, the fit results are inconsistent with the true $K_{\ell m}$ values, since $\Delta K_{\ell m} = 0$ is not contained in the 2$\sigma$ band. This effect is much worse for large oblateness, growing to a difference on the order of $10^{-2}$ between the true and fit parameters for large oblateness. Therefore, accurately modelling central-body oblateness to high precision is essential for accurate estimation of fit parameters. For non-equatorial orbits, with $J_{22} \neq 0$, we also expect $J_{22}$ to affect the accuracy of the fit results to a similar degree, with the additional requirement of using the correct asteroid orbital plane.
-
-Note that $J_{20}$, the parameter studied in this section, has a slightly more general definition than oblateness. If the planet has a moon, the integral defining $J_{20}$ (equation \ref{eqn:jlm}) can be extended to include this extra mass. Since $J_{20}$ is a second moment, this effect is magnified for large distances of the mass from the central body centre of mass (though the effect is not quite quadratic because $a_\mathcal{B}$ also increases for large distances, and $J_{20}$ is divided by $a_\mathcal{B}^2$). This process is only valid when the asteroid never passes inside the moon's orbit.
-
-As an order-of-magnitude estimate for this effect, two spherical objects with masses and radii of Earth and the Moon, separated by one Lunar distance, and both lying in the orbital plane has a combined $J_{20} = 0.25$. Extrapolating posterior uncertainty by the slopes of the best fit lines given earlier, this represents a decrease in $\sigma(K_{2m})$ by a factor of about one quarter.
-
-This analysis suggests that large moons such as ours can improve fit quality, but further study of this effect is beyond the scope of this paper. Without a moon to inflate the oblateness of the central body, planetary oblateness does not significantly improve posterior uncertainty. However, correct representation of oblateness is essential to accurately estimate $K_{\ell m}$.
-
-
-
-\section{Density distributions}
-\label{sec:distros}
-
-Hitherto, we have only discussed the density moments $K_{\ell m}$ of the asteroid rather than the true density distribution $\rho(\bm r)$. This is because only the density moments are observable by tidal torque interactions. However, by making sufficient assumptions about the density distribution, we can nevertheless estimate $\rho(\bm r)$ from $K_{\ell m}$.
-
-In this section, we outline three different assumptions which yield different types of density distributions for the same $K_{\ell m}$. One of them can be chosen, or a fourth created, depending on what features are desired to be represented in the density distribution. All three of these models assume that $a_\mathcal{A}$ and the asteroid shape is known (for example, by light curve or radar data). Uncertainty on this shape estimate is assumed to be small. The models then produce a density distribution $\rho(\bm r)$ with uncertainty from $K_{\ell m}$ propagated to uncertainty in $\rho$.
-
-In section \ref{sec:results}, we were forced to fix $a_\mathcal{A}$ rather than fit for it because $a_\mathcal{A}$ is degenerate with scaling the $K_{3m}$ components. However, $a_\mathcal{A}$ contains information about the density distribution as shown by its definition in equation \ref{eqn:am}. It might therefore be unreasonable to assume that it is exactly determined by light-curve or radar analysis. If $a_\mathcal{A}$ is too uncertain to be used as a known quantity when extracting density distributions from the moments, then the following models are flexible enough that the $a_\mathcal{A}$ constraint can be removed.
+All three of these models assume that $a_\mathcal{A}$ and the asteroid shape is known (for example, by light curve or radar data). Uncertainty on this shape estimate is assumed to be small. The models then produce a density distribution $\rho_\mathcal{A}(\bm r)$ with uncertainty from $K_{\ell m}$ propagated to uncertainty in $\rho_\mathcal{A}$. In section \ref{sec:results}, we were forced to fix $a_\mathcal{A}$ rather than fit for it because $a_\mathcal{A}$ is degenerate with scaling the $K_{3m}$ components. However, $a_\mathcal{A}$ contains information about the density distribution as shown by its definition in equation \ref{eqn:am}. It might therefore be unreasonable to assume that it is exactly determined by light-curve or radar analysis. If $a_\mathcal{A}$ is too uncertain to be used as a known quantity when extracting density distributions from the moments, then the following models are flexible enough that the $a_\mathcal{A}$ constraint can be removed. Likewise, if the asteroid shape is not known with certainty, a fourth model described in appendix \ref{app:find-surface} can be used to extract asteroid shape assuming constant density.
 
 Note that, since the overall mass of the asteroid is not observable from tidal torque, we do not expect to measure $\rho$ in an absolute sense. Only the differences in $\rho$ across the body are measurable.
-
-In section \ref{sec:general-density}, we describe the general form our three models must take. Then in sections \ref{sec:likelihood} to \ref{sec:lumpy} we lay out each individually and compare them in section \ref{sec:density-compare}. In appendix \ref{app:find-surface}, we introduce a new model which does not assume that the asteroid shape is known, instead assuming that the density is constant. This allows us to compute the asteroid shape from $K_{\ell m}$.
-
-
-\subsection{General density model design}
-\label{sec:general-density}
 
 To set the shape of the asteroid, we assume that an indicator function $\mathds{1}(\bm r)$ has been determined such that $\mathds{1}(\bm r) = 1$ inside the asteroid and 0 outside, where $\mathds{1}(\bm r)$ is defined in some frame whose orientation with respect to Earth is known. Since the asteroid rotates around its centre of mass during observations, we assume that the location of the centre of mass is also known in this frame, so that we can set it to be the origin.
 
@@ -593,11 +235,14 @@ by equation \ref{eqn:ylm-rotation}. Since $K_{\ell m}^\mathrm{body-fixed}$ was o
   \label{eqn:unc-rho}
 \end{equation}
 
-The purpose of a model is therefore to restrict the space of valid density distributions by defining the $m\times n$-dimensional constant matrix $A$ and the $m$-dimensional vector $\bm B(\bm r)$ such that equations \ref{eqn:density-model} and \ref{eqn:density-distro} are true. Then the density distribution and its uncertainty are given by equation \ref{eqn:unc-rho}.
+The purpose of a model is therefore to restrict the space of valid density distributions by defining the $m\times n$-dimensional constant matrix $A$ and the $m$-dimensional vector $\bm B(\bm r)$ such that equations \ref{eqn:density-model} and \ref{eqn:density-distro} are true. Then the density distribution and its uncertainty are given by equation \ref{eqn:unc-rho}. 
 
 
+\subsection{Model implementations for extracting density distributions from density moments}
+\label{sec:specific-density}
+In the following sections, three possible models for extracting density distributions from moments (i.e., choices of $\bm B(\bm r)$ and $A$ defined above) are given.
 
-\subsection{The ``likelihood'' model}
+\subsubsection{The ``likelihood'' model}
 \label{sec:likelihood}
 
 A natural way to restrict the degrees of freedom of $\rho(\bm r)$ is by defining a likelihood function $\mathcal{L}$ on the density distribution and choosing the one distribution which maximizes likelihood and exactly reproduces $\bm K$. We call this method the ``likelihood'' model. This likelihood should not be confused with the likelihood of equation \ref{eqn:log-likelihood}, which was a function of the spin data, not the density distribution. The choice of the density $\mathcal{L}$ is arbitrary, but the linearity of the model design outlined in the previous section will require a Gaussian likelihood.
@@ -622,7 +267,7 @@ Note that this model is fast to compute; assuming fast matrix multiplication, th
 
 
 
-\subsection{The ``harmonic'' model}
+\subsubsection{The ``harmonic'' model}
 \label{sec:harmonic}
 
 We now explore a model that seeks to restrict the space of allowed density distributions a different way: we allow only the density distributions with zero Laplacian: $\nabla^2 \rho = 0$ inside the asteroid (the harmonic distributions). We therefore call this model the ``harmonic'' model. The expansion of a harmonic function in spherical coordinates is given by 
@@ -651,7 +296,7 @@ A non-spherical perturbation will introduce small off-diagonal entries to $M$. T
 
 
 
-\subsection{The ``lumpy'' model}
+\subsubsection{The ``lumpy'' model}
 \label{sec:lumpy}
 
 The above two simple models produce smooth density distributions that generally extend non-uniformity over large regions. In this section, we define a more complicated model which identifies discrete regions differing from the overall density of the asteroid to best fit the measured density moments. We call this model the ``lumpy'' model.
@@ -707,14 +352,36 @@ which is the difference between $\bm K$ resulting from the model and the true $\
 
 
 
-\subsection{Comparisons between density models.}
-\label{sec:density-compare}
 
-To test the properties of the three density models defined above, we simulate several asteroids with different shapes and density distributions on a close Earth encounter with the reference asteroid orbital and observational parameters. Density moments are extracted via our fit process and density distributions extracted by the three above methods. Below, we compare the resulting distributions to understand the performance of the extraction methods.
+\section{Results}
+\label{sec:results}
 
-\subsubsection{Uniform density test asteroids}
+\subsection{Density moment extraction}
+To demonstrate the success of our fit process, we present example results of the MCMC fit described in section \ref{sec:fit}, applied to encounter data of the asymmetric reference asteroid. The fit results were consistent with the true density moments, and produced consistent data.
 
-First, we simulate several asteroids with uniform density distributions and ask whether a uniform distribution is recovered. The shapes we use are the symmetric and asymmetric reference ellipsoids, a ``dumbbell'' (two spheres of equal radius conjoined such that the surface of one intersects the centre of the other), and a tetrahedron. We use these shapes as rough approximations of potential shape types (i.e., a contact binary for the dumbbell, a polyhedron for the tetrahedron), but also to demonstrate the density models' efficacy on sharp corners. The extracted distributions for all three models are shown in figure \ref{fig:uniform-density}. Also in each figure is $\Delta K_{\ell m}$, the squared magnitude of difference between the fitted density moments and the density moments of the final distribution. This difference is non-zero due to numerical error in the likelihood model case, but for the harmonic and the lumpy models, they express the degree to which the extracted moments cannot be represented with harmonic or lumpy distributions respectively.
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.7\textwidth]{figs/example-residuals.pdf}
+  \caption{Data, best fit results, and residuals for a fit to synthetic data simulated for an asymmetric reference asteroid. The standard deviation of the data is plotted as an uncertainty band in the residuals plot, but these do not capture covariance between data points.}
+  \label{fig:example-residuals}
+\end{figure*}
+
+Figure \ref{fig:example-residuals} shows the spin data with uncertainty added. Data simulated given the best-fitting density moments (the mean of the PPDs) is overlaid in the top pane and the residuals are shown the bottom pane. Uncertainties are plotted on the residuals corresponding to the square root of the diagonal entries of the covariance matrix (correlations not included). The fit results are clearly consistent with the data.
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=\textwidth]{figs/example-corner.pdf}
+  \caption{A corner plot for the fit results ten parameters to synthetic data simulated for an asymmetric reference asteroid. Marginal posterior PDFs for each parameter are shown (histograms) along with two-dimensional PDFs (contours). Individual points in the contours are samples from the MCMC fit, and the contours enclose 1, 2, and 3$\sigma$ of them. True values (which are zero here due to the parameters being displayed relative to the true values) are also shown (blue lines).}
+  \label{fig:example-corner}
+\end{figure*}
+
+Figure \ref{fig:example-corner} shows a corner plot of the ten fitted PPD, marginalized to functions of one or two variables. The true parameters are shown as lines. Note that the true parameters usually lie within 1 or 2$\sigma$ of the $\Delta K_{\ell m} = 0$, where $\Delta K_{\ell m}$ is the difference between the posterior $K_{\ell m}$ and the true $K_{\ell m}$. The PPDs are generally Gaussian and no degeneracy between fit components is visible. We performed 48 independent minimizations of the likelihood before the MCMC fit began, each with an initial point chosen randomly in the parameter space. All converged to the same minimum, further showing that the model lacks degeneracy.
+
+
+
+\subsection{Density distribution extraction}
+\label{sec:asym-density}
+To demonstrate the success of our three density distribution extraction models, we show density distributions and uncertainties extracted for the asymmetric reference asteroid in figure \ref{fig:uniform-density-results}. These distributions were made given the density moment PPDs extracted in the previous section, with $a_\mathcal{A}$ fixed. The surface is fixed as a triaxial ellipsoid with semi-axis lengths such that the true values of $K_{\ell m}$ are consistent with uniform density (equation \ref{eqn:ellipsoid-axes}).
 
 \begin{figure*}
   \centering
@@ -722,6 +389,360 @@ First, we simulate several asteroids with uniform density distributions and ask 
   \includegraphics[width=0.33\textwidth]{figs/asym-ell-harmonic.pdf}\hfill
   \includegraphics[width=0.33\textwidth]{figs/asym-ell-lumpy.pdf}
 
+  \includegraphics[width=0.33\textwidth]{figs/asym-ell-unc-likelihood.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/asym-ell-unc-harmonic.pdf}\hfill\hspace{0.33\textwidth}
+
+  \caption{Density distributions (\textit{top}) and uncertainties (\textit{bottom}) extracted by the likelihood (\textit{left}), harmonic (\textit{middle}), and lumpy with $d=N=1$ (\textit{right}) models from data generated for a uniform-density, asymmetric reference asteroid. Density is normalized so that mean density is one.}
+  \label{fig:uniform-density-results}
+\end{figure*}
+
+Also in each pane of figure \ref{fig:uniform-density-results} is $\Delta K_{\ell m}$, the squared magnitude of difference between the fitted density moments and the density moments of the final distribution. This difference is non-zero due to numerical error in the likelihood model case, but for the harmonic and the lumpy models, they express the degree to which the extracted moments cannot be represented with harmonic or lumpy distributions respectively.
+
+The likelihood and harmonic models produce mostly the same density distributions. This is generally true for uniform density asteroids, which have harmonic density distributions. Consequentially, $\Delta K_{\ell m}$ is low for the harmonic model. This similarity lends confidence that the models produced are truly representative of the asteroid since they are produced via two independent methods.
+
+The distributions' non-uniformity is limited for the harmonic and likelihood models. This non-uniformity is driven by error in the estimates of the density moments. Note that most of the asteroid has density close to one in both cases, with densities of 40\% or 160\% of the mean attained only in small regions. The lumpy model yields a much more uniform distribution because it is designed to produce uniform lumps. However, it does not produce a density distribution consistent with those extracted from spin data (i.e., $\Delta K_{\ell m}$ is usually large). This is because the lump found extends outside the asteroid, violating the assumptions of the model --- a sign that the lump found does not really exist inside the asteroid.
+
+The size of uncertainty is such that the density distribution is consistent with uniform at most points for the harmonic and likelihood models (within 1-2$\sigma$), with a small number of low-uncertainty regions that are less consistent with uniform. Uncertainty is generally larger towards the edges of the distribution, both for these shapes and for the shapes shown in the following sections.
+
+
+
+
+
+
+\section{Discussion}
+\label{sec:discussion}
+
+In this section, we discuss the physical properties of the asteroid encounter system (section \ref{sec:spin-evolution}), as well as the sensitivity of the density moment uncertainty to encounter properties (section \ref{sec:fit-uncertainty}), together with an analysis of advantages and disadvantages Jupiter encounters over Earth (section \ref{sec:jupiter-earth})Finally, we discuss the kinds of distributions produced by the density distribution extraction methods (section \ref{sec:density-compare}). 
+
+\subsection{Spin evolution}
+\label{sec:spin-evolution}
+In figure \ref{fig:example-data}, we present example spin data generated via our simulation. A population of one thousand asteroids with identical initial conditions except for $\gamma_0$, $K_{20}$, and $K_{22}$ were simulated on a close Earth encounter. The exact parameters used were the symmetric and asymmetric cases described in appendix \ref{app:reference-configs}. Bands containing 68.3\%, 95.5\%, and 99.7\% of the population's spin are shown, as is the spin of the reference asteroids in black.
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.7\linewidth]{figs/nominal-data-sym.pdf}
+  \includegraphics[width=0.7\linewidth]{figs/nominal-data-asym.pdf}
+  \caption{Angular velocity data simulated for the symmetric (above) and asymmetric (below) reference asteroids. The true angular velocity evolution is shown as a black line. Also plotted is the deviation of the data for PPD-distributed perturbations to the asteroid shape (bands). Bands contain 68.3\%, 95.5\%, and 99.7\% of the 1000 simulations run.}
+  \label{fig:example-data}
+\end{figure*}
+
+To choose the initial values of $\gamma_0$, $K_{20}$, and $K_{22}$, spin data for the reference asteroids of appendix \ref{app:reference-configs} was first generated. Then $\gamma_0$, $K_{20}$, and $K_{22}$ were re-extracted via the fit described in section \ref{sec:fit}. The population's values for these parameters were PPD-distributed. However, the PPD distribution was widened by a factor of 1000 to make the band widths visible. Therefore, the scale of the bands in figure \ref{fig:example-data} have little meaning in an absolute sense, but they are meaningful when comparing two bands or two times in the same band.
+
+The figure illustrates the sensitivity of spin data to asteroid density moments and $\gamma_0$; Before perigee, all asteroids had similar angular velocities, but after perigee the angular velocities of the population diverged. The oscillation periods observable during the torque-free precession phase of the spin data (about 5 hours after perigee) vary within the population, showing that they can be used to constrain $K_{22}$ and $K_{20}$.
+
+
+
+
+
+
+\subsection{Dependence of parameter uncertainty on encounter parameters}
+\label{sec:fit-uncertainty}
+Parameter precision of 1$\sigma$ is defined such that 68.27\% of the PPD lies within 1$\sigma$ of the mean of the PPD. 2$\sigma$ is defined likewise for 95.45\% of the PPD. The PPDs are usually roughly Gaussian, so that the upper and lower error bars are usually roughly equal and 1$\sigma$ is approximately the standard deviation of the PPD. In all cases, we use the configuration of the asymmetric reference asteroid (appendix \ref{app:reference-configs}) unless otherwise stated.
+
+
+
+\subsubsection{Orbital elements}
+\label{sec:scan-orbit}
+A Keplerian orbit is completely described by five parameters, but three describe the orbit's orientation with respect to the central body. The orbit can be rotated to the $\unit X \unit Y$-plane, as mandated by our coordinate definitions, by changing the density moments of the central body. Since $J_{00}$ is unchanged by this rotation and $J_{1m}=0$, the orbit orientation is irrelevant until the $J_{2m}$ terms of equation \ref{eqn:tidal-torque}, and we do not investigate them here.
+
+We parametrize the shape of the orbit by the perigee distance $r_p$ and excess velocity $v_\infty$. Fits of the type described in section \ref{sec:fit} were run for many values of $r_p$ and $v_\infty$ and the 1 and 2$\sigma$ confidence intervals are displayed in figures \ref{fig:scan-vex} for $v_\infty$ and \ref{fig:scan-perigee} for $r_p$.
+
+Figure \ref{fig:scan-vex} demonstrates that parameter precision does not depend strongly on excess velocity, aside from a slight trend especially in the higher order parameters for uncertainty to increase with $v_\infty$. This is likely due to the fact that larger $v_\infty$ leads to a faster and flatter orbit with less time spent close to the planet, where tidal torque is strongest. There are also smaller-scale oscillations in the uncertainty, due to the orientation of the asteroid at perigee varying. The asteroid is always simulated to start at the same orientation, but increasing $v_\infty$ decreases the time to perigee, so that the asteroid enters this region of high torque at different orientations depending on $v_\infty$. This effect explains why these small-scale oscillations have the same period for all parameters. Note that these oscillations are sometimes large enough to raise $\sigma > 0.01$, shown by the red vertical line.
+
+
+Figure \ref{fig:scan-perigee} shows much stronger dependence of parameter uncertainty on perigee distance, as expected by the factor of $(a_\mathcal{A}/D)^{\ell'}$ present in equation \ref{eqn:tidal-torque} and mentioned in section \ref{sec:tidal-torque}. For $r_p \approx 6$ or 7 Earth radii, $\sigma(K_{30})$ reaches the reference 0.01 limit. At slightly higher $r_p$, $K_{31}$ and $K_{32}$ become similarly unresolved, and at $r_p \approx 20$ Earth radii, $K_{33}$, the last second-order component, becomes unresolved. Even before this, at $r_p \approx 10$ Earth radii, the most uncertain parameter $K_{30}$ fills the prior distribution with uncertainty ranging from -1 to 1, visible by the sudden cut-off in uncertainty increase and the discontinuity of the $\sigma$ curve there. The location of these limits will change if different encounter properties are used, but this is still an illustrative example.
+
+\begin{table}
+  \centering
+  \begin{tabular}{l|c}
+    \hline
+    Parameter & $\alpha$ \\ \hline
+    $\gamma_0$ & $2.05$ \\
+    $K_{22}$ & $5.47$ \\
+    $K_{20}$ & $5.47$ \\ \hline
+    $\Re K_{33}$ & $3.35$ \\
+    $\Im K_{33}$ & $3.37$ \\
+    $\Re K_{32}$ & $3.05$ \\
+    $\Im K_{32}$ & $3.27$ \\
+    $\Re K_{31}$ & $3.53$ \\
+    $\Im K_{31}$ & $4.02$ \\
+    $K_{30}$ & $5.75$ \\ \hline
+  \end{tabular}
+  \caption{Power law slope values for the dependence of parameter uncertainty on perigee distance $r_p$. Slope is defined by $\sigma \propto r_p^\alpha$.}
+  \label{tab:scan-perigee-alpha}
+\end{table}
+
+Fitted to each of the curves in figure \ref{fig:scan-perigee} are power law uncertainties $\sigma \propto r_p^\alpha$. These fits were performed via the method of least squares, and all data with $\sigma > 0.7$ was removed due to its sensitivity to the arbitrarily-chosen boundary of the prior. The values of $\alpha$ are shown in table \ref{tab:scan-perigee-alpha}. These slope values express how much each parameter is dependent on $r_p$. It is observed that $\gamma_0$ is least dependent on $r_p$, with $\sigma(\gamma_0) \sim r_p^2$. The other two first-order parameters are much more strongly dependent, with $\sigma \sim r_p^{5.5}$. The second-order parameters have milder slopes between 3 and 4 (except for $K_{30}$) which is fortunate from the perspective of making precise observations, since lower $\alpha$ renders larger values of $r_p$ accessible to measuring $K_{3m}$.
+
+The axes of figure \ref{fig:scan-perigee} show that parameters with large $m$ are more precisely determined than parameters with small $m$, as can be seen by comparing $K_{22}$ to $K_{20}$ and comparing $K_{33}$ to other $K_{3m}$ values. Large $m$ moments correspond to moments that control higher frequency fluctuations in density at the asteroid equator. This pattern of large $m$ corresponding to low uncertainty is a general trend and will be seen in the following sections as well.
+
+The very strong dependence of $\sigma$ on $r_p$ makes this analysis only to extract second-order moments on close encounters. Fortunately, in the case of Earth, these encounters are also likely to have the best associated observational uncertainty when above the horizon due to their proximity. The first-order moments can still be extracted at much larger perigee distances in our model.
+
+\afterpage{
+  \begin{landscape}
+    \begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figs/scan-all-1.pdf}
+    \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of various encounter parameters (\textit{columns}). The vertical dashed line indicates the reference asteroid values of the parameters. The red vertical lines indicate when $\sigma =0.01$.}
+    \label{fig:scan-perigee}
+    \label{fig:scan-vex}
+    \label{fig:scan-theta}
+    \label{fig:scan-rho}
+    \end{figure}
+  \end{landscape}
+}
+
+\afterpage{
+  \begin{landscape}
+    \begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figs/scan-all-2.pdf}
+    \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of various encounter parameters (\textit{columns}). The vertical dashed line indicates the reference asteroid values of the parameters. The red vertical lines indicate when $\sigma =0.01$.}
+    \label{fig:scan-am}
+    \label{fig:scan-cadence}
+    \label{fig:scan-period}
+    \label{fig:scan-gap}
+    \end{figure}
+  \end{landscape}
+}
+
+
+\subsubsection{Observational Uncertainty}
+\label{sec:scan-uncertainty}
+There are two parameters, $\sigma_\theta$ and $\sigma_\rho$, which govern the observational uncertainty of the data set (defined in section \ref{sec:uncertainty}). Rather than explore the full space spanned by these two values, we measure how parameter uncertainties depend on the product of uncertainties $\sigma_\theta\sigma_\rho$ (with the radio fixed), and the ratio $\sigma_\rho / \sigma_\theta$ (with the product fixed).
+
+We choose these metrics because we generally expect that the parameter uncertainty $\sigma$ be proportional to the observational uncertainty, but whether the dependence is stronger on $\sigma_\theta$ or $\sigma_\rho$ is not immediately clear. We get around this problem by varying $\sigma_\theta$ and $\sigma_\rho$ together and fixing their ratio, and measuring the posterior uncertainty $\sigma$, with $\sigma/\sigma_\theta$ shown in figure \ref{fig:scan-product}. Indeed, we find that $\sigma \propto \sigma_\theta$ almost exactly, and since $\sigma_\rho / \sigma_\theta$ is fixed, we also have $\sigma \propto \sigma_\rho$. For large $\sigma_\theta \sigma_\rho$, the proportionality fails, but this is because $\sigma(K_{30}) \approx 1$ which fills the prior. Uncertainty cannot increase beyond this value.
+
+
+We also investigate the dependence of posterior uncertainty on $\sigma_\rho / \sigma_\theta$ with $\sigma_\theta \sigma_\rho$ fixed in figure \ref{fig:scan-ratio}. If we simply had $\sigma \propto \sigma_\theta \sigma_\rho$, then $\sigma$ would have no dependence on $\sigma_\rho / \sigma_\theta$. Any deviation from constant $\sigma$ shown in the figure therefore reveals some additional dependence in the model on one of the observational uncertainties.
+
+
+Indeed, figure  \ref{fig:scan-ratio} shows increased uncertainty when $\sigma_\rho/\sigma_\theta$ is large, so that $\sigma$ depends more on $\sigma_\rho$ than on $\sigma_\theta$. We summarize this pattern by stating that, if the observer had to choose between better precision on the period or on the spin pole of the data, they should choose period. This is fortunate for observers since, \jtd{I want to say that precision on the period is better constrained by light curve analysis, but I do not know enough about light curve analysis to be sure.}
+
+Another conclusion that can be drawn from figure \ref{fig:scan-ratio} is that $\sigma(\sigma_\rho/\sigma_\theta)$ is proportional for all $K_{\ell m}$. The proportionality constant shows the same dependence on $\ell$ and $m$ mentioned previously. The proportionality is broken near $\sigma \approx \pm 1$, where $\sigma$ fills the prior.
+
+The location of the $\sigma > 0.01$ limit demonstrates the great influence of observational precision on fit uncertainty; increasing $\sigma_\theta \sigma_\rho$ or $\sigma_\rho / \sigma_\theta$ by even a small amount raises $\sigma(K_{3m}) > 0.01$ in most cases.
+
+
+
+\subsubsection{Asteroid shape}
+\label{sec:scan-shape}
+
+The true values of $K_{\ell m}$, $\gamma_0$, and $a_\mathcal{A}$ affect the uncertainties in extracted density moments $\sigma$. Here, we only investigate the sensitivity of $\sigma$ to the first-order parameters and $a_\mathcal{A}$. The $K_{2m}$ moments can therefore also be viewed as the axes of a uniform density triaxial ellipsoid (equation \ref{eqn:ellipsoid-axes}).
+
+In figure \ref{fig:scan-space-sigma}, we show the 1$\sigma$ confidence intervals as a function of $K_{20}$ and $K_{22}$, or alternatively $a/c$ and $b/c$. We use axis ratios rather than the values of $a$, $b$, and $c$ to remove the $a_\mathcal{A}$ dependence of equation \ref{eqn:ellipsoid-axes}. The figure shows large uncertainty in $\gamma_0$ for $K_{22}=0$, or $a/c=b/c$, because $K_{20}$ is rotationally symmetric around $\unit z$, and $\gamma_0$ is the initial orientation with respect to the $\unit z$ axis. The data then have no physical dependence on $\gamma_0$ when $K_{22}=0$. This induces degeneracy in the model which inflates uncertainties, not only in $\gamma_0$ but also the other components.
+
+\begin{figure*}
+  \includegraphics[width=0.3\textwidth]{figs/probe-space-theta-1-sigma.pdf}\hfill
+  \includegraphics[width=0.3\textwidth]{figs/probe-space-theta-2-sigma.pdf}\hfill
+  \includegraphics[width=0.3\textwidth]{figs/probe-space-theta-3-sigma.pdf}
+
+  \includegraphics[width=0.3\textwidth]{figs/probe-space-ab-1-sigma.pdf}\hfill
+  \includegraphics[width=0.3\textwidth]{figs/probe-space-ab-a-sigma.pdf}\hfill
+  \includegraphics[width=0.3\textwidth]{figs/probe-space-ab-b-sigma.pdf}
+
+  \caption{1$\sigma$ confidence interval for fit parameters $\gamma_0$, $K_{22}$, and $K_{20}$ (\textit{top row}) and $\gamma_0$, $a/c$, and $b/c$ (\textit{bottom row}). Also shown as black points are the reference asteroid shapes; the symmetric case is marked with a red circle and the asymmetric with a black triangle.}
+  \label{fig:scan-space-sigma}
+\end{figure*}
+
+To remove the inflated uncertainty, one could assume a rotationally symmetric asteroid, remove $\gamma_0$ as a parameter, and run a fit. For a nearly rotationally symmetric asteroid however, a new parametrization is necessary which does not contain the ill-constrained $\gamma_0$ parameter. This task is beyond the scope of this paper, so we mostly consider asymmetric asteroids throughout.
+
+Figure \ref{fig:scan-space-sigma} also shows low uncertainty for highly asymmetric asteroids, where $b/c$ and $a/c$ are very different (i.e., when $|K_{22}|$ is large). Additionally, $\sigma(K_{20})$ and $\sigma(K_{22})$ decrease for large $|K_{20}|$, which corresponds to large axis ratios in the ellipsoid case.
+
+Figure \ref{fig:scan-space-corr} displays the correlation between the first-order parameters for reference. They show that $\gamma_0$ and $K_{22}$ are often correlated for asymmetric asteroids, while $\gamma_0$ and $K_{20}$ are usually not. This is expected as $K_{22}$ is dependent on the orientation of the asteroid and $K_{20}$ is not. They also show that $K_{22}$ and $K_{20}$ are usually correlated, and that $a/c$ and $b/c$ are highly correlated. The latter is expected due to the $1/c$ dependence. As for the former, this correlation could likely be removed by an alternate parametrization, reducing uncertainties in the shape parameters.
+
+\begin{figure*}
+  \includegraphics[width=0.33\textwidth]{figs/probe-space-corr12.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/probe-space-corr13.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/probe-space-corr23.pdf}
+
+  \includegraphics[width=0.33\textwidth]{figs/probe-space-ab-1b.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/probe-space-ab-1a.pdf}\hfill
+  \includegraphics[width=0.33\textwidth]{figs/probe-space-ab-ab.pdf}
+  
+  \caption{Correlations between PPDs for fit parameters $\gamma_0$, $K_{22}$, and $K_{20}$ (\textit{top row}) and $\gamma_0$, $a/c$, and $b/c$ (\textit{bottom row}).  Also shown as black points are the reference asteroid shapes; the symmetric case is marked with a red circle and the asymmetric with a black triangle.}
+  \label{fig:scan-space-corr}
+\end{figure*}
+
+Overall, the variation in the uncertainties on $K_{20}$ and $K_{22}$ (the first-order density moments) is present but largely smooth across their allowed parameter space, as is their correlation (except the large $K_{22}$ corner). It therefore seems reasonable to use the asymmetric asteroid shape as a stand-in for an unknown's asteroid shape when simulating an encounter, as we do in this paper. The uncertainty then can be expected to differ across other shapes by a factor of about two or less, as long as the degenerate, symmetric asteroid regime is avoided.
+
+On the other hand, the posterior uncertainty of $K_{3m}$ is much more strongly dependent on asteroid length $a_\mathcal{A}$. Figure \ref{fig:scan-am} displays posterior uncertainty $\sigma$ as a function of $a_\mathcal{A}$, defined in equation \ref{eqn:am}. The vertical axis is shown in log space, meaning that the average of the upper and lower error bars of $\sigma$ is shown instead of showing both as is done in other figures.
+
+As was mentioned in section \ref{sec:tidal-torque}, the $K_{2m}$ parameters are insensitive to $a_\mathcal{A}$ since the $a_\mathcal{A}^2$ term in $\bm \tau$ (equation \ref{eqn:tidal-torque}) is canceled by the $a_\mathcal{A}^2$ in the moment of inertia (equation \ref{eqn:moi}). The $K_{3m}$ uncertainty is strongly dependent on $a_\mathcal{A}$ for the same reason that uncertainty is strongly dependent on $r_p$: the $(a_\mathcal{A}/D)^{\ell'}$ dependence of equation \ref{eqn:tidal-torque}. At $a_\mathcal{A} \lesssim 700$ m, $K_{30}$ becomes unresolved. The other parameters become unresolved for $a_\mathcal{A} \lesssim 300$ m, with the cut-off for $K_{33}$ being less than 100 meters. This $a_\mathcal{A}$ cut-off is quite sharp; figure \ref{fig:scan-am} shows steep decrease in $\sigma(a_\mathcal{A})$ for low $a_\mathcal{A}$, with an approximate functional form of $\sigma(a_\mathcal{A}) \sim e^{(a_\mathcal{A}/C)^p}$ for a scaling constant $C$ and some power $p < 1$. (In figure \ref{fig:scan-am}, the best fitting values are $p < 0.1$.) This sharpness indicates that the cut-off value of $a_\mathcal{A}$ is unlikely to change significantly if other parameters of the flyby are altered in a way that slightly increases or decreases $\sigma$. It therefore appears that extracting precise $K_{30}$ from asteroids with $a_\mathcal{A} \lesssim 700$ m is very unlikely with this analysis, and for $a_\mathcal{A} \lesssim 50$ m, all $K_{3m}$ will likely be unresolved.
+
+For uniform density asteroids, large $a_\mathcal{A}$ is equivalent to large asteroid radius, which was mentioned in section \ref{sec:moments} and explicitly shown in equation \ref{eqn:ellipsoid-axes}. In non-uniform density asteroids, large $a_\mathcal{A}$ can also be achieved by distributing the mass of the asteroid near the surface, because the $r^2$ term in the integrand of the definition of $a_\mathcal{A}$ causes the density of regions distant from the asteroid centre of mass to dominate $a_\mathcal{A}$.
+
+
+
+
+\subsubsection{Cadence}
+\label{sec:scan-cadence}
+
+The time between observations of asteroid angular velocity, or cadence, may vary depending on the observational schedule of the observing telescopes and the path of the asteroid through the sky.  We measure how the posterior uncertainty $\sigma$ varies with cadence ranging from two minutes to one hour in figure \ref{fig:scan-cadence}.
+
+Figure \ref{fig:scan-cadence} displays little dependence of uncertainty on cadence $\Delta t$ for $\Delta t \lesssim 40$ min. We also see flaring of uncertainty for very large cadence, largely driven by the paucity of data points. However, uncertainty dramatically increases for many parameters at about $\Delta t = 30-40$ min, a time scale which is likely characteristic of the asteroid system. We name this rough cadence limit $T_\text{cad}$.
+
+We expect $T_\text{cad}$ to be a function of two dynamical time scales of the system: the rotational period of the asteroid $P_\omega$ and the time spent near perigee $T_p$. The latter can be estimated by
+\begin{equation}
+  T_p \sim \frac{r_p}{v_\infty}\brackets{2\frac{\mu_\mathcal{B}}{r_pv_\infty^2}+1}^{-\frac{1}{2}}
+  \label{eqn:tp}
+\end{equation}
+which is the ratio of the perigee radius to velocity at perigee. The exact choice of the formula of $T_p$ not obvious, and alternatives to equation \ref{eqn:tp} are possible. For the simulated asteroid, $P_\omega = 9$ hr and $T_p = 42$ min by this definition.
+
+We further study the effect of $P_\omega$ and $T_p$ on $T_\text{cad}$ in appendix \ref{app:cadence-tests}, and find that both affect $T_\text{cad}$ by roughly the same amount.
+
+Figure \ref{fig:scan-cadence} shows that as long as $\Delta t < T_\text{cad}$ is achieved, the influence of cadence on $\sigma$ is minimal (except for $K_{30}$ where the $\sigma<0.01$ limit is slightly exceeded). However, shorter cadence almost always leads to lower uncertainties.
+
+
+
+\subsubsection{Perigee gap}
+\label{sec:scan-gap}
+In certain circumstances, spin data might not be able to be captured for a close encounter at perigee. The asteroid might dip below the horizon, or it might pass too close to the sun to be observed. Generally, angular velocity data can be collected when the asteroid is distant from the central body, where torque is low. There, the angular velocity evolution is dominated by torque-free precession dictated by the moment of inertia components. That zero-torque data can still be used to fix $K_{20}$ and $K_{22}$ as in \cite{MOSKOVITZ2020113519}. However, $K_{3m}$ are not extractable from precession data alone. We are therefore curious as to how our posterior uncertainties change due to lack of data during the encounter perigee.
+
+To test this, we mask the perigee of the counter by removing a duration $T$ of data centred on the perigee, where $T$ ranges from 0 to 3 hours. To prevent lack of precision on $K_{\ell m}$ induced by lower amounts of data for high $T$, we always cut 3 hr$-T$ from the data set, half from the beginning and half from the end, so that each data set produced for all $T$ has the same length of data before and after the perigee. We then fit the same asteroid model to the cut data for all $T$ and plot posterior uncertainties $\sigma$ in figure \ref{fig:observation-gap}.
+
+Since torque is greatest at perigee, we expect that region of the data to contain the most information about $K_{\ell m}$, and therefore uncertainty should increase monotonically with $T$, which is seen in figure \ref{fig:observation-gap}. We also see that the first-order parameters are not as sensitive to $T$ as the second-order parameters, because $K_{2m}$ are additionally constrained by torque-free precession after perigee.
+
+Most parameters show dramatically increased uncertainty in the $T \sim 1-2$ hr range. On the other hand, none of the uncertainties increase noticeably for $T < 30$ min. Thirty minutes of dropped data is equivalent to fifteen dropped points for the simulated cadence of $\Delta t = 2$ minutes, showing that many data points can dropped from the data set at perigee before the uncertainty starts to increase.
+
+Qualitatively, \ref{fig:observation-gap} shows similar dependence of $\sigma$ on $T$ as \ref{fig:scan-cadence} showed for $\sigma$ on cadence $\Delta t$. They also both have cut-offs where uncertainty markedly increases, and both the $T$ and $\Delta t$ cut-offs have qualitatively similar shapes although they occur at different values of $\Delta t$ and $T$. This suggests that the factors that govern uncertainty due to cadence (appendix \ref{app:cadence-tests}) also may govern sensitivity to lack of data at perigee in a similar way.
+
+
+\subsubsection{Initial spin pole}
+\label{sec:scan-spin}
+
+The tidal torque experienced by the asteroid is affected by the initial direction of asteroid spin $\bm \Omega_0$ both because spin sets the initial asteroid orientation up to $\gamma_0$ and because of the spin-dependence of the rotational equations of motion (equation \ref{eqn:omega-eom}).
+
+In figure \ref{fig:scan-spin}, we display 1$\sigma$ uncertainties for all parameters as a function of the direction of $\bm \Omega_0$, mapped onto the unit sphere in the inertial frame. Our samples for $\bm \Omega_0$ were laid out on a Fibonacci sphere to ensure they were roughly evenly spaced (marked in figure \ref{fig:scan-spin-avg}). To highlight common features across the parameters, we also display the average 1$\sigma$ sensitivity in figure \ref{fig:scan-spin-avg}. The average is weighted such that the uncertainty map for each parameter contributes an equal amount
+(the weight of each map is set to one-tenth of the map's mean). This average map is presented in two different projections to allow data at $\unit Z$ to be read.
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.8\textwidth]{figs/spin-pole.pdf}
+  \caption{$1\sigma$ uncertainties for the first-order parameters (\textit{top}) and second-order (\textit{bottom}) as a function of the initial direction of spin in the inertial frame. All maps are made in the Mollweide projection. The orange star indicates the reference spin pole. The red contours enclose regions where $\sigma \geq 0.01$.}
+  \label{fig:scan-spin}
+\end{figure*}
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.3\textwidth]{figs/spin-pole-avg-mollweide.pdf}
+  \includegraphics[width=0.3\textwidth]{figs/spin-pole-avg-polar.pdf}
+  \caption{The weighted average of the uncertainties shown in figure \ref{fig:scan-spin}, in Mollweide (\textit{left}) and polar (\textit{right}) projections in the inertial frame. See text for a description of how the average was computed. Black dots indicate the Fibonacci-sphere-distributed locations of sample spin poles, and the orange star indicates the reference spin pole. The polar projection is centred at the south pole, or $-\unit Z$.}
+  \label{fig:scan-spin-avg}
+\end{figure*}
+
+Certain alignments of the body-fixed frame to the inertial frame lead to special conditions on torque, as discussed in section \ref{sec:tidal-torque}. For example, $\bm z \parallel \unit Z$ and $\bm z \parallel \unit Y$ at perigee lead to $\bm \tau \parallel \unit z$ to first-order, and $\bm \tau \parallel \unit X$ at perigee leads to $\bm \tau = 0$ to first-order. We relate this to the initial direction of $\bm \Omega_0$, via the approximation that $\bm \tau$ is small until perigee. Then, since $\bm \omega_0 \parallel \unit z$ in the body-fixed frame as an initial condition (section \ref{sec:sim}), we have that $\bm \Omega_0 \parallel \unit Y$ and $\bm \Omega_0 \parallel \unit Z$ both lead to $\bm \tau \parallel \unit z$, and $\bm \Omega_0 \parallel \unit X$ leads to $\bm \tau = 0$.
+
+Figure \ref{fig:scan-spin-avg} shows area of increased uncertainty for $\bm \Omega_0 \parallel \unit Z$ and $\bm \Omega_0 \parallel \unit Y$, but not the $\unit X$ case. This indicates that $\bm \tau \parallel \unit z$ causes increased uncertainty. Physically, $\bm \tau \parallel \unit z$ only changes an asteroid's rotational period and does not cause it to tumble, eliminating the ability to discern moment of inertia ratios from zero-torque precession after the encounter. Also, $\tau_z$ affected by fewer parameters than $\tau_x$ or $\tau_y$.  Both of these are reasons why $\bm \tau \parallel \unit z$ might inhibit precise fits to spin data. If $\bm \tau = 0$ to first-order, then second-order $\bm \tau$ and non-perigee $\bm \tau$ will dominate, which may increase precision to these usually non-dominant parameters and therefore not have the same increasing effect on $\sigma$.
+
+It is important to note, however, that uncertainty does not vary by much more than a factor of two outside the imprecise regions of $\bm \Omega_0 \parallel \unit Z$ and $\bm \Omega_0 \parallel \unit Y$, though these regions are wide for some parameters. Within the imprecise regions, uncertainty can grow up to four times or more the uncertainty at other $\bm \Omega_0$ values, and can exceed the $\sigma ~0.01$ benchmark. The trends for are roughly consistent across parameters (figure \ref{fig:scan-spin}), leading to clearly visible imprecise regions in the average $\sigma$ (figure \ref{fig:scan-spin-avg}).
+
+
+
+
+\subsubsection{Rotational period}
+\label{sec:scan-period}
+
+We also study the effect of the initial rotational period of the asteroid $P_\omega$ on posterior uncertainty $\sigma$. The dynamical time scales $r_p/v_\infty$ and $\mu_\mathcal{B} / (r_p v_\infty)$ have already been mentioned in the context of the cadence cut-off (section \ref{sec:scan-cadence}), and the ratio between them and $P_\omega$ in principal may affect $\sigma$. In figure \ref{fig:scan-period}, we show $\sigma$ as a function of $P_\omega$ for a range of periods typical of NEOs.
+
+Like figure \ref{fig:scan-vex}, depicting the dependence of $\sigma$ on $v_\infty$, figure \ref{fig:scan-period} shows small-scale variation in uncertainty due to the fact that varying the initial period changes the value of $\gamma$ at perigee, which affects uncertainty to a factor of about two. But a large-scale trend is also visible in many parameters. $K_{20}$ and $K_{22}$ show very large uncertainty for $P_\omega \lesssim 4$ hr because these fast-rotators tumble very little after perigee. This increases uncertainty on the $K_{2m}$ parameters, which are constrained by tumbling.
+
+We expect that quickly rotating asteroids would not tumble because, for small $P_\omega$, the dynamical variables $\bm D$, $\bm \omega$, $\alpha$, and $\beta$ vary much smaller than $\gamma$. Approximating each variable as constant over one full rotation of $\gamma$, we can integrate the first-order contribution of $\bm \tau$ over $\gamma \in (0, 2\pi)$ and reveal that each rotation has zero average first-order torque. Since the first-order torque over each rotational period cancels out, there is no secular torque to force the asteroid to tumble. However, this effect does not apply to the second-order parameters, since the integral over the second-order term of $\bm \tau$ does not vanish, as seen in the figure.
+
+Another feature of figure \ref{fig:scan-period} is that $K_{\ell 0}$ is more uncertain at low $P_\omega$ than the other parameters. This is most visible in the figure for $K_{30}$. The cause is likely that $K_{\ell 0}$ cannot contribute to $\tau_z$ as shown in equation \ref{eqn:tidal-torque}. We already discussed that asteroids with small $P_\omega$ do not tumble, and since $\tau_x$ and $\tau_y$ are what induces tumbling, the most observable component of torque is therefore $\tau_z$, which $K_{\ell 0}$ do not affect.
+
+The most severe effect of period on $\sigma$ is in the low-period regime ($P_\omega \lesssim 5$ hr), but in this case, the most strongly affected parameters are $K_{2m}$, which are generally known better than $K_{3m}$. The effect on the imprecise parameters $K_{3m}$ is small, except for $K_{30}$. It therefore seems as though small-period asteroids are still candidates for observation, although high-period asteroids still have better uncertainty.
+
+
+\subsubsection{Central body oblateness}
+\label{sec:scan-oblateness}
+
+In all the above studies, we assumed a spherical planet ($J_{\ell m} = 0$ for $\ell \geq 1$). By assumption that $\mu_\mathcal{B} \gg \mu_\mathcal{A}$ (so that the asteroid orbit's focus is the centre of mass of the central body), we have $J_{1m} = 0$. The effect of central body oblateness, then, is limited to the $J_{2m}$ terms, and therefore damped by a factor of $(a_\mathcal{B} / D)^2$. We expect these parameters to have little effect on the asteroid.
+
+Here, we define oblateness as $\epsilon = (I_z - I_x)/(\mu_\mathcal{B} R_M^2)$, where $I_{x,y,z}$ are the central body moments of inertia along the principal axes, and $I_x = I_y$. $R_M$ is the true radius of the body (not $a_\mathcal{B}$ from equation \ref{eqn:jlm}). 
+
+$J_{\ell m}$ is defined in equation \ref{eqn:jlm} with respect to the asteroid orbit, not the principal axes of the central body. However, for an equatorial orbit, the central body principal axes coincide with the asteroid orbit frame and we may express $\epsilon$ simply in terms of $J_{\ell m}$ as $\epsilon = -2J_{20}$ and $J_{22} = 0$. (Some sources such as Ref.~\cite{paterLissauer2015} take $\epsilon=J_{20}$ as their definition of $J_{20}$). For simplicity, we use this equatorial orbit case. If the orbit is non-equatorial, the other $J_{2m}$ terms will be non-zero. Since an oblate ellipsoid is mirror-symmetric around all three axes, table \ref{tab:klm-symmetries} indicates that $J_{3m}$ are all zero. The next order of precision after this oblateness approximation is therefore $J_{4m}$, damped by an additional $(a_\mathcal{B}/D)^2$ factor, and  non-ellipsoid corrections to the central body shape.
+
+Given this conversion between $\epsilon$ and $J_{20}$, we analyze posterior uncertainty $\sigma$ of the first-order parameters as a function of $\epsilon$ across a reasonable range of central body oblatenesses based on those of Solar System planets \cite{paterLissauer2015}. These uncertainties are shown in the top pane of figure \ref{fig:scan-oblateness}, together with linear best-fitting curves for $\sigma(\epsilon)$.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.88\columnwidth]{figs/oblateness.pdf}
+  \vfill
+  \includegraphics[width=0.88\columnwidth]{figs/oblateness-differ.pdf}
+  \caption{\textit{Top}: 1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs as a function of oblateness $\epsilon$ . Linear best-fitting lines to $\sigma$ (black, dotted) are plotted. \textit{Bottom}: The difference between PPD means extracted from a zero-oblateness model and the true parameters given data with true oblateness $\epsilon_\text{true} \neq 0$. Also shown in both figures are the oblatenesses of reference Solar System bodies.}
+  \label{fig:scan-oblateness}
+\end{figure}
+
+The figure demonstrates a small dependence of $\sigma$ on oblateness $\epsilon$, but the effect is far from important compared to the other factors studied above. Most Solar System bodies do not reach the oblateness necessary to significantly increase precision on the first-order parameters. The best-fitting lines match the uncertainties well, and they have slope of $(\Delta \sigma / \sigma_{\epsilon=0}) / \Delta \epsilon = -0.26$ for $\gamma_0$, $-0.94$ for $K_{22}$, and $-1.2$ for $K_{20}$. The second-order parameters $K_{3m}$ likely depend on oblateness similarly, but fitting these parameters is computationally more expensive and we do not study them here.
+
+Note that if an encounter is executed around one of the non-Earth objects noted in figure \ref{fig:scan-oblateness}, $a_\mathcal{B}$ and $\mu_\mathcal{B}$ will change in addition to $\epsilon$. These two parameters also affect the precision of the fit parameters (appendix \ref{app:jupiter-earth}), so the figure does not show that encounters with other bodies have the same precision as encounters with Earth; only that the difference in oblateness between the two bodies is of little concern.
+
+Given the small effect of $\epsilon$ on $K_{\ell m}$, it might be tempting to neglect the planetary oblateness when fitting $K_{\ell m}$ to data. However, the bottom pane of figure \ref{fig:scan-oblateness} demonstrates that doing so is invalid. This figure displays $K_{\ell m}$ as extracted by a fit assuming $\epsilon = 0$, but run on data generated with non-zero $\epsilon$. The difference between the PPD means and true parameters are shown. Posterior uncertainties are also shown as bands. The figure shows that even for low (Moon-scale) oblateness, the fit results are inconsistent with the true $K_{\ell m}$ values, since $\Delta K_{\ell m} = 0$ is not contained in the 2$\sigma$ band. This effect is much worse for large oblateness, growing to a difference on the order of $10^{-2}$ between the true and fit parameters for large oblateness. Therefore, accurately modelling central-body oblateness to high precision is essential for accurate estimation of fit parameters. For non-equatorial orbits, with $J_{22} \neq 0$, we also expect $J_{22}$ to affect the accuracy of the fit results to a similar degree, with the additional requirement of using the correct asteroid orbital plane.
+
+Note that $J_{20}$, the parameter studied in this section, has a slightly more general definition than oblateness. If the planet has a moon, the integral defining $J_{20}$ (equation \ref{eqn:jlm}) can be extended to include this extra mass. Since $J_{20}$ is a second moment, this effect is magnified for large distances of the mass from the central body centre of mass (though the effect is not quite quadratic because $a_\mathcal{B}$ also increases for large distances, and $J_{20}$ is divided by $a_\mathcal{B}^2$). This process is only valid when the asteroid never passes inside the moon's orbit.
+
+As an order-of-magnitude estimate for this effect, two spherical objects with masses and radii of Earth and the Moon, separated by one Lunar distance, and both lying in the orbital plane has a combined $J_{20} = 0.25$. Extrapolating posterior uncertainty by the slopes of the best fit lines given earlier, this represents a decrease in $\sigma(K_{2m})$ by a factor of about one quarter.
+
+This analysis suggests that large moons such as ours can improve fit quality, but further study of this effect is beyond the scope of this paper. Without a moon to inflate the oblateness of the central body, planetary oblateness does not significantly improve posterior uncertainty. However, correct representation of oblateness is essential to accurately estimate $K_{\ell m}$.
+
+
+
+\subsection{Comparison of Jupiter and Earth encounters}
+\label{app:jupiter-earth}
+
+If sufficiently accurate spin pole data can be detected for non-Earth encounters, it may be possible to extract density moments for encounters with larger planets. In this appendix, we run our reference asteroid through a Jupiter encounter to analyze the differences in uncertainty.
+
+The physical parameters of the asteroid body are kept the same as the Earth encounter case (listed in appendix \ref{app:reference-configs}), as are the observational uncertainty and cadence. The orbit is adjusted for the Jupiter case by setting a perijove distance of $r_p=5$ Jupiter radii (compared to perigee radius $r_p=5$ Earth radii for the Earth encounter). We perform two fits, each with a different value of $v_\infty$: in one case we keep the Earth-encounter value of $v_\infty = 6$ km s$^{-1}$, and in the other case we increase the velocity such that the eccentricity (and therefore the angle between the orbits' hyperbolic asymptotes) are the same for both encounters. The latter requires $v_\infty = \sqrt{G\mu_\mathcal{B}/r_p (e-1)}=32$ km s$^{-1}$. The rationale for these excess velocity values is that, for $v_\infty = 6$ km s$^{-1}$, we keep a physically typical encounter excess velocity at the expense of changing the orbit shape, whereas for $v_\infty =32$ km s$^{-1}$ the orbit shape is unchanged, although the asteroid speed is dramatically increased.
+
+Section \ref{sec:scan-orbit} found that $v_\infty$ does not affect the posterior uncertainties, and indeed we find very little difference between the two $v_\infty$ cases. We therefore do not distinguish between the two cases further. The ratio between the posterior uncertainties in the Jupiter and the Earth encounters are shown in table \ref{tab:jupiter-uncertainty}. In all cases, the Jupiter posteriors are more uncertain than Earth posteriors.
+
+\begin{table}
+  \centering
+  \begin{tabular}{c|cc}
+    \hline 
+    $K_{\ell m}$ & $\sigma_\text{Jupiter}/\sigma_\text{Earth}$\\ \hline 
+    $\gamma_0$ & 1.6 \\
+    $K_{22}$ & 2.3 \\
+    $K_{20}$ & 11 \\
+    $\Re K_{33}$ & 18 \\
+    $\Im K_{33}$ & 18 \\
+    $\Re K_{32}$ & 18 \\
+    $\Im K_{32}$ & 18 \\
+    $\Re K_{31}$ & 25 \\
+    $\Im K_{31}$ & 10 \\
+    $K_{30}$ & 53 \\ \hline
+  \end{tabular}
+  \caption{Ratio of posterior uncertainty for all density moments $K_{\ell m}$ between an Earth encounter and a Jupiter encounter with identical properties except for an increased perigee.}
+  \label{tab:jupiter-uncertainty}
+\end{table}
+
+These uncertainty ratios can be understood as follows. The leading order of tidal torque is proportional to $\mu_\mathcal{A} / D^3$. If $D/a_\mathcal{B}$ (the ratio of the encounter distance to the central body radius) is roughly constant (as in this case, where $r_p/a_\mathcal{B}=5$), then $\mu_\mathcal{A} / D^3 \propto \rho_\mathcal{B}$ where $\rho_\mathcal{B}$ is the density of the central body. Therefore, little advantage is to be gained by looking for encounters of a massive planet in this sense. Since Jupiter is less dense than Earth, we expect that uncertainty in the first-order parameters $\gamma_0$ and $K_{2m}$ would be slightly worse than in the case of Earth, which is seen in table \ref{tab:jupiter-uncertainty}.
+
+The second-order terms are damped by an additional factor of $a_\mathcal{A}/D$, which decreases if a massive central body is used. Since Jupiter is about 10 times larger in radius than Earth, we expect that the $K_{3m}$ terms are about ten times more uncertain than the $K_{2m}$ components, which is the case.
+
+The $K_{\ell 0}$ components differ in that $\sigma_\text{Jupiter}/\sigma_\text{Earth}$ is about five times greater for $K_{\ell 0}$ than other moments of the same $\ell$. In fact, $K_{30}$ essentially fills the prior. The special properties of $K_{\ell 0}$ have been analysed noted before, in that they are always more uncertain than other moments and are particularly uncertain in regimes where the asteroid does not tumble after the perigee. In this case, the Jupiter encounter resulted in less tumbling than the Earth encounter, so the larger increase in uncertainty in $K_{\ell 0}$ shown in table \ref{tab:jupiter-uncertainty} is expected.
+
+There are additional effects of central body mass which are not captured in this analysis. For example, encounters with massive planets are more plentiful, so that observation for a fixed period of time will lead to a larger number of observed encounters conducive to low-uncertainty moment extraction (large $a_\mathcal{A}$, small $r_p$, etc.). The distribution of $r_p$ in this encounter sample will also change; the ratio of the orbit impact parameter (the distance between the orbit asymptotes and the central body) to perigee distance is 
+\begin{equation}
+  \frac{b}{r_p} = \sqrt{1+2\frac{G\mu_\mathcal{B}}{r_p v_\infty^2}}.
+\end{equation}
+It was mentioned above that the observable perigee distance $r_p$ increases with $a_\mathcal{B} \sim \mu_\mathcal{B}^{1/3}$, so that $\frac{b}{r_p}$ is larger for more massive planets and therefore the same impact parameter leads to lower periapse. Other effects, such as a change in the physical properties of the encountering asteroids, may also affect the fit uncertainties.
+
+Table \ref{tab:jupiter-uncertainty} shows that an encounter with Jupiter yields less precise posteriors than an encounter with Earth, all else being equal. However, these selection biases will cause more large-$a_\mathcal{A}$ and small-$r_p$ asteroids to encounter Jupiter, and therefore yield increased precision. Which of these contradicting effects dominates is not immediately clear, and depends on the specific asteroid population near Jupiter.
+
+
+\subsection{Comparisons between density models}
+\label{sec:density-compare}
+
+To test the properties of the three density models defined in section \ref{sec:specific-density}, we simulate several asteroids with different shapes and density distributions on a close Earth encounter with the reference asteroid orbital and observational parameters. Density moments are extracted via our fit process and density distributions extracted by the three above methods. Below, we compare the resulting distributions to understand the performance of the extraction methods.
+
+\subsubsection{Uniform density test asteroids}
+
+We simulate several asteroids with uniform density distributions and ask whether a uniform distribution is recovered. This was already done in section \ref{sec:asym-density} for the asymmetric reference asteroid. Here, we perform the same process for the symmetric reference asteroid, a ``dumbbell'' (two spheres of equal radius conjoined such that the surface of one intersects the centre of the other), and a tetrahedron. We use these shapes as rough approximations of potential shape types (i.e., a contact binary for the dumbbell, a polyhedron for the tetrahedron), but also to demonstrate the density models' efficacy on sharp corners. The extracted distributions for all three models are shown in figure \ref{fig:uniform-density}. 
+
+\begin{figure*}
+  \centering
   \includegraphics[width=0.33\textwidth]{figs/sym-ell-likelihood.pdf}\hfill
   \includegraphics[width=0.33\textwidth]{figs/sym-ell-harmonic.pdf}\hfill
   \includegraphics[width=0.33\textwidth]{figs/sym-ell-lumpy.pdf}
@@ -733,13 +754,13 @@ First, we simulate several asteroids with uniform density distributions and ask 
   \includegraphics[width=0.33\textwidth]{figs/tet-likelihood.pdf}\hfill
   \includegraphics[width=0.33\textwidth]{figs/tet-harmonic.pdf}\hfill
   \includegraphics[width=0.33\textwidth]{figs/tet-lumpy.pdf}
-  \caption{Density distributions extracted by the likelihood (\textit{left}), harmonic (\textit{middle}), and lumpy with $d=N=1$ (\textit{right}) models from data generated for a uniform-density asteroid. The asteroid shapes are, from top to bottom, the reference asymmetric ellipsoid, the reference symmetric asteroid, the dumbbell model, and a tetrahedron. Density is normalized so that mean density is one. The same distance scale is used in all figures.}
+  \caption{Density distributions extracted by the likelihood (\textit{left}), harmonic (\textit{middle}), and lumpy with $d=N=1$ (\textit{right}) models from data generated for a uniform-density asteroid. The asteroid shapes are, from top to bottom, the reference symmetric asteroid, the dumbbell model, and a tetrahedron. Density is normalized so that mean density is one. The same distance scale is used in all figures.}
   \label{fig:uniform-density}
 \end{figure*}
 
 From figure \ref{fig:uniform-density}, it can be seen that the likelihood and harmonic models produce mostly the same density distributions. This is generally true for uniform density asteroids, which have harmonic density distributions. Consequentially, $\Delta K_{\ell m}$ is low for the harmonic model. This similarity lends confidence that the models produced are truly representative of the asteroid since they are produced via two independent methods.
 
-The asymmetric and dumbbell asteroids produce distributions whose non-uniformity is limited to a factor of 2 or less for the harmonic and likelihood models. This non-uniformity is driven by error in the estimates of the density moments. Note that most of the asteroid has density close to one in both cases, with the factor of two reached only by small regions. The lumpy model yields a much more uniform distribution, because it is designed to produce uniform lumps. Note that its uncertainty $\Delta K_{\ell m}$ is usually large, both because the model is severely overdetermined (it has 2 degrees of freedom) and because the lump found extends outside the asteroid, violating the assumptions of the model. This is a sign that the lump found does not really exist inside the asteroid.
+The dumbbell asteroid, like the asymmetric asteroid of figure \ref{fig:uniform-density-results}, produces distributions whose non-uniformity is limited to a factor of 2 or less for the harmonic and likelihood models. This non-uniformity is driven by error in the estimates of the density moments. Note that most of the asteroid has density close to one in both cases, with the factor of two reached only by small regions. The lumpy model yields a much more uniform distribution, because it is designed to produce uniform lumps. Note that its uncertainty $\Delta K_{\ell m}$ is usually large, both because the model is severely overdetermined (it has 2 degrees of freedom) and because the lump found extends outside the asteroid, violating the assumptions of the model. This is a sign that the lump found does not really exist inside the asteroid.
 
 The symmetric and tetrahedral asteroids are less-well represented by the density distribution model results. In both cases, the likelihood and harmonic models produce sometimes-negative distributions, and non-uniformity is especially large in the tetrahedral case. This is not the fault of the density models, but rather because both of these asteroids have $K_{22} = 0$ and (as discussed in section \ref{sec:scan-shape}), this leads to degeneracy in $\gamma_0$ and inflated uncertainty in the density moments. In the tetrahedral case, the problem is worsened because $K_{20}=0$ as well, so that torque is dominated by the small and ill-constrained $K_{3m}$ components.
 
@@ -877,7 +898,7 @@ The code used to generate data, fit density moments to it, and extract density d
 \bibliography{asteroids.bib}
 
 
-\include{appendices}
+%\include{appendices}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -115,7 +115,7 @@ for plot_index in range(N_DIM):
     ax.axvline(x=1000, color='k', linewidth=1, linestyle='dashed')
 
     if plot_index == 9:
-        ax.set_xlabel(f"$a_m$ (m)")
+        ax.set_xlabel("$a_\\mathcal{A}$ (m)")
     else:
         ax.set_xticks([])
 

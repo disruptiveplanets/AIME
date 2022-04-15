@@ -1,5 +1,4 @@
 TEST = False
-VELOCITY_MUL = 1
 
 SAVE_PDFS = False
 
@@ -196,6 +195,9 @@ class Display:
         theta_high = np.asarray([float(x) for x in f.readline().split(',')])
         theta_low = np.asarray([float(x) for x in f.readline().split(',')])
         self.sigma = [float(d) for d in f.readline().split(',')]
+        last_line = f.readline()
+        self.velocity_mul = 1 if last_line == '' else float(last_line)
+
 
         try:
             self.gap = float(f.readline())
@@ -258,7 +260,7 @@ class Display:
         try:
             resolved_data = self.module.simulate(self.cadence, self.jlms, theta,
                 self.radius, self.spin[0], self.spin[1], self.spin[2],
-                self.impact_parameter, self.speed, CENTRAL_MU, CENTRAL_RADIUS, 0, False, VELOCITY_MUL)
+                self.impact_parameter, self.speed, CENTRAL_MU, CENTRAL_RADIUS, 0, False, self.velocity_mul)
         except:
             print("Coordinates are invalid ({})".format(theta))
             return None

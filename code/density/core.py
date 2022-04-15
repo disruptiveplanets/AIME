@@ -168,8 +168,8 @@ class Method:
         
         if self.final_uncertainty:
             print("Plotting uncertainty")
-            make_slices(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u", self.klm_error, 90)
-            make_gif(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u.gif", duration, 90)
+            make_slices(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u", self.klm_error, 95)
+            make_gif(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u.gif", duration, 95)
         elif true_densities is not None:
             print("Plotting differences")
             make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr', f"{fname}-s", self.klm_error, 90, balance=True)

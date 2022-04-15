@@ -6,6 +6,8 @@ f = open(ROOT + "paper/figs/fig-sources.txt", 'r')
 for line in f.readlines():
     if line == '':
         continue
+    if line.startswith('#'):
+        continue
     args = line[:-1].split(' ')
     if len(args) != 2:
         continue

@@ -65,7 +65,7 @@ for name in percentiles.keys():
 
 oblatenesses = -np.array(j2s) / 2
 
-fig, axs = plt.subplots(figsize=(5, 7), ncols=1, nrows=3, sharex=True)
+fig, axs = plt.subplots(figsize=(5, 5), ncols=1, nrows=3, sharex=True)
 axs = axs.reshape(-1)
 
 for i in range(N_DIM):

@@ -1,3 +1,6 @@
+scan-all1.pdf data/big-fig/all1.pdf
+scan-all2.pdf data/big-fig/all2.pdf
+
 probe-space-theta-1-sigma.pdf data/probe-space/compile-figs/theta-1-sigma.pdf
 probe-space-theta-2-sigma.pdf data/probe-space/compile-figs/theta-2-sigma.pdf
 probe-space-theta-3-sigma.pdf data/probe-space/compile-figs/theta-3-sigma.pdf
@@ -12,10 +15,10 @@ probe-space-ab-1a.pdf data/probe-space/compile-figs/corr1a.pdf
 probe-space-ab-1b.pdf data/probe-space/compile-figs/corr1b.pdf
 probe-space-ab-ab.pdf data/probe-space/compile-figs/corrab.pdf
 
-scan-product.pdf data/probe-sigma/sigmas.pdf
-scan-ratio.pdf data/probe-ratio-prod/ratios-prod.pdf
+#scan-product.pdf data/probe-sigma/sigmas.pdf
+#scan-ratio.pdf data/probe-ratio-prod/ratios-prod.pdf
 
-scan-period.pdf data/scan-period/period.pdf
+#scan-period.pdf data/scan-period/period.pdf
 
 oblateness.pdf data/oblateness/oblateness.pdf
 oblateness-differ.pdf data/oblateness-differ/oblateness-differ.pdf
@@ -29,25 +32,27 @@ example-corner.pdf code/other-figs/example-corner/cad-00-0-corner.pdf
 nominal-covariance.pdf code/fit_resolved/random-figs/random-vector-unc.pdf
 nominal-norm.pdf code/fit_resolved/random-figs/random-vector-norm.pdf
 
-scan-cadence.pdf data/scan-cadence/cadences.pdf
-cadence-accuracy.pdf data/scan-cadence/differ.pdf
-cad-speed.pdf data/cad-speed/cad-speed.pdf
-cad-period.pdf data/cad-period/cad-period.pdf
+#scan-cadence.pdf data/scan-cadence/cadences.pdf
+#cadence-accuracy.pdf data/scan-cadence/differ.pdf
+#cad-speed.pdf data/cad-speed/cad-speed.pdf
+#cad-period.pdf data/cad-period/cad-period.pdf
 
-observation-gap.pdf data/observation-gap/gap.pdf
+#observation-gap.pdf data/observation-gap/gap.pdf
 
 spin-pole.pdf data/scan-spin-pole/pole.pdf
 spin-pole-avg-mollweide.pdf data/scan-spin-pole/avg-pole-mollweide.pdf
 spin-pole-avg-polar.pdf data/scan-spin-pole/avg-pole-polar.pdf
 
-scan-vex.pdf data/scan-vex/vex.pdf
-scan-am.pdf data/scan-am/am.pdf
+#scan-vex.pdf data/scan-vex/vex.pdf
+#scan-am.pdf data/scan-am/am.pdf
 
-scan-perigee.pdf data/scan-perigee/perigee.pdf
+#scan-perigee.pdf data/scan-perigee/perigee.pdf
 
 asym-ell-harmonic.pdf code/density/figs/asym-ell/harmonic-d.pdf
 asym-ell-likelihood.pdf code/density/figs/asym-ell/likelihood-d.pdf
 asym-ell-lumpy.pdf code/density/figs/asym-ell/lumpy-1-1-d.pdf
+asym-ell-unc-harmonic.pdf code/density/figs/asym-ell/harmonic-u.pdf
+asym-ell-unc-likelihood.pdf code/density/figs/asym-ell/likelihood-u.pdf
 
 sym-ell-harmonic.pdf code/density/figs/sym-ell/harmonic-d.pdf
 sym-ell-likelihood.pdf code/density/figs/sym-ell/likelihood-d.pdf
