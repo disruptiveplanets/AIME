@@ -10,7 +10,7 @@ from multiprocessing import Pool
 
 plt.style.use("jcap")
 
-SYMMETRIC = True
+SYMMETRIC = False
 NUM_TRIALS = 1000
 EARTH_RADIUS = 6_370_000
 AMPLIFY = 700 * 3
@@ -36,7 +36,7 @@ with open(f"{FILE_NAME}.txt", 'r') as f:
     sigma = [float(d) for d in f.readline().split(", ")]# theta, ratio
 
 data = np.array(asteroids_0_2.simulate(cadence, jlms, theta_true, radius,
-                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False))
+                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False, 1))
 
 with open(f"{FILE_NAME}-0-samples.npy", 'rb') as f:
     if SYMMETRIC:
@@ -115,7 +115,7 @@ def plot_sigma():
     lows_3 = np.transpose(lows_3) * 3600
     highs_3 = np.transpose(highs_3) * 3600
 
-    plt.figure(figsize=(10, 4))
+    plt.figure(figsize=(8, 4))
     plt.plot(time, runs[0, ::3] * 3600, color="black")
     plt.plot(time, runs[0, 1::3] * 3600, color="black")
     plt.plot(time, runs[0, 2::3] * 3600, color="black")
@@ -154,6 +154,6 @@ def plot_sigma():
         plt.savefig("spin-chaos-asym.pdf")
         plt.savefig("spin-chaos-asym.png")
 
-gen_data()
+#gen_data()
 plot_sigma()
 plt.show()

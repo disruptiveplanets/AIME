@@ -85,3 +85,7 @@ Maybe this doesn't matter. I'm just going to run the figs tomorrow.
 ## March 30
 
 I fixed a bug with square rooting a complex number and redrew the shapes in the Sc.
+
+## April 19
+
+Fixed the uncertainties bug that was leading to negative uncertainty.

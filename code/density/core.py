@@ -7,6 +7,7 @@ from display import make_gif, make_slices
 import warnings, os
 
 RLM_EPSILON = 1e-20
+NEGATIVE_VEC = None
 
 
 def rlm(l,m,x,y,z):
@@ -54,10 +55,9 @@ class Method:
 
             if self.asteroid.sigma_data is not None:
                 if self.finite_element:
-                    self.unc = np.einsum('ij,jk,ik->i', a, self.asteroid.sigma_data, a)# Diagonal entries
+                    self.unc = np.einsum('ij,jk,ki->i', a, self.asteroid.sigma_data, a.transpose().conjugate())# Diagonal entries
                 else:
-                    self.unc = a @ self.asteroid.sigma_data @ a.transpose()
-
+                    self.unc = a @ self.asteroid.sigma_data @ a.transpose().conjugate()
 
     def get_density(self, x,y,z):
         if self.finite_element:
@@ -75,7 +75,7 @@ class Method:
         if self.final_uncertainty:
             b = self.get_b(x,y,z)
             if self.finite_element:
-                out = np.sqrt(self.unc[b].real).real
+                out = np.sqrt(np.abs(self.unc[b].real)).real
                 return out
 
             else:
@@ -83,7 +83,7 @@ class Method:
                     b = b.reshape(-1, b.shape[-1])
                     return np.array([np.sqrt(e @ self.unc @ e)[0] for e in b]).reshape(x.shape).real
                 else:
-                    out = np.sqrt((b @ self.unc @ b.transpose()).real)
+                    out = np.sqrt(np.abs((b.transpose() @ self.unc @ b.conjugate()).real))
                     if type(out) != np.float64:
                         return out[0].real
                     return out.real

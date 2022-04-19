@@ -174,7 +174,7 @@ The log likelihood resulting from this uncertainty model is (excluding additive 
 \begin{equation}
   \begin{split}
   \ln \mathcal{L} = -\frac{1}{2}\sum_{i = 0}\Bigg[&\frac{\cos^{-1} (\bm \Omega_i^* \cdot \bm \Omega_i/(\Omega_i^* \Omega_i))^2}{\sigma_\theta^2}\\
-  +&\frac{\ln \parens{\Omega_i /\Omega_i^*}^2}{\sigma_\rho^2} + 2\ln\frac{\Omega_i}{\Omega_i^*}\Bigg].
+  &+\frac{\ln \parens{\Omega_i /\Omega_i^*}^2}{\sigma_\rho^2} + 2\ln\frac{\Omega_i}{\Omega_i^*}\Bigg].
   \end{split}
   \label{eqn:log-likelihood}
 \end{equation}
@@ -229,11 +229,12 @@ To propagate uncertainties from $\bm K$ to $\bm \Theta$ and therefore $\rho(\bm 
   K_{\ell m}^\mathrm{hybrid} = e^{-im\Delta \gamma}K_{\ell m}^\mathrm{body-fixed}.
   \label{eqn:body-fixed-to-hybrid}
 \end{equation}
-by equation \ref{eqn:ylm-rotation}. Since $K_{\ell m}^\mathrm{body-fixed}$ was obtained by an MCMC fit, a large set of PPD-distributed samples is available for $\Delta \gamma$ and $K_{\ell m}^\mathrm{body-fixed}$, and the covariance matrix $\Sigma_K$ can be computed statistically in the hybrid frame by applying equation \ref{eqn:body-fixed-to-hybrid} to the samples. Then, propagation of uncertainty guarantees that the covariance matrix of $\bm \Theta$ is $\Sigma_\Theta = A \Sigma_K A^T$ and the density distribution and uncertainty on density distribution are equal to
+by equation \ref{eqn:ylm-rotation}. Since $K_{\ell m}^\mathrm{body-fixed}$ was obtained by an MCMC fit, a large set of PPD-distributed samples is available for $\Delta \gamma$ and $K_{\ell m}^\mathrm{body-fixed}$, and the covariance matrix $\Sigma_K$ can be computed statistically in the hybrid frame by applying equation \ref{eqn:body-fixed-to-hybrid} to the samples. Then, propagation of uncertainty guarantees that the covariance matrix of $\bm \Theta$ is $\Sigma_\Theta = A \Sigma_K A^*$ and the density distribution and uncertainty on density distribution are equal to
 \begin{equation}
-  \rho(\bm r) = \bm B(\bm r)^T A\bm K \qquad \sigma^2_\rho(\bm r) = \bm B(\bm r)^T A \Sigma_K A^T \bm B(\bm r).
+  \rho(\bm r) = \bm B(\bm r)^* A\bm K \qquad \sigma^2_\rho(\bm r) = \bm B(\bm r)^* A \Sigma_K A^* \bm B(\bm r).
   \label{eqn:unc-rho}
 \end{equation}
+where $A^*$ is the adjoint of $A$.
 
 The purpose of a model is therefore to restrict the space of valid density distributions by defining the $m\times n$-dimensional constant matrix $A$ and the $m$-dimensional vector $\bm B(\bm r)$ such that equations \ref{eqn:density-model} and \ref{eqn:density-distro} are true. Then the density distribution and its uncertainty are given by equation \ref{eqn:unc-rho}. 
 
@@ -361,19 +362,19 @@ To demonstrate the success of our fit process, we present example results of the
 
 \begin{figure*}
   \centering
-  \includegraphics[width=0.7\textwidth]{figs/example-residuals.pdf}
-  \caption{Data, best fit results, and residuals for a fit to synthetic data simulated for an asymmetric reference asteroid. The standard deviation of the data is plotted as an uncertainty band in the residuals plot, but these do not capture covariance between data points.}
+  \includegraphics[width=0.6\textwidth]{figs/example-residuals.pdf}
+  \caption{Data, best fit results, and residuals for a fit to synthetic data simulated for an asymmetric reference asteroid. Uncertainty bands are also shown.}
   \label{fig:example-residuals}
 \end{figure*}
 
-Figure \ref{fig:example-residuals} shows the spin data with uncertainty added. Data simulated given the best-fitting density moments (the mean of the PPDs) is overlaid in the top pane and the residuals are shown the bottom pane. Uncertainties are plotted on the residuals corresponding to the square root of the diagonal entries of the covariance matrix (correlations not included). The fit results are clearly consistent with the data.
-
 \begin{figure*}
   \centering
-  \includegraphics[width=\textwidth]{figs/example-corner.pdf}
-  \caption{A corner plot for the fit results ten parameters to synthetic data simulated for an asymmetric reference asteroid. Marginal posterior PDFs for each parameter are shown (histograms) along with two-dimensional PDFs (contours). Individual points in the contours are samples from the MCMC fit, and the contours enclose 1, 2, and 3$\sigma$ of them. True values (which are zero here due to the parameters being displayed relative to the true values) are also shown (blue lines).}
+  \includegraphics[width=0.85\textwidth]{figs/example-corner.png}
+  \caption{PPDs extracted from synthetic encounter data for the asymmetric reference asteroid. Samples from the MCMC fit are shown as individual points, and the contours enclose 1, 2, and 3$\sigma$ confidence regions. True values are shown as blue lines.}
   \label{fig:example-corner}
 \end{figure*}
+
+Figure \ref{fig:example-residuals} shows the spin data with uncertainty added. Data simulated given the best-fitting density moments (the mean of the PPDs) is overlaid in the top pane and the residuals are shown the bottom pane. Uncertainties are plotted on the residuals corresponding to the square root of the diagonal entries of the covariance matrix (correlations not included). The fit results are clearly consistent with the data.
 
 Figure \ref{fig:example-corner} shows a corner plot of the ten fitted PPD, marginalized to functions of one or two variables. The true parameters are shown as lines. Note that the true parameters usually lie within 1 or 2$\sigma$ of the $\Delta K_{\ell m} = 0$, where $\Delta K_{\ell m}$ is the difference between the posterior $K_{\ell m}$ and the true $K_{\ell m}$. The PPDs are generally Gaussian and no degeneracy between fit components is visible. We performed 48 independent minimizations of the likelihood before the MCMC fit began, each with an initial point chosen randomly in the parameter space. All converged to the same minimum, further showing that the model lacks degeneracy.
 
@@ -412,19 +413,19 @@ The size of uncertainty is such that the density distribution is consistent with
 \section{Discussion}
 \label{sec:discussion}
 
-In this section, we discuss the physical properties of the asteroid encounter system (section \ref{sec:spin-evolution}), as well as the sensitivity of the density moment uncertainty to encounter properties (section \ref{sec:fit-uncertainty}), together with an analysis of advantages and disadvantages Jupiter encounters over Earth (section \ref{sec:jupiter-earth})Finally, we discuss the kinds of distributions produced by the density distribution extraction methods (section \ref{sec:density-compare}). 
+In this section, we discuss the physical properties of the asteroid encounter system (section \ref{sec:spin-evolution}), as well as the sensitivity of the density moment uncertainty to encounter properties (section \ref{sec:fit-uncertainty}), together with an analysis of advantages and disadvantages Jupiter encounters over Earth (section \ref{sec:jupiter-earth}). Finally, we discuss the kinds of distributions produced by the density distribution extraction methods (section \ref{sec:density-compare}). 
 
 \subsection{Spin evolution}
 \label{sec:spin-evolution}
 In figure \ref{fig:example-data}, we present example spin data generated via our simulation. A population of one thousand asteroids with identical initial conditions except for $\gamma_0$, $K_{20}$, and $K_{22}$ were simulated on a close Earth encounter. The exact parameters used were the symmetric and asymmetric cases described in appendix \ref{app:reference-configs}. Bands containing 68.3\%, 95.5\%, and 99.7\% of the population's spin are shown, as is the spin of the reference asteroids in black.
 
-\begin{figure*}
+\begin{figure}
   \centering
-  \includegraphics[width=0.7\linewidth]{figs/nominal-data-sym.pdf}
-  \includegraphics[width=0.7\linewidth]{figs/nominal-data-asym.pdf}
+  \includegraphics[width=\linewidth]{figs/nominal-data-sym.pdf}
+  \includegraphics[width=\linewidth]{figs/nominal-data-asym.pdf}
   \caption{Angular velocity data simulated for the symmetric (above) and asymmetric (below) reference asteroids. The true angular velocity evolution is shown as a black line. Also plotted is the deviation of the data for PPD-distributed perturbations to the asteroid shape (bands). Bands contain 68.3\%, 95.5\%, and 99.7\% of the 1000 simulations run.}
   \label{fig:example-data}
-\end{figure*}
+\end{figure}
 
 To choose the initial values of $\gamma_0$, $K_{20}$, and $K_{22}$, spin data for the reference asteroids of appendix \ref{app:reference-configs} was first generated. Then $\gamma_0$, $K_{20}$, and $K_{22}$ were re-extracted via the fit described in section \ref{sec:fit}. The population's values for these parameters were PPD-distributed. However, the PPD distribution was widened by a factor of 1000 to make the band widths visible. Therefore, the scale of the bands in figure \ref{fig:example-data} have little meaning in an absolute sense, but they are meaningful when comparing two bands or two times in the same band.
 
@@ -452,6 +453,8 @@ Figure \ref{fig:scan-vex} demonstrates that parameter precision does not depend 
 
 Figure \ref{fig:scan-perigee} shows much stronger dependence of parameter uncertainty on perigee distance, as expected by the factor of $(a_\mathcal{A}/D)^{\ell'}$ present in equation \ref{eqn:tidal-torque} and mentioned in section \ref{sec:tidal-torque}. For $r_p \approx 6$ or 7 Earth radii, $\sigma(K_{30})$ reaches the reference 0.01 limit. At slightly higher $r_p$, $K_{31}$ and $K_{32}$ become similarly unresolved, and at $r_p \approx 20$ Earth radii, $K_{33}$, the last second-order component, becomes unresolved. Even before this, at $r_p \approx 10$ Earth radii, the most uncertain parameter $K_{30}$ fills the prior distribution with uncertainty ranging from -1 to 1, visible by the sudden cut-off in uncertainty increase and the discontinuity of the $\sigma$ curve there. The location of these limits will change if different encounter properties are used, but this is still an illustrative example.
 
+Fitted to each of the curves in figure \ref{fig:scan-perigee} are power law uncertainties $\sigma \propto r_p^\alpha$. These fits were performed via the method of least squares, and all data with $\sigma > 0.7$ was removed due to its sensitivity to the arbitrarily-chosen boundary of the prior. The values of $\alpha$ are shown in table \ref{tab:scan-perigee-alpha}. These slope values express how much each parameter is dependent on $r_p$. It is observed that $\gamma_0$ is least dependent on $r_p$, with $\sigma(\gamma_0) \sim r_p^2$. The other two first-order parameters are much more strongly dependent, with $\sigma \sim r_p^{5.5}$. The second-order parameters have milder slopes between 3 and 4 (except for $K_{30}$) which is fortunate from the perspective of making precise observations, since lower $\alpha$ renders larger values of $r_p$ accessible to measuring $K_{3m}$.
+
 \begin{table}
   \centering
   \begin{tabular}{l|c}
@@ -472,17 +475,18 @@ Figure \ref{fig:scan-perigee} shows much stronger dependence of parameter uncert
   \label{tab:scan-perigee-alpha}
 \end{table}
 
-Fitted to each of the curves in figure \ref{fig:scan-perigee} are power law uncertainties $\sigma \propto r_p^\alpha$. These fits were performed via the method of least squares, and all data with $\sigma > 0.7$ was removed due to its sensitivity to the arbitrarily-chosen boundary of the prior. The values of $\alpha$ are shown in table \ref{tab:scan-perigee-alpha}. These slope values express how much each parameter is dependent on $r_p$. It is observed that $\gamma_0$ is least dependent on $r_p$, with $\sigma(\gamma_0) \sim r_p^2$. The other two first-order parameters are much more strongly dependent, with $\sigma \sim r_p^{5.5}$. The second-order parameters have milder slopes between 3 and 4 (except for $K_{30}$) which is fortunate from the perspective of making precise observations, since lower $\alpha$ renders larger values of $r_p$ accessible to measuring $K_{3m}$.
 
 The axes of figure \ref{fig:scan-perigee} show that parameters with large $m$ are more precisely determined than parameters with small $m$, as can be seen by comparing $K_{22}$ to $K_{20}$ and comparing $K_{33}$ to other $K_{3m}$ values. Large $m$ moments correspond to moments that control higher frequency fluctuations in density at the asteroid equator. This pattern of large $m$ corresponding to low uncertainty is a general trend and will be seen in the following sections as well.
 
 The very strong dependence of $\sigma$ on $r_p$ makes this analysis only to extract second-order moments on close encounters. Fortunately, in the case of Earth, these encounters are also likely to have the best associated observational uncertainty when above the horizon due to their proximity. The first-order moments can still be extracted at much larger perigee distances in our model.
 
+
+
 \afterpage{
   \begin{landscape}
     \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figs/scan-all-1.pdf}
+    \includegraphics[width=\linewidth]{figs/scan-all.pdf}
     \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of various encounter parameters (\textit{columns}). The vertical dashed line indicates the reference asteroid values of the parameters. The red vertical lines indicate when $\sigma =0.01$.}
     \label{fig:scan-perigee}
     \label{fig:scan-vex}
@@ -496,7 +500,7 @@ The very strong dependence of $\sigma$ on $r_p$ makes this analysis only to extr
   \begin{landscape}
     \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figs/scan-all-2.pdf}
+    \includegraphics[width=\linewidth]{figs/scan-all.pdf}
     \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of various encounter parameters (\textit{columns}). The vertical dashed line indicates the reference asteroid values of the parameters. The red vertical lines indicate when $\sigma =0.01$.}
     \label{fig:scan-am}
     \label{fig:scan-cadence}
@@ -505,6 +509,7 @@ The very strong dependence of $\sigma$ on $r_p$ makes this analysis only to extr
     \end{figure}
   \end{landscape}
 }
+
 
 
 \subsubsection{Observational Uncertainty}
@@ -615,18 +620,18 @@ The tidal torque experienced by the asteroid is affected by the initial directio
 
 In figure \ref{fig:scan-spin}, we display 1$\sigma$ uncertainties for all parameters as a function of the direction of $\bm \Omega_0$, mapped onto the unit sphere in the inertial frame. Our samples for $\bm \Omega_0$ were laid out on a Fibonacci sphere to ensure they were roughly evenly spaced (marked in figure \ref{fig:scan-spin-avg}). To highlight common features across the parameters, we also display the average 1$\sigma$ sensitivity in figure \ref{fig:scan-spin-avg}. The average is weighted such that the uncertainty map for each parameter contributes an equal amount
 (the weight of each map is set to one-tenth of the map's mean). This average map is presented in two different projections to allow data at $\unit Z$ to be read.
-
+`'
 \begin{figure*}
   \centering
-  \includegraphics[width=0.8\textwidth]{figs/spin-pole.pdf}
+  \includegraphics[width=0.8\textwidth]{figs/spin-pole.png}
   \caption{$1\sigma$ uncertainties for the first-order parameters (\textit{top}) and second-order (\textit{bottom}) as a function of the initial direction of spin in the inertial frame. All maps are made in the Mollweide projection. The orange star indicates the reference spin pole. The red contours enclose regions where $\sigma \geq 0.01$.}
   \label{fig:scan-spin}
 \end{figure*}
 
 \begin{figure*}
   \centering
-  \includegraphics[width=0.3\textwidth]{figs/spin-pole-avg-mollweide.pdf}
-  \includegraphics[width=0.3\textwidth]{figs/spin-pole-avg-polar.pdf}
+  \includegraphics[width=0.3\textwidth]{figs/spin-pole-avg-mollweide.png}
+  \includegraphics[width=0.3\textwidth]{figs/spin-pole-avg-polar.png}
   \caption{The weighted average of the uncertainties shown in figure \ref{fig:scan-spin}, in Mollweide (\textit{left}) and polar (\textit{right}) projections in the inertial frame. See text for a description of how the average was computed. Black dots indicate the Fibonacci-sphere-distributed locations of sample spin poles, and the orange star indicates the reference spin pole. The polar projection is centred at the south pole, or $-\unit Z$.}
   \label{fig:scan-spin-avg}
 \end{figure*}

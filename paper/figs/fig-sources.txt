@@ -28,6 +28,7 @@ nominal-data-asym.pdf code/other-figs/model-spread/spin-chaos-asym.pdf
 
 example-residuals.pdf code/other-figs/example-corner/cad-00-0-compare.pdf
 example-corner.pdf code/other-figs/example-corner/cad-00-0-corner.pdf
+example-corner.png code/other-figs/example-corner/cad-00-0-corner.png
 
 nominal-covariance.pdf code/fit_resolved/random-figs/random-vector-unc.pdf
 nominal-norm.pdf code/fit_resolved/random-figs/random-vector-norm.pdf
@@ -42,6 +43,10 @@ nominal-norm.pdf code/fit_resolved/random-figs/random-vector-norm.pdf
 spin-pole.pdf data/scan-spin-pole/pole.pdf
 spin-pole-avg-mollweide.pdf data/scan-spin-pole/avg-pole-mollweide.pdf
 spin-pole-avg-polar.pdf data/scan-spin-pole/avg-pole-polar.pdf
+
+spin-pole.png data/scan-spin-pole/pole.png
+spin-pole-avg-mollweide.png data/scan-spin-pole/avg-pole-mollweide.png
+spin-pole-avg-polar.png data/scan-spin-pole/avg-pole-polar.png
 
 #scan-vex.pdf data/scan-vex/vex.pdf
 #scan-am.pdf data/scan-am/am.pdf
