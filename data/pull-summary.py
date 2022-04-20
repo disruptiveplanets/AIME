@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "jupiter"
+PATH = "probe-s-theta"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1
