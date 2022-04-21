@@ -28,7 +28,7 @@ cadences = 60 * np.linspace(2, 60, 20)
 periods = 10**np.linspace(np.log10(4.5), np.log10(18), 10)
 
 for icad, cad in enumerate(cadences):
-    for iperiod, period in periods:
+    for iperiod, period in enumerate(periods):
         with open("../../staged/{}-{:02}-{:02}.txt".format(BASE_NAME, icad, iperiod), 'w') as f:
             f.write(get_text(period, cad))
 

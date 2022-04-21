@@ -27,7 +27,7 @@ cadences = 60 * np.linspace(2, 60, 20)
 factors = 10**np.linspace(np.log10(0.5), np.log10(2), 10)
 
 for icad, cad in enumerate(cadences):
-    for ifactor, factor in factors:
+    for ifactor, factor in enumerate(factors):
         with open("../../staged/{}-{:02}-{:02}.txt".format(BASE_NAME, icad, ifactor), 'w') as f:
             f.write(get_text(factor, cad))
 
