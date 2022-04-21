@@ -13,14 +13,13 @@ def get_text(period, cadence):
 {}
 5
 1000
-6
-0.00006464182, 0.00012928364, -0.00012928364
+6000
+{}, {}, {}
 1.0
 {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
 0.78539816339, 0.125, 0, 1, 1, 1, 1, 1, 1, 1
 -0.78539816339, -0.125, -0.25, -1, -1, -1, -1, -1, -1, -1
-1e-2, 1e-5
-{}""".format(cadence, 0.00006464182 * 9 / period, 0.00012928364 * 9 / period, -0.00012928364 * 9 / period,
+1e-2, 1e-5""".format(cadence, 0.00006464182 * 9 / period, 0.00012928364 * 9 / period, -0.00012928364 * 9 / period,
     LOW_ORDER[0], LOW_ORDER[1], LOW_ORDER[2], HIGH_ORDER[0], HIGH_ORDER[1],
     HIGH_ORDER[2], HIGH_ORDER[3], HIGH_ORDER[4], HIGH_ORDER[5], HIGH_ORDER[6])
 
