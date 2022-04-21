@@ -88,6 +88,7 @@ for plot_index in range(N_DIM):
 
     thresh = s_theta[(np.abs(param_data[2]-param_data[0]) > 0.01) | np.abs((param_data[-2]-param_data[0]) > 0.01)]
     if len(thresh) > 0:
+        #print("Threshold", thresh[0])
         ax.axvline(x=thresh[0], color='r', linewidth=1)
 
 

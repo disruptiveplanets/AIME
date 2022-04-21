@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "probe-s-theta"
+PATH = "probe-s-rho"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1

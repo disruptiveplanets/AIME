@@ -113,9 +113,9 @@ for i in range(N_DIM):
 custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=4, alpha=0.6),
                 Line2D([0], [0], color='k', lw=1, linestyle='dashed')]
-fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, framealpha=1, loc="lower center", prop={'size': LEGEND_SIZE})
+#fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, framealpha=1, loc="lower center", prop={'size': LEGEND_SIZE})
 fig.tight_layout()
-fig.subplots_adjust(bottom=0.15)
+#fig.subplots_adjust(bottom=0.15)
 plt.savefig("oblateness-differ.pdf")
 plt.savefig("oblateness-differ.png")
 plt.show()

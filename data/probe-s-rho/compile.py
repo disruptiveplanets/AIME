@@ -36,7 +36,7 @@ with open("percentiles.dat", 'r') as f:
 # Get true sigmas
 index = 0
 for name in percentiles.keys():
-    dir_name = name[:8]
+    dir_name = name[:6]
     with open(f"{dir_name}/{dir_name}.txt", 'r') as f:
         max_j, max_l = f.readline().split(", ")
         max_j, max_l = (int(max_j), int(max_l))
@@ -86,6 +86,7 @@ for plot_index in range(N_DIM):
 
     thresh = s_rho[(np.abs(param_data[2]-param_data[0]) > 0.01) | np.abs((param_data[-2]-param_data[0]) > 0.01)]
     if len(thresh) > 0:
+        print(thresh[0])
         ax.axvline(x=thresh[0], color='r', linewidth=1)
 
 
@@ -94,14 +95,14 @@ for plot_index in range(N_DIM):
     else:
         ax.set_ylabel(f"$\sigma({param_names[plot_index]}) (\\times 10^{{-2}})$", size=AXIS_SIZE)
 
-    #ax.set_xscale('log')
-    #axs[plot_index].set_yscale('log')
+    ax.set_xscale('log')
+    #ax.set_yscale('log')
 
     ax.set_xlim(np.min(s_rho), np.max(s_rho))
     ax.axvline(x=1e-7, color='k', linewidth=1, linestyle='dashed')
 
     if plot_index == 9:
-        ax.set_xlabel(f"$\sigma_\\theta$")
+        ax.set_xlabel(f"$\sigma_\\rho$")
     else:
         ax.set_xticks([])
         

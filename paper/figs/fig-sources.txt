@@ -1,5 +1,5 @@
-scan-all1.pdf data/big-fig/all1.pdf
-scan-all2.pdf data/big-fig/all2.pdf
+scan-all1.pdf data/all-fig/all1.pdf
+scan-all2.pdf data/all-fig/all2.pdf
 
 probe-space-theta-1-sigma.pdf data/probe-space/compile-figs/theta-1-sigma.pdf
 probe-space-theta-2-sigma.pdf data/probe-space/compile-figs/theta-2-sigma.pdf

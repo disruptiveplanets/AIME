@@ -104,15 +104,15 @@ for i in range(N_DIM):
         for name, ob in oblateness_markers.items():
             axs[i].text(x=ob, y=18, verticalalignment='bottom', horizontalalignment='center', s=name, fontsize=12)
 
-    if i == 2:
-        axs[i].set_xlabel(f"$\epsilon$")
+    #if i == 2:
+    #    axs[i].set_xlabel(f"$\epsilon$")
 
 custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=4, alpha=0.6),
                 Line2D([0], [0], color='k', lw=1, linestyle='dashed')]
-fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, framealpha=1, loc="lower center", prop={'size': LEGEND_SIZE})
-fig.tight_layout()
-fig.subplots_adjust(bottom=0.15)
-plt.savefig("oblateness.pdf")
-plt.savefig("oblateness.png")
+#fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, framealpha=1, loc='lower center', prop={'size': LEGEND_SIZE})
+#fig.tight_layout()
+#fig.subplots_adjust(bottom=0.15)
+plt.savefig("oblateness.pdf", bbox_inches="tight")
+plt.savefig("oblateness.png", bbox_inches="tight")
 plt.show()
