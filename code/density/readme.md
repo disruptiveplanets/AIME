@@ -89,3 +89,7 @@ I fixed a bug with square rooting a complex number and redrew the shapes in the 
 ## April 19
 
 Fixed the uncertainties bug that was leading to negative uncertainty.
+
+## April 22
+
+Made new figs. Everything, including the uncertainty, should be correct.
