@@ -8,16 +8,14 @@
 \section{Tidal torque \& Equations of motion}
 \label{app:eom}
 
-In this appendix, we derive the equations of motion used to simulate the asteroid angular velocity during the encounter. In particular, we describe our coordinates (section \ref{sec:coordinates}) for an encountering asteroid's position and orientation, and we parametrize its density distribution via its ``density moments'' (section \ref{sec:moments}). Then we derive an arbitrary-order equation for tidal torque (section \ref{sec:tidal-torque}) and write the equations of motion for the system (section \ref{sec:eom}).
+In this appendix, we derive the equations of motion used to simulate the asteroid angular velocity during the encounter. In particular, we describe our coordinates (section \ref{sec:coordinates}) for an encountering asteroid's position and orientation, and we parametrize its density distribution via its ``density moments'' (section \ref{sec:moments}). Then we derive an arbitrary-order equation for tidal torque (section \ref{sec:tidal-torque}) and write the equations of motion for the system (section \ref{sec:eom}). We do not consider any third-body perturbations, and we assume that the body being encountered (the central body, e.g.~a planet) is much more massive than the asteroid.
 
 \subsection{Coordinates}
 \label{sec:coordinates}
 
-Throughout this paper, we assume that the asteroid under study is on a hyperbolic encounter with periapse $r_p$ and excess velocity $v_\infty$. We do not consider any third-body perturbations, and we assume that the body being encountered (the central body, e.g.~a planet) is much more massive than the asteroid.
+We make use of two frames of reference to model this system. One is the ``inertial frame,'' with axes denoted by $\unit{X}$, $\unit{Y}$, $\unit{Z}$ and origin placed at the central body's centre of mass. $\unit{X}$ points from the central body to the asteroid periapse, and $\unit{Z}$ points parallel to the orbit angular momentum. We assume that the mass distribution of the central body is known in this inertial frame.
 
-We make use of two frames of reference to model this system. One is the ``inertial frame,'' with axes denoted by $\unit{X}$, $\unit{Y}$, $\unit{Z}$ and origin placed at the central body's centre of mass and each axis aligned with an asteroid principal axis. $\unit{X}$ points from the central body to the asteroid periapse and $\unit{Z}$ points parallel to the orbit angular momentum. We will assume that the mass distribution of the central body is known in this inertial frame.
-
-Our second frame is the ``body-fixed'' frame, denoted by $\unit{x}, \unit{y}, \unit{z}$. This frame is fixed with respect to the asteroid's principal axes and rotates with the asteroid, with its origin at the asteroid's centre of mass. We will solve for the asteroid's mass distribution with reference to the body-fixed frame. For definiteness, we define $\unit{z}$ to be the principal axis with maximal MOI. In general, we use capital letters to denote vectors in the inertial frame and lowercase vectors to denote vectors in the body-fixed frame.
+Our second frame is the ``body-fixed'' frame, denoted by $\unit{x}, \unit{y}, \unit{z}$. Each axis in this frame is aligned with a principal axis and rotates with the asteroid, with its origin at the asteroid's centre of mass. For definiteness, we define $\unit{z}$ to be the principal axis with maximal moment of inertia. In general, we use capital letters to denote vectors in the inertial frame and lowercase vectors to denote vectors in the body-fixed frame.
 
 The difference between the origins of the body-fixed and inertial frames is the position of the asteroid. We represent the relative orientations by $z-y-z$ Euler angles $\alpha$, $\beta$, and $\gamma$, such that a matrix $M$ rotating from the body-fixed to the inertial frame ($M\bm{r} = \bm{R}$) is given by
 \begin{equation}
@@ -32,7 +30,7 @@ Here, $R_i(\theta)$ is a rotation around the unit vector $i$ by $\theta$ (figure
     \draw[-{Latex[length=3mm]}] (0, 0) -- (-4, 0) node[anchor=east] {$\unit x$};
     \draw[-{Latex[length=3mm]}] (0, 0) -- (2, -3) node[anchor=west] {$\unit y$};
     \draw[-{Latex[length=3mm]}] (0, 0) -- (0, 4) node[anchor=south] {$\unit z$};
-    \draw[dashed, -{Latex[length=3mm]}] (0, 0) -- (3.7, -2) node[anchor=north] {$\unit n$};
+    \draw[dashed, -{Latex[length=3mm]}] (0, 0) -- (3.7, -2) node[anchor=north] {};
     \draw[line width=0.5mm,-{Latex[length=3mm]}] (0, 0) -- (-0.5, -3) node[anchor=north] {$\unit X$};
     \draw[line width=0.5mm,-{Latex[length=3mm]}] (0, 0) -- (4, 1) node[anchor=south] {$\unit Y$};
     \draw[line width=0.5mm,-{Latex[length=3mm]}] (0, 0) -- (-1.6, 2.7) node[anchor=south] {$\unit Z$};
@@ -54,17 +52,17 @@ Here, $R_i(\theta)$ is a rotation around the unit vector $i$ by $\theta$ (figure
 \subsection{Density moments}
 \label{sec:moments}
 
-In the next section, it will be shown that only certain parameters of the asteroid density distribution affect tidal torque called ``density moments.'' First, we define the un-normalized spherical harmonics $Y_{\ell m}(\theta, \phi) = P_{\ell m}(\cos \theta)e^{im\phi}$, where $P_{\ell m}$ are the associated Legendre Polynomials without the Condon-Shortley phase. The regular and irregular spherical harmonics then defined as:
+In the next section, it will be shown that only certain parameters of the asteroid density distribution affect tidal torque called ``density moments.'' First, we define the un-normalized spherical harmonics $Y_{\ell m}(\theta, \phi) = P_{\ell m}(\cos \theta)e^{im\phi}$, where $P_{\ell m}$ are the associated Legendre Polynomials without the Condon-Shortley phase. The regular and irregular spherical harmonics then defined as
 \begin{equation}
   \begin{split}
     S_{\ell m}(\bm r) &= (-1)^m (\ell - m)! \frac{Y_{\ell m}(\unit r)}{r^{\ell+1}} \\
     R_{\ell m} (\bm r) &= (-1)^m \frac{r^\ell}{(\ell + m)!} Y_{\ell m}(\unit r).
   \end{split}
 \end{equation}
-These spherical harmonics obey many useful identities summarized in Ref.~\cite{Gelderen1998TheSO}, which derives spherical harmonic identities useful for quantum mechanics.
+These spherical harmonics obey many useful identities summarized in Ref.~\cite{Gelderen1998TheSO}, which are also useful for quantum mechanics.
 
 We define the density moments of an asteroid in equation \ref{eqn:klm}.
-Note that these are complex. Here, $\mathcal{A}$ indicates the volume of the asteroid, $\mu_\mathcal{A}$ is the mass of the asteroid, $\rho_\mathcal{A}(\bm r)$ is the density distribution, and $a_\mathcal{A}$ is a real length scale defined in equation \ref{eqn:am}. This length can be thought of as akin to the radius of the asteroid (although a spherical, uniform-density asteroid has radius $a_\mathcal{A}\sqrt{5/3} $). Both equations \ref{eqn:am} and \ref{eqn:klm} should be computed in the body-fixed axes.
+Note that these are complex. The length defined in equation \ref{eqn:am} can be thought of as akin to the radius of the asteroid (a spherical, uniform-density asteroid has radius $a_\mathcal{A}\sqrt{5/3} $). Both equations \ref{eqn:am} and \ref{eqn:klm} should be computed in the body-fixed frame.
 
 Equations \ref{eqn:am} and \ref{eqn:klm} can be extended to the central body:
 \begin{equation}
@@ -74,7 +72,7 @@ Equations \ref{eqn:am} and \ref{eqn:klm} can be extended to the central body:
   \end{split}
   \label{eqn:jlm}
 \end{equation}
-which should be computed in the inertial axes.
+which should be computed in the inertial frame.
 
 Note that both $J_{\ell m}$ and $K_{\ell m}$ are unitless. We call them ``moments'' because the $R_{\ell m}(\bm r)$ contains an $r^\ell$ dependence so that $K_{\ell m}$ is the $\ell$th density moment of the asteroid. The gravitational potential field of the asteroid can be written entirely in terms of $K_{\ell m}$ and $a_\mathcal{A}$, so we expect not to need any information about the density distribution of the asteroid beyond these parameters to compute tidal torque.
 
@@ -122,7 +120,7 @@ Finally, the requirement that $\rho_\mathcal{A}(\bm r) \geq 0$ everywhere restri
   -\frac{1}{4} \leq K_{20} \leq 0, \qquad |K_{22}| \leq -\frac{K_{20}}{2}.
   \label{eqn:parameter-bounds}
 \end{equation}
-In practice, we also observe that $|K_{3m}| < 1$; often, $|K_{3m}| < 0.01$ even. For the rest of this paper, we therefore treat an uncertainty on $|K_{3m}|$ of $0.01$ or less as a practical limit on observability, in that uncertainty greater than 0.01 means $K_{3m}$ are effectively unknown. This is only a rough estimate, however.
+In practice, we also observe that $|K_{3m}| < 1$; often, $|K_{3m}| < 0.01$ even.
 
 
 
@@ -177,9 +175,9 @@ where $\rho_\mathcal{A}$ is the density distribution of the asteroid and $\mathc
   & +2im\unit z R_{\ell m}(\bm u)\Big],
   \end{split}
 \end{equation}
-tidal torque can now be expressed as a function only of $J_{\ell m}$, $K_{\ell m}$, $a_\mathcal{A}$, $a_\mathcal{B}$, and the asteroid orientation and position. This equation is given explicitly as equation \ref{eqn:tidal-torque}. Some $K_{\ell m}$ terms are included in this equation with $|m|>\ell$; these should all be taken to be zero.
+tidal torque can now be expressed as a function only of $J_{\ell m}$, $K_{\ell m}$, $a_\mathcal{A}$, $a_\mathcal{B}$, and the asteroid orientation and position. This equation is given explicitly as equation \ref{eqn:tidal-torque}. Some $K_{\ell m}$ terms are written in this equation with $|m|>\ell$; these should all be taken to be zero.
 
-Equation \ref{eqn:tidal-torque} possesses a few explicit properties which we discuss before writing the asteroid equations of motion. Firstly, $K_{00}$ does not appear, so that $\bm \tau$ is independent of asteroid mass. The mean density of the asteroid is therefore not constrained by tidal torque analysis. Secondly, torque is largest when $D$ is small (as expected), with the leading order of $\bm \tau$ proportional to $D^{-3}$. Thirdly, each $J_{\ell m}K_{\ell' m'}$ term is multiplied by $(a_\mathcal{B}/D)^\ell (a_\mathcal{A}/D)^{\ell'}$, the latter of which especially is small in most cases. Equation \ref{eqn:tidal-torque} can therefore be computed approximately by removing terms of large $\ell$ and $\ell'$. For our analysis, we remove $\ell' > 3$ and we usually keep only $\ell=0$. Note that $\ell=1$ contributes nothing since $J_{1m}=0$.
+Equation \ref{eqn:tidal-torque} possesses a few explicit properties which we discuss before writing the asteroid equations of motion. Firstly, $K_{00}$ does not appear, so that $\bm \tau$ is independent of asteroid mass. The mean density of the asteroid is therefore not constrained by tidal torque analysis. Secondly, torque is largest when $D$ is small (as expected), with the leading order of $\bm \tau$ proportional to $D^{-3}$. Thirdly, each $J_{\ell m}K_{\ell' m'}$ term is multiplied by $(a_\mathcal{B}/D)^\ell (a_\mathcal{A}/D)^{\ell'}$, the latter of which especially is small in most cases. Equation \ref{eqn:tidal-torque} can therefore be computed approximately by removing terms of large $\ell$ and $\ell'$. For our analysis, we removed $\ell' > 3$ and we usually keep only $\ell=0$. Note that $\ell=1$ contributes nothing since $J_{1m}=0$.
 
 Further insight can be gained by remarking the value of the first-order of $\bm \tau$ for particular Euler angle cases. Setting $\beta = 0$ produces diagonal Wigner-$D$ matrices, and hence $\bm \tau \parallel \unit z$ to first-order. Also, the component $\tau_z$ oscillates, so that for certain values of $\alpha$ and $\gamma$, $\bm \tau = 0.$ This $\beta=0$ condition is equivalent to $\unit z \parallel \unit Z$ (see figure \ref{fig:euler-angles}).
 
@@ -226,7 +224,7 @@ Except when otherwise mentioned, we use the following asteroid encounter paramet
   \item An orbit around a spherical, Moonless Earth with $6$ km s$^{-1}$ excess velocity and perigee at 5 Earth radii. This orbit was chosen to roughly match that of 99942 Apophis \cite{giorgini2005recent, giorgini2008predicting, smalley20052004}, discovered on June 19, 2004 by R. A. Tucker, D. J. Tholen, and F. Bernardi. These orbital parameters correspond to an eccentricity of 3.88. The comparison to Apophis is complicated by the fact that Apophis is smaller than our $a_\mathcal{A}$ value, is tumbling \cite{PRAVEC201448}, and may change slightly in physical properties due to tidal interaction during the encounter \cite{yu2014numerical,hirabayashi2021finite}. It therefore is not entirely comparable to our analysis. 
   \item An initial roll of $\gamma_0=\pi/8$.
   \item A cadence of 2 minutes and observational uncertainty of $\sigma_\theta = 0.01$ and $\sigma_\rho / \sigma_\theta = 10^{-5}$.
-  \item A rotational period of 9 hours, with the rotational velocity vector distributed between the $\unit X$, $\unit Y$, and $\unit Z$ axes in a $1:2:-2$ ratio.
+  \item A rotational period of 9 hours, with the angular velocity vector distributed between the $\unit X$, $\unit Y$, and $\unit Z$ axes in a $1:2:-2$ ratio.
   \item An asteroid with radius $a_\mathcal{A} = 1$ km and $K_{3m}=0$. For $K_{22}$ and $K_{20}$, we use two standard values: one with $(K_{22}, K_{20}) = (0, -0.097)$ and one with $(0.052, -0.202)$. Including the third point obtained by reflection $K_{22}\rightarrow -K_{22}$, these are the three points that minimize the mean distance between an arbitrary point in the allowed parameter space (equation \ref{eqn:parameter-bounds}) and these reference values. The first point is called the symmetric case because the corresponding uniform-density-ellipsoid model is rotationally symmetric around $\unit z$. The second case and its reflection are called the asymmetric cases. Values of $(0.052, -0.202)$ have $a < b$ in the ellipsoid model, and the reflected value has $a > b$. If not specified, we use the $a < b$ case. Specifically, the asymmetric case has $a=1140$ m, $b=1839$ m, and $c=565$ m, while the symmetric case has $a=b=1411$ m and $c=1008$ m.
 \end{enumerate}
 
@@ -300,11 +298,11 @@ without loss of generality. To keep $r(\theta, \phi) \in \mathds{R}$, we require
 \end{equation}
 which can also be solved via polynomial methods.
 
-Equations \ref{eqn:surface-klm} and \ref{eqn:surface-am} form a set of $n+1$ constraints, where $n$ is the number of density moments known. That is, $n=(\ell_\text{max}+1)^2+1$, where $\ell_\text{max}$ is the maximum degree of $K_{\ell m}$ known. By setting the same maximum degree on $C_{\ell m}$, we also have $n$ variables plus one for $\rho_0$. The system is therefore well-determined and will yield finitely many solutions. These solutions can be further refined by removing those that produce $r(\theta, \phi) < 0$ for any $\theta, \phi$, which is unphysical. We do not attempt to model uncertainty on the shape.
+Equations \ref{eqn:surface-klm} and \ref{eqn:surface-am} form $(\ell_\text{max} + 1)^2 + 1$ constraints, where $\ell_\text{max}$ is the maximum degree of $C_{\ell m}$. By setting the same maximum degree as for the known $K_{\ell m}$, the system is well-determined and will yield finitely many solutions. These solutions can be filtered by removing those that produce $r(\theta, \phi) < 0$ for any $\theta, \phi$, which is unphysical.
 
-To test the model, this process was run for an asteroid with $K_{1m}=K_{2m'}=0$, but randomly chosen $K_{3m}$. The resulting surface is shown in figure \ref{fig:surface-density}. The figure shows a near-spherical asteroid, which is expected for $K_{\ell m} = 0$ for $\ell > 0$. However, the additional $K_{3m}$ components clearly induce non-sphericity in the asteroid which is captured by the surface model.
+To test the model, this process was run for an asteroid with $K_{1m}=K_{2m'}=0$, but randomly chosen $K_{3m}$ in the range 0.01 to -0.01. The resulting surface is shown in figure \ref{fig:surface-density}. The figure shows a near-spherical asteroid, which is expected for $K_{\ell m} = 0$ for $\ell > 0$. However, the additional $K_{3m}$ components clearly induce non-sphericity in the asteroid which is captured by the surface model.
 
-To give an alternate view of the non-sphericities found via this new surface model, figure \ref{fig:surface-density} also displays the density distribution extracted via the likelihood model assuming a spherical asteroid shape, but with the same density moments. (Uncertainty in the moments is not modelled in this figure, to better compare the two.) Where the likelihood model displays low density, the surface model clearly retracts into the asteroid. Where the likelihood model yields high density, the surface model extends. Thus, the connection made in section \ref{sec:spherical-density} between non-uniformities in the densities of the likelihood and harmonic models at the asteroid surface and inaccuracies in the surface is more firmly represented.
+To give an alternate view of the non-sphericities found via this new surface model, figure \ref{fig:surface-density} also displays the density distribution extracted via the likelihood model assuming a spherical asteroid shape, but with the same density moments. (Uncertainty in the moments is not modelled in this figure, to better compare the two.) Where the likelihood model displays low density, the surface model clearly retracts into the asteroid. Where the likelihood model yields high density, the surface model extends. Thus, the connection made in section \ref{sec:spherical-density} between non-uniformities in extracted densities at the asteroid surface and inaccuracies in the surface shape is more firmly represented.
 
-This surface model could, in principle, be used to improve estimates of the surface of an asteroid made by light curve analysis, since it connects rotational data to the asteroid surface which reflects the light we observe. Thus, uncertainties either in the density moments or the asteroid surface (or both), could be reduced. We only suggest this as a possibility, however, since light-curve analysis is beyond the scope of this paper.
+This surface model could, in principle, be used to improve estimates of the surface of an asteroid made by light curve analysis, since it connects rotational data to the asteroid surface which reflects the light we observe. Thus, uncertainties either in the density moments or the asteroid surface (or both), could be reduced. However, light-curve analysis is beyond the scope of this paper.
 

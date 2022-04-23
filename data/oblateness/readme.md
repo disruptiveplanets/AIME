@@ -13,3 +13,7 @@ Everything worked; however, I looked up the J2 values of Jupiter and Saturn and 
 ## Jan 19
 
 Extended the plot
+
+## April 22
+
+Realized I made a mistake in the connection between oblateness and J20. Remade the plots.

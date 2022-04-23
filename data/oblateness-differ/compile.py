@@ -8,11 +8,18 @@ plt.style.use("jcap")
 param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
 
 oblateness_markers = {
-    "Moon": 203e-6,
+    #"Moon": 203e-6,
     "Earth": 1082e-6,
     #"Mars": 1960e-6,
     "Jupiter": 14696e-6,
     "Neptune": 3343e-6,}
+colors = [
+    '#f00070', '#db8000', '#00b3cf',
+    '#01821d', '#00c22a',
+    '#ad8002', '#ffbf0d',
+    '#870073', '#e600b3', 
+    '#000ac9'
+]
 
 percentiles = {}
 name_index = {}
@@ -34,7 +41,7 @@ def plot_best_fit(ax, xs, ys, scale):
 
 # Get percentiles
 with open("percentiles.dat", 'r') as f:
-    for line in f.readlines():
+    for line in f.readlines()[:-11]:
         if line == '': continue
         elements = line.split(':')
         name = elements[0]
@@ -67,7 +74,7 @@ for name in percentiles.keys():
     true_sigma = sigma[0]
     j2s.append(jlms[-1])
 
-oblatenesses = -np.array(j2s) / 2
+oblatenesses = -np.array(j2s) * 2 # No 5/3 factor because the real radius was used
 
 fig, axs = plt.subplots(figsize=(5, 5), ncols=1, nrows=3, sharex=True)
 axs = axs.reshape(-1)
@@ -77,17 +84,17 @@ for i in range(N_DIM):
     for f in percentiles.keys():
         param_data[:,name_index[f]] = percentiles[f][i]
     scale = 1e5
-    axs[i].plot(oblatenesses, abs(param_data[1] - THETA_TRUE[i]) * scale, color=f"C{i}", linewidth=1)
-    axs[i].plot(oblatenesses, abs(param_data[-1] - THETA_TRUE[i]) * scale, color=f"C{i}", linewidth=1)
+    axs[i].plot(oblatenesses, abs(param_data[1] - THETA_TRUE[i]) * scale, color=colors[i], linewidth=1)
+    axs[i].plot(oblatenesses, abs(param_data[-1] - THETA_TRUE[i]) * scale, color=colors[i], linewidth=1)
     axs[i].fill_between(oblatenesses, abs(param_data[1]-THETA_TRUE[i]) * scale, 
-        abs(param_data[-1]-THETA_TRUE[i]) * scale,  color=f"C{i}", alpha=0.3)
+        abs(param_data[-1]-THETA_TRUE[i]) * scale,  color=colors[i], alpha=0.3)
 
-    axs[i].plot(oblatenesses, abs(param_data[2]-THETA_TRUE[i]) * scale, color=f"C{i}", linewidth=1)
-    axs[i].plot(oblatenesses, abs(param_data[-2]-THETA_TRUE[i]) * scale, color=f"C{i}", linewidth=1)
+    axs[i].plot(oblatenesses, abs(param_data[2]-THETA_TRUE[i]) * scale, color=colors[i], linewidth=1)
+    axs[i].plot(oblatenesses, abs(param_data[-2]-THETA_TRUE[i]) * scale, color=colors[i], linewidth=1)
     axs[i].fill_between(oblatenesses, abs(param_data[2]-THETA_TRUE[i]) * scale,
-        abs(param_data[-2]-THETA_TRUE[i]) * scale, color=f"C{i}", alpha=0.3)
+        abs(param_data[-2]-THETA_TRUE[i]) * scale, color=colors[i], alpha=0.3)
 
-    axs[i].plot(oblatenesses, abs(param_data[3]-THETA_TRUE[i]) * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+    axs[i].plot(oblatenesses, abs(param_data[3]-THETA_TRUE[i]) * scale, color=colors[i], linewidth=1, linestyle='dashed')
 
     axs[i].set_xscale('log')
     axs[i].set_yscale('log')
@@ -98,7 +105,7 @@ for i in range(N_DIM):
 
     if i == 0:
         for name, ob in oblateness_markers.items():
-            axs[i].text(x=ob, y=650, verticalalignment='bottom', horizontalalignment='center', s=name, fontsize=12)
+            axs[i].text(x=ob, y=80, verticalalignment='bottom', horizontalalignment='center', s=name, fontsize=12)
 
     if i == 2:
         axs[i].set_xlabel("$\epsilon_\\textrm{true}$")
@@ -108,7 +115,12 @@ for i in range(N_DIM):
     high = (param_data[2]-param_data[0])*EXTENT_AMOUNT + param_data[0] - THETA_TRUE[i]
     mid = param_data[0] - THETA_TRUE[i]
     trues = ((low < 0) & (0 < mid)) | (mid < 0) & (0 < low) | ((high < 0) & (0 < mid)) | (mid < 0) & (0 < high)
-    print(trues, oblatenesses[trues], oblateness_markers.values())
+    14696e-6
+
+
+    deviation = abs(param_data[0] - THETA_TRUE[i]) / (abs(param_data[1] - THETA_TRUE[i]) - abs(param_data[0] - THETA_TRUE[i]))
+    print(deviation[17])
+    print(oblatenesses[17] - 14696e-6)
 
 custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=4, alpha=0.6),

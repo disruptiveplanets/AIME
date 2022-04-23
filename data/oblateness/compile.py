@@ -8,7 +8,7 @@ plt.style.use("jcap")
 param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
 
 oblateness_markers = {
-    "Moon": 203e-6,
+    #"Moon": 203e-6,
     "Earth": 1082e-6,
     #"Mars": 1960e-6,
     "Jupiter": 14696e-6,
@@ -17,6 +17,13 @@ oblateness_markers = {
 percentiles = {}
 name_index = {}
 j2s = []
+colors = [
+    '#f00070', '#db8000', '#00b3cf',
+    '#01821d', '#00c22a',
+    '#ad8002', '#ffbf0d',
+    '#870073', '#e600b3', 
+    '#000ac9'
+]
 
 AXIS_SIZE = 12
 LEGEND_SIZE = 12
@@ -25,14 +32,13 @@ N_DIM = None
 N_PERCENTILES = None
 
 def plot_best_fit(ax, xs, ys, scale):
-    slope = np.cov(ys, xs)[0][1] / np.var(xs)
-    yint = np.mean(ys) - slope * np.mean(xs)
+    slope, yint = np.polyfit(xs, ys, 1)
     ax.plot(xs, (xs * slope + yint) * scale, color='k', linewidth=1, linestyle='dotted')
     return slope / yint
 
 # Get percentiles
 with open("percentiles.dat", 'r') as f:
-    for line in f.readlines():
+    for line in f.readlines()[:-10]:
         if line == '': continue
         elements = line.split(':')
         name = elements[0]
@@ -63,7 +69,7 @@ for name in percentiles.keys():
     name_index[name] = int(dir_name[-2:])
     j2s.append(jlms[-1])
 
-oblatenesses = -np.array(j2s) / 2
+oblatenesses = -np.array(j2s) * 2 # No 5/3 factor because the real radius was used
 
 fig, axs = plt.subplots(figsize=(5, 5), ncols=1, nrows=3, sharex=True)
 axs = axs.reshape(-1)
@@ -73,17 +79,17 @@ for i in range(N_DIM):
     for f in percentiles.keys():
         param_data[:,name_index[f]] = percentiles[f][i]
     scale = 10**7 if i < 3 else 1
-    axs[i].plot(oblatenesses, (param_data[1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
-    axs[i].plot(oblatenesses, (param_data[-1]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[i].plot(oblatenesses, (param_data[1]-param_data[0]) * scale, color=colors[i], linewidth=1)
+    axs[i].plot(oblatenesses, (param_data[-1]-param_data[0]) * scale, color=colors[i], linewidth=1)
     axs[i].fill_between(oblatenesses, (param_data[1]-param_data[0]) * scale, 
-        (param_data[-1]-param_data[0]) * scale,  color=f"C{i}", alpha=0.3)
+        (param_data[-1]-param_data[0]) * scale,  color=colors[i], alpha=0.3)
 
-    axs[i].plot(oblatenesses, (param_data[2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
-    axs[i].plot(oblatenesses, (param_data[-2]-param_data[0]) * scale, color=f"C{i}", linewidth=1)
+    axs[i].plot(oblatenesses, (param_data[2]-param_data[0]) * scale, color=colors[i], linewidth=1)
+    axs[i].plot(oblatenesses, (param_data[-2]-param_data[0]) * scale, color=colors[i], linewidth=1)
     axs[i].fill_between(oblatenesses, (param_data[2]-param_data[0]) * scale,
-        (param_data[-2]-param_data[0]) * scale, color=f"C{i}", alpha=0.3)
+        (param_data[-2]-param_data[0]) * scale, color=colors[i], alpha=0.3)
 
-    axs[i].plot(oblatenesses, (param_data[3]-param_data[0]) * scale, color=f"C{i}", linewidth=1, linestyle='dashed')
+    axs[i].plot(oblatenesses, (param_data[3]-param_data[0]) * scale, color=colors[i], linewidth=1, linestyle='dashed')
 
     axs[i].set_xscale('log')
     axs[i].set_ylabel(f"$\sigma({param_names[i]})\\ (\\times 10^{{-7}})$", size=AXIS_SIZE)
@@ -104,8 +110,8 @@ for i in range(N_DIM):
         for name, ob in oblateness_markers.items():
             axs[i].text(x=ob, y=18, verticalalignment='bottom', horizontalalignment='center', s=name, fontsize=12)
 
-    #if i == 2:
-    #    axs[i].set_xlabel(f"$\epsilon$")
+    if i == 2:
+        axs[i].set_xlabel(f"$\epsilon$")
 
 custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=4, alpha=0.6),

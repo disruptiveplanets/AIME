@@ -19,6 +19,13 @@ axis_names = {
     "scan-vex": "$v_\infty$ (km s$^{-1}$)",
     "observation-gap": "$T$ (hr)",
 }
+colors = [
+    '#f00070', '#db8000', '#00b3cf',
+    '#01821d', '#00c22a',
+    '#ad8002', '#ffbf0d',
+    '#870073', '#e600b3', 
+    '#000ac9'
+]
 trues = {
     "scan-perigee": 5,
     "probe-s-theta": 1e-2,
@@ -53,7 +60,7 @@ specialized_y_labels = {
 
 
 scales = (1e7, 1e2)
-AXIS_SIZE = 12
+AXIS_SIZE = 9
 LEGEND_SIZE = 12
 
 N_DIM = 10
@@ -136,26 +143,26 @@ def show_figs(plot_name, plot_name_index, num_columns):
         scale = scales[0] if plot_index < 3 else scales[1]
 
 
-        ax.plot(xs, (param_data[1]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+        ax.plot(xs, (param_data[1]-param_data[0]) * scale, color=colors[plot_index], linewidth=1)
         if not logs[plot_name][1]:
-            ax.plot(xs, (param_data[-1]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+            ax.plot(xs, (param_data[-1]-param_data[0]) * scale, color=colors[plot_index], linewidth=1)
         ax.fill_between(xs, (param_data[1]-param_data[0]) * scale, 
-            (param_data[-1]-param_data[0]) * scale,  color=f"C{plot_index}", alpha=0.3)
+            (param_data[-1]-param_data[0]) * scale,  color=colors[plot_index], alpha=0.3)
 
-        ax.plot(xs, (param_data[2]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+        ax.plot(xs, (param_data[2]-param_data[0]) * scale, color=colors[plot_index], linewidth=1)
         if not logs[plot_name][1]:
-            ax.plot(xs, (param_data[-2]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+            ax.plot(xs, (param_data[-2]-param_data[0]) * scale, color=colors[plot_index], linewidth=1)
         ax.fill_between(xs, (param_data[2]-param_data[0]) * scale,
-            (param_data[-2]-param_data[0]) * scale, color=f"C{plot_index}", alpha=0.3)
+            (param_data[-2]-param_data[0]) * scale, color=colors[plot_index], alpha=0.3)
 
         if not logs[plot_name][1]:
-            ax.plot(xs, (param_data[3]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1, linestyle='dashed')
+            ax.plot(xs, (param_data[3]-param_data[0]) * scale, color=colors[plot_index], linewidth=1, linestyle='dashed')
 
 
         thresh = xs[(np.abs(param_data[2]-param_data[0]) > 0.01) | np.abs((param_data[-2]-param_data[0]) > 0.01)]
         if len(thresh) > 0 and thresh[0] == xs[0]:
                 thresh = xs[(np.abs(param_data[2]-param_data[0]) < 0.01) & np.abs((param_data[-2]-param_data[0]) < 0.01)]
-        if len(thresh) > 0:
+        if len(thresh) > 0 and plot_index > 2:
             ax.axvline(x=thresh[0], color='r', linewidth=1)
 
         if plot_name_index == 0:

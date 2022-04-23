@@ -1,0 +1,368 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 12.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     14180,        360]
+NotebookOptionsPosition[     12504,        327]
+NotebookOutlinePosition[     12896,        343]
+CellTagsIndexPosition[     12853,        340]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Ylm", "[", 
+   RowBox[{"l_", ",", "m_", ",", "\[Theta]_", ",", "\[Phi]_"}], "]"}], ":=", 
+  RowBox[{
+   RowBox[{"LegendreP", "[", 
+    RowBox[{"l", ",", "m", ",", 
+     RowBox[{"Cos", "[", "\[Theta]", "]"}]}], "]"}], " ", 
+   RowBox[{"Exp", "[", 
+    RowBox[{"I", " ", "m", " ", "\[Phi]"}], "]"}], " ", 
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{"-", "1"}], ")"}], "^", "m"}]}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Rlm", "[", 
+    RowBox[{"l_", ",", "m_", ",", "r_", ",", "\[Theta]_", ",", "\[Phi]_"}], 
+    "]"}], ":=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{"-", "1"}], ")"}], "^", "m"}], " ", 
+    RowBox[{
+     RowBox[{"r", "^", "l"}], "/", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"l", "+", "m"}], ")"}], "!"}]}], " ", 
+    RowBox[{"Ylm", "[", 
+     RowBox[{"l", ",", "m", ",", "\[Theta]", ",", "\[Phi]"}], "]"}]}]}], 
+  ";"}]}], "Input",
+ CellLabel->"In[54]:=",ExpressionUUID->"48074d7d-66a5-45e6-9b8d-870c47834e57"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"J20", " ", "of", " ", "Earth"}], "-", 
+    RowBox[{"Moon", " ", "system"}]}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"mMoon", "=", 
+     RowBox[{"7.34767309", "*", 
+      RowBox[{"10", "^", 
+       RowBox[{"(", "22", ")"}]}]}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"mEarth", "=", 
+     RowBox[{"5.97", "*", 
+      RowBox[{"10", "^", 
+       RowBox[{"(", "24", ")"}]}]}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"rMoon", "=", "1737.4477824"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"rEarth", "=", "6371.071027"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"dist", "=", "384472.282"}], ";"}]}]}]], "Input",
+ CellChangeTimes->{{3.859649594744027*^9, 3.859649631360867*^9}, {
+   3.8596496964289103`*^9, 3.859649718476142*^9}, {3.859650317883212*^9, 
+   3.8596503748107862`*^9}, 3.859658090026024*^9, 3.85965837435507*^9, {
+   3.8596589171512537`*^9, 3.85965893208363*^9}, 3.859659998628687*^9, {
+   3.8596600294964523`*^9, 3.859660041340377*^9}},
+ CellLabel->
+  "In[223]:=",ExpressionUUID->"93aecfd1-839b-482e-b70c-e10d33d928c3"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{"dMoon", "=", " ", 
+  RowBox[{
+   FractionBox["mEarth", 
+    RowBox[{"mMoon", " ", "+", "mEarth"}]], " ", 
+   "dist"}]}], "\[IndentingNewLine]", 
+ RowBox[{"dEarth", "=", 
+  RowBox[{"dist", "-", "dMoon"}]}], "\[IndentingNewLine]", 
+ RowBox[{"aSys", "=", 
+  RowBox[{"Sqrt", "[", 
+   RowBox[{
+    FractionBox["1", 
+     RowBox[{"mMoon", " ", "+", "mEarth"}]], 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"mMoon", 
+       RowBox[{"(", " ", 
+        RowBox[{
+         RowBox[{
+          FractionBox["3", "5"], 
+          RowBox[{"rMoon", "^", "2"}]}], "+", 
+         RowBox[{"dMoon", "^", "2"}]}], ")"}]}], "+", 
+      RowBox[{"mEarth", " ", 
+       RowBox[{"(", " ", 
+        RowBox[{
+         RowBox[{
+          FractionBox["3", "5"], 
+          RowBox[{"rEarth", "^", "2"}]}], "+", 
+         RowBox[{"dEarth", "^", "2"}]}], ")"}]}]}], ")"}]}], 
+   "]"}]}]}], "Input",
+ CellChangeTimes->{{3.859649633535099*^9, 3.8596497391845493`*^9}, {
+   3.859657851627211*^9, 3.859657862942704*^9}, {3.859657943822255*^9, 
+   3.859657952107296*^9}, 3.859658037720852*^9, 3.859658431902914*^9, {
+   3.85965888169142*^9, 3.859658886950157*^9}},
+ CellLabel->
+  "In[228]:=",ExpressionUUID->"0e478f06-4173-4c17-8380-1257715a71f6"],
+
+Cell[BoxData["379797.8590377036`"], "Output",
+ CellChangeTimes->{
+  3.859657863251254*^9, {3.859657949932253*^9, 3.859657952532344*^9}, 
+   3.859658000841055*^9, 3.859658044092298*^9, 3.859658093052943*^9, 
+   3.859658376349147*^9, 3.859658437436557*^9, {3.8596588873502407`*^9, 
+   3.859658893251183*^9}, 3.8596589352308807`*^9, {3.85965997269351*^9, 
+   3.8596600435392323`*^9}},
+ CellLabel->
+  "Out[228]=",ExpressionUUID->"542c7160-7cd3-4d1b-83c0-f3cdf4e445c1"],
+
+Cell[BoxData["4674.422962296405`"], "Output",
+ CellChangeTimes->{
+  3.859657863251254*^9, {3.859657949932253*^9, 3.859657952532344*^9}, 
+   3.859658000841055*^9, 3.859658044092298*^9, 3.859658093052943*^9, 
+   3.859658376349147*^9, 3.859658437436557*^9, {3.8596588873502407`*^9, 
+   3.859658893251183*^9}, 3.8596589352308807`*^9, {3.85965997269351*^9, 
+   3.859660043544943*^9}},
+ CellLabel->
+  "Out[229]=",ExpressionUUID->"836817ff-7bc9-40f1-bf7f-a1bff2b80c8a"],
+
+Cell[BoxData["42419.52476736073`"], "Output",
+ CellChangeTimes->{
+  3.859657863251254*^9, {3.859657949932253*^9, 3.859657952532344*^9}, 
+   3.859658000841055*^9, 3.859658044092298*^9, 3.859658093052943*^9, 
+   3.859658376349147*^9, 3.859658437436557*^9, {3.8596588873502407`*^9, 
+   3.859658893251183*^9}, 3.8596589352308807`*^9, {3.85965997269351*^9, 
+   3.859660043549675*^9}},
+ CellLabel->
+  "Out[230]=",ExpressionUUID->"fae88d90-bd66-4d51-bfa0-a7aef62268cc"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"Aligned", " ", "along", " ", "z"}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"J20Sys", "=", 
+    RowBox[{
+     FractionBox["1", 
+      RowBox[{"aSys", "^", "2"}]], 
+     FractionBox["1", 
+      RowBox[{"mMoon", " ", "+", "mEarth"}]], 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"mEarth", " ", 
+        RowBox[{"Rlm", "[", 
+         RowBox[{"2", ",", "0", ",", "dEarth", ",", "0", ",", "0"}], "]"}]}], 
+       "+", 
+       RowBox[{"mMoon", " ", 
+        RowBox[{"Rlm", "[", 
+         RowBox[{"2", ",", "0", ",", "dMoon", ",", "Pi", ",", "\[Phi]"}], 
+         "]"}]}]}], ")"}]}]}], "\[IndentingNewLine]", 
+   RowBox[{"J22Sys", "=", 
+    RowBox[{
+     FractionBox["1", 
+      RowBox[{"aSys", "^", "2"}]], 
+     FractionBox["1", 
+      RowBox[{"mMoon", " ", "+", "mEarth"}]], 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"mEarth", " ", 
+        RowBox[{"Rlm", "[", 
+         RowBox[{"2", ",", "2", ",", "dEarth", ",", "0", ",", "0"}], "]"}]}], 
+       "+", 
+       RowBox[{"mMoon", " ", 
+        RowBox[{"Rlm", "[", 
+         RowBox[{"2", ",", "2", ",", "dMoon", ",", "Pi", ",", "\[Phi]"}], 
+         "]"}]}]}], ")"}]}]}], "\[IndentingNewLine]", 
+   RowBox[{"oblateness", "=", 
+    RowBox[{
+     FractionBox[
+      RowBox[{"-", "10"}], "3"], "J20Sys"}]}]}]}]], "Input",
+ CellChangeTimes->{{3.859649742289311*^9, 3.85964976151518*^9}, {
+  3.859649808152897*^9, 3.859649914545856*^9}, {3.8596499826004047`*^9, 
+  3.859650108946451*^9}, {3.859650265571465*^9, 3.859650270017823*^9}, {
+  3.859650385213249*^9, 3.859650389707658*^9}, {3.8596505807348413`*^9, 
+  3.8596506676535177`*^9}, {3.859650789250573*^9, 3.859650794323704*^9}, {
+  3.859657850649919*^9, 3.859657853811167*^9}, {3.859658356212906*^9, 
+  3.859658358492619*^9}, {3.8596586808238163`*^9, 3.859658692658918*^9}},
+ CellLabel->
+  "In[231]:=",ExpressionUUID->"166bc2ce-99ab-4d25-98f1-2667a005fc64"],
+
+Cell[BoxData["0.49330887157795206`"], "Output",
+ CellChangeTimes->{
+  3.859650097463725*^9, {3.859650376638247*^9, 3.859650389992689*^9}, {
+   3.8596505955124083`*^9, 3.859650668841357*^9}, {3.8596578207786837`*^9, 
+   3.859657854271348*^9}, 3.859658061788312*^9, 3.859658094606584*^9, {
+   3.859658363169631*^9, 3.859658378429555*^9}, {3.8596584404408712`*^9, 
+   3.859658449663657*^9}, 3.859658694017302*^9, {3.859658888953829*^9, 
+   3.8596588948937063`*^9}, 3.859658936735298*^9, 3.859659974142123*^9, {
+   3.859660038388966*^9, 3.859660047595533*^9}},
+ CellLabel->
+  "Out[231]=",ExpressionUUID->"532026cf-e7ae-43d3-89a9-c4f47bc444fb"],
+
+Cell[BoxData["0.`"], "Output",
+ CellChangeTimes->{
+  3.859650097463725*^9, {3.859650376638247*^9, 3.859650389992689*^9}, {
+   3.8596505955124083`*^9, 3.859650668841357*^9}, {3.8596578207786837`*^9, 
+   3.859657854271348*^9}, 3.859658061788312*^9, 3.859658094606584*^9, {
+   3.859658363169631*^9, 3.859658378429555*^9}, {3.8596584404408712`*^9, 
+   3.859658449663657*^9}, 3.859658694017302*^9, {3.859658888953829*^9, 
+   3.8596588948937063`*^9}, 3.859658936735298*^9, 3.859659974142123*^9, {
+   3.859660038388966*^9, 3.8596600475994387`*^9}},
+ CellLabel->
+  "Out[232]=",ExpressionUUID->"9c54bd04-b417-4691-b1be-d6ae0765c05a"],
+
+Cell[BoxData[
+ RowBox[{"-", "1.6443629052598403`"}]], "Output",
+ CellChangeTimes->{
+  3.859650097463725*^9, {3.859650376638247*^9, 3.859650389992689*^9}, {
+   3.8596505955124083`*^9, 3.859650668841357*^9}, {3.8596578207786837`*^9, 
+   3.859657854271348*^9}, 3.859658061788312*^9, 3.859658094606584*^9, {
+   3.859658363169631*^9, 3.859658378429555*^9}, {3.8596584404408712`*^9, 
+   3.859658449663657*^9}, 3.859658694017302*^9, {3.859658888953829*^9, 
+   3.8596588948937063`*^9}, 3.859658936735298*^9, 3.859659974142123*^9, {
+   3.859660038388966*^9, 3.859660047603464*^9}},
+ CellLabel->
+  "Out[233]=",ExpressionUUID->"919b0e62-ee46-4fc3-80e8-6d734c39cec9"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"Aligned", " ", "along", " ", "x"}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"J20Sys", "=", 
+    RowBox[{
+     FractionBox["1", 
+      RowBox[{"aSys", "^", "2"}]], 
+     FractionBox["1", 
+      RowBox[{"mMoon", " ", "+", "mEarth"}]], 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"mEarth", " ", 
+        RowBox[{"Rlm", "[", 
+         RowBox[{"2", ",", "0", ",", "dEarth", ",", 
+          FractionBox["Pi", "2"], ",", "0"}], "]"}]}], "+", 
+       RowBox[{"mMoon", " ", 
+        RowBox[{"Rlm", "[", 
+         RowBox[{"2", ",", "0", ",", "dMoon", ",", 
+          FractionBox["Pi", "2"], ",", "Pi"}], "]"}]}]}], ")"}]}]}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"J22Sys", "=", 
+    RowBox[{
+     FractionBox["1", 
+      RowBox[{"aSys", "^", "2"}]], 
+     FractionBox["1", 
+      RowBox[{"mMoon", " ", "+", "mEarth"}]], 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"mEarth", " ", 
+        RowBox[{"Rlm", "[", 
+         RowBox[{"2", ",", "2", ",", "dEarth", ",", 
+          FractionBox["Pi", "2"], ",", "0"}], "]"}]}], "+", 
+       RowBox[{"mMoon", " ", 
+        RowBox[{"Rlm", "[", 
+         RowBox[{"2", ",", "2", ",", "dMoon", ",", 
+          FractionBox["Pi", "2"], ",", "Pi"}], "]"}]}]}], ")"}]}]}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"oblateness", "=", 
+    RowBox[{
+     FractionBox[
+      RowBox[{"-", "10"}], "3"], "J20Sys"}]}]}]}]], "Input",
+ CellChangeTimes->{{3.859650803297509*^9, 3.8596508206617537`*^9}, {
+  3.859658353082055*^9, 3.85965836060382*^9}, {3.859658667096023*^9, 
+  3.859658697343153*^9}},
+ CellLabel->
+  "In[234]:=",ExpressionUUID->"46879281-fef3-469e-af4f-f5daddc3da0e"],
+
+Cell[BoxData[
+ RowBox[{"-", "0.24665443578897603`"}]], "Output",
+ CellChangeTimes->{
+  3.859650821038156*^9, 3.859657834120837*^9, 3.859658064624675*^9, {
+   3.859658108859046*^9, 3.8596581158373003`*^9}, {3.859658361271755*^9, 
+   3.859658380446919*^9}, 3.859658454169499*^9, 3.8596586977052383`*^9, {
+   3.859658890690713*^9, 3.859658896545636*^9}, 3.859658938820344*^9, 
+   3.859659975770993*^9, 3.859660050320372*^9},
+ CellLabel->
+  "Out[234]=",ExpressionUUID->"70083147-27f0-4e2d-ac5f-6ab2cbb45f04"],
+
+Cell[BoxData["0.12332721789448801`"], "Output",
+ CellChangeTimes->{
+  3.859650821038156*^9, 3.859657834120837*^9, 3.859658064624675*^9, {
+   3.859658108859046*^9, 3.8596581158373003`*^9}, {3.859658361271755*^9, 
+   3.859658380446919*^9}, 3.859658454169499*^9, 3.8596586977052383`*^9, {
+   3.859658890690713*^9, 3.859658896545636*^9}, 3.859658938820344*^9, 
+   3.859659975770993*^9, 3.859660050325012*^9},
+ CellLabel->
+  "Out[235]=",ExpressionUUID->"71ec5569-418d-411c-9336-d0e159872b56"],
+
+Cell[BoxData["0.8221814526299202`"], "Output",
+ CellChangeTimes->{
+  3.859650821038156*^9, 3.859657834120837*^9, 3.859658064624675*^9, {
+   3.859658108859046*^9, 3.8596581158373003`*^9}, {3.859658361271755*^9, 
+   3.859658380446919*^9}, 3.859658454169499*^9, 3.8596586977052383`*^9, {
+   3.859658890690713*^9, 3.859658896545636*^9}, 3.859658938820344*^9, 
+   3.859659975770993*^9, 3.859660050329055*^9},
+ CellLabel->
+  "Out[236]=",ExpressionUUID->"b94defa6-a1d7-4c29-b83c-c2c2d4056665"]
+}, Open  ]]
+},
+WindowSize->{1440., 789.75},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"12.3 for Linux x86 (64-bit) (May 11, 2021)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"5c03ffcf-3e0b-4461-ad77-df96f8a4c7c0"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 994, 30, 51, "Input",ExpressionUUID->"48074d7d-66a5-45e6-9b8d-870c47834e57"],
+Cell[1555, 52, 1186, 29, 133, "Input",ExpressionUUID->"93aecfd1-839b-482e-b70c-e10d33d928c3"],
+Cell[CellGroupData[{
+Cell[2766, 85, 1236, 35, 105, "Input",ExpressionUUID->"0e478f06-4173-4c17-8380-1257715a71f6"],
+Cell[4005, 122, 464, 8, 33, "Output",ExpressionUUID->"542c7160-7cd3-4d1b-83c0-f3cdf4e445c1"],
+Cell[4472, 132, 462, 8, 33, "Output",ExpressionUUID->"836817ff-7bc9-40f1-bf7f-a1bff2b80c8a"],
+Cell[4937, 142, 462, 8, 33, "Output",ExpressionUUID->"fae88d90-bd66-4d51-bfa0-a7aef62268cc"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5436, 155, 1930, 49, 147, "Input",ExpressionUUID->"166bc2ce-99ab-4d25-98f1-2667a005fc64"],
+Cell[7369, 206, 639, 10, 33, "Output",ExpressionUUID->"532026cf-e7ae-43d3-89a9-c4f47bc444fb"],
+Cell[8011, 218, 624, 10, 33, "Output",ExpressionUUID->"9c54bd04-b417-4691-b1be-d6ae0765c05a"],
+Cell[8638, 230, 655, 11, 33, "Output",ExpressionUUID->"919b0e62-ee46-4fc3-80e8-6d734c39cec9"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9330, 246, 1672, 47, 154, "Input",ExpressionUUID->"46879281-fef3-469e-af4f-f5daddc3da0e"],
+Cell[11005, 295, 504, 9, 33, "Output",ExpressionUUID->"70083147-27f0-4e2d-ac5f-6ab2cbb45f04"],
+Cell[11512, 306, 487, 8, 33, "Output",ExpressionUUID->"71ec5569-418d-411c-9336-d0e159872b56"],
+Cell[12002, 316, 486, 8, 56, "Output",ExpressionUUID->"b94defa6-a1d7-4c29-b83c-c2c2d4056665"]
+}, Open  ]]
+}
+]
+*)
+

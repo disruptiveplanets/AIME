@@ -2,6 +2,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 from matplotlib.lines import Line2D
+from matplotlib.colors import LinearSegmentedColormap, to_rgba
 from scipy.interpolate import LinearNDInterpolator
 from scipy.linalg import norm
 
@@ -19,6 +20,7 @@ LEGEND_SIZE = 12
 
 N_DIM = None
 N_PERCENTILES = None
+
 
 def show_true_point(ax):
     spin = [0.00006464182, 0.00012928364, -0.00012928364]
