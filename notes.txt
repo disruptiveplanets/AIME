@@ -10,3 +10,6 @@ Sample parameters:
 
 Spin:
 0.00006464182, 0.00012928364, -0.00012928364
+
+Time to perigee: 49422 s = 13.728 hr 
+Gamma at perigee: -2.59344
