@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "probe-s-rho"
+PATH = "cad-period-contour"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1
