@@ -30,10 +30,25 @@ Baxansky A.,  Kiryati N.,  2007, \mn@doi [Pattern Recognition]
   et~al.}{2020}]{benson2020spin}
 Benson C.~J.,  Scheeres D.~J.,   Moskovitz N.~A.,  2020, Icarus, 340, 113518
 
+\bibitem[\protect\citeauthoryear{Berthier et~al.,}{Berthier
+  et~al.}{2020}]{BERTHIER2020113990}
+Berthier J.,  et~al., 2020, \mn@doi [Icarus]
+  {https://doi.org/10.1016/j.icarus.2020.113990}, 352, 113990
+
 \bibitem[\protect\citeauthoryear{Boué \& Laskar}{Boué \&
   Laskar}{2009}]{BOUE2009750}
 Boué G.,  Laskar J.,  2009, \mn@doi [Icarus]
   {https://doi.org/10.1016/j.icarus.2009.02.001}, 201, 750
+
+\bibitem[\protect\citeauthoryear{Brown et~al.,}{Brown
+  et~al.}{2013}]{brown2013cumbres}
+Brown T.,  et~al., 2013, Publications of the Astronomical Society of the
+  Pacific, 125, 1031
+
+\bibitem[\protect\citeauthoryear{Descamps et~al.,}{Descamps
+  et~al.}{2020}]{DESCAMPS2020113726}
+Descamps P.,  et~al., 2020, \mn@doi [Icarus]
+  {https://doi.org/10.1016/j.icarus.2020.113726}, 345, 113726
 
 \bibitem[\protect\citeauthoryear{Foreman-Mackey, Hogg, Lang  \&
   Goodman}{Foreman-Mackey et~al.}{2013}]{foreman2013emcee}
@@ -67,11 +82,6 @@ Hou X.,  Scheeres D.~J.,   Xin X.,  Mar 2017, Celestial Mechanics and Dynamical
   et~al.}{2002}]{kaiser2002pan}
 Kaiser N.,  et~al., 2002, in Survey and Other Telescope Technologies and
   Discoveries. pp 154--164
-
-\bibitem[\protect\citeauthoryear{Kwiecinski, Krause  \& {Van
-  Gorder}}{Kwiecinski et~al.}{2018}]{KWIECINSKI2018170}
-Kwiecinski J.~A.,  Krause A.~L.,   {Van Gorder} R.~A.,  2018, \mn@doi [Icarus]
-  {https://doi.org/10.1016/j.icarus.2018.04.005}, 311, 170
 
 \bibitem[\protect\citeauthoryear{Larson, Brownlee, Hergenrother  \&
   Spahr}{Larson et~al.}{1998}]{larson1998catalina}
@@ -143,6 +153,10 @@ Souchay J.,  Lhotka C.,  Heron G.,  Herve Y.,  Puente V.,   Lopez M.~F.,  2018,
 Stokes G.~H.,  Evans J.~B.,  Viggh H.~E.,  Shelly F.~C.,   Pearce E.~C.,  2000,
   Icarus, 148, 21
 
+\bibitem[\protect\citeauthoryear{Tyson}{Tyson}{2002}]{tyson2002large}
+Tyson J.~A.,  2002, Survey and Other Telescope Technologies and Discoveries,
+  4836, 10
+
 \bibitem[\protect\citeauthoryear{Valvano, Winter, Sfair, Machado~Oliveira,
   Borderes-Motta  \& Moura}{Valvano et~al.}{2022}]{valvano2022apophis}
 Valvano G.,  Winter O.~C.,  Sfair R.,  Machado~Oliveira R.,  Borderes-Motta G.,
@@ -156,6 +170,11 @@ Wright E.~L.,  et~al., 2010, The Astronomical Journal, 140, 1868
   Ballouz}{Yu et~al.}{2014}]{yu2014numerical}
 Yu Y.,  Richardson D.~C.,  Michel P.,  Schwartz S.~R.,   Ballouz R.-L.,  2014,
   Icarus, 242, 82
+
+\bibitem[\protect\citeauthoryear{de Wit, Gillon, Demory  \& Seager}{de~Wit
+  et~al.}{2012}]{de2012towards}
+de Wit J.,  Gillon M.,  Demory B.-O.,   Seager S.,  2012, Astronomy \&
+  Astrophysics, 548, A128
 
 \bibitem[\protect\citeauthoryear{van Gelderen}{van
   Gelderen}{1998}]{Gelderen1998TheSO}
