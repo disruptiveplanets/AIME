@@ -21,7 +21,9 @@ cadences = []
 periods = []
 
 def get_indices_from_name(name):
-    return int(name[7:9]), int(name[10:12])
+    print(name)
+    print(int(name[8:10]), int(name[11:13]))
+    return int(name[8:10]), int(name[11:13])
 
 # Get percentiles
 with open("percentiles.dat", 'r') as f:
@@ -38,7 +40,7 @@ with open("percentiles.dat", 'r') as f:
         percentiles[name] = perc_array
 
 for name in percentiles.keys():
-    dir_name = name[:12]
+    dir_name = name[:13]
     with open(f"{dir_name}/{dir_name}.txt", 'r') as f:
         max_j, max_l = f.readline().split(", ")
         max_j, max_l = (int(max_j), int(max_l))
