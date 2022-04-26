@@ -5,6 +5,8 @@ from multiprocessing import Pool
 
 #plt.style.use("jcap")
 
+FONT_SIZE = 20
+
 import matplotlib as mpl
 mpl.rcParams["font.family"] = "serif"
 mpl.rcParams["font.monospace"] = "Roboto mono"
@@ -13,7 +15,7 @@ mpl.rcParams["figure.figsize"] = (6.5, 4.00)
 mpl.rcParams["legend.framealpha"] = 0.5
 mpl.rcParams["lines.linewidth"] = 2
 mpl.rcParams["lines.markersize"] = 4
-mpl.rcParams["font.size"] = 16
+mpl.rcParams["font.size"] = FONT_SIZE
 mpl.rcParams["legend.fontsize"] = 10
 
 VERY_SMALL = 1
@@ -64,7 +66,7 @@ def make_frame(densities, pos_array, axis_name, cmap, percentile, balance, z_ind
         vmin=want_min,
         vmax=want_max,
         cmap=cmap)
-    plt.colorbar(c, label=axis_name)
+    plt.colorbar(c).set_label(axis_name)
     plt.axis('equal')
     plt.xlabel("$y$ (m)")
     plt.ylabel("$x$ (m)")
@@ -149,7 +151,7 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
     ax.set_ylabel("$y$")
     ax.set_zlabel("$z$")
 
-    ax.set_title(f"$\\Delta K_{{\\ell m}}={latexify(klm_error)}$", y=0.1, fontdict={'fontsize': 16})
+    ax.set_title(f"$\\Delta K_{{\\ell m}}^2={latexify(klm_error)}$", y=0.1, fontdict={'fontsize': FONT_SIZE})
 
     c = fig.colorbar(contour_handle, ax=ax)
     c.set_label(axis_name)

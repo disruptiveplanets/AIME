@@ -4,4 +4,4 @@ Decided that I wanted to try a version where I adjust the initial phase to corre
 
 ## April 26
 
-Pulled the data and made the sync plot
+Pulled the data and made the sync plot. It looks pretty good

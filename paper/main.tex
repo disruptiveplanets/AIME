@@ -136,7 +136,7 @@ In section \ref{sec:sim}, we describe the simulation used to integrate the equat
 \subsection{Simulation design}
 \label{sec:sim}
 
-We built a publicly accessible, custom simulation in C++ to produce time series of angular velocity data during a close encounter with a more massive astronomical object. This simulation requires as initial data (1) the orbital parameters of the asteroid $r_p$ (perigee distance) and $v_\infty$ (hyperbolic excess velocity); (2) the cadence of angular velocity observation $\Delta t$; (3) the central body moments $J_{\ell m}$, mass $\mu_\mathcal{B}$, and radius $a_\mathcal{B}$; (4) the initial asteroid angular velocity in the inertial frame $\bm \Omega_0$; (5) the asteroid length $a_\mathcal{A}$ (see equation \ref{eqn:am}); and (6) the asteroid's density moments $K_{\ell m}$ and initial Euler angle $\gamma_0$. All parameters except (6) are assumed to be known to high accuracy. One can imagine that $a_\mathcal{A}$ is approximated by light-curve analysis, but if not, it is still necessary to fix $a_\mathcal{A}$ or else the values of $K_{\ell m}$ are degenerate with $a_\mathcal{A}$.
+We built a publicly accessible, custom simulation in C++ to produce time series of angular velocity data during a close encounter with a more massive astronomical object. This simulation requires as initial data (1) the orbital parameters of the asteroid $r_p$ (perigee distance) and $v_\infty$ (hyperbolic excess velocity); (2) the cadence of angular velocity observation $\Delta t$; (3) the central body moments $J_{\ell m}$, mass $\mu_\mathcal{B}$, and radius $a_\mathcal{B}$; (4) the initial asteroid angular velocity in the inertial frame $\bm \Omega_0$; (5) the asteroid length $a_\mathcal{A}$ (see equation \ref{eqn:am}); and (6) the asteroid's density moments $K_{\ell m}$ and initial Euler angle $\gamma_0$. All parameters except (6) are assumed to be known to high accuracy. One can imagine that $a_\mathcal{A}$ is approximated by light-curve analysis, but if not, it is still necessary to fix $a_\mathcal{A}$ or else the values of $K_{\ell m}$ are degenerate with $a_\mathcal{A}$. \jtd{The choice of $a_\mathcal{A}$ can be adjusted after the fit to assess the dependence of the density distributions on $a_\mathcal{A}$}
 
 We further assume that the asteroid is initially not tumbling. Thus, the angular velocity is aligned with a principal axis (assumed to be $\unit z$, which maximizes moment of inertia). This sets $\beta = 0$ and we can further choose $\alpha = 0$. Thus, only the Euler angle $\gamma_0$ is necessary to provide initial data for the simulation.
 
@@ -157,7 +157,7 @@ To add noise to data generated via the above simulation, we use the following un
 \begin{equation}
   P(\rho) = \frac{1}{\rho\sqrt{2\pi \sigma_\rho^2}} \exp\parens{-\frac{\ln^2\rho}{2\sigma_\rho^2}}.
 \end{equation}
-See figure \ref{fig:uncertainty-model} for an illustration of the uncertainty model.
+See figure \ref{fig:uncertainty-model} for an illustration of the uncertainty model. \jtd{A log normal distribution is chosen such that $\rho > 0$, but since $\sigma_\rho \ll 1$ typically in our analysis, $P(\rho)$ is approximately Gaussian.}
 
 \begin{figure}
   \centering
@@ -214,7 +214,7 @@ To further ensure convergence, we minimized with respect to data truncated after
 The asteroid density distribution $\rho_\mathcal{A}(\bm r)$ is not uniquely constrained via tidal torque interactions because only the density moments $K_{\ell m}$ contribute to equation \ref{eqn:tidal-torque}. However, by making sufficient assumptions about the density distribution, we can nevertheless estimate $\rho(\bm r)$ from $K_{\ell m}$. We outline three different assumptions which constitute three models for extracting density distributions from density moments. 
 Our goal in investigating different families of models to translate constraints on the density moments into constraints on the density distribution is to reveal the major features in the density distribution that are consistently present, independent of the family of mapping model used, despite the problem underdetermination (in a similar fashion to \cite{de2012towards}).
 
-All are (partially) linear to facilitate computational ease and uncertainty propagation. All three of these models assume that $a_\mathcal{A}$ and the asteroid shape is known (for example, by light curve or radar data). Uncertainty on this shape estimate is assumed to be negligible compared to the density moment uncertainty and their contributions to to the density distribution. The models then produce a density distribution $\rho_\mathcal{A}(\bm r)$ with uncertainty from $K_{\ell m}$ propagated to uncertainty in $\rho_\mathcal{A}$. If the asteroid shape is not known, a fourth model defined in appendix \ref{app:find-surface} can be used to extract it assuming uniform density. In section \ref{sec:results}, we were forced to fix $a_\mathcal{A}$ rather than fit for it because $a_\mathcal{A}$ is degenerate with scaling $K_{3m}$. \jtd{Move this: However, $a_\mathcal{A}$ contains information about the density distribution as shown by its definition in equation \ref{eqn:am}. It might therefore be unreasonable to assume that it is exactly determined by light-curve or radar analysis. If $a_\mathcal{A}$ is too uncertain to be used as a known quantity when extracting density distributions from the moments, then the following models are flexible enough that the $a_\mathcal{A}$ constraint can be removed.}
+All are (partially) linear to facilitate computational ease and uncertainty propagation. All three of these models assume that $a_\mathcal{A}$ and the asteroid shape is known (for example, by light curve or radar data). Uncertainty on this shape estimate is assumed to be negligible compared to the density moment uncertainty and their contributions to to the density distribution. The models then produce a density distribution $\rho_\mathcal{A}(\bm r)$ with uncertainty from $K_{\ell m}$ propagated to uncertainty in $\rho_\mathcal{A}$. If the asteroid shape is not known, a fourth model defined in appendix \ref{app:find-surface} can be used to extract it assuming uniform density. In section \ref{sec:results}, we were forced to fix $a_\mathcal{A}$ rather than fit for it because $a_\mathcal{A}$ is degenerate with scaling $K_{3m}$. \jtd{When extracting density distributions, multiple $a_\mathcal{A}$ values may be tested and the multiple produced density distributions can be compared to highlight common features.}
 
 Since the overall mass of the asteroid is not observable from tidal torque, we do not expect to measure $\rho$ in an absolute sense. Only the differences in $\rho$ across the body are measurable.
 
@@ -255,7 +255,7 @@ The role of a model is therefore to restrict the space of valid density distribu
 
 A natural way to restrict the degrees of freedom of $\rho(\bm r)$ is by defining a likelihood function $\mathcal{L}$ on the density distribution and choosing the one distribution which maximizes $\mathcal{L}$ and exactly reproduces $\bm K$. We call this the ``likelihood'' model. This likelihood should not be confused with the likelihood of equation \ref{eqn:log-likelihood}, which was a function of the spin data, not the density distribution. The choice of $\mathcal{L}$ is arbitrary, but a Gaussian likelihood will produce a linear model.
 
-To employ this likelihood method, we divide the asteroid into a square grid of $m \gg n$ elements, each of which is assumed to have uniform density $\rho_0+\Theta_i$, where $\rho_0$ is constant across the asteroid and $\Theta_i$ is a local deviation. This defines the model function $\bm B(\bm r)$, which is zeroed in all components except for the $i$th, where $i$ is the index of the grid element that contains $\bm r$.
+To employ this likelihood method, we divide the asteroid into a square grid of $m \gg n$ elements, each of which is assumed to have uniform density $\rho_0+\Theta_i$, where $\rho_0$ is constant across the asteroid and $\Theta_i$ is a local deviation. In our work, we use $m \sim 10^{6}$. This defines the model function $\bm B(\bm r)$, which is zeroed in all components except for the $i$th, where $i$ is the index of the grid element that contains $\bm r$.
 
 We use a likelihood of 
 \begin{equation}
@@ -270,7 +270,7 @@ Putting aside the problem of minimizing the norm, we use the linearity of equati
 \end{equation}
 The vector $\bm \Theta=M^+\bm K$ is guaranteed to solve $\bm K = M \bm \Theta$, and by the properties of the Moore-Penrose inverse, this $\bm \Theta$ also happens to minimize the norm of all possible $\bm \Theta$ that satisfy the equation. Thus, defining $A=M^+$ also minimizes $\mathcal{L}$ and fully defines the model.
 
-This model is fast to compute; assuming fast matrix multiplication, the matrix inversion of equation \ref{eqn:mpi-underdetermined} is fast because $MM^\dagger$ is an $n$-dimensional square matrix, which is very small compared to the number of finite elements $m$.
+This model is fast to compute; assuming fast matrix multiplication, the matrix inversion of equation \ref{eqn:mpi-underdetermined} is fast because $MM^\dagger$ is an $n$-dimensional square matrix, which is very small compared to the large number of finite elements $m$.
 
 
 
@@ -402,8 +402,14 @@ Figure \ref{fig:uniform-density-results} shows the density distributions and unc
   \includegraphics[width=0.3\textwidth]{figs/asym-ell-harmonic.pdf}\hfill
   \includegraphics[width=0.3\textwidth]{figs/asym-ell-lumpy.pdf}
 
+  % \includegraphics[width=0.3\textwidth]{figs/asym-ell-diff-likelihood.pdf}\hfill
+  % \includegraphics[width=0.3\textwidth]{figs/asym-ell-diff-harmonic.pdf}\hfill\hspace{0.3\textwidth}
+
   \includegraphics[width=0.3\textwidth]{figs/asym-ell-unc-likelihood.pdf}\hfill
   \includegraphics[width=0.3\textwidth]{figs/asym-ell-unc-harmonic.pdf}\hfill\hspace{0.3\textwidth}
+
+  % \includegraphics[width=0.3\textwidth]{figs/asym-ell-ratio-likelihood.pdf}\hfill
+  % \includegraphics[width=0.3\textwidth]{figs/asym-ell-ratio-harmonic.pdf}\hfill\hspace{0.3\textwidth}
 
   \caption{Density distributions (\textit{top}) and uncertainties (\textit{bottom}) extracted by the likelihood (\textit{left}), harmonic (\textit{middle}), and lumpy with $d=N=1$ (\textit{right}) models from data generated for a uniform-density, asymmetric reference asteroid. Density is normalized so that mean density is one.}
   \label{fig:uniform-density-results}

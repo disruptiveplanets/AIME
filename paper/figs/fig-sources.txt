@@ -58,6 +58,10 @@ asym-ell-likelihood.pdf code/density/figs/asym-ell/likelihood-d.pdf
 asym-ell-lumpy.pdf code/density/figs/asym-ell/lumpy-1-1-d.pdf
 asym-ell-unc-harmonic.pdf code/density/figs/asym-ell/harmonic-u.pdf
 asym-ell-unc-likelihood.pdf code/density/figs/asym-ell/likelihood-u.pdf
+asym-ell-rat-harmonic.pdf code/density/figs/asym-ell/harmonic-r.pdf
+asym-ell-rat-likelihood.pdf code/density/figs/asym-ell/likelihood-r.pdf
+asym-ell-diff-harmonic.pdf code/density/figs/asym-ell/harmonic-s.pdf
+asym-ell-diff-likelihood.pdf code/density/figs/asym-ell/likelihood-s.pdf
 
 sym-ell-harmonic.pdf code/density/figs/sym-ell/harmonic-d.pdf
 sym-ell-likelihood.pdf code/density/figs/sym-ell/likelihood-d.pdf

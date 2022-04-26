@@ -100,11 +100,16 @@ class Method:
 
     def save_density(self):
         fname = f"data/{self.get_bare_name()}-d.npy"
+        if not os.path.exists(f"data/{self.asteroid.name}"):
+            print("Make")
+            os.mkdir(f"data/{self.asteroid.name}")
         with open(fname, 'wb') as f:
             np.save(f, self.map_density())
 
     def save_unc(self):
         fname = f"data/{self.get_bare_name()}-u.npy"
+        if not os.path.exists(f"data/{self.asteroid.name}"):
+            os.mkdir(f"data/{self.asteroid.name}")
         with open(fname, 'wb') as f:
             np.save(f, self.map_unc())
 
@@ -159,8 +164,7 @@ class Method:
 
                 for p in 10 * np.arange(11):
                     print(f"Ratio percentile {p} = {np.nanpercentile(ratios, p)}")
-            else:
-                difference = (true_densities - display_densities) / true_densities
+            difference = (true_densities - display_densities) / true_densities
 
         print("Plotting density")
         make_slices(display_densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"{fname}-d", self.klm_error)
@@ -170,10 +174,9 @@ class Method:
             print("Plotting uncertainty")
             make_slices(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u", self.klm_error, 95)
             make_gif(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u.gif", duration, 95)
-        elif true_densities is not None:
-            print("Plotting differences")
-            make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr', f"{fname}-s", self.klm_error, 90, balance=True)
-            make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr', f"{fname}-s.gif", duration, 90, balance=True)
+        print("Plotting differences")
+        make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr', f"{fname}-s", self.klm_error, 90, balance=True)
+        make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr', f"{fname}-s.gif", duration, 90, balance=True)
 
         
         warnings.filterwarnings("default")

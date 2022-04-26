@@ -2,7 +2,7 @@
 
 # Slurm sbatsh options
 #SBATCH -o plot.log
-#SBATCH -c 16
+#SBATCH -c 24s
 
 source /etc/profile
 
