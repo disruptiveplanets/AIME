@@ -5,3 +5,8 @@ Wrote the scatter script. Plan is to a 10x20 grid from 0.5 to 2 on t_orbit/t_spi
 ## April 21
 
 Fixed a couple staging bugs
+
+
+## April 26
+
+I realized that this would suffer from the same problems as period so I redid the scatter so that all encounters have the same gamma at perigee.

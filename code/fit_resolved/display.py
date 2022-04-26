@@ -22,7 +22,7 @@ mpl.rcParams["font.family"] = "serif"
 mpl.rcParams["legend.framealpha"] = 0.5
 mpl.rcParams["lines.linewidth"] = 2
 mpl.rcParams["lines.markersize"] = 4
-mpl.rcParams["font.size"] = 16
+mpl.rcParams["font.size"] = 20
 mpl.rcParams["legend.fontsize"] = 10
 
 

@@ -1,7 +1,0 @@
-g++ -DASTEROIDS_MAX_J=0 -DASTEROIDS_MAX_K=2 -Wall -std=c++17 main.cpp ../sim/*.cpp ../../code/sim/wignerd.cpp ../../code/sim/algebra.cpp -o "bin/generate" -O3
-
-./bin/generate
-
-#python3 orbit.py
-python3 display.py
-#python3 fft.py

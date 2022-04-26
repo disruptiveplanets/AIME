@@ -25,6 +25,7 @@ Earth-centric orbital elements at perigee [JPL Ephemeris](https://ssd.jpl.nasa.g
 
 Physical properties [Lee et al 2022](https://arxiv.org/pdf/2204.02540.pdf):
     Iabc=0.64, 0.97, 1
+    Klm=0.0316092, -0.0747126
     L in ecliptic coords: (275, -85 deg)
     rotation period: 264.178 hr
     precession period: 27.38547 hr
