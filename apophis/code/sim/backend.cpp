@@ -425,7 +425,7 @@ double get_tilt(double roll) {
     }
 
     // Interpolate from code
-    roll = fmod(roll, 2 * PI);
+    roll = roll - (2 * PI) * floor( roll / (2 * PI) );
     assert(roll > 0);
     assert(roll < 2 * PI);
     int i;
