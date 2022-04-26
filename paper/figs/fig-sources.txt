@@ -97,6 +97,13 @@ out-lumpy.pdf code/density/figs/out/lumpy-1-1-d.pdf
 blob-harmonic.pdf code/density/figs/blob/harmonic-d.pdf
 blob-likelihood.pdf code/density/figs/blob/likelihood-d.pdf
 blob-lumpy.pdf code/density/figs/blob/lumpy-1-1-d.pdf
+blob-unc-harmonic.pdf code/density/figs/blob/harmonic-u.pdf
+blob-unc-likelihood.pdf code/density/figs/blob/likelihood-u.pdf
+blob-diff-harmonic.pdf code/density/figs/blob/harmonic-s.pdf
+blob-diff-likelihood.pdf code/density/figs/blob/likelihood-s.pdf
+blob-diff-lumpy.pdf code/density/figs/blob/lumpy-1-1-s.pdf
+blob-ratio-harmonic.pdf code/density/figs/blob/harmonic-r.pdf
+blob-ratio-likelihood.pdf code/density/figs/blob/likelihood-r.pdf
 
 
 high-surface.pdf code/density/old/figs/high-surface-slice.pdf

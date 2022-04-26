@@ -423,7 +423,33 @@ The distributions are non-uniform for the harmonic and likelihood models (driven
 
 The size of uncertainty is such that the density distribution is consistent with uniform for the harmonic and likelihood models (within 1.5$\sigma$). Uncertainty is generally larger towards the edges of the distribution, both for these shapes and for the shapes shown later.
 
+To test the ability of the asteroid to identify discrete changes in density distribution of the kind that the lumpy model is designed to detect, we show one more example extraction. We place a spherical mass of density six times that of the surrounding medium inside the asymmetric reference asteroid, slightly displaced along $\unit y$. Both the mass and the medium have uniform density. The density moments are extracted via  a fit similarly to section \ref{sec:example-fit} and the distributions extracted by the three models for this asteroid are shown in figure \ref{fig:blob-density}.
 
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.3\textwidth]{figs/blob-likelihood.pdf}\hfill
+  \includegraphics[width=0.3\textwidth]{figs/blob-harmonic.pdf}\hfill
+  \includegraphics[width=0.3\textwidth]{figs/blob-lumpy.pdf}
+
+  % \includegraphics[width=0.3\textwidth]{figs/blob-diff-likelihood.pdf}\hfill
+  % \includegraphics[width=0.3\textwidth]{figs/blob-diff-harmonic.pdf}\hfill
+  %\includegraphics[width=0.3\textwidth]{figs/blob-diff-lumpy.pdf}
+
+  % \includegraphics[width=0.3\textwidth]{figs/blob-unc-likelihood.pdf}\hfill
+  % \includegraphics[width=0.3\textwidth]{figs/blob-unc-harmonic.pdf}\hfill\hspace{0.3\textwidth}
+
+  % \includegraphics[width=0.3\textwidth]{figs/blob-ratio-likelihood.pdf}\hfill
+  % \includegraphics[width=0.3\textwidth]{figs/blob-ratio-harmonic.pdf}\hfill\hspace{0.3\textwidth}
+
+  \caption{Density distributions extracted by the likelihood (\textit{left}), harmonic (\textit{middle}), and lumpy with $d=N=1$ (\textit{right}) models from data generated for an asteroid with an off-centre lump. Density is normalized so that mean density is one. The same distance scale is used in all figures.}
+  \label{fig:blob-density}
+\end{figure*}
+
+We see from figure \ref{fig:blob-density} that the harmonic and likelihood model fail to recover the presence or location of the lump. There appears to be a slight increase in density at roughly the correct location for both models, but this is a small effect. Like figure \ref{fig:non-uniform-density}, we see that the harmonic and likelihood models do not agree exactly, and the failure of the harmonic model to exactly reproduce $K_{\ell m}$ suggests that the true distribution is not harmonic.
+
+The failure of these models to find lumps is expected, since $K_{2 m}$ and $K_{3 m}$ are only sensitive to large-scale non-uniformities in the density and cannot exactly resolve the edges of the lump. However, the lumpy model computes the location and density of the mass very well. Some inaccuracies are induced by the uncertainty in $K_{3m}$, which changes the minimum of equation \ref{eqn:lump-minimize} such that the lump is displaced by 9 m along $\unit y$ from where it should be. This in turn causes a 70 m difference between the extracted lump's radius and the true radius. Nevertheless, it seems that the lumpy model is capable of recreating the location of lumps (except for the caveat mentioned above when the density moment data is redundant with the asteroid shape). But the ability of the lumpy model to place a lump does not guarantee the lump to exist, as was seen in the above sections.
+
+\jtd{I will also add a discussion of uncertainties once the plots are generated.}
 
 
 
@@ -825,23 +851,6 @@ An example of this caveat applied is an elliptical lump inside an elliptical ast
 
 
 
-\subsubsection{Lumpy asteroids}
-
-Finally, we test an asteroid with a discrete change in density distribution (for example, a rock of high density), of the kind that the lumpy model is designed to detect. We place a spherical mass of density six times that of the surrounding medium inside the asymmetric reference asteroid, slightly displaced along $\unit y$. Both the mass and the medium have uniform density. The distributions extracted by the three model for this asteroid are shown in figure \ref{fig:blob-density}.
-
-\begin{figure*}
-  \centering
-  \includegraphics[width=0.3\textwidth]{figs/blob-likelihood.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{figs/blob-harmonic.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{figs/blob-lumpy.pdf}
-
-  \caption{Density distributions extracted by the likelihood (\textit{left}), harmonic (\textit{middle}), and lumpy with $d=N=1$ (\textit{right}) models from data generated for an asteroid with an off-centre lump. Density is normalized so that mean density is one. The same distance scale is used in all figures.}
-  \label{fig:blob-density}
-\end{figure*}
-
-We see from figure \ref{fig:blob-density} that the harmonic and likelihood model fail to recover the presence or location of the lump. There appears to be a slight increase in density at roughly the correct location for both models, but this is a small effect. Like figure \ref{fig:non-uniform-density}, we see that the harmonic and likelihood models do not agree exactly, and the failure of the harmonic model to exactly reproduce $K_{\ell m}$ suggests that the true distribution is not harmonic.
-
-The failure of these models to find lumps is expected, since $K_{2 m}$ and $K_{3 m}$ are only sensitive to large-scale non-uniformities in the density and cannot exactly resolve the edges of the lump. However, the lumpy model computes the location and density of the mass very well. Some inaccuracies are induced by the uncertainty in $K_{3m}$, which changes the minimum of equation \ref{eqn:lump-minimize} such that the lump is displaced by 9 m along $\unit y$ from where it should be. This in turn causes a 70 m difference between the extracted lump's radius and the true radius. Nevertheless, it seems that the lumpy model is capable of recreating the location of lumps (except for the caveat mentioned above when the density moment data is redundant with the asteroid shape). But the ability of the lumpy model to place a lump does not guarantee the lump to exist, as was seen in the above sections.
 
 \section{Conclusions}
 
