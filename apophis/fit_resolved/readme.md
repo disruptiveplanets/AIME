@@ -2,12 +2,12 @@
 
 Made this folder and modified it for a tumbling asteroid. Confirmed that the simulation built, but didn't test anything. Especially in danger are the initializing quaternions (both for the axis conversions from north to ecliptic to inertial) and the rotational periods.
 
-## To do:
+## April 25
 
-Make torque-free sample data, plot it, take fourier transforms, and confirm the correct periods
+Performed a thorough check of the tumbling math, and checked that the true Apophis periods are reproduced. Also checked the ecliptic coordinate system quaternion.
 
-Check orbit shape
+Free parameters: K3m, initial roll & precession, radius, cadence, period gap, observational precision
 
-Figure out the parameterization of the system
+## To do
 
-If I remembered, I would also cite [Kaasalainen 2001](https://www.aanda.org/articles/aa/pdf/2001/34/aah2821.pdf), state that my model is for SAMs, and mention that Apophis has MOI ratios extracted as well.
+Perform fit! Perhaps a cadence scan from 2 min to 1 hour.

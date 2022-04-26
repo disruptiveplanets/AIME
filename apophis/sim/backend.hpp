@@ -18,7 +18,7 @@
 #define MAX_DT 20.0
 #define POSITION_DT 1.0
 
-#define INTEGRAL_LIMIT_FRAC 1.0e-3// 5e-6
+#define INTEGRAL_LIMIT_FRAC 1.0e-6//1.0e-3
 
 //#define TEXT_DEBUG
 #define SEGFAULT_DEBUG
@@ -67,7 +67,7 @@ private:
     void calculate_poses();
     bool extract_pos(double time, Vector3& position, Vector3& velocity);
     Vector3 extract_spin(Vector3 angles, Vector3 momenta);
-    Quaternion initialize_rotation() const;
+    void initialize_rotation(Quaternion& quat, Vector3& spin) const;
     void compute_coefficient(int l, int m, int lp, int mp, int mpp, 
         cdouble& coeff_x, cdouble& coeff_y, cdouble& coeff_z) const;
     void make_coefficients();

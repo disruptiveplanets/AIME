@@ -30,3 +30,5 @@ Physical properties [Lee et al 2022](https://arxiv.org/pdf/2204.02540.pdf):
     precession period: 27.38547 hr
 
 Location of North [Wikipedia](https://en.wikipedia.org/wiki/Orbital_pole)
+
+Example of Apophis encounter map: https://arxiv.org/pdf/2111.08144.pdf

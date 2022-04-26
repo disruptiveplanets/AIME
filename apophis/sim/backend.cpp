@@ -6,8 +6,7 @@ const int max_k = (ASTEROIDS_MAX_K + 1) * (ASTEROIDS_MAX_K + 1);
 const int max_j = (ASTEROIDS_MAX_J + 1) * (ASTEROIDS_MAX_J + 1);
 
 Asteroid::Asteroid(const cdouble* klms, double asteroid_radius,
-    double initial_roll, double initial_precess, double distance_ratio_cut,
-    bool enforce_drc, double velocity_mul) :
+    double initial_roll, double initial_precess, double distance_ratio_cut, bool enforce_drc, double velocity_mul) :
     klms(klms), asteroid_radius(asteroid_radius), distance_ratio_cut(distance_ratio_cut),
     enforce_drc(enforce_drc), initial_roll(initial_roll), initial_precess(initial_precess), velocity_mul(velocity_mul) {
 
@@ -154,12 +153,11 @@ void Asteroid::calculate_poses() {
     #endif
 
     double pericenter_vel = sqrt(excess_vel * excess_vel + 2 * MU / PERIGEE);
-    const double cutoff_dist_squared = PERIGEE * PERIGEE
-        * pow(INTEGRAL_LIMIT_FRAC, -2/3.0);// Go a little over for safety
+    const double cutoff_dist_squared = PERIGEE * PERIGEE * pow(INTEGRAL_LIMIT_FRAC, -2/3.0);// Go a little over for safety
 
     #ifdef TEXT_DEBUG
     std::cout << "cutoff distance: " << sqrt(cutoff_dist_squared) << std::endl;
-    std::cout << "periapsis: " << pericenter_pos << std::endl;
+    std::cout << "periapsis: " << PERIGEE << std::endl;
     #endif
     Vector3 velocity = Vector3({0, pericenter_vel, 0});
     Vector3 position = Vector3({PERIGEE, 0, 0});
@@ -268,11 +266,6 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
         }
     }
     torque = Vector3({x_torque.r, y_torque.r, z_torque.r});
-
-    // double phi = atan2(position[1], position[0]);
-    // double min_phi = 0;
-    // double max_phi = 0.9;
-    // torque *= (min_phi < abs(phi) && abs(phi) < max_phi) ? 1 : 0;
     
     #else
 
@@ -308,37 +301,43 @@ void Asteroid::get_derivatives(Vector3 position, Vector3 spin, Quaternion quat, 
     dquat = 0.5 * quat * Quaternion(0, spin[0], spin[1], spin[2]);
 }
 
-Quaternion Asteroid::initialize_rotation() const {
+void Asteroid::initialize_rotation(Quaternion& quat, Vector3& spin) const {
     // Find the quaternion that is consistent with the initial angular momentum and the initial angles
     // Make a quat that rotates from the ecliptic frame to the inertial frame
     Quaternion ecliptic = get_ecliptic_quat();
 
-    Quaternion ang_mom_ecliptic = Quaternion(0, cos(L_LON) * cos(L_LAT), sin(L_LON) * cos(L_LAT), sin(L_LAT));
-    Vector3 ang_mom_inertial = (ecliptic * ang_mom_ecliptic).vec();
-    double inertial_lon = atan2(ang_mom_inertial[1], ang_mom_inertial[0]);
-    double inertial_lat = asin(ang_mom_inertial[2]);
+    Vector3 ang_mom_inertial = ecliptic.rotate(Vector3({cos(L_LON) * cos(L_LAT), sin(L_LON) * cos(L_LAT), sin(L_LAT)}));
+    double inertial_phi = atan2(ang_mom_inertial[1], ang_mom_inertial[0]);
+    double inertial_theta = acos(ang_mom_inertial[2]);
 
     // Now make an actual orientation that rotates inertial to body-fixed
     double initial_tilt = get_tilt(initial_roll); // assumes gamma = psi
 
-    Quaternion quat = Quaternion(cos(inertial_lon / 2), 0, 0, sin(inertial_lon / 2))
-        * Quaternion(cos(PI / 4 - inertial_lat / 2), sin(PI / 4 - inertial_lat / 2), 0, 0)
-        * Quaternion(cos(initial_precess / 2), 0, 0, sin(initial_precess / 2))
+    // Verified (free parameter lines up with initial precession)
+    Quaternion inertial_to_l = Quaternion(cos(inertial_phi / 2), 0, 0, sin(inertial_phi / 2))
+        * Quaternion(cos(inertial_theta / 2), 0, sin(inertial_theta / 2), 0);
+    
+    // Verified
+    Quaternion l_to_body_fixed = Quaternion(cos(initial_precess / 2), 0, 0, sin(initial_precess / 2))
         * Quaternion(cos(initial_tilt / 2), sin(initial_tilt / 2), 0, 0)
         * Quaternion(cos(initial_roll / 2), 0, 0, sin(initial_roll / 2));
 
-    return quat;
+    // Verified
+    quat = inertial_to_l * l_to_body_fixed;
+
+    // Spin is such that, when multiplied by the moi matrix and rotated by quat, it gives inertial l
+    spin = Matrix3({inv_moi[0], 0, 0, 0, inv_moi[1], 0, 0, 0, inv_moi[2]}) * quat.inverse().rotate(ang_mom_inertial);
+    spin *= 2 * PI / P_PSI / spin.mag();
 }
 
 int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
     int frames = 0;
     int cadence_index = -expire_time / cadence-1;
     double dt = MIN_DT;
-    Quaternion dquat1, dquat2, dquat3, dquat4;
-    Vector3 dspin1, dspin2, dspin3, dspin4, position, velocity;
-    Quaternion quat = initialize_rotation();
+    Quaternion quat, dquat1, dquat2, dquat3, dquat4;
+    Vector3 spin, dspin1, dspin2, dspin3, dspin4, position, velocity;
 
-    Vector3 spin = Vector3::z() * 2 * PI / P_PSI;
+    initialize_rotation(quat, spin);
 
     const double expire_distance_sqr = distance_ratio_cut * distance_ratio_cut * PERIGEE * PERIGEE;
 
@@ -431,7 +430,10 @@ double get_tilt(double roll) {
 }
 
 Quaternion get_ecliptic_quat() {
-    return Quaternion(cos(ARG_PERI / 2), 0, 0, sin(ARG_PERI / 2))
-        * Quaternion(cos(INCLINATION / 2), sin(INCLINATION / 2), 0, 0)
-        * Quaternion(cos(LON_ASC_NODE / 2), 0, 0, sin(LON_ASC_NODE / 2));
+    // Rotates from ecliptic to inertial
+
+    // Confirmed based on plot in https://arxiv.org/pdf/2111.08144.pdf
+    return Quaternion(cos(ARG_PERI / 2), 0, 0, sin(-ARG_PERI / 2))
+        * Quaternion(cos(INCLINATION / 2), sin(-INCLINATION / 2), 0, 0)
+        * Quaternion(cos(LON_ASC_NODE / 2), 0, 0, sin(-LON_ASC_NODE / 2));
 }
