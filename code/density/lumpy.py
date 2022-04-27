@@ -6,12 +6,15 @@ from scipy.special import factorial
 from scipy.spatial.transform import Rotation
 from matplotlib import pyplot as plt
 
+LUMPY_N = 1
+LUMPY_D = 1
+
 class Lumpy(Method):
     def __init__(self, asteroid):
         print("Lumpy model")
         super().__init__(asteroid, False, final_uncertainty=False)
-        self.N = 1
-        self.rot_dim = 1
+        self.N = LUMPY_N
+        self.rot_dim = LUMPY_D
         if self.rot_dim == 1:
             self.lms = []
             self.lms_dof = 1

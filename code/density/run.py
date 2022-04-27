@@ -1,7 +1,7 @@
 import sys, os
 from likelihood import Likelihood
 from harmonic import Harmonic
-from lumpy import Lumpy
+from lumpy import Lumpy, LUMPY_D, LUMPY_N
 from core import Asteroid, Indicator, TrueShape
 import matplotlib.pyplot as plt
 
@@ -46,8 +46,8 @@ asteroids = {
 }
 
 methods = {
-    "likelihood": Likelihood,
-    "harmonic": Harmonic, 
+    #"likelihood": Likelihood,
+    #"harmonic": Harmonic, 
     "lumpy": Lumpy, 
 }
 
@@ -63,7 +63,11 @@ if len(sys.argv) == 2:
             new_args = [a for a in args]
             #new_args[0] = ""
 
-            if not os.path.exists(f"data/{asteroid_name}/{method_name}-d.npy"):
+            file_name = method_name
+            if method_name == "lumpy":
+                file_name += '-' + str(LUMPY_N) + '-' + str(LUMPY_D)
+            if not os.path.exists(f"data/{asteroid_name}/{file_name}-d.npy"):
+                print(file_name)
                 print(f"Data was not present for asteroid {asteroid_name} method {method_name}")
                 continue
             print(f"Plotting asteroid {asteroid_name} method {method_name}")
@@ -71,7 +75,7 @@ if len(sys.argv) == 2:
             asteroid = make_asteroid([asteroid_name]+new_args)
             method = method_class(asteroid)
             
-            method.reload(f"data/{asteroid_name}/{method_name}-d.npy", f"data/{asteroid_name}/{method_name}-u.npy")
+            method.reload(f"data/{asteroid_name}/{file_name}-d.npy", f"data/{asteroid_name}/{file_name}-u.npy")
             method.display()
 
             plt.close("all")
