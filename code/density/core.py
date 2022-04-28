@@ -159,8 +159,8 @@ class Method:
             true_densities /= np.nanmean(true_densities)
             if self.final_uncertainty:
                 ratios = (true_densities - display_densities) / (display_densities * display_uncs)
-                make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r", self.klm_error, balance=True)
-                make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r.gif", duration=duration, balance=True)
+                make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r", self.klm_error, percentile=95, balance=True)
+                make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r.gif", duration=duration, percentile=95, balance=True)
 
                 for p in 10 * np.arange(11):
                     print(f"Ratio percentile {p} = {np.nanpercentile(ratios, p)}")
@@ -176,8 +176,8 @@ class Method:
             make_gif(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u.gif", duration, 95)
         if true_densities is not None:
             print("Plotting differences")
-            make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr_r', f"{fname}-s", self.klm_error, 90, balance=True)
-            make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr_r', f"{fname}-s.gif", duration, 90, balance=True)
+            make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr_r', f"{fname}-s", self.klm_error, 95, balance=True)
+            make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr_r', f"{fname}-s.gif", duration, 95, balance=True)
 
         
         warnings.filterwarnings("default")

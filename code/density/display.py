@@ -22,6 +22,7 @@ VERY_SMALL = 1
 NUM_SLICES = 6
 EXPAND_X=1.15 # Scale along x and y so that spheres look circular
 AXIS_LIMIT = 1000
+EPSILON = 0.00000001
 
 
 def latexify(number):
@@ -63,17 +64,18 @@ def make_frame(densities, pos_array, axis_name, cmap, percentile, balance, z_ind
         want_max = max(want_max, -want_min)
         want_min = -want_max
 
-    densities = np.clip(densities, want_min, want_max)
+    densities = np.clip(densities, want_min+(abs(want_min) * EPSILON), want_max-(abs(want_max) * EPSILON))
+
 
     # Does the colorbar have an arrow?
     extend = 'neither'
-    if percentile < 95:
-        extend = 'max'
+    if percentile < 98:
+        if balance:
+            extend = 'both'
+        else:
+            extend = 'max'
 
-    c = plt.pcolormesh(pos_array, pos_array, csection.transpose()   , shading='auto',
-        vmin=want_min,
-        vmax=want_max,
-        cmap=cmap)
+    c = plt.pcolormesh(pos_array, pos_array, csection.transpose(), shading='auto', vmin=want_min, vmax=want_max, cmap=cmap)
     plt.colorbar(c, extend=extend).set_label(axis_name)
     plt.axis('equal')
     plt.xlabel("$y$ (m)")
@@ -85,34 +87,6 @@ def make_frame(densities, pos_array, axis_name, cmap, percentile, balance, z_ind
     plt.title("$z$ = {} m".format(str(pos_array[z_index])[:5]))
     fig.tight_layout()
     return fig
-
-def show_cross_section(densities, pos_array, axis_name, cmap, fname, percentile=99, balance=False):
-    plt.figure()
-    want_min = np.nanpercentile(densities, 1)
-    want_max = np.nanpercentile(densities, percentile)
-    densities = np.clip(densities, want_min, want_max)
-    csection = densities[:,:,densities.shape[-1]//2]
-
-    # Does the colorbar have an arrow?
-    extend = 'neither'
-    if percentile < 95:
-        extend = 'max'
-
-    plt.pcolormesh(pos_array, pos_array, csection.transpose(), shading='auto',
-        vmin= want_min,
-        vmax= want_max,
-        cmap=cmap)
-    c = plt.colorbar(extend=extend)
-    plt.axis('equal')
-    plt.xlabel("$x$ (m)")
-    plt.ylabel("$y$ (m)")
-    mins = np.min(np.where(~np.isnan(densities)), axis=1)
-    maxes = np.max(np.where(~np.isnan(densities)), axis=1)
-    plt.xlim(pos_array[mins[0]], pos_array[maxes[0]])
-    plt.ylim(pos_array[mins[1]], pos_array[maxes[1]])
-    c.set_label(axis_name)
-    plt.tight_layout()
-    plt.savefig(fname)
 
 def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percentile=99, balance=False):
     fig = plt.figure(figsize=(6.5,5))
@@ -126,12 +100,13 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
         want_min = np.nanmin(densities)
         want_min = 0
 
-    densities = np.clip(densities, want_min, want_max)
-
     # Does the colorbar have an arrow?
     extend = 'neither'
-    if percentile < 95:
-        extend = 'max'
+    if percentile < 98:
+        if balance:
+            extend = 'both'
+        else:
+            extend = 'max'
 
     if balance:
         want_max = min(want_max, -want_min)
@@ -139,10 +114,16 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
         if want_max < want_min:
             want_max, want_min = want_min, want_max
 
+    densities = np.clip(densities, want_min+(abs(want_min) * EPSILON), want_max-(abs(want_max) * EPSILON))
+
+
     if want_min != want_max:
         levels = np.linspace(want_min, want_max, 10)
     else:
         levels = np.linspace(0.99, 1.01, 10)
+
+    print(np.sum(densities < want_min), want_min)
+
     mins = np.min(np.where(~np.isnan(densities)), axis=1)
     maxes = np.max(np.where(~np.isnan(densities)), axis=1)
 
@@ -156,7 +137,7 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
 
     fig2 = plt.figure()
     ax2 = fig2.gca()
-    contour_handle = ax2.contourf(pos_array, pos_array, densities[:,:,0], levels=levels, cmap=cmap)
+    contour_handle = ax2.contourf(pos_array, pos_array, densities[:,:,0], levels=levels, cmap=cmap, extend=extend)
 
     '''max_radius = max([max(abs(pos_array[mins[i]]), abs(pos_array[maxes[i]])) for i in range(len(densities.shape))])
     ax.set_xlim3d(-max_radius * EXPAND_X / 2, max_radius * EXPAND_X / 2)
@@ -182,14 +163,3 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
     fig.tight_layout()
     fig.savefig(name+".pdf")
     fig.savefig(name+".png")
-
-def make_figs(barename):
-    print(barename.upper())
-    with open("data/"+barename+".dat", 'rb') as f:
-        densities = np.load(f)
-    make_gif(densities, "figs/"+barename+".gif", 2.0)
-    print("Gif done")
-    show_cross_section(densities, "figs/"+barename+".png")
-    show_cross_section(densities, "figs/"+barename+".pdf")
-    print("Cross section done")
-    make_slices(densities, "figs/"+barename+"-slice")
