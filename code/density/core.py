@@ -176,8 +176,8 @@ class Method:
             make_gif(display_uncs, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{fname}-u.gif", duration, 95)
         if true_densities is not None:
             print("Plotting differences")
-            make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr', f"{fname}-s", self.klm_error, 90, balance=True)
-            make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr', f"{fname}-s.gif", duration, 90, balance=True)
+            make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr_r', f"{fname}-s", self.klm_error, 90, balance=True)
+            make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr_r', f"{fname}-s.gif", duration, 90, balance=True)
 
         
         warnings.filterwarnings("default")

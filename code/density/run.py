@@ -5,7 +5,7 @@ from lumpy import Lumpy, LUMPY_D, LUMPY_N
 from core import Asteroid, Indicator, TrueShape
 import matplotlib.pyplot as plt
 
-DIVISION = 99
+DIVISION = 9
 MAX_RADIUS = 2000
 RELOAD = False
 
