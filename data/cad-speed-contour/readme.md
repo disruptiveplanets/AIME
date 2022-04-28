@@ -10,3 +10,7 @@ Fixed a couple staging bugs
 ## April 26
 
 I realized that this would suffer from the same problems as period so I redid the scatter so that all encounters have the same gamma at perigee.
+
+## April 28
+
+Pulled the samples today, except for 06-00. But it doesn't seem to matter. High tspin/torbit corresponds to high uncertainty in cadence.

@@ -234,32 +234,23 @@ We use the asymmetric ellipsoid in nearly all runs, due to the degeneracy induce
 
 
 
-% \section{The cadence cut-off}
-% \label{app:cadence-tests}
+\section{The cadence cut-off}
+\label{app:cadence-tests}
 
-% In section \ref{sec:scan-cadence}, we noted that posterior uncertainty as a function of observation cadence $\Delta t$ appears to increase suddenly near $\Delta t \sim T_\text{cad}=30-40$ min. We mentioned that this cadence cut-off is likely a function both of the rotational period of the asteroid and the time spent near perigee. We study this cut-off in closer detail in this appendix.
+In section \ref{sec:scan-cadence}, we noted that posterior uncertainty as a function of observation cadence $\Delta t$ appears to increase suddenly near $\Delta t \sim T_\text{cad}=30-40$ min. In the left panel of figure \ref{fig:cad-contour}, we display contour plots of posterior uncertainty $\sigma(K_{\ell m})$ of the fit parameters as a function of both cadence $\Delta t$ and $P_\omega$ (left panel) or the relative orbit speed $t_\text{spin} \ t_\text{orbit}$ (right panel). Both panels show the sudden increase in posterior uncertainty we named $T_\text{cad}$. Now $T_\text{cad}$ is visible as a function of frequency and relative orbit speed.
 
-% We measure the dependence of the cadence cut-off on rotational period by varying the period $P_\omega$ and reproducing figure \ref{fig:scan-cadence}; i.e., we run many simulations of the changed $P_\omega$ with different cadences and plot the posterior fit uncertainty $\sigma$ as a function of cadence $\Delta t$. Specifically, we use $P_\omega = 5$ hr and 20 hr, roughly double and half of the reference $P_\omega=9$ hr. The resulting curves of $\sigma(\Delta t)$ are shown in figure \ref{fig:cad-period}, with each normalized so that their maximum values is 1 so that changes to $\sigma$ induced by the change in $P_\omega$ that are not a function of $\Delta t$ (i.e., those studied in section \ref{sec:scan-period}), are removed; they are irrelevant here.
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.49\textwidth]{figs/cad-period.pdf}\hfill
+  \includegraphics[width=0.49\textwidth]{figs/cad-speed.pdf}
+  \caption{Contour plots showing posterior uncertainties in the first- and second-order fit parameters as a function of cadence $\Delta t$ and dynamical time scales for the encounter: rotational period $P_\omega$ (\textit{left}) and the relative speed of the orbit (\textit{right}; see text for a definition).}
+  \label{fig:cad-contour}
+\end{figure*}
 
-% \begin{figure}
-%   \centering
-%   \includegraphics[height=0.89\textheight]{figs/cad-period.pdf}
-%   \caption{1$\sigma$ confidence intervals plotted as a function of cadence $\Delta t$ for periods of 9 hr (the reference asteroid, solid coloured lines), and 5 hours (dotted lines), and 20 hours (dashed lines). Confidence intervals have been normalized for the sake of comparison, so that the maximum for each curve is 1.}
-%   \label{fig:cad-period}
-% \end{figure}
+The relative orbit speed $t_\text{spin} \ t_\text{orbit}$ was determined by un-physically increasing or decreasing the time at which the asteroid moved through the orbit determined by the equations of motion (but leaving the orbit shape unchanged). The equations of motion affecting the orientation and spin of the asteroid however were unaffected. With this unphysical process, we isolate the effect of the amount of time spent near perigee on posterior uncertainty, without inheriting additional affects that would have been caused by the orbit changing shape.
 
-% We also wish to capture dependence on the time spent by the asteroid near perigee, but we do not wish to change the orbit shape or central body, because this may induce other effects that could also affect the cadence plot. Instead, we (un-physically) manipulate the speed at which the asteroid moves through the orbit. In one instance, the asteroid's path is artificially slowed by a factor of 2, which we denote as $t_\text{spin}/t_\text{orbit}=0.5$; in the other instance, $t_\text{spin}/t_\text{orbit}=2$, meaning that the orbit is sped up. This approach of changing the speed of the orbit is meant to approximate changes to $T_p$ defined in equation \ref{eqn:tp}. The posterior uncertainties for these two cases and the original case are shown as a function of $\Delta t$ in figure \ref{fig:cad-speed}. Again, $\sigma$ is normalized so that $\Delta t$-independent variations are removed. The $t_\text{spin}/t_\text{orbit}=2$ uncertainties begin to fill the prior distribution for large $\Delta t$ for some parameters, which can be seen by discontinuous variation in the dotted line of figure \ref{fig:cad-speed}.
+Figure \ref{fig:cad-contour} demonstrates that ...
 
-% \begin{figure}
-%   \centering
-%   \includegraphics[height=0.89\textheight]{figs/cad-speed.pdf}
-%   \caption{1$\sigma$ confidence intervals plotted as a function of the orbit time scaling $t_\text{spin}/t_\text{orbit}$ for no scaling (the reference asteroid, solid coloured lines), time doubling (dotted lines), and halving (dashed lines). See text for the definition of $t_\text{spin}/t_\text{orbit}$. Confidence intervals have been normalized for the sake of comparison, so that the maximum for each curve is 1.}
-%   \label{fig:cad-speed}
-% \end{figure}
-
-% Many of the curves in figures \ref{fig:cad-period} and \ref{fig:cad-speed} show a cadence cut-off at $T_\text{cad} \sim 30-60$ min. Those that show no cut-off (i.e., they merely smoothly increase over $\Delta t$) may in fact exhibit a cut-off $T_\text{cad} > 60$ min, which is off the plot. By comparing $\sigma(\Delta t)$ for a specific parameter, we see that the dashed lines often (but not always) reach the cadence cut-off at lower $\Delta t$ than the solid line. For example, in figure \ref{fig:cad-period}, this effect is especially clear for $K_{22}$, $K_{33}$, $\Im K_{22}$, and $\Re K_{31}$, but the opposite appears for $\Re K_{32}$. The dashed curves are significant in both figures because they represent larger $\sigma$ cases ($P_\omega=5$ hours, or $t_\text{spin}/t_\text{orbit}=2$); section \ref{sec:scan-period} reveals that fast rotators lead to larger $\sigma$, and $t_\text{spin}/t_\text{orbit} > 1$ leads to larger $\sigma$ because of the presence of less perigee data. It therefore appears that small $P_\omega$ and small times spent at perigee move the cadence cut-off to smaller $T_\text{cad}$.
-
-% The dependence of the exact location of the cadence cut-off is likely more complicated than the above analysis indicates. However, large uncertainties induced by small $P_\omega$ or large $t_\text{spin}/t_\text{orbit}$ makes it difficult to produce data which are not affected by the finite size of the prior (as figure \ref{fig:scan-vex} is) to study these regimes. Computation time and random variation in $\sigma$ also limits us. We therefore do not attempt to explore the dependence between $T_\text{cad}$ and the encounter parameters further. If a future analysis does require a detailed understanding of how cadence affects uncertainty for a specific encounter, our simulation and fit process can be run given the parameters of the encounter in question in a similar manner to section \ref{sec:scan-cadence} to yield more information. 
 
   
 
@@ -274,7 +265,7 @@ We use the asymmetric ellipsoid in nearly all runs, due to the degeneracy induce
   \label{fig:surface-density}
 \end{figure*}
 
-In section \ref{sec:general-density}, we mention that the shape of the asteroid can be computed from observations of the density moments and $a_\mathcal{A}$ if a uniform density distribution is assumed. We did not further describe the model in the main text because it is unlike the other three models in the nature of its assumptions, and in the fact that it is non-linear. However, it may be a useful technique so it is mentioned here; we call it the ``surface'' model. A similar model was also studied in Ref.~\cite{BAXANSKY2007756}.
+In section \ref{sec:density-distro}, we mention that the shape of the asteroid can be computed from observations of the density moments and $a_\mathcal{A}$ if a uniform density distribution is assumed. We did not further describe the model in the main text because it is unlike the other three models in the nature of its assumptions, and in the fact that it is non-linear. However, it may be a useful technique so it is mentioned here; we call it the ``surface'' model. A similar model was also studied in Ref.~\cite{BAXANSKY2007756}.
 
 Suppose our asteroid has constant density $\rho_0$ and known parameters $K_{\ell m}$ and $a_\mathcal{A}^2$, and that the asteroid is ``star shaped'' in that every ray originating from the centre of mass of the asteroid (the origin of the body-fixed frame) passes through the surface of the asteroid exactly once, at distance $r(\theta, \phi)$ written in spherical coordinates. By the divergence theorem, we write
 \begin{equation}

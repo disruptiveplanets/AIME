@@ -62,6 +62,7 @@ asym-ell-rat-harmonic.pdf code/density/figs/asym-ell/harmonic-r.pdf
 asym-ell-rat-likelihood.pdf code/density/figs/asym-ell/likelihood-r.pdf
 asym-ell-diff-harmonic.pdf code/density/figs/asym-ell/harmonic-s.pdf
 asym-ell-diff-likelihood.pdf code/density/figs/asym-ell/likelihood-s.pdf
+asym-ell-diff-lumpy.pdf code/density/figs/asym-ell/lumpy-1-1-s.pdf
 
 sym-ell-harmonic.pdf code/density/figs/sym-ell/harmonic-d.pdf
 sym-ell-likelihood.pdf code/density/figs/sym-ell/likelihood-d.pdf
@@ -102,9 +103,12 @@ blob-unc-likelihood.pdf code/density/figs/blob/likelihood-u.pdf
 blob-diff-harmonic.pdf code/density/figs/blob/harmonic-s.pdf
 blob-diff-likelihood.pdf code/density/figs/blob/likelihood-s.pdf
 blob-diff-lumpy.pdf code/density/figs/blob/lumpy-1-1-s.pdf
-blob-ratio-harmonic.pdf code/density/figs/blob/harmonic-r.pdf
-blob-ratio-likelihood.pdf code/density/figs/blob/likelihood-r.pdf
+blob-rat-harmonic.pdf code/density/figs/blob/harmonic-r.pdf
+blob-rat-likelihood.pdf code/density/figs/blob/likelihood-r.pdf
 
 
 high-surface.pdf code/density/old/figs/high-surface-slice.pdf
 high-likelihood.pdf code/density/old/figs/high-likelihood-slice.pdf
+
+cad-speed.pdf data/cad-speed-contour/cad-speed-contour.pdf
+cad-period.pdf data/cad-period-sync-contour/cad-period-contour.pdf

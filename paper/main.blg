@@ -7,50 +7,49 @@ Warning--I'm ignoring HouMar2017's extra "note" field
 --line 132 of file asteroids.bib
 Warning--I'm ignoring HouMar2017's extra "note" field
 --line 133 of file asteroids.bib
-Warning--I didn't find a database entry for ""
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Warning--empty booktitle in Lee2022Apophis
 Warning--empty booktitle in Makarov2022ChaosOO
-You've used 36 entries,
+You've used 37 entries,
             2881 wiz_defined-function locations,
-            971 strings with 15307 characters,
-and the built_in function-call counts, 17296 in all, are:
-= -- 1391
-> -- 1285
+            978 strings with 16048 characters,
+and the built_in function-call counts, 17667 in all, are:
+= -- 1429
+> -- 1302
 < -- 83
-+ -- 561
++ -- 570
 - -- 196
-* -- 1988
-:= -- 2746
+* -- 2038
+:= -- 2796
 add.period$ -- 0
-call.type$ -- 36
-change.case$ -- 73
-chr.to.int$ -- 36
-cite$ -- 38
-duplicate$ -- 860
-empty$ -- 883
-format.name$ -- 304
-if$ -- 3031
+call.type$ -- 37
+change.case$ -- 75
+chr.to.int$ -- 37
+cite$ -- 39
+duplicate$ -- 881
+empty$ -- 905
+format.name$ -- 308
+if$ -- 3097
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 37
-newline$ -- 122
-num.names$ -- 250
-pop$ -- 211
+missing$ -- 38
+newline$ -- 125
+num.names$ -- 254
+pop$ -- 215
 preamble$ -- 1
-purify$ -- 144
+purify$ -- 148
 quote$ -- 0
-skip$ -- 519
+skip$ -- 531
 stack$ -- 0
-substring$ -- 975
-swap$ -- 417
-text.length$ -- 147
+substring$ -- 1003
+swap$ -- 421
+text.length$ -- 151
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 321
+type$ -- 330
 warning$ -- 2
-while$ -- 270
+while$ -- 276
 width$ -- 0
-write$ -- 368
-(There were 5 warnings)
+write$ -- 378
+(There were 4 warnings)

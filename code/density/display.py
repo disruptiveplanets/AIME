@@ -62,11 +62,19 @@ def make_frame(densities, pos_array, axis_name, cmap, percentile, balance, z_ind
     if balance:
         want_max = max(want_max, -want_min)
         want_min = -want_max
+
+    densities = np.clip(densities, want_min, want_max)
+
+    # Does the colorbar have an arrow?
+    extend = 'neither'
+    if percentile < 95:
+        extend = 'max'
+
     c = plt.pcolormesh(pos_array, pos_array, csection.transpose()   , shading='auto',
         vmin=want_min,
         vmax=want_max,
         cmap=cmap)
-    plt.colorbar(c).set_label(axis_name)
+    plt.colorbar(c, extend=extend).set_label(axis_name)
     plt.axis('equal')
     plt.xlabel("$y$ (m)")
     plt.ylabel("$x$ (m)")
@@ -80,12 +88,21 @@ def make_frame(densities, pos_array, axis_name, cmap, percentile, balance, z_ind
 
 def show_cross_section(densities, pos_array, axis_name, cmap, fname, percentile=99, balance=False):
     plt.figure()
+    want_min = np.nanpercentile(densities, 1)
+    want_max = np.nanpercentile(densities, percentile)
+    densities = np.clip(densities, want_min, want_max)
     csection = densities[:,:,densities.shape[-1]//2]
+
+    # Does the colorbar have an arrow?
+    extend = 'neither'
+    if percentile < 95:
+        extend = 'max'
+
     plt.pcolormesh(pos_array, pos_array, csection.transpose(), shading='auto',
-        vmin= np.nanpercentile(densities, 1),
-        vmax= np.nanpercentile(densities, percentile),
+        vmin= want_min,
+        vmax= want_max,
         cmap=cmap)
-    c = plt.colorbar()
+    c = plt.colorbar(extend=extend)
     plt.axis('equal')
     plt.xlabel("$x$ (m)")
     plt.ylabel("$y$ (m)")
@@ -109,6 +126,12 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
         want_min = np.nanmin(densities)
         want_min = 0
 
+    densities = np.clip(densities, want_min, want_max)
+
+    # Does the colorbar have an arrow?
+    extend = 'neither'
+    if percentile < 95:
+        extend = 'max'
 
     if balance:
         want_max = min(want_max, -want_min)
@@ -153,7 +176,7 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
 
     ax.set_title(f"$\\Delta K_{{\\ell m}}^2={latexify(klm_error)}$", y=0.1, fontdict={'fontsize': FONT_SIZE})
 
-    c = fig.colorbar(contour_handle, ax=ax)
+    c = fig.colorbar(contour_handle, ax=ax, extend=extend)
     c.set_label(axis_name)
 
     fig.tight_layout()

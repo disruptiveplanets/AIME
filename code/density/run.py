@@ -5,7 +5,7 @@ from lumpy import Lumpy, LUMPY_D, LUMPY_N
 from core import Asteroid, Indicator, TrueShape
 import matplotlib.pyplot as plt
 
-DIVISION = 9
+DIVISION = 99
 MAX_RADIUS = 2000
 RELOAD = False
 
@@ -46,8 +46,8 @@ asteroids = {
 }
 
 methods = {
-    #"likelihood": Likelihood,
-    #"harmonic": Harmonic, 
+    "likelihood": Likelihood,
+    "harmonic": Harmonic, 
     "lumpy": Lumpy, 
 }
 

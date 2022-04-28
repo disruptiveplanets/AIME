@@ -50,6 +50,11 @@ Brown T.,  et~al., 2013, Publications of the Astronomical Society of the
 Descamps P.,  et~al., 2020, \mn@doi [Icarus]
   {https://doi.org/10.1016/j.icarus.2020.113726}, 345, 113726
 
+\bibitem[\protect\citeauthoryear{Devogèle et~al.,}{Devogèle
+  et~al.}{2021}]{10.1093/mnras/stab1252}
+Devogèle M.,  et~al., 2021, \mn@doi [Monthly Notices of the Royal Astronomical
+  Society] {10.1093/mnras/stab1252}, 505, 245
+
 \bibitem[\protect\citeauthoryear{Foreman-Mackey, Hogg, Lang  \&
   Goodman}{Foreman-Mackey et~al.}{2013}]{foreman2013emcee}
 Foreman-Mackey D.,  Hogg D.~W.,  Lang D.,   Goodman J.,  2013, Publications of

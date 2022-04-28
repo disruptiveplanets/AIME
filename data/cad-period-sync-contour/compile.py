@@ -1,9 +1,10 @@
 # Goal: spawn a bunch of runs that cover the parameter space.
 from matplotlib import pyplot as plt
 import numpy as np
-from matplotlib.colors import Colormap
+import matplotlib as mpl
 
 plt.style.use("jcap")
+mpl.rcParams['font.size'] = 14
 
 param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
 
@@ -86,11 +87,13 @@ for plot_index in range(N_DIM):
 
     cbar = fig.colorbar(p, ax=ax)
     if plot_index < 3:
-        cbar.set_label(f"${param_names[plot_index]}\ (\\times 10^{{5}})$")
+        cbar.set_label(f"$\sigma({param_names[plot_index]})\ (\\times 10^{{5}})$")
     else:
-        cbar.set_label(f"${param_names[plot_index]}\ (\\times 10^{{2}})$")
+        cbar.set_label(f"$\sigma({param_names[plot_index]})\ (\\times 10^{{2}})$")
 
     ax.set_ylabel(f"$P_\omega$ (hr)")
+
+    ax.axhline(y=9, color='k', linestyle='dashed', linewidth=1)
 
     #axs[plot_index].set_xscale('log')
     #axs[plot_index].set_yscale('log')
