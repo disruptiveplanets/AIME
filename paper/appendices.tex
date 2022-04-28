@@ -237,19 +237,24 @@ We use the asymmetric ellipsoid in nearly all runs, due to the degeneracy induce
 \section{The cadence cut-off}
 \label{app:cadence-tests}
 
-In section \ref{sec:scan-cadence}, we noted that posterior uncertainty as a function of observation cadence $\Delta t$ appears to increase suddenly near $\Delta t \sim T_\text{cad}=30-40$ min. In the left panel of figure \ref{fig:cad-contour}, we display contour plots of posterior uncertainty $\sigma(K_{\ell m})$ of the fit parameters as a function of both cadence $\Delta t$ and $P_\omega$ (left panel) or the relative orbit speed $t_\text{spin} \ t_\text{orbit}$ (right panel). Both panels show the sudden increase in posterior uncertainty we named $T_\text{cad}$. Now $T_\text{cad}$ is visible as a function of frequency and relative orbit speed.
+In section \ref{sec:scan-cadence}, we noted that posterior uncertainty as a function of observation cadence $\Delta t$ appears to increase suddenly near $\Delta t \sim T_\text{cad}=30-40$ min. In the left panel of figure \ref{fig:cad-contour}, we display contour plots of posterior uncertainty $\sigma(K_{\ell m})$ of the fit parameters as a function of both cadence $\Delta t$ and $P_\omega$ (left panel) or the relative orbit speed $t_\text{spin} / t_\text{orbit}$ (right panel). Both panels show the sudden increase in posterior uncertainty we named $T_\text{cad}$. Now $T_\text{cad}$ is visible as a function of frequency and relative orbit speed. In all cases, the value of $\gamma_0$ was set so that all data points achieve the same value of $\gamma$ at perigee.
 
 \begin{figure*}
   \centering
   \includegraphics[width=0.49\textwidth]{figs/cad-period.pdf}\hfill
   \includegraphics[width=0.49\textwidth]{figs/cad-speed.pdf}
-  \caption{Contour plots showing posterior uncertainties in the first- and second-order fit parameters as a function of cadence $\Delta t$ and dynamical time scales for the encounter: rotational period $P_\omega$ (\textit{left}) and the relative speed of the orbit (\textit{right}; see text for a definition).}
+  \caption{Contour plots showing posterior uncertainties in the first- and second-order fit parameters as a function of cadence $\Delta t$ and dynamical time scales for the encounter: rotational period $P_\omega$ (\textit{left}) and the relative speed of the orbit (\textit{right}; see text for a definition). The reference values of $P_\omega=9$ hr and $t_\text{spin}/t_\text{orbit}=1$ are shown as dotted lines. The line }
   \label{fig:cad-contour}
 \end{figure*}
 
-The relative orbit speed $t_\text{spin} \ t_\text{orbit}$ was determined by un-physically increasing or decreasing the time at which the asteroid moved through the orbit determined by the equations of motion (but leaving the orbit shape unchanged). The equations of motion affecting the orientation and spin of the asteroid however were unaffected. With this unphysical process, we isolate the effect of the amount of time spent near perigee on posterior uncertainty, without inheriting additional affects that would have been caused by the orbit changing shape.
+The relative orbit speed $t_\text{spin} / t_\text{orbit}$ was determined by un-physically increasing or decreasing the time at which the asteroid moved through the orbit determined by the equations of motion (but leaving the orbit shape unchanged). The equations of motion affecting the orientation and spin of the asteroid however were unaffected. With this unphysical process, we isolate the effect of the amount of time spent near perigee on posterior uncertainty, without inheriting additional affects that would have been caused by the orbit changing shape.
 
-Figure \ref{fig:cad-contour} demonstrates that ...
+Figure \ref{fig:cad-contour} demonstrates that, near the reference values of $P_\text{omega}$ and $t_\text{spin} / t_\text{orbit}$, $T_\text{cad}$ depends on both time scales $P_\omega$ and $t_\text{spin} / t_\text{orbit}$. Specifically, high rotational period and slow orbits are optimal for large $T_\text{cad}$. The dependence on $P_\omega$ agrees with the fact that large rotational periods for fixed cadence lead to better posterior uncertainty, discussed in section \ref{sec:scan-period}. The figure also demonstrates that for large $P_\omega$, $T_\text{cad}$ depends less strongly on $P_\text{omega}$ and may even reverse its dependence such that increasing $P_\text{omega}$ decreases $T_\text{omega}$. In all cases except $\Re K_{33}$, at least constant-$\sigma(K_{\ell m})$ contour is seen to curve back such that $\Delta t$ decreases as a function of $P_\text{omega}$ for large $P_\text{omega}$. However, in these regions the cadence cut-off also dulls, as shown by the spreading of the constant-$\sigma(K_{\ell m})$ contours in this region.
+
+The right panel of figure \ref{fig:cad-contour} shows a slightly stronger and more monotonic dependence of $T_\text{cad}$ on $t_\text{spin} / t_\text{orbit}$. It appears that slightly slower orbits sharply increases $T_\text{cad}$. Similar in the $P_\omega$ case, for increasingly fast orbits, $T_\text{cad}$ depends less on $t_\text{spin}/ t_\text{orbit}$. 
+\jtd{I wanted to talk to Julien about the interpretation of this panel. Because $t_\text{spin} / t_\text{orbit}$, I find it hard to interpret. Maybe a different type of scan is better.}
+
+Figure \ref{fig:cad-contour} demonstrates that, for large period, the cadence cut-off $T_\text{cad}$ reduces in prominence and rises to above one hour, meaning that large gaps of time between observations can still lead to well-constrained parameters in these cases. Faster orbits also lead to $T_\text{cad} > 1$ hr for for as small a decrease as $t_\text{spin} / t_\text{orbit}  \approx 75$\%.
 
 
   

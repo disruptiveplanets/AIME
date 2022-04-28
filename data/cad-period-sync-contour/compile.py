@@ -22,8 +22,6 @@ cadences = []
 periods = []
 
 def get_indices_from_name(name):
-    print(name)
-    print(int(name[8:10]), int(name[11:13]))
     return int(name[8:10]), int(name[11:13])
 
 # Get percentiles
@@ -83,7 +81,8 @@ for plot_index in range(N_DIM):
 
     #p = ax.pcolormesh(cadences, periods, param_data.transpose() * scale, vmin=0, cmap="Oranges_r")
     levels = np.linspace(0, np.percentile(param_data * scale, 90), 12)
-    p = ax.contourf(cadences, periods, param_data.transpose() * scale, cmap="Oranges_r", levels=levels, extend='max')
+    p = ax.contourf(cadences, periods, param_data.transpose() * scale, cmap="PuBu_r", levels=levels, extend='max')
+    ax.contour(cadences, periods, param_data.transpose(), colors=['r'], levels=[0.01])
 
     cbar = fig.colorbar(p, ax=ax)
     if plot_index < 3:

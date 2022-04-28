@@ -82,7 +82,8 @@ for plot_index in range(N_DIM):
 
     #p = ax.pcolormesh(cadences, time_ratios, param_data.transpose() * scale, vmin=0, cmap="Oranges_r")
     levels = np.linspace(0, np.percentile(param_data * scale, 90), 12)
-    p = ax.contourf(cadences, time_ratios, param_data.transpose() * scale, cmap="Oranges_r", levels=levels, extend='max')
+    p = ax.contourf(cadences, time_ratios, param_data.transpose() * scale, cmap="PuBu_r", levels=levels, extend='max')
+    ax.contour(cadences, time_ratios, param_data.transpose(), colors=['r'], levels=[0.01])
 
     cbar = fig.colorbar(p, ax=ax)
     if plot_index < 3:
@@ -91,6 +92,7 @@ for plot_index in range(N_DIM):
         cbar.set_label(f"$\sigma({param_names[plot_index]})\ (\\times 10^{{2}})$")
 
     ax.set_ylabel(f"$t_\\mathrm{{spin}}/t_\\mathrm{{orbit}}$")
+
 
     #axs[plot_index].set_xscale('log')
     #axs[plot_index].set_yscale('log')
