@@ -15,7 +15,7 @@ NUM_TRIALS = 1000
 EARTH_RADIUS = 6_370_000
 AMPLIFY = 700 * 3
 if not SYMMETRIC:
-    FILE_NAME = "../../../data/probe-sigma/sigma-1-47/sigma-1-47"
+    FILE_NAME = "../../../data/probe-s-theta/theta-47/theta-47"
 if SYMMETRIC:
     FILE_NAME = "sigma-1-47-sym"
 GM = 3.986004418e14
@@ -24,7 +24,7 @@ with open(f"{FILE_NAME}.txt", 'r') as f:
     ASTEROIDS_MAX_J, ASTEROIDS_MAX_K = f.readline().split(', ')
     ASTEROIDS_MAX_J = int(ASTEROIDS_MAX_J)
     ASTEROIDS_MAX_K = int(ASTEROIDS_MAX_K)
-    cadence = int(float(f.readline()))
+    cadence =float(f.readline())
     perigee = EARTH_RADIUS * float(f.readline())
     radius = float(f.readline())
     speed = float(f.readline())
@@ -53,7 +53,7 @@ def gen_data():
         print(i)
         try:
             results.append(asteroids_0_2.simulate(cadence, jlms, seed, radius,
-                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False))
+                spin[0], spin[1], spin[2], perigee, speed, GM, EARTH_RADIUS, 0, False, 1))
         except Exception:
             continue
     if SYMMETRIC:
@@ -143,7 +143,7 @@ def plot_sigma():
     #plt.contourf(time, spins_middle, np.array(z_hist).transpose(), colors=blues)
 
     plt.legend(loc=(0.02, 0.6), fontsize=12)
-    plt.xlabel("Time to periapsis (hr)")
+    plt.xlabel("Time after perigee (hr)")
     plt.ylabel("Angular velocity (rad / hr)")
     plt.xlim(-5, np.max(time))
     plt.tight_layout()
@@ -154,6 +154,6 @@ def plot_sigma():
         plt.savefig("spin-chaos-asym.pdf")
         plt.savefig("spin-chaos-asym.png")
 
-#gen_data()
+gen_data()
 plot_sigma()
 plt.show()
