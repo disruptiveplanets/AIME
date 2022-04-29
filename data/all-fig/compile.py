@@ -17,7 +17,7 @@ axis_names = {
     "scan-period": "$P_\omega$ (hr)",
     "scan-am": "$a_\\mathcal{A}$ (m)",
     "scan-vex": "$v_\infty$ (km s$^{-1}$)",
-    "observation-gap": "$T$ (hr)",
+    "observation-gap": "$T_\mathrm{gap}$ (hr)",
 }
 colors = [
     '#f00070', '#db8000', '#00b3cf',

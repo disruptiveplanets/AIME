@@ -15,8 +15,6 @@ lump_shift = 57.02376624759285
 
 
 asteroids = {
-    "test": ("samples/den-in-0-samples.npy", 1047.477436728389, DIVISION, MAX_RADIUS,
-        Indicator.ell(1000, k22a, k20a), TrueShape.in_(1000)),
     "sym-sph": ("samples/den-sym-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.sph(1000), None),
     "asym-sph": ("samples/den-asym-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
@@ -29,20 +27,23 @@ asteroids = {
         Indicator.tet(1000), TrueShape.uniform()),
     "db": ("samples/den-db-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
         Indicator.dumbbell(1000), TrueShape.uniform()),
-    "high": ("samples/den-high-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
-        Indicator.sph(1000), TrueShape.uniform()),
     "in": ("samples/den-in-0-samples.npy", 809.2996416062074, DIVISION, MAX_RADIUS,
         Indicator.ell(1000, k22a, k20a), TrueShape.in_(1000)),
     "out": ("samples/den-out-0-samples.npy", 1264.373369575561, DIVISION, MAX_RADIUS,
         Indicator.ell(1000, k22a, k20a), TrueShape.out(1000)),
-    "in-sph": ("samples/den-tet-0-samples.npy", 809.2996416062074, DIVISION, MAX_RADIUS,
-        Indicator.sph(1000), TrueShape.in_sph(1000)),
-    "out-sph": ("samples/den-tet-0-samples.npy", 1264.373369575561, DIVISION, MAX_RADIUS,
-        Indicator.sph(1000), TrueShape.out_sph(1000)),
     "blob": ("samples/den-blob-0-samples.npy", 965.2268359486612, DIVISION, MAX_RADIUS,
         Indicator.ell_y_shift(1000, k22a, k20a, -lump_shift), TrueShape.blob(1000, k22a, k20a)),
-    "rot-blob": ("samples/den-blob-0-samples.npy", 966.4144167196462, DIVISION, MAX_RADIUS,
-        Indicator.ell_y_shift(1000, k22a, k20a, -lump_shift), TrueShape.rot_blob(1000, k22a, k20a)),
+
+    # "test": ("samples/den-in-0-samples.npy", 1047.477436728389, DIVISION, MAX_RADIUS,
+    #     Indicator.ell(1000, k22a, k20a), TrueShape.in_(1000)),
+    #"rot-blob": ("samples/den-blob-0-samples.npy", 966.4144167196462, DIVISION, MAX_RADIUS,
+    #    Indicator.ell_y_shift(1000, k22a, k20a, -lump_shift), TrueShape.rot_blob(1000, k22a, k20a)),
+    #"high": ("samples/den-high-0-samples.npy", 1000, DIVISION, MAX_RADIUS,
+    #    Indicator.sph(1000), TrueShape.uniform()),
+    #"in-sph": ("samples/den-tet-0-samples.npy", 809.2996416062074, DIVISION, MAX_RADIUS,
+    #    Indicator.sph(1000), TrueShape.in_sph(1000)),
+    #"out-sph": ("samples/den-tet-0-samples.npy", 1264.373369575561, DIVISION, MAX_RADIUS,
+    #    Indicator.sph(1000), TrueShape.out_sph(1000)),
 }
 
 methods = {

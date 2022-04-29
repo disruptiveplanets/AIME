@@ -1,7 +1,7 @@
 from re import L
 import numpy as np
 from scipy.special import lpmv, factorial
-from scipy.linalg import norm, eigh
+from scipy.linalg import norm, eigh, pinv
 from scipy.spatial.transform import Rotation
 from display import make_gif, make_slices
 import warnings, os
@@ -124,15 +124,30 @@ class Method:
                 index += 1
         calc_rlms[index] = np.sum(rlms_field[index] * densities) / self.asteroid.am ** 2 * self.asteroid.division**3
 
-        self.klm_error = 0
+        # Calculate chisqr
+        uncertain_params = []
+        for l in range(self.asteroid.max_l + 1):
+            for m in range(-l, l+1):
+                if l == 0 or l == 1:
+                    uncertain_params.append(False)
+                elif l == 2 and (abs(m) == 1 or m == -2):
+                    uncertain_params.append(False)
+                else:
+                    uncertain_params.append(True)
+        uncertain_params = np.append(uncertain_params, False)
+        dof = (self.asteroid.max_l + 1)**2 - 7
+
+        deltas = (calc_rlms - self.asteroid.data)[uncertain_params]
+        nonzero_cov = self.asteroid.sigma_data[uncertain_params,:][:,uncertain_params]
+        self.klm_error = abs(deltas.transpose().conj() @ pinv(nonzero_cov) @ deltas / dof)
+
         for i, r in enumerate(calc_rlms):
             l = int(np.sqrt(i))
             m = i - l**2 - l
-            self.klm_error += np.abs(self.asteroid.data[i] - r) ** 2
             if display:
                 print("({}, {})\tExpected  {:.5f}\t Got {:.5f} \t Difference {:.2g}".format(l, m, self.asteroid.data[i], r, abs(self.asteroid.data[i]-r)))
         if display:
-            print("Net root mean error:", np.sqrt(self.klm_error))
+            print("Reduced chi squared:", self.klm_error)
 
     def display(self, duration=5):
         fname = f"figs/{self.get_bare_name()}"

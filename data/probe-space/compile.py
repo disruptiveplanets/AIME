@@ -106,6 +106,7 @@ def plot_pdf(index):
 
 def covariance():
     side_length = int(-0.5 + np.sqrt(1 + 8 * len(names)) / 2)
+    print(side_length)
     X = []
     Y = []
     cov12_data = []
