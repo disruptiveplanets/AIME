@@ -4,7 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import emcee, time, sys, logging
 if not TEST:
-    import asteroids_0_2, asteroids_0_3, asteroids_2_2, asteroids_2_3
+    import asteroids2_0_2 as asteroids_0_2
+    import asteroids2_0_3 as asteroids_0_3
+    import asteroids2_2_2 as asteroids_2_2
+    import asteroids_2_3 as  asteroids_2_3
 if TEST:
     import test_loglike as asteroids_0_2
     import test_loglike as asteroids_0_3

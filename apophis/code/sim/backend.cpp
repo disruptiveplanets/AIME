@@ -407,7 +407,7 @@ int Asteroid::simulate(double cadence, std::vector<double>& resolved_data) {
 double get_tilt(double roll) {
     // Load code
     std::ifstream data_file;
-    data_file.open("../find-angles/psis-thetas.txt");
+    data_file.open("../get-angles/psis-thetas.txt");
 
     std::string line;
     double f;
