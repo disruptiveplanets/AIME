@@ -11,3 +11,7 @@ Free parameters: K3m, initial roll & precession, radius, cadence, period gap, ob
 ## April 26
 
 Tested the fit code with the test backend to make sure it runs
+
+## April 28
+
+Fixed a bug with the initial orientation (it's now z-y-z and confirmed with as long of a fourier transform as I can make with 4 GB Memory)..

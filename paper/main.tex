@@ -771,34 +771,34 @@ It was mentioned above that the observable perigee distance $r_p$ increases with
 
 To test the properties of the three density models defined in section \ref{sec:density-distro} to extract density distributions from density moments, we simulate several asteroids with different shapes and density distributions on a close Earth encounter with the reference asteroid orbital and observational parameters. In all cases, the density moments are extracted via our fit process. Below, we compare the resulting distributions to understand the performance of the density distribution models.
 
-\subsubsection{Uniform density asteroids}
+% \subsubsection{Uniform density asteroids}
 
-We simulate several asteroids with uniform density distributions and ask whether a uniform distribution is recovered. This was already done in section \ref{sec:asym-density} for the asymmetric reference asteroid. Here, we perform the same process for a ``dumbbell'' (two spheres of equal radius conjoined such that the surface of one intersects the centre of the other), the symmetric reference asteroid, and a tetrahedron. We use these shapes as examples of potential shape types (i.e., a contact binary for the dumbbell, a polyhedron for the tetrahedron) and to demonstrate the density models' efficacy on very different shapes. The extracted distributions for all three models are shown in figure \ref{fig:uniform-density}. 
+% We simulate several asteroids with uniform density distributions and ask whether a uniform distribution is recovered. This was already done in section \ref{sec:asym-density} for the asymmetric reference asteroid. Here, we perform the same process for a ``dumbbell'' (two spheres of equal radius conjoined such that the surface of one intersects the centre of the other), the symmetric reference asteroid, and a tetrahedron. We use these shapes as examples of potential shape types (i.e., a contact binary for the dumbbell, a polyhedron for the tetrahedron) and to demonstrate the density models' efficacy on very different shapes. The extracted distributions for all three models are shown in figure \ref{fig:uniform-density}. 
 
-\begin{figure*}
-  \centering
-  \includegraphics[width=0.3\textwidth]{figs/db-likelihood.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{figs/db-harmonic.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{figs/db-lumpy.pdf}
+% \begin{figure*}
+%   \centering
+%   \includegraphics[width=0.3\textwidth]{figs/db-likelihood.pdf}\hfill
+%   \includegraphics[width=0.3\textwidth]{figs/db-harmonic.pdf}\hfill
+%   \includegraphics[width=0.3\textwidth]{figs/db-lumpy.pdf}
 
-  \includegraphics[width=0.3\textwidth]{figs/sym-ell-likelihood.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{figs/sym-ell-harmonic.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{figs/sym-ell-lumpy.pdf}
+%   \includegraphics[width=0.3\textwidth]{figs/sym-ell-likelihood.pdf}\hfill
+%   \includegraphics[width=0.3\textwidth]{figs/sym-ell-harmonic.pdf}\hfill
+%   \includegraphics[width=0.3\textwidth]{figs/sym-ell-lumpy.pdf}
 
-  \includegraphics[width=0.3\textwidth]{figs/tet-likelihood.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{figs/tet-harmonic.pdf}\hfill
-  \includegraphics[width=0.3\textwidth]{figs/tet-lumpy.pdf}
-  \caption{Density distributions extracted by the likelihood (\textit{left}), harmonic (\textit{middle}), and lumpy with $d=N=1$ (\textit{right}) models from data generated for a uniform-density asteroid. The asteroid shapes are, from top to bottom, a dumbbell, the symmetric reference asteroid, and a tetrahedron. Density is normalized so that mean density is one. The same distance scale is used in all figures. The likelihood and harmonic models generally recover accurate density distributions for asymmetric, uniform density asteroids, though symmetric asteroids yield much worse precision.}
-  \label{fig:uniform-density}
-\end{figure*}
+%   \includegraphics[width=0.3\textwidth]{figs/tet-likelihood.pdf}\hfill
+%   \includegraphics[width=0.3\textwidth]{figs/tet-harmonic.pdf}\hfill
+%   \includegraphics[width=0.3\textwidth]{figs/tet-lumpy.pdf}
+%   \caption{Density distributions extracted by the likelihood (\textit{left}), harmonic (\textit{middle}), and lumpy with $d=N=1$ (\textit{right}) models from data generated for a uniform-density asteroid. The asteroid shapes are, from top to bottom, a dumbbell, the symmetric reference asteroid, and a tetrahedron. Density is normalized so that mean density is one. The same distance scale is used in all figures. The likelihood and harmonic models generally recover accurate density distributions for asymmetric, uniform density asteroids, though symmetric asteroids yield much worse precision.}
+%   \label{fig:uniform-density}
+% \end{figure*}
 
-From figure \ref{fig:uniform-density}, it can be seen that the likelihood and harmonic models produce mostly the same density distributions like in the case of section \ref{sec:asym-density}. Consequentially, $\Delta K_{\ell m}^2$ is low for the harmonic model. Also like section \ref{sec:asym-density}, the dumbbell asteroid produces largely uniform distributions except in a few small regions, and the lumpy model generates clearly incorrect results indicating that no lump is present.
+% From figure \ref{fig:uniform-density}, it can be seen that the likelihood and harmonic models produce mostly the same density distributions like in the case of section \ref{sec:asym-density}. Consequentially, $\Delta K_{\ell m}^2$ is low for the harmonic model. Also like section \ref{sec:asym-density}, the dumbbell asteroid produces largely uniform distributions except in a few small regions, and the lumpy model generates clearly incorrect results indicating that no lump is present.
 
-The symmetric and tetrahedral asteroids are less-well represented by the density distribution model results. In both cases, the likelihood and harmonic models produce sometimes-negative distributions, and non-uniformity is especially large in the tetrahedral case. This is not the fault of the density models, but rather because both of these asteroids have $K_{22} = 0$ and (as discussed in section \ref{sec:scan-shape}), this leads to degeneracy in $\gamma_0$ and inflated uncertainty in the density moments. In the tetrahedral case, the problem is worsened because $K_{20}=0$ as well, so that torque is dominated by the small and ill-constrained $K_{3m}$ components. To avoid negative density distributions, the likelihood model could be adjusted to use, for example, a multivariate log-normal distribution. However, the model would no longer be linear.
+% The symmetric and tetrahedral asteroids are less-well represented by the density distribution model results. In both cases, the likelihood and harmonic models produce sometimes-negative distributions, and non-uniformity is especially large in the tetrahedral case. This is not the fault of the density models, but rather because both of these asteroids have $K_{22} = 0$ and (as discussed in section \ref{sec:scan-shape}), this leads to degeneracy in $\gamma_0$ and inflated uncertainty in the density moments. In the tetrahedral case, the problem is worsened because $K_{20}=0$ as well, so that torque is dominated by the small and ill-constrained $K_{3m}$ components. To avoid negative density distributions, the likelihood model could be adjusted to use, for example, a multivariate log-normal distribution. However, the model would no longer be linear.
 
-Uncertainty in each distribution was calculated but not shown. The size of uncertainty is such that the density distribution is very consistent with uniform at most points for the (asymmetric) dumbbell model (within $\sim 1\sigma$), while the symmetric reference and tetrahedral asteroids were generally within $\sim 2 \sigma$ of uniform. Uncertainty is generally larger towards the edges of the distribution, both for these shapes and for the shapes shown in the following sections.
+% Uncertainty in each distribution was calculated but not shown. The size of uncertainty is such that the density distribution is very consistent with uniform at most points for the (asymmetric) dumbbell model (within $\sim 1\sigma$), while the symmetric reference and tetrahedral asteroids were generally within $\sim 2 \sigma$ of uniform. Uncertainty is generally larger towards the edges of the distribution, both for these shapes and for the shapes shown in the following sections.
 
-If desired, the parameters of the models can be reduced to only fit the $K_{2m}$ density moments; this will produce exactly uniform distributions, since it is equivalent to assuming $K_{3m}=0$. However, doing so ignores the observational insight we gain from our fits to $K_{3m}$, so it is only valid when $K_{3m}$ are too poorly constrained to be used. 
+% If desired, the parameters of the models can be reduced to only fit the $K_{2m}$ density moments; this will produce exactly uniform distributions, since it is equivalent to assuming $K_{3m}=0$. However, doing so ignores the observational insight we gain from our fits to $K_{3m}$, so it is only valid when $K_{3m}$ are too poorly constrained to be used. 
 
 \subsubsection{Spherical asteroids}
 \label{sec:spherical-density}

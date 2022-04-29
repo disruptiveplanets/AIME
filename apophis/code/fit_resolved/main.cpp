@@ -44,7 +44,7 @@ std::vector<double> simulate(double cadence, const std::vector<double> parameter
     }
 
 
-    Asteroid asteroid(klms, radius, initial_roll + initial_precess, initial_roll - initial_precess, distance_ratio_cut, enforce_drc, velocity_mul);
+    Asteroid asteroid(klms, radius, initial_roll, initial_precess, distance_ratio_cut, enforce_drc, velocity_mul);
 
     // Run asteroid
     std::vector<double> resolved_data;

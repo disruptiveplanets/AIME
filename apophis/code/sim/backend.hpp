@@ -18,7 +18,7 @@
 #define MAX_DT 20.0
 #define POSITION_DT 1.0
 
-#define INTEGRAL_LIMIT_FRAC_START 1,0e-3 // 1.0e-12
+#define INTEGRAL_LIMIT_FRAC_START 1.0e-3 // 1.0e-12
 #define INTEGRAL_LIMIT_FRAC_END 1.0e-3
 
 //#define TEXT_DEBUG

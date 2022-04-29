@@ -25,6 +25,9 @@ time = np.arange(0, len(perfect_xs), 1) * 120/3600
 plt.plot(time, perfect_xs, label=f'x perfect')
 plt.plot(time, perfect_ys, label=f'y perfect')
 plt.plot(time, perfect_zs, label=f'z perfect')
+plt.scatter(time, perfect_xs, label=f'x perfect', s=2)
+plt.scatter(time, perfect_ys, label=f'y perfect', s=2)
+plt.scatter(time, perfect_zs, label=f'z perfect', s=2)
 plt.title(file_name)
 
 f = open(f"{file_name}-resolved.dat", 'r')
