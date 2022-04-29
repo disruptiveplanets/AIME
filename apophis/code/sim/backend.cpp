@@ -322,13 +322,13 @@ void Asteroid::initialize_rotation(Quaternion& quat, Vector3& spin) const {
     // Now make an actual orientation that rotates inertial to body-fixed
     double initial_tilt = get_tilt(initial_roll); // assumes gamma = psi
 
-    // Verified (free parameter lines up with initial precession)
+    // Verified (free parameter is redundant with initial precession)
     Quaternion inertial_to_l = Quaternion(cos(inertial_phi / 2), 0, 0, sin(inertial_phi / 2))
         * Quaternion(cos(inertial_theta / 2), 0, sin(inertial_theta / 2), 0);
     
     // Verified
     Quaternion l_to_body_fixed = Quaternion(cos(initial_precess / 2), 0, 0, sin(initial_precess / 2))
-        * Quaternion(cos(initial_tilt / 2), sin(initial_tilt / 2), 0, 0)
+        * Quaternion(cos(initial_tilt / 2), 0, sin(initial_tilt / 2), 0)
         * Quaternion(cos(initial_roll / 2), 0, 0, sin(initial_roll / 2));
 
     // Verified

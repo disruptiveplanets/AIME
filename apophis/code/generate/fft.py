@@ -20,11 +20,20 @@ for line in f.readlines():
     ys.append(float(y))
     zs.append(float(z))
 time = np.arange(0, len(xs), 1) * 120/3600
-xs = np.array(xs)
-ys = np.array(ys)
-zs = np.array(zs)
-#period = 2 * np.sin(2 * np.pi /30 * time) * np.sin(2 * np.pi / 60 * time)
-period = 2 * np.pi / np.sqrt(xs*xs + ys*ys + zs*zs)
+xs = np.array(xs) * np.sin(np.pi * time / np.max(time))
+ys = np.array(ys) * np.sin(np.pi * time / np.max(time))
+zs = np.array(zs) * np.sin(np.pi * time / np.max(time))
+period = 2 * np.sin(2 * np.pi /27.38547 * time) * np.sin(2 * np.pi / (264.178/2) * time) * np.sin(np.pi * time / np.max(time))
+#period = 2 * np.pi / np.sqrt(xs*xs + ys*ys + zs*zs)
+
+plt.plot(time, xs, label='x')
+plt.plot(time, ys, label='y')
+#plt.plot(time, zs, label='z')
+#plt.plot(time, period, label='period')
+plt.xlabel("Time (hr)")
+plt.ylabel("spins")
+plt.legend()
+plt.tight_layout()
     
 TRIGGER = 0.3
 def get_peaks(freqs, data):
@@ -55,20 +64,20 @@ def get_envelopes(freqs, data):
 
 x_fft = np.abs(np.fft.fft(xs))
 y_fft = np.abs(np.fft.fft(ys))
-z_fft = np.abs(np.fft.fft(zs))
+#z_fft = np.abs(np.fft.fft(zs))
 p_fft = np.abs(np.fft.fft(period))
 freqs = np.fft.fftfreq(len(xs), 120 / 3600)
 
-
+plt.figure()
 mask = (0.1 > np.abs(freqs)) & (np.abs(freqs) > 0.01)
-print("\t\t\t", 27.38547, "\t\t", 264.178)
+print("\t\t\t", 27.38547, "\t\t", 264.178/2)
 print("X sum & diff periods\t", '\t'.join([str(f) for f in get_envelopes(freqs[mask], x_fft[mask])]))
 print("Y sum & diff periods\t", '\t'.join([str(f) for f in get_envelopes(freqs[mask], y_fft[mask])]))
-print("Z sum & diff periods\t", '\t'.join([str(f) for f in get_envelopes(freqs[mask], z_fft[mask])]))
+#print("Z sum & diff periods\t", '\t'.join([str(f) for f in get_envelopes(freqs[mask], z_fft[mask])]))
 print("P sum & diff periods\t", '\t'.join([str(f) for f in get_envelopes(freqs[mask], p_fft[mask])]))
 plt.plot(1/freqs[mask], x_fft[mask] / np.max(x_fft[mask]))
 plt.plot(1/freqs[mask], y_fft[mask] / np.max(y_fft[mask]))
-plt.plot(1/freqs[mask], z_fft[mask] / np.max(z_fft[mask]))
+#plt.plot(1/freqs[mask], z_fft[mask] / np.max(z_fft[mask]))
 plt.plot(1/freqs[mask], p_fft[mask] / np.max(p_fft[mask]), color='k')
 
 # plt.axvline(x=264.178 / 2)
