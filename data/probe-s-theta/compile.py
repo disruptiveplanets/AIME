@@ -80,11 +80,11 @@ for plot_index in range(N_DIM):
     ax.fill_between(s_theta, (param_data[2]-param_data[0]) * scale,
         (param_data[-2]-param_data[0]) * scale, color=f"C{plot_index}", alpha=0.3)
 
-    ax.plot(s_theta, (param_data[3]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1, linestyle='dashed')
+    #ax.plot(s_theta, (param_data[3]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1, linestyle='dashed')
 
-    y_min_norm = np.min((param_data[-1]-param_data[0]) * scale)
-    y_max_norm = np.max((param_data[1]-param_data[0]) * scale)
-    ax.set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
+   # y_min_norm = np.min((param_data[-1]-param_data[0]) * scale)
+    #y_max_norm = np.max((param_data[1]-param_data[0]) * scale)
+    #ax.set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
 
     thresh = s_theta[(np.abs(param_data[2]-param_data[0]) > 0.01) | np.abs((param_data[-2]-param_data[0]) > 0.01)]
     if len(thresh) > 0:
@@ -97,8 +97,8 @@ for plot_index in range(N_DIM):
     else:
         ax.set_ylabel(f"$\sigma({param_names[plot_index]}) (\\times 10^{{-2}})$", size=AXIS_SIZE)
 
-    #ax.set_xscale('log')
-    #axs[plot_index].set_yscale('log')
+    ax.set_xscale('log')
+    ax.set_yscale('log')
 
     ax.set_xlim(np.min(s_theta), np.max(s_theta))
     ax.axvline(x=1e-2, color='k', linewidth=1, linestyle='dashed')

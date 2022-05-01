@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "cad-speed-contour"
+PATH = "probe-s-theta"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1
