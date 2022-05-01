@@ -4,10 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import emcee, time, sys, logging
 if not TEST:
-    import asteroids2_0_2 as asteroids_0_2
-    import asteroids2_0_3 as asteroids_0_3
-    import asteroids2_2_2 as asteroids_2_2
-    import asteroids_2_3 as  asteroids_2_3
+    import asteroids_0_2, asteroids_0_3, asteroids_2_2, asteroids_2_3
 if TEST:
     import test_loglike as asteroids_0_2
     import test_loglike as asteroids_0_3
@@ -30,11 +27,8 @@ except:
 
 logging.basicConfig(level=logging.INFO)
 
-THETA_ZERO = np.pi / 4
-THETA_SIGMA = 1e-7
-
 PLOT_POSES = True
-NUM_MINIMIZE_POINTS_PER = 4#4 # Used to be 8
+NUM_MINIMIZE_POINTS_PER = 4 # Used to be 8
 NUM_L3_MINIMIZATIONS = 1# Changed to 1 to decrease time.
 DISTANCE_RATIO_CUTS = [
     [2.0, None],
@@ -42,15 +36,18 @@ DISTANCE_RATIO_CUTS = [
 ]
 THRESHOLD_LIKE_RAT = 2
 
+GM = 3.986004418e14 # Earth
+
+EARTH_RADIUS = 6_370_000
 UNCERTAINTY_MODEL = random_vector.TILT_UNIFORM_TRUE
 
 N_WALKERS = 32
 MAX_N_STEPS = 100_000
 MIN_THETA_DIST = 1e-4
 LARGE_NUMBER = 1e100
-MIN_SPACING = np.array([1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6,
+MIN_SPACING = np.array([1.0e-6, 1.0e-6, 1.0e-6,
     1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1, 1.0e-1])# Comes in blocks corresponding to the block diagonals
-MAX_SPACING = np.array([0.0003, 0.0003, 0.0003, 0.0003,
+MAX_SPACING = np.array([0.0003, 0.0003, 0.0003,
     LARGE_NUMBER, LARGE_NUMBER, LARGE_NUMBER, LARGE_NUMBER, LARGE_NUMBER, LARGE_NUMBER, LARGE_NUMBER])
 DEFAULT_THIN = 10
 
@@ -63,6 +60,7 @@ ASTEROIDS_MAX_J = int(ASTEROIDS_MAX_J)
 ASTEROIDS_MAX_K = int(ASTEROIDS_MAX_K)
 cadence = int(float(f.readline()))
 radius = float(f.readline())
+initial_precess = float(f.readline())
 theta_true = [float(x) for x in f.readline().split(',')]
 theta_high = np.asarray([float(x) for x in f.readline().split(',')])
 theta_low = np.asarray([float(x) for x in f.readline().split(',')])
@@ -74,15 +72,15 @@ while output_name[-1] == '\n':
     output_name = output_name[:-1]
 f.close()
 assert(len(theta_true) == len(theta_high) == len(theta_low))
-assert(len(theta_true) == (ASTEROIDS_MAX_K + 1)**2 - 5)
+assert(len(theta_true) == (ASTEROIDS_MAX_K + 1)**2 - 6)
 assert(np.all(theta_high > theta_low))
 
 SIGMA_FACTOR = (sigma[0] / 0.01)**2#theta
 
 if ASTEROIDS_MAX_K == 2:
-    cut_index = 4
+    cut_index = 3
 elif ASTEROIDS_MAX_K == 3:
-    cut_index = 11
+    cut_index = 10
 else:
     raise Exception("Have not implemented max k >= 4")
 MIN_SPACING = MIN_SPACING[:cut_index]
@@ -90,6 +88,7 @@ MAX_SPACING = MAX_SPACING[:cut_index]
 
 logging.info("Cadence {}".format(cadence))
 logging.info("Radius {}".format(radius))
+logging.info("Initial precess {}".format(initial_precess))
 logging.info("Theta true {}".format(theta_true))
 logging.info("Theta high {}".format(theta_high))
 logging.info("Theta low {}".format(theta_low))
@@ -106,14 +105,24 @@ if len(sys.argv) == 3 and sys.argv[2] == "reload":
 def fit_function(theta, target_length=None):
     if ASTEROIDS_MAX_K == 3:
         if ASTEROIDS_MAX_J == 0:
-            resolved_data = asteroids_0_3.simulate(cadence, theta, radius, 0, False, VELOCITY_MUL)
+            resolved_data = asteroids_0_3.simulate(cadence, theta, radius,
+                initial_precess, 0, False, VELOCITY_MUL)
         elif ASTEROIDS_MAX_J == 2:
-            resolved_data = asteroids_2_3.simulate(cadence, theta, radius, 0, False, VELOCITY_MUL)
+            resolved_data = asteroids_2_3.simulate(cadence, theta, radius,
+                initial_precess, 0, False, VELOCITY_MUL)
+        elif ASTEROIDS_MAX_J == 3:
+            resolved_data = asteroids_3_3.simulate(cadence, theta, radius,
+                initial_precess, 0, False, VELOCITY_MUL)
     elif ASTEROIDS_MAX_K == 2:
         if ASTEROIDS_MAX_J == 0:
-            resolved_data = asteroids_0_2.simulate(cadence, theta, radius, 0, False, VELOCITY_MUL)
+            resolved_data = asteroids_0_2.simulate(cadence, theta, radius,
+                initial_precess, 0, False, VELOCITY_MUL)
         elif ASTEROIDS_MAX_J == 2:
-            resolved_data = asteroids_2_2.simulate(cadence, theta, radius, 0, False, VELOCITY_MUL)
+            resolved_data = asteroids_2_2.simulate(cadence, theta, radius,
+                initial_precess, 0, False, VELOCITY_MUL)
+        elif ASTEROIDS_MAX_J == 3:
+            resolved_data = asteroids_3_2.simulate(cadence, theta, radius,
+                initial_precess, 0, False, VELOCITY_MUL)
     if target_length is not None:
         while len(resolved_data)//3 < target_length:
             resolved_data.append(resolved_data[-3])
@@ -128,7 +137,7 @@ def log_likelihood(theta, y, y_inv_covs):
     except RuntimeError:
         return -np.inf # Zero likelihood
    
-    return random_vector.log_likelihood(UNCERTAINTY_MODEL, y, model, len(y), UNCERTAINTY_ARGUMENT) - (theta[0] - THETA_ZERO)**2 / THETA_SIGMA
+    return random_vector.log_likelihood(UNCERTAINTY_MODEL, y, model, len(y), UNCERTAINTY_ARGUMENT)
 
 def log_prior(theta):
     for i, param in enumerate(theta):
@@ -165,16 +174,19 @@ def get_data_cut(drc):
     drc = 0 if drc is None else drc
     if ASTEROIDS_MAX_J == 0:
         return len(asteroids_0_2.simulate(cadence, theta_true, radius,
-            drc, enforce_drc, VELOCITY_MUL))//3
+                initial_precess, 0, False, VELOCITY_MUL))//3
     elif ASTEROIDS_MAX_J == 2:
         return len(asteroids_2_2.simulate(cadence, theta_true, radius,
-            drc, enforce_drc, VELOCITY_MUL))//3
+                initial_precess, 0, False, VELOCITY_MUL))//3
+    elif ASTEROIDS_MAX_J == 3:
+        return len(asteroids_3_2.simulate(cadence, theta_true, radius,
+                initial_precess, 0, False, VELOCITY_MUL))//3
     raise Exception("Cannot handle this J.")
 
 data_cuts = [[get_data_cut(drc) for drc in tier] for tier in DISTANCE_RATIO_CUTS]
 
 plt.figure(figsize=(12, 4))
-x_display = np.arange(len(y)) * cadence / 3600
+x_display = np.arange(len(y))
 uncs = np.array([2 * np.sqrt(np.diagonal(pinvh(a))) for a in y_inv_covs])
 plt.fill_between(x_display, y[:,0]+uncs[:,0], y[:,0]-uncs[:,0], alpha=0.5, color="C0")
 plt.fill_between(x_display, y[:,1]+uncs[:,1], y[:,1]-uncs[:,1],alpha=0.5, color="C1")
@@ -182,11 +194,11 @@ plt.fill_between(x_display, y[:,2]+uncs[:,2], y[:,2]-uncs[:,2],  alpha=0.5, colo
 plt.scatter(x_display, y[:,0], label='x', s=1, color="C0")
 plt.scatter(x_display, y[:,1], label='y', s=1, color="C1")
 plt.scatter(x_display, y[:,2], label='z', s=1, color="C2")
-plt.xlabel("Time (hr)")
+plt.xlabel("Time (Cadences)")
 plt.ylabel("Spin (rad/s)")
 for tier in data_cuts:
     for drc in tier:
-        plt.axvline(x=drc * cadence / 3600, color='k')
+        plt.axvline(x=drc, color='k')
 plt.legend()
 plt.show()
 
@@ -201,7 +213,8 @@ def minimize_function(theta, simulate_func, l_index, cut_index):
     enforce_drc = False if drc is None else True
 
     drc = 0 if drc is None else drc
-    resolved_data = simulate_func(cadence, theta, radius, drc, enforce_drc, VELOCITY_MUL)
+    resolved_data = simulate_func(cadence, theta, radius,
+        initial_precess, 0, False, VELOCITY_MUL)
     
     want_length = data_cuts[l_index][cut_index]
     while len(resolved_data)//3 < want_length:
@@ -232,7 +245,7 @@ def minimize_log_prob(float_theta, fix_theta, simulate_func, l_index, cut_index)
     # Return chisq
     chisq = 0
     want_length = data_cuts[l_index][cut_index]
-    return -random_vector.log_likelihood(UNCERTAINTY_MODEL, y, model, want_length, UNCERTAINTY_ARGUMENT) + (theta[0] - THETA_ZERO)**2 / THETA_SIGMA
+    return -random_vector.log_likelihood(UNCERTAINTY_MODEL, y, model, want_length, UNCERTAINTY_ARGUMENT)
 
 
 if ASTEROIDS_MAX_K == 3:
@@ -240,11 +253,15 @@ if ASTEROIDS_MAX_K == 3:
         real_sim_func = asteroids_0_3.simulate
     elif ASTEROIDS_MAX_J == 2:
         real_sim_func = asteroids_2_3.simulate
+    elif ASTEROIDS_MAX_J == 3:
+        real_sim_func = asteroids_3_3.simulate
 elif ASTEROIDS_MAX_K == 2:
     if ASTEROIDS_MAX_J == 0:
         real_sim_func = asteroids_0_2.simulate
     elif ASTEROIDS_MAX_J == 2:
         real_sim_func = asteroids_2_2.simulate
+    elif ASTEROIDS_MAX_J == 3:
+        real_sim_func = asteroids_3_2.simulate
 
 
 true_redchi = 2 * minimize_log_prob(theta_true, [], real_sim_func, 0, -1) / len(y) / 3
@@ -261,11 +278,15 @@ def get_minimum(arg):
             simulate_func = asteroids_0_2.simulate
         elif ASTEROIDS_MAX_J == 2:
             simulate_func = asteroids_2_2.simulate
+        elif ASTEROIDS_MAX_J == 3:
+            simulate_func = asteroids_3_2.simulate
     elif l == 3:
         if ASTEROIDS_MAX_J == 0:
             simulate_func = asteroids_0_3.simulate
         elif ASTEROIDS_MAX_J == 2:
             simulate_func = asteroids_2_3.simulate
+        elif ASTEROIDS_MAX_J == 3:
+            simulate_func = asteroids_3_3.simulate
 
     # Do an initial fit with cut data
     for cut_index in range(len(DISTANCE_RATIO_CUTS)):
@@ -322,10 +343,12 @@ def get_minimum(arg):
     #hess = derivatives.Hessian(hess_func, step=1e-10)(result)
 
     if l == 2:
-        logging.debug(minimize_log_prob_uncut(result+np.array([1.0e-8, 0, 0, 0]))-minimizing_likelihood)
-        logging.debug(minimize_log_prob_uncut(result-np.array([1.0e-8, 0, 0, 0]))-minimizing_likelihood)
-        logging.debug(minimize_log_prob_uncut(result+np.array([0, 1.0e-8, 0, 0]))-minimizing_likelihood)
-        logging.debug(minimize_log_prob_uncut(result-np.array([0, 1.0e-8, 0, 0]))-minimizing_likelihood)
+        logging.debug(minimize_log_prob_uncut(result+np.array([1.0e-8, 0, 0]))-minimizing_likelihood)
+        logging.debug(minimize_log_prob_uncut(result-np.array([1.0e-8, 0, 0]))-minimizing_likelihood)
+        logging.debug(minimize_log_prob_uncut(result+np.array([0, 1.0e-8, 0]))-minimizing_likelihood)
+        logging.debug(minimize_log_prob_uncut(result-np.array([0, 1.0e-8, 0]))-minimizing_likelihood)
+        logging.debug(minimize_log_prob_uncut(result+np.array([0, 0, 1.0e-8]))-minimizing_likelihood)
+        logging.debug(minimize_log_prob_uncut(result-np.array([0, 0, 1.0e-8]))-minimizing_likelihood)
 
     logging.debug("Hessian: {}".format(hess))
 
@@ -357,7 +380,7 @@ def get_minimum(arg):
                 logging.warning("Allowing the Hessian to pass with reversed first eigenvalue.")
 
         if l == 3:
-            new_evals[4:] = 1 / LARGE_NUMBER
+            new_evals[3:] = 1 / LARGE_NUMBER
             logging.warning("Allowing the Hessian to pass with maxed eigenvalues for l=3 components.")
             
     logging.debug(f"Eigenvalues: {new_evals}")
@@ -375,22 +398,26 @@ def get_minimum(arg):
 
 def minimize(l, fix_theta):
     assert l <= ASTEROIDS_MAX_K
-    assert len(fix_theta) == max((l)**2 - 5, 0)
+    assert len(fix_theta) == max((l)**2 - 6, 0)
 
     if l == 2:
         if ASTEROIDS_MAX_J == 0:
             simulate = asteroids_0_2.simulate
         elif ASTEROIDS_MAX_J == 2:
             simulate = asteroids_2_2.simulate
+        elif ASTEROIDS_MAX_J == 3:
+            simulate = asteroids_3_2.simulate
     elif l == 3:
         if ASTEROIDS_MAX_J == 0:
             simulate = asteroids_0_3.simulate
         elif ASTEROIDS_MAX_J == 2:
             simulate = asteroids_2_3.simulate
+        elif ASTEROIDS_MAX_J == 3:
+            simulate = asteroids_3_3.simulate
     else:
         raise Exception("l={} is not supported".format(l))
 
-    theta_indices = range(max(0, (l)**2 - 5), (l+1)**2 - 5)
+    theta_indices = range(max(0, (l)**2 - 6), (l+1)**2 - 6)
     bounds = np.asarray([(theta_low[i], theta_high[i]) for i in theta_indices])
     bound_widths = np.asarray([theta_high[i] - theta_low[i] for i in theta_indices])
 
@@ -431,11 +458,11 @@ def minimize(l, fix_theta):
             continue
         choose = True
         for distinct_theta, _, _, _ in distinct_results:
-            if np.all(np.abs(distinct_theta - theta)[2:4] < MIN_THETA_DIST):
-                # Only scan for theta 2 and 3 (K2m)
+            if np.all(np.abs(distinct_theta - theta)[1:3] < MIN_THETA_DIST):
+                # Only scan for theta 1 and 2 (K2m)
                 choose = False
                 break
-            if len(theta) > 4 and len (distinct_results) >= NUM_L3_MINIMIZATIONS:
+            if len(theta) > 3 and len (distinct_results) >= NUM_L3_MINIMIZATIONS:
                 # Do not choose more than NUM_L3_MINIMIZATIONS l=3 tiers.
                 choose = False
                 break
@@ -460,16 +487,15 @@ for i in range(2, ASTEROIDS_MAX_K + 1):
 kernel = []
 for theta, evals, evecs, redchi in queue:
     resized_evecs = []
-    max_len = (1 + ASTEROIDS_MAX_K)**2 - 5
+    max_len = (1 + ASTEROIDS_MAX_K)**2 - 6
     for e in evecs:
         l_value = (len(e) - 1) // 2
-        start_index = l_value**2 - 5
+        start_index = l_value**2 - 6
         if l_value < 2:
             l_value = 2
             start_index = 0
         evec = [0] * start_index + list(e) + [0] * (max_len - start_index - len(e))
         resized_evecs.append(np.array(evec))
-    
     if redchi / true_redchi > THRESHOLD_LIKE_RAT:
         logging.warning(f"The point with theta {theta} and redchi {redchi} was excluded from the kernel")
         continue

@@ -18,4 +18,10 @@ Fixed a bug with the initial orientation (it's now z-y-z and confirmed with as l
 
 ## April 30
 
-To test the degeneracy, I edited main.cpp so that the initial roll is always pi/4. The redchi and log-like are adjusted to make the first parameter still meaningful; that way the fit still converges. This requires the use of fit-less and recompiling main.cpp
+To test the degeneracy, I edited main.cpp so that the initial roll is always pi/4. The redchi and log-like are adjusted to make the first parameter still meaningful; that way the fit still converges. This requires the use of fit-less and recompiling main.cpp.
+
+## May 1
+
+The degeneracy indeed seems better. I thought to myself that, since in the other case, we assumed that initial spin pole was well known, here we can assume that initial_precess is also well known and fix it.
+
+I'm running one fit with that in mind now. If it works, I'll extend the data end and later I will try different sensitivity models.

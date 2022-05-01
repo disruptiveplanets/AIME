@@ -4,12 +4,14 @@ SAVE_PDFS = False
 
 import corner, emcee
 if not TEST:
-    import asteroids_0_3, asteroids_0_2, asteroids_2_3, asteroids_2_2
+    import asteroids_0_3, asteroids_0_2, asteroids_2_3, asteroids_2_2, asteroids_3_3, asteroids_3_2
 else:
     import test_loglike as asteroids_0_2
     import test_loglike as asteroids_0_3
     import test_loglike as asteroids_2_2
     import test_loglike as asteroids_2_3
+    import test_loglike as asteroids_3_2
+    import test_loglike as asteroids_3_3
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.linalg import pinvh
@@ -24,11 +26,8 @@ mpl.rcParams["font.size"] = 20
 mpl.rcParams["legend.fontsize"] = 10
 
 
-EARTH_RADIUS = 6370000
 STANDARD_RESULTS_METHOD = False
 REDCHI_THRESHOLD = 2
-CENTRAL_RADIUS = EARTH_RADIUS
-CENTRAL_MU = 5.972e24 * 6.674e-11
 
 DATA_POINT_LIMIT = 642
 
@@ -185,6 +184,7 @@ class Display:
         self.maxk = int(asteroids_max_k)
         self.cadence = int(float(f.readline()))
         self.radius = float(f.readline())
+        self.initial_precess = float(f.readline())
         self.theta_true = [float(x) for x in f.readline().split(',')]
         theta_high = np.asarray([float(x) for x in f.readline().split(',')])
         theta_low = np.asarray([float(x) for x in f.readline().split(',')])
@@ -254,7 +254,7 @@ class Display:
         self.get_params()
         try:
             resolved_data = self.module.simulate(self.cadence, theta,
-                self.radius, 0, False, self.velocity_mul)
+                self.radius, self.initial_precess, 0, False, self.velocity_mul)
         except:
             print("Coordinates are invalid ({})".format(theta))
             return None

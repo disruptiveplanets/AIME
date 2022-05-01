@@ -5,13 +5,12 @@
 #include "../sim/backend.hpp"
 #include "../../../code/sim/algebra.hpp"
 
-std::vector<double> simulate(double cadence, const std::vector<double> parameters,  double radius,
+std::vector<double> simulate(double cadence, const std::vector<double> parameters,  double radius, double initial_precess,
     double distance_ratio_cut=0, double enforce_drc=false, double velocity_mul=1) {
 
     std::vector<cdouble> halfklms;
     auto klm_raw_iter = parameters.begin();
     const double initial_roll = *klm_raw_iter++;
-    const double initial_precess = *klm_raw_iter++;
     halfklms.push_back({1, 0}); // K00
     halfklms.push_back({0, 0}); // K11
     halfklms.push_back({0, 0}); // K10
@@ -42,10 +41,6 @@ std::vector<double> simulate(double cadence, const std::vector<double> parameter
             k++;
         }
     }
-
-    ///////////////////////////////
-    initial_roll = PI / 4;
-    ///////////////////////////////
 
     Asteroid asteroid(klms, radius, initial_roll, initial_precess, distance_ratio_cut, enforce_drc, velocity_mul);
 

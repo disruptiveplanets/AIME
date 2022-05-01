@@ -5,7 +5,7 @@ DATA_WIDTH = 500
 EARTH_RADIUS = 6_370_000
 x = np.linspace(0, 12 * np.pi, DATA_WIDTH)
 
-def simulate(cadence, theta, radius, drc=-1, enforce_drc=False, speed_factor=1):
+def simulate(cadence, theta, radius, initial_precess, drc=-1, enforce_drc=False, speed_factor=1):
 
     consider_x = x[:int(DATA_WIDTH / 2 * (1 + drc / 10)) - 1] if enforce_drc else x
 
@@ -14,7 +14,7 @@ def simulate(cadence, theta, radius, drc=-1, enforce_drc=False, speed_factor=1):
     y3 = np.zeros_like(consider_x)
     for n, p in enumerate(theta):
         mul = 1
-        if n >= 4:
+        if n >= 3:
             mul = 0.000001
         y1 += mul * p**3 * np.sin(consider_x * n)
         y2 += mul * p**3 * np.cos(consider_x * n)
