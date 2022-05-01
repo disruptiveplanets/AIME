@@ -43,6 +43,9 @@ std::vector<double> simulate(double cadence, const std::vector<double> parameter
         }
     }
 
+    ///////////////////////////////
+    initial_roll = PI / 4;
+    ///////////////////////////////
 
     Asteroid asteroid(klms, radius, initial_roll, initial_precess, distance_ratio_cut, enforce_drc, velocity_mul);
 

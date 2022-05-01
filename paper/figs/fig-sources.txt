@@ -80,6 +80,8 @@ tet-lumpy.pdf code/density/figs/tet/lumpy-1-1-d.pdf
 asym-sph-harmonic.pdf code/density/figs/asym-sph/harmonic-d.pdf
 asym-sph-likelihood.pdf code/density/figs/asym-sph/likelihood-d.pdf
 asym-sph-lumpy.pdf code/density/figs/asym-sph/lumpy-1-1-d.pdf
+asym-sph-unc-harmonic.pdf code/density/figs/asym-sph/harmonic-u.pdf
+asym-sph-unc-likelihood.pdf code/density/figs/asym-sph/likelihood-u.pdf
 
 sym-sph-harmonic.pdf code/density/figs/sym-sph/harmonic-d.pdf
 sym-sph-likelihood.pdf code/density/figs/sym-sph/likelihood-d.pdf
@@ -89,11 +91,24 @@ sym-sph-lumpy.pdf code/density/figs/sym-sph/lumpy-1-1-d.pdf
 in-harmonic.pdf code/density/figs/in/harmonic-d.pdf
 in-likelihood.pdf code/density/figs/in/likelihood-d.pdf
 in-lumpy.pdf code/density/figs/in/lumpy-1-1-d.pdf
+in-unc-harmonic.pdf code/density/figs/in/harmonic-u.pdf
+in-unc-likelihood.pdf code/density/figs/in/likelihood-u.pdf
+in-rat-harmonic.pdf code/density/figs/in/harmonic-r.pdf
+in-rat-likelihood.pdf code/density/figs/in/likelihood-r.pdf
+in-diff-harmonic.pdf code/density/figs/in/harmonic-s.pdf
+in-diff-likelihood.pdf code/density/figs/in/likelihood-s.pdf
+in-diff-lumpy.pdf code/density/figs/in/lumpy-1-1-s.pdf
 
 out-harmonic.pdf code/density/figs/out/harmonic-d.pdf
 out-likelihood.pdf code/density/figs/out/likelihood-d.pdf
 out-lumpy.pdf code/density/figs/out/lumpy-1-1-d.pdf
-
+out-unc-harmonic.pdf code/density/figs/out/harmonic-u.pdf
+out-unc-likelihood.pdf code/density/figs/out/likelihood-u.pdf
+out-rat-harmonic.pdf code/density/figs/out/harmonic-r.pdf
+out-rat-likelihood.pdf code/density/figs/out/likelihood-r.pdf
+out-diff-harmonic.pdf code/density/figs/out/harmonic-s.pdf
+out-diff-likelihood.pdf code/density/figs/out/likelihood-s.pdf
+out-diff-lumpy.pdf code/density/figs/out/lumpy-1-1-s.pdf
 
 blob-harmonic.pdf code/density/figs/blob/harmonic-d.pdf
 blob-likelihood.pdf code/density/figs/blob/likelihood-d.pdf

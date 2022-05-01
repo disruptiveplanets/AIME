@@ -141,6 +141,8 @@ class Method:
         nonzero_cov = self.asteroid.sigma_data[uncertain_params,:][:,uncertain_params]
         self.klm_error = abs(deltas.transpose().conj() @ pinv(nonzero_cov) @ deltas / dof)
 
+        print("Ratios", deltas / np.sqrt(np.diagonal(nonzero_cov)))
+
         for i, r in enumerate(calc_rlms):
             l = int(np.sqrt(i))
             m = i - l**2 - l
@@ -177,8 +179,8 @@ class Method:
                 make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r", self.klm_error, percentile=95, balance=True)
                 make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{fname}-r.gif", duration=duration, percentile=95, balance=True)
 
-                for p in 10 * np.arange(11):
-                    print(f"Ratio percentile {p} = {np.nanpercentile(ratios, p)}")
+                # for p in 10 * np.arange(11):
+                #     print(f"Ratio percentile {p} = {np.nanpercentile(ratios, p)}")
             difference = (true_densities - display_densities) / true_densities
 
         print("Plotting density")

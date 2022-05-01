@@ -15,3 +15,7 @@ Tested the fit code with the test backend to make sure it runs
 ## April 28
 
 Fixed a bug with the initial orientation (it's now z-y-z and confirmed with as long of a fourier transform as I can make with 4 GB Memory)..
+
+## April 30
+
+To test the degeneracy, I edited main.cpp so that the initial roll is always pi/4. The redchi and log-like are adjusted to make the first parameter still meaningful; that way the fit still converges. This requires the use of fit-less and recompiling main.cpp
