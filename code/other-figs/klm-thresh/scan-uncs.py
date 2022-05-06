@@ -3,13 +3,25 @@
 import sys, os
 import numpy as np
 sys.path.append("../../density")
-from likelihood import Likelihood
+from likelihood import Likelihood as Model
+#from likelihood import Harmonic as Model
 from core import Asteroid, Indicator, TrueShape
 
 DIVISION = 99
 NUM_SAMPLES = 153
 
 sigmas = np.zeros((NUM_SAMPLES, 10))
+
+percentiles = {}
+with open("shape-data/percentiles.dat", 'r') as f:
+    for line in f.readlines():
+        if line == '': continue
+        elements = line.split(':')
+        name = elements[0]
+        perc_array = []
+        for percs in elements[1:]:
+            perc_array.append([float(x) for x in percs.split(',')])
+        percentiles[name] = np.array(perc_array)
 
 for i in range(NUM_SAMPLES):
     d = "param-{:03}".format(i)
@@ -42,14 +54,19 @@ for i in range(NUM_SAMPLES):
     max_radius = int(max(a, b, c) + 4 * DIVISION)
     
     asteroid = Asteroid("shape-{i}", f"shape-data/{d}/{d}-0-samples.npy", am, DIVISION, max_radius, Indicator.ell(radius, k22, k20), None)
-    method = Likelihood(asteroid)
+    method = Model(asteroid)
     method.solve()
     uncs = method.map_unc()
 
-    density_uncertainty = np.nanmax(uncs)
+    density_uncertainty = np.nanmedian(uncs)
+    
+    ## Divide original sigmas by density_uncertainty
+    ptiles = percentiles[f"{d}-0-samples.npy"]
+    original_sigma = ((ptiles[:,2] - ptiles[:,3]) - (ptiles[:,-2] - ptiles[:,3]))/2
+
     print(density_uncertainty)
-    print(np.diagonal(asteroid.sigma_data))
-    sigmas[i] = np.sqrt(np.diagonal(asteroid.sigma_data)) / density_uncertainty
+
+    sigmas[i] = original_sigma / density_uncertainty
 
 with open("sigmas.npy", 'wb') as f:
     np.save(f, sigmas)

@@ -5,8 +5,15 @@ import numpy as np
 plt.style.use('jcap')
 
 SIDE_LENGTH = 17
-FIG_SIZE = (5.333, 4)
+FIG_SIZE = (7, 4)
 NUM_LEVELS = 21
+
+param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
+
+def plot_pt():
+    plt.scatter([0], [-0.09766608], color='r', marker='o')
+    plt.scatter([0.05200629], [-0.2021978], color='k', marker='^')
+    plt.scatter([-0.05200629], [-0.2021978], color='k', marker='^')
 
 with open("sigmas.npy", 'rb') as f:
     sigmas = np.load(f)
@@ -23,27 +30,36 @@ def show_sigmas(sigma_index):
         delta = 0.25 / SIDE_LENGTH / 2 * (SIDE_LENGTH - i - 1)
         for j, x in enumerate(np.linspace(-0.125+delta, 0.125+delta, SIDE_LENGTH)):
             index = i * (i + 1) // 2 + j
-            data_line.append(sigmas[index, sigma_index])
+            if j > i:
+                data_line.append(np.nan)
+            else:
+                data_line.append(sigmas[index, sigma_index])
             X_line.append(x)
             Y_line.append(y)
         data.append(data_line)
         X.append(X_line)
         Y.append(Y_line)
 
-    data_max = max(np.nanmax(data), -np.nanmin(data))
-    levels = np.linspace(-data_max, data_max, NUM_LEVELS)
-    print(levels)
+    data_max = np.nanmax(data)
+    levels = np.linspace(0, data_max, NUM_LEVELS)
     plt.figure(figsize=FIG_SIZE)
     c = plt.contourf(X, Y, data, levels=levels, cmap='Oranges_r')
     axc = plt.colorbar(c)
-    axc.set_label("$\\textrm{Corr}(K_{22}, K_{20})$")
-    plt.xlim(-0.11, 0.11)
-    plt.ylim(-0.24, -0.03)
+    axc.set_label(f"$\sigma({param_names[sigma_index]})$")
+    plt.xlim(-0.125, 0.125)
+    plt.ylim(-0.25, 0.0)
     plt.xlabel("$K_{22}$")
     plt.ylabel("$K_{20}$")
+    plot_pt()
     plt.tight_layout()
-    plt.savefig("compile-figs/corr23.pdf")
+    plt.savefig(f"sigma-{sigma_index}.png")
 
 if __name__ == "__main__":
     show_sigmas(3)
+    show_sigmas(4)
+    show_sigmas(5)
+    show_sigmas(6)
+    show_sigmas(7)
+    show_sigmas(8)
+    show_sigmas(9)
     plt.show()
