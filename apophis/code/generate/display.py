@@ -2,12 +2,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys, os
 
+plt.style.use("jcap")
+
 if len(sys.argv) == 2:
     file_name = sys.argv[-1]
 else:
     file_name = "2-params"
 
-plt.figure(figsize=(8, 4))
+plt.figure(figsize=(6, 6))
 
 if os.path.exists(f"{file_name}-resolved-perfect.dat"):
     f = open(f"{file_name}-resolved-perfect.dat", 'r')
@@ -52,11 +54,14 @@ if os.path.exists(f"{file_name}-resolved-perfect.dat"):
         del ys[-1]
         del zs[-1]
 
-time = np.arange(0, len(zs), 1) * 120/3600
+time = np.arange(-len(zs)/2, len(zs)/2, 1) * 120/3600
 
-plt.plot(time, xs, label=f'x')
-plt.plot(time, ys, label=f'y')
-plt.plot(time, zs, label=f'z')
+plt.plot(time, np.array(xs)*3600, label=f'$\omega_x$')
+plt.plot(time, np.array(ys)*3600, label=f'$\omega_y$')
+plt.plot(time, np.array(zs)*3600, label=f'$\omega_z$')
+
+plt.xlabel("Time after perigee (hr)")
+plt.ylabel("Angular velocity (rad/hr)")
 
 plt.xlim(time[0], time[-1])
 plt.legend()
@@ -70,5 +75,8 @@ if os.path.exists(f"{file_name}-resolved-perfect.dat"):
     plt.plot(time, np.array(zs) - np.array(perfect_zs), label="z")
     plt.legend()
     plt.tight_layout()
+
+plt.savefig("spin-data.png")
+#plt.savefig("spin-data.pdf")
 
 plt.show()

@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "cad-period-sync-contour"
+PATH = "scan-cad"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1
