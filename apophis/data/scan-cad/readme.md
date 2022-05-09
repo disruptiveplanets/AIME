@@ -9,3 +9,11 @@ The code was taking longer than I expected, so I copied one and named it cad-99 
 ## April 29
 
 Had to kill the fits to run other things, but it's clear that degeneracy is a problem. Removed the + and - from main.py to avoid mistakes.
+
+## May 6
+
+Pushed today
+
+## May 9
+
+Pulled today. For some reason, lots of them failed. So I'm re-pushing those. Of those that succeeded, there are still some issues. So I'm working on that.

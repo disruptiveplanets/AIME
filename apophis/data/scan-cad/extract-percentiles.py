@@ -44,8 +44,8 @@ for bare in file_names:
             min_text = file + ": " +  ": ".join(data)+"\n"
             min_dist = dist
 
-    #if min_text is None:
-    #    continue
+    if min_text is None:
+        continue
     pf.write(min_text)
     print(bare, min_dist)
 
