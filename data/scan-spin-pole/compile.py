@@ -21,10 +21,14 @@ LEGEND_SIZE = 12
 N_DIM = None
 N_PERCENTILES = None
 
+with open("../../code/thresholds/scan-spin-pole.npy", 'rb') as f:
+    uncs = np.load(f)
 
-def show_true_point(ax):
+def show_true_point(ax, flip=False):
     spin = [0.00006464182, 0.00012928364, -0.00012928364]
     theta, phi = np.pi / 2 - np.arccos(spin[2] / norm(spin)), np.arctan2(spin[1], spin[0])
+    if flip:
+        theta *= -1
     ax.scatter(phi, theta, color='tab:orange', marker='*', s=32)
 
 # Get percentiles
@@ -106,9 +110,6 @@ for plot_index in range(N_DIM+1):
 
     vmax = np.percentile(cart_array, 95)
     im = axs[plot_index].pcolormesh(Lon, Lat, cart_array, vmin=np.min(cart_array), vmax=vmax, cmap='Blues_r')
-
-    if plot_index > 2:
-        axs[plot_index].contour(Lon, Lat, np.array(cart_array), levels=[10], colors=['r'], linewidths=[1])
     
     cbar = fig.colorbar(im, ax=axs[plot_index], extend='max')
     if i < 3:
@@ -143,13 +144,18 @@ plt.savefig("pole.png")
 
 # Plot average    
 interp = LinearNDInterpolator(xyzs, net_data)
+interp_unc = LinearNDInterpolator(xyzs, uncs)
 cart_array = []
+cart_array_unc = []
 for i, lat in enumerate(lats):
     cart_line = []
+    cart_line_unc = []
     for j, lon in enumerate(lons):
         p = projected_vecs[i][j]
         cart_line.append(interp(p[0], p[1], p[2]))
+        cart_line_unc.append(interp_unc(p[0], p[1], p[2]))
     cart_array.append(np.array(cart_line))
+    cart_array_unc.append(np.array(cart_line_unc))
 
 fig, ax = plt.subplots(figsize=(6,5), ncols=1, nrows=1, subplot_kw=dict(projection="mollweide"))
 im = ax.pcolormesh(Lon, Lat, cart_array, vmin=0, cmap='Blues_r')
@@ -161,18 +167,22 @@ ax.set_xlabel("$\\theta$")
 ax.set_ylabel("$\\phi$")
 ax.set_xticks([-3 * np.pi / 4, -np.pi / 2, -np.pi / 4, 0, np.pi / 4, np.pi / 2, 3 * np.pi / 4])
 ax.set_yticks([np.pi/3, np.pi/6, 0, -np.pi/6, -np.pi/3])
+ax.contour(Lon, Lat, np.array(cart_array_unc), levels=[1.0], colors=['r'], linewidths=[1])
+ax.contour(Lon, Lat, np.array(cart_array_unc), levels=[0.2], colors=['r'], linewidths=[1], linestyles=['dotted'])
 ax.grid(True)
 fig.tight_layout()
 plt.savefig("avg-pole-mollweide.pdf")
 plt.savefig("avg-pole-mollweide.png")
 
 fig, ax = plt.subplots(figsize=(6,5), ncols=1, nrows=1, subplot_kw=dict(projection="polar"))
-im = ax.pcolormesh(Lon, Lat, cart_array, vmin=0, cmap='Blues_r')
+im = ax.pcolormesh(Lon, -Lat, cart_array, vmin=0, cmap='Blues_r')
 cbar = fig.colorbar(im, ax=ax)
 cbar.set_label(f"$\overline{{\sigma}}$")
 fig.tight_layout()
-ax.scatter(theta_phis[:,1], theta_phis[:,0], s=1, c='k')
-show_true_point(ax)
+ax.scatter(theta_phis[:,1], -theta_phis[:,0], s=1, c='k')
+ax.contour(Lon, -Lat, cart_array_unc, levels=[1.0], colors=['r'], linewidths=[1])
+ax.contour(Lon, -Lat, cart_array_unc, levels=[0.2], colors=['r'], linewidths=[1], linestyles=['dotted'])
+show_true_point(ax, flip=True)
 ax.set_yticklabels(['']*5)
 ax.grid(True)
 plt.savefig("avg-pole-polar.pdf")

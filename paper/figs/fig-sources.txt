@@ -122,8 +122,8 @@ blob-rat-harmonic.pdf code/density/figs/blob/harmonic-r.pdf
 blob-rat-likelihood.pdf code/density/figs/blob/likelihood-r.pdf
 
 
-high-surface.pdf code/density/old/figs/high-surface-slice.pdf
-high-likelihood.pdf code/density/old/figs/high-likelihood-slice.pdf
+high-surface.pdf code/density/figs/high/high-surface-slice.pdf
+high-likelihood.pdf code/density/figs/high/high-likelihood-slice.pdf
 
 cad-speed.pdf data/cad-speed-contour/cad-speed-contour.pdf
 cad-period.pdf data/cad-period-sync-contour/cad-period-contour.pdf

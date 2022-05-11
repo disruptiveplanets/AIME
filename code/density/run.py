@@ -1,11 +1,12 @@
 import sys, os
 from likelihood import Likelihood
+from finite_element import FiniteElement
 from harmonic import Harmonic
 from lumpy import Lumpy, LUMPY_D, LUMPY_N
 from core import Asteroid, Indicator, TrueShape
 import matplotlib.pyplot as plt
 
-DIVISION = 9
+DIVISION = 29
 MAX_RADIUS = 2000
 RELOAD = False
 
@@ -50,6 +51,7 @@ methods = {
     "likelihood": Likelihood,
     "harmonic": Harmonic, 
     "lumpy": Lumpy, 
+    "fe": FiniteElement, 
 }
 
 def make_asteroid(args):

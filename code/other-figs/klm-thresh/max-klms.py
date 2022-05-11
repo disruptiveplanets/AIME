@@ -49,7 +49,7 @@ def get_max_k3m(klms):
     k20 = klms[2]
     indicator_map = get_indicator_map(LENGTH, k22, k20)
     if indicator_map is None:
-        return np.nan
+        return [np.nan] * 7
     real_constants = np.append([0, 0, 0, 0], klms)
     constants = []
     i = 0
@@ -92,8 +92,10 @@ def get_max_k3m(klms):
     #     print()
     # print(f"a\t{radius}")
 
-
-    return max(np.max(np.abs(klms[9:-1].real)), np.max(np.abs(klms[9:-1].imag)))
+    return [abs(klms[9].real), abs(klms[9].imag), 
+        abs(klms[10].real), abs(klms[10].imag), 
+        abs(klms[11].real), abs(klms[11].imag), 
+        abs(klms[12].real)]
 
 def pick_k2m():
     k20 = 1
@@ -109,18 +111,31 @@ if __name__ == "__main__":
 
     plt.style.use('jcap')
     N_TRIALS = 500
-    seeds = []
-    for _ in range(N_TRIALS):
-        k22, k20 = pick_k2m()
-        seeds.append(np.append([k22, 0, k20, 0, k22], np.random.randn(7)))
-    with Pool() as pool:
-        maxes = pool.map(get_max_k3m, seeds)
+    LOAD_DATA = True
 
-    print("There were", np.sum(np.isnan(maxes)), "nans")
+    if not LOAD_DATA:
+        seeds = []
+        for _ in range(N_TRIALS):
+            k22, k20 = pick_k2m()
+            seeds.append(np.append([k22, 0, k20, 0, k22], np.random.randn(7)))
 
-    plt.hist(maxes, histtype='step', bins=np.linspace(0, np.nanmax(maxes), 20), color = 'k')
-    plt.xlabel("Maximum $K_{\ell m}$")
-    plt.ylabel("Count")
-    plt.tight_layout()
-    plt.savefig("klms.png")
+        with Pool() as pool:
+           maxes = pool.map(get_max_k3m, seeds)
+        with open('maxes.npy', 'wb') as f:
+           np.save(f, maxes)
+    else:
+        with open('maxes.npy', 'rb') as f:
+            maxes = np.load(f)
+
+    def display(these_maxes, index):
+        plt.figure()
+        plt.hist(these_maxes, histtype='step', bins=np.linspace(0, np.nanmax(maxes), 20))
+        plt.xlabel(f"Maximum $K_{{3{index}}}$")
+        plt.ylabel("Count")
+        plt.tight_layout()
+        plt.savefig(f"klms-{index}.png")
+    display(maxes[:,0:2], 3)
+    display(maxes[:,2:4], 2)
+    display(maxes[:,4:6], 1)
+    display(maxes[:,6], 0)
     plt.show()
