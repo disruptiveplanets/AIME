@@ -488,17 +488,14 @@ It seems that the lumpy model is capable of recreating the location of lumps. Bu
 
 In this section, we discuss how the precision of the best-fitting density moments is affected by various encounter properties. We call this precision ``posterior uncertainty,'' or $\sigma(K_{\ell m})$, defining 1$\sigma$  posterior uncertainty as the range containing 68.27\% of the PPD centred on the median. 2$\sigma$ posterior uncertainty is defined likewise for 95.45\% of the PPD. These are roughly equivalent to 1 or 2 times standard deviation of the PPD respectively. We use the configuration of the asymmetric reference asteroid (appendix \ref{app:reference-configs}) unless otherwise stated.
 
+\jtd{It will be useful to have a rule-of-thumb ``posterior uncertainty threshold,'' above which we say that posterior uncertainty $\sigma(K_{\ell m})$ is too large to yield meaningful estimates of density distribution. We define this posterior uncertainty threshold as the point at which the median of the ratio between the the local density uncertainty and local density  ($\rho_\sigma / \rho$) is equal to a fraction $f$. For this analysis, we investigate both $f=100\%$ (corresponding to an essentially unconstrained density distribution) and $f=20\%$.}
 
-
-
-It will be useful to have a rule-of-thumb ``posterior uncertainty threshold,'' above which we say that posterior uncertainty $\sigma(K_{\ell m})$ is too large to yield meaningful estimates of density distribution. There are many possible definitions of posterior uncertainty, but we explore one in this paper which is outlined in appendix \ref{app:sigma-threshold}. This leads to cut-offs of the encounter properties which lead to posterior uncertainty less than the threshold. These critical values are shown in table \ref{tab:threshold-summary} as a summary, and are discussed in detail in the following sections.
-
-\jtd{This Klm uncertainty threshold language is still in the paper, although the numbers in the above table reflect the method I used for the conference, which is asking what encounter properties yield density distributions with uncertainty 100 or 20\% of the local density. The caveat to the latter, density-distribution based, uncertainty threshold is that it changes based on which models you use and how many Klms you choose to fit due to the fact that the density distribution is underdetermined. A constraint on the density moments is more general, but harder to define. My feeling is that we should use this distribution-based constraint, and mention the caveats here. I'll write up all this if Julien agrees.}
+\jtd{We use this threshold because it has clear physical meaning, unlike the density moments. But the value of $\rho_\sigma / \rho$ depends on the model used. In this analysis, we use the likelihood model, but choosing a different model with constraints added would reduce density uncertainty, and lead to less restrictive thresholds.}
 
 \begin{table}
   \centering
   \begin{tabular}{lll} \hline
-    Encounter property & $\sigma_\rho / \rho = 100\%$ & $\sigma_\rho / \rho = 20\%$ \\ \hline
+    Encounter property & $\sigma_\rho / \rho = 100\%$ & $20\%$ \\ \hline
     Perigee ($r_p$, Earth radii) & $<$7.9 & $<$4.7 \\
     Spin pole uncertainty ($\sigma_\theta$, $^\circ$) & $<$2.8 & $<$0.5 \\
     Spin period uncertainty ($P_\omega \sigma_\rho$, ms) & $<$15 & $<$3.1\\
@@ -507,7 +504,7 @@ It will be useful to have a rule-of-thumb ``posterior uncertainty threshold,'' a
     Data gap ($T_\text{gap}$, hr) & $<$1.8 & $<$0 \\
     Period ($P_\omega$, hr) & $>$4.3 & $>$9.5\\ \hline
   \end{tabular}
-  \caption{For each encounter property discussed in section \ref{sec:discussion}, the cut-offs (i.e., the values which leads to $\sigma(K_{3 m})$ at the threshold value) are given. Properties inside the strong cut-off have all $\sigma(K_{3m})$ under the threshold value, while properties inside the weak cut-off have at least one $\sigma(K_{3m})$ under the threshold value. The reference asymmetric asteroid is used. \jtd{summary}}
+  \caption{For each encounter property discussed in section \ref{sec:discussion}, the properties that lead to density uncertainty equal to 100\% (20\%) of the local density are shown in the middle (right) columns. The reference asymmetric asteroid is used. The 20\% threshold is very restrictive, but the 100\% threshold is more achievable and demonstrates the thresholds in the right column are not hard cut-offs.}
   \label{tab:threshold-summary}
 \end{table}
 
