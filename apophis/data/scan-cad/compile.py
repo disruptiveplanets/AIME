@@ -42,11 +42,7 @@ for name in percentiles.keys():
         max_j, max_l = f.readline().split(", ")
         max_j, max_l = (int(max_j), int(max_l))
         cadence = int(float(f.readline()))
-        perigee = int(f.readline())
         radius = float(f.readline())
-        speed = float(f.readline())
-        spin = [float(x) for x in f.readline().split(',')]
-        jlms = [float(x) for x in f.readline().split(',')]
         theta_true = [float(x) for x in f.readline().split(',')]
         theta_high = [float(x) for x in f.readline().split(',')]
         theta_low = [float(x) for x in f.readline().split(',')]

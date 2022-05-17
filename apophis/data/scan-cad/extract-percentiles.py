@@ -23,6 +23,8 @@ for bare in file_names:
         if not file[-11:] == "samples.npy": continue
         with open("{}/{}".format(bare, file), 'rb') as f:
             array = np.load(f)
+        if array.shape[1] == 0:
+            continue
         
         flat_samples = array.reshape(-1, array.shape[-1])
 
@@ -45,6 +47,7 @@ for bare in file_names:
             min_dist = dist
 
     if min_text is None:
+        print(bare, "failed")
         continue
     pf.write(min_text)
     print(bare, min_dist)
