@@ -24,6 +24,23 @@ periods = []
 def get_indices_from_name(name):
     return int(name[8:10]), int(name[11:13])
 
+with open("../../code/thresholds/cad-period-sync-contour.npy", 'rb') as f:
+    uncs = np.load(f)
+
+# Adjust uncs so that everything after the first large unc is large
+def adjust(a):
+    res = []
+    for line in a:
+        wheres = np.where(line > 1)[0]
+        if len(wheres) == 0 or wheres[0] == len(line) - 1:
+            res.append(line)
+        else:
+            new_line = np.copy(line)
+            new_line[wheres[0]+1:] = 2
+            res.append(new_line)
+    return np.array(res)
+uncs = adjust(uncs)
+
 # Get percentiles
 with open("percentiles.dat", 'r') as f:
     for line in f.readlines():
@@ -82,7 +99,7 @@ for plot_index in range(N_DIM):
     #p = ax.pcolormesh(cadences, periods, param_data.transpose() * scale, vmin=0, cmap="Oranges_r")
     levels = np.linspace(0, np.percentile(param_data * scale, 90), 12)
     p = ax.contourf(cadences, periods, param_data.transpose() * scale, cmap="PuBu_r", levels=levels, extend='max')
-    ax.contour(cadences, periods, param_data.transpose(), colors=['r'], levels=[0.01])
+    ax.contour(cadences, periods, uncs, colors='r', levels=[0.2, 1], linestyles=["dashed", "solid"])
 
     cbar = fig.colorbar(p, ax=ax)
     if plot_index < 3:
@@ -104,5 +121,8 @@ for plot_index in range(N_DIM):
         
 plt.savefig("cad-period-contour.pdf", bbox_inches="tight")
 plt.savefig("cad-period-contour.png", bbox_inches="tight")
+
+# plt.figure()
+# plt.pcolormesh(cadences, periods, uncs)
 
 plt.show()

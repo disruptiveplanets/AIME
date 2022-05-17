@@ -1,5 +1,6 @@
 # PROBLEM: this data doesn't have K3m.
 
+from socket import ntohl
 import sys, os
 import numpy as np
 sys.path.append("../density")
@@ -11,17 +12,19 @@ from core import Asteroid, Indicator
 DIVISION = 29
 FILE_PATH = "../../data/"
 
-NAMES = [
-    #"scan-perigee", 
-    #"probe-s-theta", 
-    #"probe-s-rho", 
-    #"scan-cadence",
-    #"scan-period", 
-    #"scan-am", 
-    #"scan-vex", 
-    #"observation-gap"
-    "scan-spin-pole",
-    ]
+NAMES = {
+    #"scan-perigee": (2,), 
+    #"probe-s-theta": (2,), 
+    #"probe-s-rho": (2,), 
+    #"scan-cadence": (2,),
+    #"scan-period": (2,), 
+    #"scan-am": (2,), 
+    #"scan-vex": (2,), 
+    #"observation-gap": (2,)
+    #"scan-spin-pole": (2,),
+    "cad-period-sync-contour": (2,2),
+    "cad-speed-contour": (2,2)
+}
 
 from contextlib import contextmanager
 import sys, os
@@ -36,16 +39,28 @@ def suppress_stdout():
         finally:
             sys.stdout = old_stdout
 
-def scan_directory(directory):
+def get_indices(name, index_lengths):
+    index_pos = 0
+    indices = []
+    for index, index_length in enumerate(index_lengths):
+        if index_pos == 0:
+            indices.append(int(name[index_pos-index_length:]))
+        else:
+            indices.append(int(name[index_pos-index_length:index_pos]))
+        index_pos -= index_length + 1
+    return np.array(indices, dtype=int)
+    
+def scan_directory(directory, index_lengths):
     if not os.path.exists(directory):
         raise Exception(f"Directory {directory} does not exist")
 
-    max_index = 0
+    max_indices = np.zeros_like(index_lengths)
     for dname in os.listdir(directory):
         if os.path.isdir(directory+'/'+dname):
-            max_index = max(max_index, int(dname[-2:]))
-            
-    uncs = np.ones(max_index + 1) * np.nan
+            indices = get_indices(dname, index_lengths)
+            max_indices = np.maximum(max_indices, indices)
+    max_indices += 1
+    uncs = np.ones(max_indices) * np.nan
 
     for dname in os.listdir(directory):
         if not os.path.isdir(directory+'/'+dname):
@@ -53,9 +68,11 @@ def scan_directory(directory):
         for fname in os.listdir(directory+'/'+dname):
             if not fname.endswith("-0-samples.npy"):
                 continue
+            indices = tuple(get_indices(dname, index_lengths))
+            if not np.isnan(uncs[indices]):
+                raise Exception(f"Index {indices} was already processed")
             unc = get_unc_for_file(directory+'/'+dname, directory+'/'+dname+'/'+fname)
-            index = int(dname[-2:])
-            uncs[index] = unc
+            uncs[indices] = unc
     return uncs
 
 
@@ -110,46 +127,48 @@ def get_unc_for_file(dname, fname):
 
 def scan_specific(directory, threshold):
     from matplotlib import pyplot as plt
-    uncs = scan_directory(FILE_PATH + sys.argv[1])
+    uncs = scan_directory(FILE_PATH + sys.argv[1], index_lengths[sys.argv[1]])
     print(uncs)
     with open(sys.argv[1]+".npy", 'wb') as f:
         np.save(f, uncs)
-    where_more_than_one = np.where(uncs>threshold)[0]
-    if len(where_more_than_one) > 0:
-        threshold_index_left = where_more_than_one[0]
-        threshold_index_right = where_more_than_one[-1]
+    if len(uncs.shape) == 1:
+        where_more_than_one = np.where(uncs>threshold)[0]
+        if len(where_more_than_one) > 0:
+            threshold_index_left = where_more_than_one[0]
+            threshold_index_right = where_more_than_one[-1]
 
-    else:
-        threshold_index_left = None
-        threshold_index_right = None
-    print("Increasing threshold", threshold_index_left, "\t", "Decreasing threshold", threshold_index_right)
-    
-    plt.plot(uncs)
-    plt.xlabel("index")
-    plt.ylabel("Distribution uncertainty")
-    plt.axhline(y=threshold)
-    plt.show()
+        else:
+            threshold_index_left = None
+            threshold_index_right = None
+        print("Increasing threshold", threshold_index_left, "\t", "Decreasing threshold", threshold_index_right)
+        
+        plt.plot(uncs)
+        plt.xlabel("index")
+        plt.ylabel("Distribution uncertainty")
+        plt.axhline(y=threshold)
+        plt.show()
 
 def scan_all(thresholds):
     print("Thresholds", thresholds)
-    for name in NAMES:
-        uncs = scan_directory(FILE_PATH + name)
+    for name, index_lengths in NAMES.items():
+        uncs = scan_directory(FILE_PATH + name, index_lengths)
         print(uncs)
         with open(name+".npy", 'wb') as f:
             np.save(f, uncs)
-        
-        print(name, end='')
-        for threshold in thresholds:
-            where_more_than_one = np.where(uncs>threshold)[0]
-            if len(where_more_than_one) > 0:
-                threshold_index_left = where_more_than_one[0]
-                threshold_index_right = where_more_than_one[-1]
 
-            else:
-                threshold_index_left = None
-                threshold_index_right = None
-                
-            print(f"\tinc.\t{threshold_index_left}\tdec.\t{threshold_index_right}")
+        if len(uncs.shape) == 1:
+            print(name, end='')
+            for threshold in thresholds:
+                where_more_than_one = np.where(uncs>threshold)[0]
+                if len(where_more_than_one) > 0:
+                    threshold_index_left = where_more_than_one[0]
+                    threshold_index_right = where_more_than_one[-1]
+
+                else:
+                    threshold_index_left = None
+                    threshold_index_right = None
+                    
+                print(f"\tinc.\t{threshold_index_left}\tdec.\t{threshold_index_right}")
 
 if __name__ == "__main__":
     #scan_specific(sys.argv[1], 1)
