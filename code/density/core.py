@@ -22,6 +22,7 @@ class Method:
         self.asteroid = asteroid
         self.unc = None
         self.d = None
+        self.is_linear = True
         self.densities = None
         self.density_uncs = None
         self.finite_element = finite_element
@@ -41,6 +42,12 @@ class Method:
         # Return number for finite_element, vector otherwise
         raise NotImplementedError
 
+    def get_nonlinear_d(self):
+        raise NotImplementedError
+
+    def get_nonlinear_unc(self):
+        raise NotImplementedError
+
     def get_c(self):
         # Default value.
         return np.zeros_like(self.asteroid.data)
@@ -50,14 +57,24 @@ class Method:
 
     def solve(self):
         if self.unc is None:
-            a = self.get_a()
-            self.d = a @ (self.asteroid.data - self.get_c())
+            if self.is_linear:
+                a = self.get_a()
+                self.d = a @ (self.asteroid.data - self.get_c())
 
-            if self.asteroid.sigma_data is not None:
-                if self.finite_element:
-                    self.unc = np.einsum('ij,jk,ki->i', a, self.asteroid.sigma_data, a.transpose().conjugate())# Diagonal entries
-                else:
-                    self.unc = a @ self.asteroid.sigma_data @ a.transpose().conjugate()
+                if self.asteroid.sigma_data is not None:
+                    if self.finite_element:
+                        self.unc = np.einsum('ij,jk,ki->i', a, self.asteroid.sigma_data, a.transpose().conjugate())# Diagonal entries
+                    else:
+                        self.unc = a @ self.asteroid.sigma_data @ a.transpose().conjugate()
+            else:
+                self.get_nonlinear_d()
+
+                if self.asteroid.sigma_data is not None:
+                    if self.finite_element:
+                        self.unc = self.get_nonlinear_unc()
+                    else:
+                        raise NotImplementedError
+
 
     def get_density(self, x,y,z):
         if self.finite_element:
@@ -120,9 +137,11 @@ class Method:
         densities = self.map_density()
         for l in range(0, self.asteroid.max_l + 1):
             for m in range(-l, l+1):
-                calc_rlms[index] = np.sum(rlms_field[index] * densities) / self.asteroid.am ** l * self.asteroid.division**3
+                calc_rlms[index] = np.sum(rlms_field[index] * densities) / self.asteroid.surface_am ** (l - 2) * self.asteroid.division**3
                 index += 1
-        calc_rlms[index] = np.sum(rlms_field[index] * densities) / self.asteroid.am ** 2 * self.asteroid.division**3
+        calc_rlms[index] = np.sum(rlms_field[index] * densities) * self.asteroid.division**3
+
+        calc_rlms[index] /= calc_rlms[index] # Normalize by mass radius squared
 
         # Calculate chisqr
         uncertain_params = []
@@ -207,10 +226,10 @@ class Method:
 
 
 class Asteroid:
-    def __init__(self, name, sample_file, am, division, max_radius, indicator, true_shape):
+    def __init__(self, name, sample_file, surface_am, division, max_radius, indicator, true_shape):
         self.name = name
         self.max_l = None
-        self.am = am
+        self.surface_am = surface_am
         self.true_shape = true_shape
         self.true_densities = None
         self.division = division
@@ -219,6 +238,7 @@ class Asteroid:
         self.indicator_map = self.get_indicator_map()
         if sample_file != "":
             self.data, self.sigma_data = self.load_samples(sample_file)
+        self.sample_file = sample_file
         self.moments = None
 
     def load_samples(self, fname):

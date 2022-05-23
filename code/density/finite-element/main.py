@@ -1,31 +1,33 @@
-import emcee, corner, sys, lmfit, random, os, time
+import emcee, corner, sys, lmfit, random, os, warnings
 import numpy as np
 from scipy.linalg import pinvh, inv
 from matplotlib import pyplot as plt
 from multiprocessing import Pool, Lock
 from grids import get_grids_centroid
 sys.path.append("..")
-from core import Asteroid, Indicator
+from core import Asteroid, Indicator, TrueShape
 from scipy.optimize import minimize
 from threading import Thread
-from numdifftools import Hessian
+from display import make_gif, make_slices
 
 N_WALKERS = 32
 MAX_L = 3
 N_ALL_DIM = (MAX_L + 1)**2
 N_FREE_DIM = N_ALL_DIM - 7
 MAX_N_STEPS = 100_000
-DIVISION = 49
+DIVISION = 29
 RLM_EPSILON = 1e-20
 MAX_RADIUS = 2000
 SMALL_SIGMA = 1e-5
 CERTAIN_INDICES = [0, 1, 2, 3, 5, 7, -1]
 MAX_DENSITY = 10
 MIN_DENSITY = 0
-UNCERTAINTY_RATIO = 0.005
-AM = 1000
-VERY_LARGE_SLOPE = 1e30
+UNCERTAINTY_RATIO = 0.25
+VERY_LARGE_SLOPE = 1e30 # Can be infinite for mcmc
 NUM_THREADS = os.cpu_count()
+MIN_LOG_LIKE = 1000# 100
+
+np.random.seed(23678)
 
 def get_cov(path):
     with open(path, 'rb') as f:
@@ -34,72 +36,72 @@ def get_cov(path):
     data = np.mean(flat_samples, axis=0)
     return data, cov
 
-def get_theta_long(theta_short):
+def get_theta_long(theta_short, info):
     # Get the densities consistent with making the mass 1 and com 0 and rotation
-    return np.append(theta_short, rlm_fixed_inv[:,-1] - rlm_prod @ theta_short)
+    return np.append(theta_short, info.rlm_fixed_inv[:,-1] - info.rlm_prod @ theta_short)
 
-def get_klms(theta_long):
-    unscaled_klms = rlm_mat @ theta_long
-    radius_sqr = radius_vec @ theta_long
+def get_klms(theta_long, info):
+    unscaled_klms = info.rlm_mat @ theta_long
+    radius_sqr = info.radius_vec @ theta_long
+    #radius_sqr = 1000**2
     scaled_klms = np.array(unscaled_klms) / radius_sqr
     scaled_klms[-1] *= radius_sqr # Do not scale mass term
     return scaled_klms
 
 
-def log_prior(theta_long):
-    if np.any(theta_long < mean_density * MIN_DENSITY):
-        return VERY_LARGE_SLOPE * np.min(theta_long) / mean_density
-    if np.any(theta_long > mean_density * MAX_DENSITY):
-        return -VERY_LARGE_SLOPE * (np.max(theta_long) / mean_density - MAX_DENSITY)
+def log_prior(theta_long, info):
+    if np.any(theta_long < info.mean_density * MIN_DENSITY):
+        return VERY_LARGE_SLOPE * np.min(theta_long) / info.mean_density
+    if np.any(theta_long > info.mean_density * MAX_DENSITY):
+        return -VERY_LARGE_SLOPE * (np.max(theta_long) / info.mean_density - MAX_DENSITY)
     return 0.0
     
-def log_like(theta_long):
-    diff_klms = get_klms(theta_long)[:N_FREE_DIM] - data
-    return -0.5 * diff_klms.transpose() @ data_inv_covs @ diff_klms
+def log_like(theta_long, info):
+    diff_klms = get_klms(theta_long, info)[:N_FREE_DIM] - info.data
+    return -0.5 * diff_klms.transpose() @ info.data_inv_covs @ diff_klms
 
-def log_probability(theta_short):
-    theta_long = get_theta_long(theta_short)
-    lp = log_prior(theta_long)
-    ll = log_like(theta_long)
+def log_probability(theta_short, info):
+    theta_long = get_theta_long(theta_short, info)
+    lp = log_prior(theta_long, info)
+    ll = log_like(theta_long, info)
     return ll + lp
 
-def mcmc_fit(theta_start, output_name, generate=True):
+def mcmc_fit(theta_start, output_name, info, generate=True):
     if generate:
         backend = emcee.backends.HDFBackend(output_name+".h5")
         backend.reset(N_WALKERS, N_FREE_DIM)
         old_tau = np.inf
 
         with Pool() as pool:
-            sampler = emcee.EnsembleSampler(N_WALKERS, N_FREE_DIM, log_probability, backend=backend, pool=pool)
+            sampler = emcee.EnsembleSampler(N_WALKERS, N_FREE_DIM, log_probability, args = (info,), backend=backend, pool=pool)
 
             pos = np.zeros((N_WALKERS, N_FREE_DIM))
             for i in range(N_FREE_DIM):
-                pos[:,i] = np.random.randn(N_WALKERS) * UNCERTAINTY_RATIO * mean_density + theta_start[i]
-            for p in pos:
-                print("Log prob of pos:", log_probability(p))
-
+                pos[:,i] = np.random.randn(N_WALKERS) * UNCERTAINTY_RATIO * info.mean_density + theta_start[i]
+            
 
             for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
-                if sampler.iteration % 200 == 0:
+                if sampler.iteration % 500 == 0:
                     # Compute the autocorrelation time so far
                     # Using tol=0 means that we'll always get an estimate even
                     # if it isn't trustworthy
                     tau = sampler.get_autocorr_time(tol=0)
 
                     # Check convergence
-                    converged = np.all(tau * 100 < sampler.iteration)
+                    converged = np.all(tau * 500 < sampler.iteration)
                     converged &= np.all(np.abs(old_tau - tau) / tau < 0.01)
                     if converged:
                         print("Converged")
                         break
                     old_tau = tau
                 if sampler.iteration % 1000 == 0:
-                    print("Last log prob", np.mean(sampler.get_last_sample().log_prob))
+                    print("Average walker likelihood", np.mean(sampler.get_last_sample().log_prob))
 
-            sampler._previous_state = sample
+            #sampler._previous_state = sample
+
     else:
         backend = emcee.backends.HDFBackend(output_name+".h5", read_only=True)
-        sampler = emcee.EnsembleSampler(N_WALKERS, N_FREE_DIM, log_probability, backend=backend)
+        sampler = emcee.EnsembleSampler(N_WALKERS, N_FREE_DIM, log_probability, args=(info,), backend=backend)
 
     return sampler
 
@@ -125,54 +127,53 @@ class MinResult:
         self.lock.release()
         return result
 
-def minimize_func(theta, result):
+def minimize_func(theta, info, result):
     if result.is_set():
         raise Exception()
-    return -log_probability(theta)
+    return -log_probability(theta, info)
 
-def min_func_mcmc(seed, result):
+def min_func_mcmc(seed, info, result):
     local_rng = random.Random()
     local_rng.seed(seed)
     while not result.is_set():
-        val = [local_rng.random() * 4 * mean_density for _ in range(N_FREE_DIM)]
+        val = [local_rng.random() * 4 * info.mean_density for _ in range(N_FREE_DIM)]
         try:
-            min_result = minimize(minimize_func, x0=val, method="Nelder-Mead", args=(result,), options = {"maxiter": 500 * len(val)})
+            min_result = minimize(minimize_func, x0=val, method="Nelder-Mead", args=(info, result,), options = {"maxiter": 500 * len(val)})
         except:
             print("Thread bailed")
             return
-        if min_result.success and min_result.fun < 1e4:
-            print(f"Thread successfully completed with redchi {min_result.fun}")
+        if min_result.success and min_result.fun < MIN_LOG_LIKE:
+            print(f"Thread successfully completed with log like {min_result.fun}")
             result.set(min_result.x)
             return
         else:
-            print(f"Attempt failed with redchi {min_result.fun}")
+            print(f"Attempt failed with log like {min_result.fun}")
 
-def get_theta_start_mcmc():
+def get_theta_start_mcmc(info):
     threads = []
     result = MinResult()
     print(f"Starting {NUM_THREADS} threads")
     for i in range(NUM_THREADS):
         seed = random.randint(0, 0xffff_ffff_ffff_ffff)
-        t = Thread(target=min_func_mcmc, args=(seed, result))
+        t = Thread(target=min_func_mcmc, args=(seed, info, result))
         t.start()
         threads.append(t)
     for t in threads:
         t.join()
     result = result.get()
-    print(Hessian(lambda theta: -log_probability(theta))(result))
+    #print(Hessian(lambda theta: -log_probability(theta, info))(result))
     return result
     
-def get_densities_mcmc(output_name, generate=True):
+def get_densities_mcmc(output_name, info, generate=True):
     if generate:
-        theta_start = get_theta_start_mcmc()
+        theta_start = get_theta_start_mcmc(info)
         print("Theta start:", theta_start)
-        sampler = mcmc_fit(theta_start, output_name, True)
-        try:
-            tau = sampler.get_autocorr_time()
-            print("Autocorrelation time", tau)
-            flat_samples = sampler.get_chain(discard=2 * np.max(tau), thin=np.max(tau) / 2, flat=True)
-        except Exception:
-            flat_samples = sampler.get_chain(discard=1000, thin=1, flat=True)
+        sampler = mcmc_fit(theta_start, output_name, info, True)
+
+        tau = sampler.get_autocorr_time()
+        max_tau = int(np.max(tau))
+        print("Autocorrelation time", tau)
+        flat_samples = sampler.get_chain(discard=2 * max_tau, thin=max_tau // 2, flat=True)
 
         with open(output_name + ".npy", 'wb') as f:
             np.save(f, flat_samples)
@@ -180,12 +181,34 @@ def get_densities_mcmc(output_name, generate=True):
         with open(output_name + ".npy", 'rb') as f:
             flat_samples = np.load(f)
 
-    fig = corner.corner(flat_samples)
-    fig.savefig(output_name + ".png")
+    means = np.median(flat_samples, axis=0)
 
-    means = np.mean(flat_samples, axis=0)
-    unc = np.std(flat_samples, axis=0)
-    return means, unc
+    least_dist = None
+    least_point = None
+    for point in flat_samples:
+        mean_dist = np.sum((flat_samples - point)**2) / len(flat_samples)
+        if least_dist is None:
+            least_dist = mean_dist
+            least_point = point
+        if least_dist > mean_dist:
+            least_dist = mean_dist
+            least_point = point
+
+
+    means = least_point
+    long_samples = np.array([get_theta_long(theta_short, info) for theta_short in flat_samples])
+
+
+
+    long_means = get_theta_long(means, info)
+    high_unc = np.percentile(long_samples, (100 + 68.27) / 2, axis=0) - long_means
+    low_unc = long_means - np.percentile(long_samples, (100 - 68.27) / 2, axis=0)
+
+    #fig = corner.corner(long_samples, truths=np.ones(N_ALL_DIM))
+    #corner.overplot_lines(fig, long_means / info.mean_density, color='C1')
+    #fig.savefig(output_name + ".png")
+
+    return long_means, high_unc, low_unc
 
 
 def min_func_ls_sq(params, result):
@@ -195,21 +218,21 @@ def min_func_ls_sq(params, result):
     ll = -log_probability(thetas)
     return ll
 
-def get_single_density(seed, result):
+def get_single_density(seed, info, result):
     local_rng = random.Random()
     local_rng.seed(seed)
     while not result.is_set():
-        val = [local_rng.random() * 4 * mean_density for _ in range(N_FREE_DIM)]
+        val = [local_rng.random() * 4 * info.mean_density for _ in range(N_FREE_DIM)]
         params = lmfit.Parameters()
-        params.add("d0", value=val[0], min=MIN_DENSITY * mean_density, max=MAX_DENSITY*mean_density)
-        params.add("d1", value=val[1], min=MIN_DENSITY * mean_density, max=MAX_DENSITY*mean_density)
-        params.add("d2", value=val[2], min=MIN_DENSITY * mean_density, max=MAX_DENSITY*mean_density)
-        params.add("d3", value=val[3], min=MIN_DENSITY * mean_density, max=MAX_DENSITY*mean_density)
-        params.add("d4", value=val[4], min=MIN_DENSITY * mean_density, max=MAX_DENSITY*mean_density)
-        params.add("d5", value=val[5], min=MIN_DENSITY * mean_density, max=MAX_DENSITY*mean_density)
-        params.add("d6", value=val[6], min=MIN_DENSITY * mean_density, max=MAX_DENSITY*mean_density)
-        params.add("d7", value=val[7], min=MIN_DENSITY * mean_density, max=MAX_DENSITY*mean_density)
-        params.add("d8", value=val[8], min=MIN_DENSITY * mean_density, max=MAX_DENSITY*mean_density)
+        params.add("d0", value=val[0], min=MIN_DENSITY * info.mean_density, max=MAX_DENSITY*info.mean_density)
+        params.add("d1", value=val[1], min=MIN_DENSITY * info.mean_density, max=MAX_DENSITY*info.mean_density)
+        params.add("d2", value=val[2], min=MIN_DENSITY * info.mean_density, max=MAX_DENSITY*info.mean_density)
+        params.add("d3", value=val[3], min=MIN_DENSITY * info.mean_density, max=MAX_DENSITY*info.mean_density)
+        params.add("d4", value=val[4], min=MIN_DENSITY * info.mean_density, max=MAX_DENSITY*info.mean_density)
+        params.add("d5", value=val[5], min=MIN_DENSITY * info.mean_density, max=MAX_DENSITY*info.mean_density)
+        params.add("d6", value=val[6], min=MIN_DENSITY * info.mean_density, max=MAX_DENSITY*info.mean_density)
+        params.add("d7", value=val[7], min=MIN_DENSITY * info.mean_density, max=MAX_DENSITY*info.mean_density)
+        params.add("d8", value=val[8], min=MIN_DENSITY * info.mean_density, max=MAX_DENSITY*info.mean_density)
         try:
             min_result = lmfit.minimize(min_func_ls_sq, params, args=(result,),method='lbfgsb')
         except:
@@ -223,13 +246,13 @@ def get_single_density(seed, result):
         else:
             print(f"Attempt failed with redchi {min_result.redchi}")
 
-def get_densities_ls_sq(output_name):
+def get_densities_ls_sq(output_name, info):
     threads = []
     result = MinResult()
     print(f"Starting {NUM_THREADS} threads")
     for i in range(NUM_THREADS):
         seed = random.randint(0, 0xffff_ffff_ffff_ffff)
-        t = Thread(target=get_single_density, args=(seed, result))
+        t = Thread(target=get_single_density, args=(seed, info, result))
         t.start()
         threads.append(t)
     for t in threads:
@@ -237,18 +260,29 @@ def get_densities_ls_sq(output_name):
     best_result = result.get()
     print("Best result:", best_result)
 
+class AsteroidInfo:
+    def __init__(self, mean_density, data, data_inv_covs, rlm_mat, radius_vec, rlm_fixed_inv, rlm_prod, masks):
+        self.mean_density = mean_density
+        self.data = data
+        self.data_inv_covs = data_inv_covs
+        self.rlm_mat = rlm_mat
+        self.radius_vec = radius_vec
+        self.rlm_fixed_inv = rlm_fixed_inv
+        self.rlm_prod = rlm_prod
+        self.masks = masks
 
-if __name__ == "__main__":
-    k22a, k20a = -0.05200629, -0.2021978
-    path = "../samples/den-asym-0-samples.npy"
-
-    asteroid = Asteroid("fe", path, AM, DIVISION, MAX_RADIUS, Indicator.ell(AM, k22a, k20a), None)
-
+def load(asteroid, surface_am, sample_path, generate=True):
     mean_density = 1 / (np.sum(asteroid.indicator_map) * DIVISION**3)
-
-    data, cov = get_cov(path)
+    data, cov = get_cov(sample_path)
     data_inv_covs = pinvh(cov)
-    masks = get_grids_centroid(N_ALL_DIM, asteroid.grid_line, asteroid.indicator_map, asteroid.indicator)[1]
+    if generate:
+        masks = get_grids_centroid(N_ALL_DIM, asteroid.grid_line, asteroid.indicator_map, asteroid.indicator)[1]
+        with open("grids.npy", 'wb') as f:
+            np.save(f, masks)
+    else:
+        with open("grids.npy", 'rb') as f:
+            masks = np.load(f)
+    
     rlms = asteroid.moment_field()
 
     rlm_mat_complex = np.einsum("iabc,jabc->ji", masks, rlms) * DIVISION**3
@@ -257,16 +291,16 @@ if __name__ == "__main__":
     rlm_mat = np.zeros((N_ALL_DIM, N_ALL_DIM))
     rlm_mat[0, :] = rlm_mat_complex[8,:].real # K22
     rlm_mat[1, :] = rlm_mat_complex[6,:].real # K20
-    rlm_mat[2, :] = rlm_mat_complex[15,:].real / AM # R K33
-    rlm_mat[3, :] = rlm_mat_complex[15,:].imag / AM # I K33
-    rlm_mat[4, :] = rlm_mat_complex[14,:].real / AM # R K32
-    rlm_mat[5, :] = rlm_mat_complex[14,:].imag / AM # I K32
-    rlm_mat[6, :] = rlm_mat_complex[13,:].real / AM # R K31
-    rlm_mat[7, :] = rlm_mat_complex[13,:].imag / AM # I K31
-    rlm_mat[8, :] = rlm_mat_complex[12,:].real / AM # K30
-    rlm_mat[9, :] = rlm_mat_complex[3,:].real * AM # R K11
-    rlm_mat[10, :] = rlm_mat_complex[3,:].imag * AM # I K11
-    rlm_mat[11, :] = rlm_mat_complex[2,:].real * AM # K10
+    rlm_mat[2, :] = rlm_mat_complex[15,:].real / surface_am # R K33
+    rlm_mat[3, :] = rlm_mat_complex[15,:].imag / surface_am # I K33
+    rlm_mat[4, :] = rlm_mat_complex[14,:].real / surface_am # R K32
+    rlm_mat[5, :] = rlm_mat_complex[14,:].imag / surface_am # I K32
+    rlm_mat[6, :] = rlm_mat_complex[13,:].real / surface_am # R K31
+    rlm_mat[7, :] = rlm_mat_complex[13,:].imag / surface_am # I K31
+    rlm_mat[8, :] = rlm_mat_complex[12,:].real / surface_am # K30
+    rlm_mat[9, :] = rlm_mat_complex[ 3,:].real * surface_am # R K11
+    rlm_mat[10, :] = rlm_mat_complex[3,:].imag * surface_am # I K11
+    rlm_mat[11, :] = rlm_mat_complex[2,:].real * surface_am # K10
     rlm_mat[12, :] = rlm_mat_complex[7,:].real # R K21
     rlm_mat[13, :] = rlm_mat_complex[7,:].imag # I K21
     rlm_mat[14, :] = rlm_mat_complex[8,:].imag # I K22
@@ -276,15 +310,73 @@ if __name__ == "__main__":
     rlm_fixed_inv = inv(rlm_mat[np.arange(9, 16),:][:,np.arange(9, 16)])
     rlm_cross = rlm_mat[np.arange(9, 16),:][:,np.arange(0, 9)]
     rlm_prod = rlm_fixed_inv @ rlm_cross
+    return AsteroidInfo(mean_density, data, data_inv_covs, rlm_mat, radius_vec, rlm_fixed_inv, rlm_prod, masks)
 
-    print("Uniform probability:", log_probability([mean_density] * 9))
+def display(densities, true_densities, uncertainty_ratios,
+    grid_line, error, asteroid_name, duration=5):
 
-    means, unc = get_densities_mcmc("fe", False)
-    #means, unc = get_densities_ls_sq("fe")
+    if not os.path.isdir(f"../figs/{asteroid_name}"):
+        os.mkdir(f"../figs/{asteroid_name}")
 
-    print("Means", means / np.mean(means))
-    print("Standard deviations", unc / np.mean(means))
-    print("Ratios", unc / means)
-    print("Klm error", get_klms(means)[:N_FREE_DIM] - data)
+    warnings.filterwarnings("ignore")
 
-    ## Still need to propagate uncertainties to the other densities
+    densities /= np.nanmean(densities)
+
+    if true_densities is not None:
+        true_densities /= np.nanmean(true_densities)
+        ratios = (densities - true_densities) / (densities * uncertainty_ratios)
+        make_slices(ratios, grid_line, "$\\Delta\\sigma$", 'coolwarm', f"../figs/{asteroid_name}/fe-r", error, percentile=95, balance=True)
+        make_gif(ratios, grid_line, "$\\Delta\\sigma$", 'coolwarm', f"../figs/{asteroid_name}/fe-r.gif", duration=duration, percentile=95, balance=True)
+        difference = (true_densities - densities)
+
+    print("Plotting density")
+    make_slices(densities, grid_line, "$\\rho$", 'plasma', f"../figs/{asteroid_name}/fe-d", error)
+    make_gif(densities, grid_line, "$\\rho$", 'plasma', f"../figs/{asteroid_name}/fe-d.gif", duration)
+    
+    print("Plotting uncertainty")
+    make_slices(uncertainty_ratios, grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"../figs/{asteroid_name}/fe-u", error, 95)
+    make_gif(uncertainty_ratios, grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"../figs/{asteroid_name}/fe-u.gif", duration, 95)
+
+    if true_densities is not None:
+        print("Plotting differences")
+        make_slices(difference, grid_line, "$\\Delta\\rho$", 'PuOr_r', f"../figs/{asteroid_name}/fe-s", error, 95, balance=True)
+        make_gif(difference, grid_line, "$\\Delta\\rho$", 'PuOr_r', f"../figs/{asteroid_name}/fe-s.gif", duration, 95, balance=True)
+
+    warnings.filterwarnings("default")
+
+def get_map(info, means, unc, asteroid):
+    densities = np.einsum("ijkl,i->jkl", info.masks, means)
+    unc_ratios = np.einsum("ijkl,i->jkl", info.masks, unc) / densities
+    densities = densities / np.nanmean(densities)
+
+    densities[~asteroid.indicator_map] = np.nan
+    unc_ratios[~asteroid.indicator_map] = np.nan
+
+    return densities, unc_ratios
+
+
+def pipeline(name, sample_path, indicator, surface_am, map):
+    generate = False
+    asteroid = Asteroid(name, sample_path, surface_am, DIVISION, MAX_RADIUS, indicator, TrueShape.uniform())
+    asteroid_info = load(asteroid, surface_am, sample_path, generate)
+    
+    means, high_unc, low_unc = get_densities_mcmc("fe", asteroid_info, generate)
+    unc = (high_unc + low_unc) / 2
+
+    if map:
+        densities, uncertainty_ratios = get_map(asteroid_info, means, unc, asteroid)
+        true_densities = asteroid.get_true_densities()
+        true_densities[~asteroid.indicator_map] = np.nan
+        error = log_probability(means[:N_FREE_DIM], asteroid_info) / N_FREE_DIM * -2
+        display(densities, true_densities, uncertainty_ratios,
+        asteroid.grid_line, error, name)
+    
+if __name__ == "__main__":
+    k22, k20, am = -0.05200629, -0.2021978, 1000
+    pipeline(
+        "asym-ell",
+        "../samples/den-asym-0-samples.npy",
+        Indicator.ell(am, k22, k20),
+        am,
+        True
+    )

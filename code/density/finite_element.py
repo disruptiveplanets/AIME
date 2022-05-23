@@ -7,7 +7,7 @@ SHIFT_FRACTION = 1
 
 class FiniteElement(Method):
     def __init__(self, asteroid):
-        print("Finite element model")
+        print("Finite element linear model")
         super().__init__(asteroid, False)
 
         if self.asteroid.max_l is not None:
