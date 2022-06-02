@@ -15,7 +15,7 @@ MAX_L = 3
 N_ALL_DIM = (MAX_L + 1)**2
 N_FREE_DIM = N_ALL_DIM - 7
 MAX_N_STEPS = 100_000
-DIVISION = 29
+DIVISION = 99
 RLM_EPSILON = 1e-20
 MAX_RADIUS = 2000
 SMALL_SIGMA = 1e-5
@@ -26,8 +26,6 @@ UNCERTAINTY_RATIO = 0.25
 VERY_LARGE_SLOPE = 1e30 # Can be infinite for mcmc
 NUM_THREADS = os.cpu_count()
 MIN_LOG_LIKE = 1000# 100
-
-np.random.seed(23678)
 
 def get_cov(path):
     with open(path, 'rb') as f:
@@ -271,21 +269,21 @@ class AsteroidInfo:
         self.rlm_prod = rlm_prod
         self.masks = masks
 
-def load(asteroid, surface_am, sample_path, generate=True):
-    mean_density = 1 / (np.sum(asteroid.indicator_map) * DIVISION**3)
+def load(name, asteroid, surface_am, sample_path, division, generate=True):
+    mean_density = 1 / (np.sum(asteroid.indicator_map) * division**3)
     data, cov = get_cov(sample_path)
     data_inv_covs = pinvh(cov)
     if generate:
         masks = get_grids_centroid(N_ALL_DIM, asteroid.grid_line, asteroid.indicator_map, asteroid.indicator)[1]
-        with open("grids.npy", 'wb') as f:
+        with open(name + "grids.npy", 'wb') as f:
             np.save(f, masks)
     else:
-        with open("grids.npy", 'rb') as f:
+        with open(name + "grids.npy", 'rb') as f:
             masks = np.load(f)
     
     rlms = asteroid.moment_field()
 
-    rlm_mat_complex = np.einsum("iabc,jabc->ji", masks, rlms) * DIVISION**3
+    rlm_mat_complex = np.einsum("iabc,jabc->ji", masks, rlms) * division**3
 
     # Set order
     rlm_mat = np.zeros((N_ALL_DIM, N_ALL_DIM))
@@ -355,12 +353,12 @@ def get_map(info, means, unc, asteroid):
     return densities, unc_ratios
 
 
-def pipeline(name, sample_path, indicator, surface_am, map):
-    generate = False
-    asteroid = Asteroid(name, sample_path, surface_am, DIVISION, MAX_RADIUS, indicator, TrueShape.uniform())
-    asteroid_info = load(asteroid, surface_am, sample_path, generate)
+def pipeline(name, sample_path, indicator, surface_am, division, max_radius, map):
+    generate = True
+    asteroid = Asteroid(name, sample_path, surface_am, division, max_radius, indicator, TrueShape.uniform())
+    asteroid_info = load(name, asteroid, surface_am, sample_path, division, generate)
     
-    means, high_unc, low_unc = get_densities_mcmc("fe", asteroid_info, generate)
+    means, high_unc, low_unc = get_densities_mcmc(name+"-fe", asteroid_info, generate)
     unc = (high_unc + low_unc) / 2
 
     if map:
@@ -370,13 +368,18 @@ def pipeline(name, sample_path, indicator, surface_am, map):
         error = log_probability(means[:N_FREE_DIM], asteroid_info) / N_FREE_DIM * -2
         display(densities, true_densities, uncertainty_ratios,
         asteroid.grid_line, error, name)
+
+    return unc
     
 if __name__ == "__main__":
     k22, k20, am = -0.05200629, -0.2021978, 1000
-    pipeline(
-        "asym-ell",
-        "../samples/den-asym-0-samples.npy",
-        Indicator.ell(am, k22, k20),
-        am,
-        True
-    )
+    pipeline("asym-ell-0", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
+    pipeline("asym-ell-1", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
+    pipeline("asym-ell-2", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
+    pipeline("asym-ell-3", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
+    pipeline("asym-ell-4", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
+    pipeline("asym-ell-5", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
+    pipeline("asym-ell-6", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
+    pipeline("asym-ell-7", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
+    pipeline("asym-ell-8", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
+    pipeline("asym-ell-9", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)

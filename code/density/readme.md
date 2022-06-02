@@ -106,3 +106,5 @@ Found moments for a core asteroid. They are:
         K20 = -0.1754365400999416
         aA = 851.5964018739621
 Pushed them to supercomputer to run extraction.
+
+The core densities are three times the shell densities (ceres) and the radii were chosen such that the core and shell have equal mass.
