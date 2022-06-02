@@ -396,7 +396,7 @@ class TrueShape:
         c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20) * radius_ratio
         def func(x, y, z):
             dist = x*x / (a*a) + y*y / (b*b) + z*z / (c*c)
-            return 1 * (dist > 1) + density_ratio * (dist >= 1)
+            return 1 * (dist > 1) + density_ratio * (dist <= 1)
         return func
 
     def blob(am, k22, k20):
