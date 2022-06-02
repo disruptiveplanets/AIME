@@ -93,3 +93,16 @@ Fixed the uncertainties bug that was leading to negative uncertainty.
 ## April 22
 
 Made new figs. Everything, including the uncertainty, should be correct.
+
+## June 2
+
+Found moments for a core asteroid. They are:
+    Elliptical core
+        K22 = -0.05200645295935643 (old)
+        K20 = -0.20219868297920368 (old)
+        aA = 891.777
+    Spherical core
+        K22 = -0.03973412605878553
+        K20 = -0.1754365400999416
+        aA = 851.5964018739621
+Pushed them to supercomputer to run extraction.
