@@ -390,6 +390,15 @@ class TrueShape:
         r2 = 5/3 * am * am
         return lambda x, y, z: np.exp(0.5 * (x*x + y*y + z*z)/r2)
 
+    def core(am, k22, k20, density_ratio, radius_ratio):
+        a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 + 12 * k22) * radius_ratio
+        b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22) * radius_ratio
+        c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20) * radius_ratio
+        def func(x, y, z):
+            dist = x*x / (a*a) + y*y / (b*b) + z*z / (c*c)
+            return 1 * (dist > 1) + density_ratio * (dist >= 1)
+        return func
+
     def blob(am, k22, k20):
         blob_displacement = 500
         blob_rad = 300
