@@ -11,17 +11,17 @@ DIVISION = 99
 FILE_PATH = "../../../data/"
 
 NAMES = {
-    #"scan-perigee": (2,), 
+    "scan-perigee": (2,), 
     "probe-s-theta": (2,), 
-    #"probe-s-rho": (2,), 
-    #"scan-cadence": (2,),
-    #"scan-period": (2,), 
-    #"scan-am": (2,),
-    #"scan-vex": (2,), 
-    #"observation-gap": (2,)
-    #"scan-spin-pole": (2,),
-    #"cad-period-sync-contour": (2,2),
-    #"cad-speed-contour": (2,2)
+    "probe-s-rho": (2,), 
+    "scan-cadence": (2,),
+    "scan-period": (2,), 
+    "scan-am": (2,),
+    "scan-vex": (2,), 
+    "observation-gap": (2,),
+    "scan-spin-pole": (2,),
+    "cad-period-sync-contour": (2,2),
+    "cad-speed-contour": (2,2)
 }
 
 from contextlib import contextmanager
