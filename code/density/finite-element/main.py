@@ -86,14 +86,13 @@ def mcmc_fit(theta_start, output_name, info, generate=True):
                     tau = sampler.get_autocorr_time(tol=0)
 
                     # Check convergence
-                    converged = np.all(tau * 500 < sampler.iteration)
+                    converged = np.all(tau * 100 < sampler.iteration)
                     converged &= np.all(np.abs(old_tau - tau) / tau < 0.01)
                     if converged:
                         print("Converged")
                         break
                     old_tau = tau
-                if sampler.iteration % 1000 == 0:
-                    print("Average walker likelihood", np.mean(sampler.get_last_sample().log_prob))
+                    print(np.mean(sampler.get_last_sample().log_prob), tau)
 
             #sampler._previous_state = sample
 
@@ -173,38 +172,37 @@ def get_densities_mcmc(output_name, info, generate=True):
         print("Autocorrelation time", tau)
         flat_samples = sampler.get_chain(discard=2 * max_tau, thin=max_tau // 2, flat=True)
 
+        means = np.median(flat_samples, axis=0)
+
+        least_dist = None
+        least_point = None
+        for point in flat_samples:
+            mean_dist = np.sum((flat_samples - point)**2) / len(flat_samples)
+            if least_dist is None:
+                least_dist = mean_dist
+                least_point = point
+            if least_dist > mean_dist:
+                least_dist = mean_dist
+                least_point = point
+
+
+        means = least_point
+        long_samples = np.array([get_theta_long(theta_short, info) for theta_short in flat_samples])
+
         with open(output_name + ".npy", 'wb') as f:
-            np.save(f, flat_samples)
+            np.save(f, long_samples)
+    
     else:
         with open(output_name + ".npy", 'rb') as f:
-            flat_samples = np.load(f)
-
-    means = np.median(flat_samples, axis=0)
-
-    least_dist = None
-    least_point = None
-    for point in flat_samples:
-        mean_dist = np.sum((flat_samples - point)**2) / len(flat_samples)
-        if least_dist is None:
-            least_dist = mean_dist
-            least_point = point
-        if least_dist > mean_dist:
-            least_dist = mean_dist
-            least_point = point
-
-
-    means = least_point
-    long_samples = np.array([get_theta_long(theta_short, info) for theta_short in flat_samples])
-
-
+            long_samples = np.load(f)
 
     long_means = get_theta_long(means, info)
     high_unc = np.percentile(long_samples, (100 + 68.27) / 2, axis=0) - long_means
     low_unc = long_means - np.percentile(long_samples, (100 - 68.27) / 2, axis=0)
 
-    #fig = corner.corner(long_samples, truths=np.ones(N_ALL_DIM))
-    #corner.overplot_lines(fig, long_means / info.mean_density, color='C1')
-    #fig.savefig(output_name + ".png")
+    fig = corner.corner(long_samples, truths=np.ones(N_ALL_DIM))
+    corner.overplot_lines(fig, long_means / info.mean_density, color='C1')
+    fig.savefig(output_name + ".png")
 
     return long_means, high_unc, low_unc
 
@@ -275,10 +273,10 @@ def load(name, asteroid, surface_am, sample_path, division, generate=True):
     data_inv_covs = pinvh(cov)
     if generate:
         masks = get_grids_centroid(N_ALL_DIM, asteroid.grid_line, asteroid.indicator_map, asteroid.indicator)[1]
-        with open(name + "grids.npy", 'wb') as f:
+        with open(name + "-grids.npy", 'wb') as f:
             np.save(f, masks)
     else:
-        with open(name + "grids.npy", 'rb') as f:
+        with open(name + "-grids.npy", 'rb') as f:
             masks = np.load(f)
     
     rlms = asteroid.moment_field()
@@ -353,9 +351,11 @@ def get_map(info, means, unc, asteroid):
     return densities, unc_ratios
 
 
-def pipeline(name, sample_path, indicator, surface_am, division, max_radius, map):
+def pipeline(name, sample_path, indicator, surface_am, division, max_radius, map, used_bulk_am=None):
+    if used_bulk_am is None:
+        used_bulk_am = am
     generate = True
-    asteroid = Asteroid(name, sample_path, surface_am, division, max_radius, indicator, TrueShape.uniform())
+    asteroid = Asteroid(name, sample_path, surface_am, division, max_radius, indicator, TrueShape.uniform(), used_bulk_am)
     asteroid_info = load(name, asteroid, surface_am, sample_path, division, generate)
     
     means, high_unc, low_unc = get_densities_mcmc(name+"-fe", asteroid_info, generate)
@@ -373,13 +373,7 @@ def pipeline(name, sample_path, indicator, surface_am, division, max_radius, map
     
 if __name__ == "__main__":
     k22, k20, am = -0.05200629, -0.2021978, 1000
-    pipeline("asym-ell-0", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
-    pipeline("asym-ell-1", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
-    pipeline("asym-ell-2", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
-    pipeline("asym-ell-3", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
-    pipeline("asym-ell-4", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
-    pipeline("asym-ell-5", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
-    pipeline("asym-ell-6", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
-    pipeline("asym-ell-7", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
-    pipeline("asym-ell-8", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
-    pipeline("asym-ell-9", "../samples/den-asym-0-samples.npy", Indicator.ell(am, k22, k20), am, DIVISION, MAX_RADIUS, True)
+    pipeline("den-core-ell", "../samples/den-core-ell-0-samples.npy", Indicator.ell(am, k22, k20),
+        am, DIVISION, MAX_RADIUS, True, used_bulk_am=891.777)
+    pipeline("den-core-sph", "../samples/den-core-sph-0-samples.npy", Indicator.ell(am, k22, k20),
+        am, DIVISION, MAX_RADIUS, True, used_bulk_am=851.5964018739621)

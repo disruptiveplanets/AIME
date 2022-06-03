@@ -107,4 +107,4 @@ Found moments for a core asteroid. They are:
         aA = 851.5964018739621
 Pushed them to supercomputer to run extraction.
 
-The core densities are three times the shell densities (ceres) and the radii were chosen such that the core and shell have equal mass.
+The core densities are three times the shell densities (ceres; Julie C. Castillo-Rogez and Thomas B. McCord, 2010) and the radii were chosen such that the core and shell have equal mass.

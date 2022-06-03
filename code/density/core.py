@@ -226,7 +226,7 @@ class Method:
 
 
 class Asteroid:
-    def __init__(self, name, sample_file, surface_am, division, max_radius, indicator, true_shape):
+    def __init__(self, name, sample_file, surface_am, division, max_radius, indicator, true_shape, used_bulk_am):
         self.name = name
         self.max_l = None
         self.surface_am = surface_am
@@ -237,11 +237,11 @@ class Asteroid:
         self.indicator = indicator
         self.indicator_map = self.get_indicator_map()
         if sample_file != "":
-            self.data, self.sigma_data = self.load_samples(sample_file)
+            self.data, self.sigma_data = self.load_samples(sample_file, used_bulk_am)
         self.sample_file = sample_file
         self.moments = None
 
-    def load_samples(self, fname):
+    def load_samples(self, fname, bulk_am):
         with open(fname, 'rb') as f:
             samples = np.load(f)
         samples = samples.reshape(-1, samples.shape[-1]).transpose()
@@ -276,15 +276,22 @@ class Asteroid:
             klms[9] = -klms[15].conj()
             ms = np.append(ms, [-3, -2, -1, 0, 1, 2, 3])
 
+        # Cnvert to new Klm definition, which goes like 1 / bulk am^2.
+        i = 0
+        for l in range(0, self.max_l + 1):
+            for m in range(-l, l+1):
+                klms[i] *= (bulk_am / self.surface_am) ** (l - 2)
+                i += 1
+
         delta_gamma = samples[0] - np.mean(samples[0])
         hybrids = klms * np.exp(-1j * np.outer(ms, delta_gamma))
         klm_means = np.mean(hybrids, axis=1)
 
         klm_cov = np.cov(hybrids)
-        added_one_cov = np.hstack((klm_cov, np.zeros((klm_cov.shape[0], 1))))
-        added_cov = np.vstack((added_one_cov, np.zeros((1, klm_cov.shape[0]+1))))
+        #added_one_cov = np.hstack((klm_cov, np.zeros((klm_cov.shape[0], 1))))
+        #added_cov = np.vstack((added_one_cov, np.zeros((1, klm_cov.shape[0]+1))))
 
-        return np.append(klm_means, 1), added_cov
+        return klm_means, klm_cov  # Removed radius from data.
 
     def get_true_densities(self):
         if self.true_densities is None:

@@ -1,23 +1,22 @@
 # PROBLEM: this data doesn't have K3m.
 
-from socket import ntohl
 import sys, os
 import numpy as np
-sys.path.append("../density")
-from core import Asteroid, Indicator
-sys.path.append("../density/finite-element")
+sys.path.append("../../density")
+from core import Indicator
+sys.path.append("../../density/finite-element")
 from main import pipeline
 
-DIVISION = 49
-FILE_PATH = "../../data/"
+DIVISION = 99
+FILE_PATH = "../../../data/"
 
 NAMES = {
     #"scan-perigee": (2,), 
     "probe-s-theta": (2,), 
-    "probe-s-rho": (2,), 
+    #"probe-s-rho": (2,), 
     #"scan-cadence": (2,),
     #"scan-period": (2,), 
-    #"scan-am": (2,), 
+    #"scan-am": (2,),
     #"scan-vex": (2,), 
     #"observation-gap": (2,)
     #"scan-spin-pole": (2,),
@@ -114,9 +113,12 @@ def get_unc_for_file(dname, fname):
 
     max_radius = int(max(a, b, c) + 4 * DIVISION)
     
+    short_name = fname[:-14]
+    short_name = short_name[short_name.rfind('/')+1:]
+    print(short_name)
     
     with suppress_stdout():
-        uncs = pipeline(f"ast-{fname}", fname, Indicator.ell(radius, k22, k20), am, DIVISION, max_radius, False)
+        uncs = pipeline(f"ast-{short_name}", fname, Indicator.ell(radius, k22, k20), am, DIVISION, max_radius, False)
 
     density_uncertainty = np.nanmedian(uncs)
     return density_uncertainty
