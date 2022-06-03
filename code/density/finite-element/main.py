@@ -1,4 +1,4 @@
-import emcee, corner, sys, lmfit, random, os, warnings
+import emcee, corner, sys, random, os, warnings
 import numpy as np
 from scipy.linalg import pinvh, inv
 from matplotlib import pyplot as plt
@@ -20,8 +20,8 @@ RLM_EPSILON = 1e-20
 MAX_RADIUS = 2000
 SMALL_SIGMA = 1e-5
 CERTAIN_INDICES = [0, 1, 2, 3, 5, 7, -1]
-MAX_DENSITY = 10
-MIN_DENSITY = 0
+MAX_DENSITY = 9 # Iron
+MIN_DENSITY = 0.5 
 UNCERTAINTY_RATIO = 0.25
 VERY_LARGE_SLOPE = 1e30 # Can be infinite for mcmc
 NUM_THREADS = os.cpu_count()
@@ -353,7 +353,7 @@ def get_map(info, means, unc, asteroid):
 
 def pipeline(name, sample_path, indicator, surface_am, division, max_radius, map, used_bulk_am=None):
     if used_bulk_am is None:
-        used_bulk_am = am
+        used_bulk_am = surface_am
     generate = True
     asteroid = Asteroid(name, sample_path, surface_am, division, max_radius, indicator, TrueShape.uniform(), used_bulk_am)
     asteroid_info = load(name, asteroid, surface_am, sample_path, division, generate)
@@ -372,8 +372,10 @@ def pipeline(name, sample_path, indicator, surface_am, division, max_radius, map
     return unc
     
 if __name__ == "__main__":
-    k22, k20, am = -0.05200629, -0.2021978, 1000
-    pipeline("den-core-ell", "../samples/den-core-ell-0-samples.npy", Indicator.ell(am, k22, k20),
-        am, DIVISION, MAX_RADIUS, True, used_bulk_am=891.777)
-    pipeline("den-core-sph", "../samples/den-core-sph-0-samples.npy", Indicator.ell(am, k22, k20),
-        am, DIVISION, MAX_RADIUS, True, used_bulk_am=851.5964018739621)
+    k22, k20, surface_am = -0.05200629, -0.2021978, 1000 # For the shape
+    pipeline("den-core-ell", "../samples/den-core-ell-0-samples.npy", Indicator.ell(surface_am, k22, k20),
+        surface_am, DIVISION, MAX_RADIUS, True, used_bulk_am=891.777)
+    pipeline("den-core-sph", "../samples/den-core-sph-0-samples.npy", Indicator.ell(surface_am, k22, k20),
+        surface_am, DIVISION, MAX_RADIUS, True, used_bulk_am=851.5964018739621)
+    pipeline("asym-ell", "../samples/asym-ell-0-samples.npy", Indicator.ell(surface_am, k22, k20),
+        surface_am, DIVISION, MAX_RADIUS, True, used_bulk_am=surface_am)

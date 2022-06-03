@@ -108,3 +108,7 @@ Found moments for a core asteroid. They are:
 Pushed them to supercomputer to run extraction.
 
 The core densities are three times the shell densities (ceres; Julie C. Castillo-Rogez and Thomas B. McCord, 2010) and the radii were chosen such that the core and shell have equal mass.
+
+## June 3
+
+Sent a lot of things to Julien. Changed the prior density bounds so that only asym-ell, den-core-ell, and den-core-sph are valid.
