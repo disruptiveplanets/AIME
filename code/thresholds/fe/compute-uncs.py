@@ -124,8 +124,8 @@ def get_unc_for_file(dname, fname):
     return density_uncertainty
 
 def scan_specific(directory, threshold):
-    from matplotlib import pyplot as plt
-    uncs = scan_directory(FILE_PATH + sys.argv[1], index_lengths[sys.argv[1]])
+    index_lengths = NAMES[sys.argv[1]]
+    uncs = scan_directory(FILE_PATH + sys.argv[1], index_lengths)
     print(uncs)
     with open(sys.argv[1]+".npy", 'wb') as f:
         np.save(f, uncs)
@@ -140,12 +140,6 @@ def scan_specific(directory, threshold):
             threshold_index_right = None
         print("Increasing threshold", threshold_index_left, "\t", "Decreasing threshold", threshold_index_right)
         
-        plt.plot(uncs)
-        plt.xlabel("index")
-        plt.ylabel("Distribution uncertainty")
-        plt.axhline(y=threshold)
-        plt.show()
-
 def scan_all(thresholds):
     print("Thresholds", thresholds)
     for name, index_lengths in NAMES.items():
@@ -169,5 +163,6 @@ def scan_all(thresholds):
                 print(f"\tinc.\t{threshold_index_left}\tdec.\t{threshold_index_right}")
 
 if __name__ == "__main__":
-    #scan_specific(sys.argv[1], 1)
-    scan_all((1, 0.2))
+    scan_specific(sys.argv[1], 1)
+    scan_specific(sys.argv[1], 0.2)
+    #scan_all((1, 0.2))
