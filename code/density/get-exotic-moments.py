@@ -42,7 +42,7 @@ asteroids = [
 
 def get_klms(index):
     name, indicator, generator = asteroids[index]
-    asteroid = Asteroid(name, "", am, division, max_radius, indicator, None)
+    asteroid = Asteroid(name, "", am, division, max_radius, indicator, None, used_bulk_am=am)
     density = asteroid.map_np(generator)
 
     rlms = asteroid.moment_field(max_l=3)

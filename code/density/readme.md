@@ -112,3 +112,11 @@ The core densities are three times the shell densities (ceres; Julie C. Castillo
 ## June 3
 
 Sent a lot of things to Julien. Changed the prior density bounds so that only asym-ell, den-core-ell, and den-core-sph are valid.
+
+I also realized that the core of Spherical core might extend beyond the asteroid. So I manually set its radius (500 m) such that it didn't. New moments are 
+    Spherical core
+        K22 = -0.05040959164683727
+        K20 = -0.19599016007639866
+        aA = 922.9234884822591
+
+I set the new spherical shell running in the supercomputer.

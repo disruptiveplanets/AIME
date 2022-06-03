@@ -4,4 +4,4 @@ I started extraction of uncertainties as a function of observational precision. 
 
 ## June 3
 
-I killed the process and switched to 99 m. It was taking too long. (2 hours per task)
+I killed the process and switched to 99 m. It was taking too long. (2 hours per task). I'm running all scans now.

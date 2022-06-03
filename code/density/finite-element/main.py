@@ -48,10 +48,12 @@ def get_klms(theta_long, info):
 
 
 def log_prior(theta_long, info):
-    if np.any(theta_long < info.mean_density * MIN_DENSITY):
-        return VERY_LARGE_SLOPE * np.min(theta_long) / info.mean_density
-    if np.any(theta_long > info.mean_density * MAX_DENSITY):
-        return -VERY_LARGE_SLOPE * (np.max(theta_long) / info.mean_density - MAX_DENSITY)
+    mask_too_small = theta_long < info.mean_density * MIN_DENSITY
+    if np.any(mask_too_small):
+        return VERY_LARGE_SLOPE * np.sum((theta_long / info.mean_density - MIN_DENSITY) * mask_too_small)
+    mask_too_big = theta_long > info.mean_density * MAX_DENSITY
+    if np.any(mask_too_big):
+        return -VERY_LARGE_SLOPE * np.sum((np.max(theta_long) / info.mean_density - MAX_DENSITY) * mask_too_big)
     return 0.0
     
 def log_like(theta_long, info):
@@ -133,7 +135,7 @@ def min_func_mcmc(seed, info, result):
     local_rng = random.Random()
     local_rng.seed(seed)
     while not result.is_set():
-        val = [local_rng.random() * 4 * info.mean_density for _ in range(N_FREE_DIM)]
+        val = [(local_rng.random() * 4 + 0.5) * info.mean_density for _ in range(N_FREE_DIM)]
         try:
             min_result = minimize(minimize_func, x0=val, method="Nelder-Mead", args=(info, result,), options = {"maxiter": 500 * len(val)})
         except:
