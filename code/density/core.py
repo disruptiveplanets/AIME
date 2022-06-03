@@ -406,6 +406,13 @@ class TrueShape:
             return 1 * (dist > 1) + density_ratio * (dist <= 1)
         return func
 
+    
+    def core_sph(density_ratio, radius):
+        def func(x, y, z):
+            dist = x*x + y*y + z*z
+            return 1 * (dist > radius * radius) + density_ratio * (dist <= radius * radius)
+        return func
+
     def blob(am, k22, k20):
         blob_displacement = 500
         blob_rad = 300

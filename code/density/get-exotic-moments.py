@@ -36,8 +36,8 @@ asteroids = [
     #("out-sph", Indicator.sph(am), TrueShape.out_sph(am)),
     #("blob", Indicator.ell_y_shift(am, k22a, k20a, -lump_shift), TrueShape.blob(am, k22a, k20a)),
     #("rot-blob", Indicator.ell_y_shift(am, k22a, k20a, -lump_shift), TrueShape.rot_blob(am, k22a, k20a)),
-    ("core-ell", Indicator.ell(am, k22a, k20a), TrueShape.core(am, k22a, k20a, 1, 0.65)),
-    ("core-sph", Indicator.ell(am, k22a, k20a), TrueShape.core(am, 0, 0, 3, 0.65)),
+    ("core-ell", Indicator.ell(am, k22a, k20a), TrueShape.core(am, k22a, k20a, 3, 0.65)),
+    ("core-sph", Indicator.ell(am, k22a, k20a), TrueShape.core_sph(3, 500)),
 ]
 
 def get_klms(index):
