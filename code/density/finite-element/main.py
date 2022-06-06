@@ -26,10 +26,13 @@ UNCERTAINTY_RATIO = 0.25
 VERY_LARGE_SLOPE = 1e30 # Can be infinite for mcmc
 NUM_THREADS = os.cpu_count()
 MIN_LOG_LIKE = 1000# 100
+MINIMIZATION_ATTEMPTS = 500
 
 def get_cov(path):
     with open(path, 'rb') as f:
         flat_samples = np.load(f).reshape(-1, N_FREE_DIM + 1)[:, 1:]
+    if flat_samples.shape[0] == 0:
+        return None, None
     cov = np.cov(flat_samples.transpose())
     data = np.mean(flat_samples, axis=0)
     return data, cov
@@ -108,11 +111,23 @@ class MinResult:
     def __init__(self):
         self.lock = Lock()
         self.val = None
+        self.attempts = 0
     
     def set(self, v):
         self.lock.acquire()
         self.val = v
         self.lock.release()
+
+    def increment(self):
+        self.lock.acquire()
+        self.attempts += 1
+        self.lock.release()
+
+    def query(self, threshold):
+        self.lock.acquire()
+        greater = self.attempts > threshold
+        self.lock.release()
+        return greater
 
     def get(self):
         self.lock.acquire()
@@ -127,7 +142,7 @@ class MinResult:
         return result
 
 def minimize_func(theta, info, result):
-    if result.is_set():
+    if result.is_set() or result.query(MINIMIZATION_ATTEMPTS):
         raise Exception()
     return -log_probability(theta, info)
 
@@ -138,7 +153,7 @@ def min_func_mcmc(seed, info, result):
         val = [(local_rng.random() * 4 + 0.5) * info.mean_density for _ in range(N_FREE_DIM)]
         try:
             min_result = minimize(minimize_func, x0=val, method="Nelder-Mead", args=(info, result,), options = {"maxiter": 500 * len(val)})
-        except:
+        except Exception:
             print("Thread bailed")
             return
         if min_result.success and min_result.fun < MIN_LOG_LIKE:
@@ -147,6 +162,7 @@ def min_func_mcmc(seed, info, result):
             return
         else:
             print(f"Attempt failed with log like {min_result.fun}")
+            result.increment()
 
 def get_theta_start_mcmc(info):
     threads = []
@@ -167,6 +183,8 @@ def get_densities_mcmc(output_name, info, generate=True):
     if generate:
         theta_start = get_theta_start_mcmc(info)
         print("Theta start:", theta_start)
+        if theta_start is None:
+            return np.nan, np.nan
         sampler = mcmc_fit(theta_start, output_name, info, True)
 
         tau = sampler.get_autocorr_time()
@@ -174,21 +192,7 @@ def get_densities_mcmc(output_name, info, generate=True):
         print("Autocorrelation time", tau)
         flat_samples = sampler.get_chain(discard=2 * max_tau, thin=max_tau // 2, flat=True)
 
-        means = np.median(flat_samples, axis=0)
 
-        least_dist = None
-        least_point = None
-        for point in flat_samples:
-            mean_dist = np.sum((flat_samples - point)**2) / len(flat_samples)
-            if least_dist is None:
-                least_dist = mean_dist
-                least_point = point
-            if least_dist > mean_dist:
-                least_dist = mean_dist
-                least_point = point
-
-
-        means = least_point
         long_samples = np.array([get_theta_long(theta_short, info) for theta_short in flat_samples])
 
         with open(output_name + ".npy", 'wb') as f:
@@ -198,15 +202,30 @@ def get_densities_mcmc(output_name, info, generate=True):
         with open(output_name + ".npy", 'rb') as f:
             long_samples = np.load(f)
 
-    long_means = get_theta_long(means, info)
-    high_unc = np.percentile(long_samples, (100 + 68.27) / 2, axis=0) - long_means
-    low_unc = long_means - np.percentile(long_samples, (100 - 68.27) / 2, axis=0)
+    long_means, unc = get_stats_from_long_samples(long_samples)
 
-    fig = corner.corner(long_samples, truths=np.ones(N_ALL_DIM))
+    fig = corner.corner(long_samples / info.mean_density, truths=np.ones(N_ALL_DIM))
     corner.overplot_lines(fig, long_means / info.mean_density, color='C1')
     fig.savefig(output_name + ".png")
 
-    return long_means, high_unc, low_unc
+    return long_means, unc / long_means
+
+def get_stats_from_long_samples(long_samples):
+    short_samples = long_samples[:, :N_FREE_DIM]
+
+    # Don't compute the mean; compute the middle of the data set.
+    least_dist = None
+    for i, point in enumerate(short_samples):
+        mean_dist = np.sum((short_samples - point)**2) / len(short_samples)
+        if least_dist is None or least_dist > mean_dist:
+            least_dist = mean_dist
+            least_point_index = i
+    
+    long_means = long_samples[least_point_index]
+    high_unc = np.percentile(long_samples, (100 + 68.27) / 2, axis=0) - long_means
+    low_unc = long_means - np.percentile(long_samples, (100 - 68.27) / 2, axis=0)
+
+    return long_means, (high_unc + low_unc) / 2
 
 
 def min_func_ls_sq(params, result):
@@ -272,6 +291,9 @@ class AsteroidInfo:
 def load(name, asteroid, surface_am, sample_path, division, generate=True):
     mean_density = 1 / (np.sum(asteroid.indicator_map) * division**3)
     data, cov = get_cov(sample_path)
+    if cov is None:
+        # Sample path was empty
+        return None
     data_inv_covs = pinvh(cov)
     if generate:
         masks = get_grids_centroid(N_ALL_DIM, asteroid.grid_line, asteroid.indicator_map, asteroid.indicator)[1]
@@ -344,7 +366,7 @@ def display(densities, true_densities, uncertainty_ratios,
 
 def get_map(info, means, unc, asteroid):
     densities = np.einsum("ijkl,i->jkl", info.masks, means)
-    unc_ratios = np.einsum("ijkl,i->jkl", info.masks, unc) / densities
+    unc_ratios = np.einsum("ijkl,i->jkl", info.masks, unc)
     densities = densities / np.nanmean(densities)
 
     densities[~asteroid.indicator_map] = np.nan
@@ -353,15 +375,20 @@ def get_map(info, means, unc, asteroid):
     return densities, unc_ratios
 
 
-def pipeline(name, sample_path, indicator, surface_am, division, max_radius, map, used_bulk_am=None):
+def pipeline(name, sample_path, indicator, surface_am, division, max_radius, map, used_bulk_am=None, generate=True):
     if used_bulk_am is None:
         used_bulk_am = surface_am
-    generate = True
-    asteroid = Asteroid(name, sample_path, surface_am, division, max_radius, indicator, TrueShape.uniform(), used_bulk_am)
-    asteroid_info = load(name, asteroid, surface_am, sample_path, division, generate)
     
-    means, high_unc, low_unc = get_densities_mcmc(name+"-fe", asteroid_info, generate)
-    unc = (high_unc + low_unc) / 2
+    asteroid = Asteroid(name, sample_path, surface_am, division, max_radius, indicator, TrueShape.uniform(), used_bulk_am)
+    print("Grid line", asteroid.grid_line)
+    asteroid_info = load(name, asteroid, surface_am, sample_path, division, generate)
+
+    if asteroid_info is None:
+        return np.nan
+    
+    means, unc = get_densities_mcmc(name+"-fe", asteroid_info, generate)
+    if np.any(np.isnan(unc)):
+        return np.nan
 
     if map:
         densities, uncertainty_ratios = get_map(asteroid_info, means, unc, asteroid)
@@ -375,9 +402,6 @@ def pipeline(name, sample_path, indicator, surface_am, division, max_radius, map
     
 if __name__ == "__main__":
     k22, k20, surface_am = -0.05200629, -0.2021978, 1000 # For the shape
-    pipeline("den-core-ell", "../samples/den-core-ell-0-samples.npy", Indicator.ell(surface_am, k22, k20),
-        surface_am, DIVISION, MAX_RADIUS, True, used_bulk_am=891.777)
-    pipeline("den-core-sph", "../samples/den-core-sph-0-samples.npy", Indicator.ell(surface_am, k22, k20),
-        surface_am, DIVISION, MAX_RADIUS, True, used_bulk_am=851.5964018739621)
-    pipeline("asym-ell", "../samples/asym-ell-0-samples.npy", Indicator.ell(surface_am, k22, k20),
-        surface_am, DIVISION, MAX_RADIUS, True, used_bulk_am=surface_am)
+    for i in range(20):
+        pipeline(f"den-core-sph-{i}", "../samples/den-core-sph-0-samples.npy", Indicator.ell(surface_am, k22, k20),
+            surface_am, DIVISION, MAX_RADIUS, True, used_bulk_am=922.9234884822591)

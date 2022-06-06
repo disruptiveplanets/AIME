@@ -120,3 +120,7 @@ I also realized that the core of Spherical core might extend beyond the asteroid
         aA = 922.9234884822591
 
 I set the new spherical shell running in the supercomputer.
+
+## June 6
+
+Pulled the spherical core run from the supercomputer and ran lots of fits to it. 

@@ -5,7 +5,7 @@ import numpy as np
 sys.path.append("../../density")
 from core import Indicator
 sys.path.append("../../density/finite-element")
-from main import pipeline
+from main import pipeline, get_stats_from_long_samples
 
 DIVISION = 99
 FILE_PATH = "../../../data/"
@@ -61,20 +61,22 @@ def scan_directory(directory, index_lengths):
     uncs = np.ones(max_indices) * np.nan
 
     for dname in os.listdir(directory):
-        if not os.path.isdir(directory+'/'+dname):
+        run_name = directory+'/'+dname
+        if not os.path.isdir(run_name):
             continue
-        for fname in os.listdir(directory+'/'+dname):
+        for fname in os.listdir(run_name):
             if not fname.endswith("-0-samples.npy"):
                 continue
             indices = tuple(get_indices(dname, index_lengths))
             if not np.isnan(uncs[indices]):
                 raise Exception(f"Index {indices} was already processed")
-            unc = get_unc_for_file(directory+'/'+dname, directory+'/'+dname+'/'+fname)
+            unc = get_unc_for_file(run_name, run_name+'/'+fname)
             uncs[indices] = unc
     return uncs
 
 
 def get_unc_for_file(dname, fname):
+    # fname ends with -0-samples.npy
     with open(fname, 'rb') as f:
         array = np.load(f)
         if len(array) == 0: return np.nan
@@ -102,7 +104,10 @@ def get_unc_for_file(dname, fname):
 
     # Make asteroid
     am = radius
-    if am < 2 * DIVISION:
+
+    division = DIVISION * radius / 1000
+
+    if am < 2 * division:
         return np.nan
     k20 = theta_true[2]
     k22 = theta_true[1]
@@ -111,23 +116,35 @@ def get_unc_for_file(dname, fname):
     b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
     c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
 
-    max_radius = int(max(a, b, c) + 4 * DIVISION)
+    max_radius = int(max(a, b, c) + 4 * division)
     
     short_name = fname[:-14]
     short_name = short_name[short_name.rfind('/')+1:]
     print(short_name)
-    
+
+    # # Check to see if this has already been processed. This code just pulls data and doesn't redo anything
+    # if os.path.exists(f"ast-{short_name}-fe.npy"):
+    #     print("Already run")
+    #     with open(f"ast-{short_name}-fe.npy", 'rb') as f:
+    #         long_samples = np.load(f);
+    #         uncs = get_stats_from_long_samples(long_samples)
     with suppress_stdout():
-        uncs = pipeline(f"ast-{short_name}", fname, Indicator.ell(radius, k22, k20), am, DIVISION, max_radius, False)
+        # Do not regenerate if the file was already done.
+        generate = not os.path.exists(f"ast-{short_name}-fe.npy")
+        uncs = pipeline(f"ast-{short_name}", fname, Indicator.ell(radius, k22, k20), am, division,
+            max_radius, False, used_bulk_am=None, generate=generate)
+
+    if np.any(np.isnan(uncs)):
+        return np.nan
 
     density_uncertainty = np.nanmedian(uncs)
     return density_uncertainty
 
 def scan_specific(directory, threshold):
-    index_lengths = NAMES[sys.argv[1]]
-    uncs = scan_directory(FILE_PATH + sys.argv[1], index_lengths)
+    index_lengths = NAMES[directory]
+    uncs = scan_directory(FILE_PATH + directory, index_lengths)
     print(uncs)
-    with open(sys.argv[1]+".npy", 'wb') as f:
+    with open(directory+".npy", 'wb') as f:
         np.save(f, uncs)
     if len(uncs.shape) == 1:
         where_more_than_one = np.where(uncs>threshold)[0]
@@ -164,5 +181,5 @@ def scan_all(thresholds):
 
 if __name__ == "__main__":
     scan_specific(sys.argv[1], 1)
-    scan_specific(sys.argv[1], 0.2)
-    #scan_all((1, 0.2))
+    #scan_specific(sys.argv[1], 0.2)
+    #scan_all((1,))
