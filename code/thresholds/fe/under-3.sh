@@ -8,4 +8,4 @@ source /etc/profile
 
 module load anaconda/2022a
 
-python compute-uncs-underdetermined.py probe-s-rho 3
+python -u compute-uncs-underdetermined.py probe-s-rho 3

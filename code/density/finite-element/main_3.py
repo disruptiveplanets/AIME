@@ -206,7 +206,7 @@ def get_densities_mcmc(output_name, info, generate=True):
 
     long_means, unc = get_stats_from_long_samples(long_samples)
 
-    fig = corner.corner(long_samples / info.mean_density, truths=np.ones(N_ALL_DIM))
+    fig = corner.corner(long_samples / info.mean_density, truths=np.ones(N_ALL))
     corner.overplot_lines(fig, long_means / info.mean_density, color='C1')
     fig.savefig(output_name + ".png")
 

@@ -139,15 +139,9 @@ def get_unc_for_file(dname, fname):
     short_name = short_name[short_name.rfind('/')+1:]
     print(short_name)
 
-    # # Check to see if this has already been processed. This code just pulls data and doesn't redo anything
-    # if os.path.exists(f"ast-{short_name}-fe.npy"):
-    #     print("Already run")
-    #     with open(f"ast-{short_name}-fe.npy", 'rb') as f:
-    #         long_samples = np.load(f);
-    #         uncs = get_stats_from_long_samples(long_samples)
     with suppress_stdout():
         # Do not regenerate if the file was already done.
-        generate = not os.path.exists(f"ast-{short_name}-fe.npy")
+        generate = not os.path.exists(f"ast-{sys.argv[2]}-{short_name}-fe.npy")
         uncs = pipeline(f"ast-{sys.argv[2]}-{short_name}", fname, Indicator.ell(radius, k22, k20), am, division,
             max_radius, False, used_bulk_am=None, generate=generate)
 
