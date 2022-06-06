@@ -123,4 +123,4 @@ I set the new spherical shell running in the supercomputer.
 
 ## June 6
 
-Pulled the spherical core run from the supercomputer and ran lots of fits to it. 
+Pulled the spherical core run from the supercomputer and ran lots of fits to it. Mostly still running on the supercomputer, but their priors are 0.5-9 and they run full number of elements.

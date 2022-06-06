@@ -11,3 +11,5 @@ I killed the process and switched to 99 m. It was taking too long. (2 hours per 
 I edited the code so that it would not do reruns of data already generated, and would not kill itself when it hit a failed run. Pulled some of the scans.
 
 I also realized that the output is pure uncertainty, not uncertainty ratio. So I changed it to uncertainty ratio.
+
+After my meeting with Julien, I changed the prior to 0.25-3 and adjusted the number of finite elements used. Then I ran all of these on the SC.

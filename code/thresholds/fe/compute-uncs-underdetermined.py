@@ -5,7 +5,24 @@ import numpy as np
 sys.path.append("../../density")
 from core import Indicator
 sys.path.append("../../density/finite-element")
-from main import pipeline, get_stats_from_long_samples
+if "0" == sys.argv[2]:
+    from main import pipeline, get_stats_from_long_samples
+if "1" == sys.argv[2]:
+    from main_1 import pipeline, get_stats_from_long_samples
+if "2" == sys.argv[2]:
+    from main_2 import pipeline, get_stats_from_long_samples
+if "3" == sys.argv[2]:
+    from main_3 import pipeline, get_stats_from_long_samples
+if "4" == sys.argv[2]:
+    from main_4 import pipeline, get_stats_from_long_samples
+if "5" == sys.argv[2]:
+    from main_5 import pipeline, get_stats_from_long_samples
+if "6" == sys.argv[2]:
+    from main_6 import pipeline, get_stats_from_long_samples
+if "7" == sys.argv[2]:
+    from main_7 import pipeline, get_stats_from_long_samples
+if "8" == sys.argv[2]:
+    from main_8 import pipeline, get_stats_from_long_samples
 
 DIVISION = 99
 FILE_PATH = "../../../data/"
@@ -131,7 +148,7 @@ def get_unc_for_file(dname, fname):
     with suppress_stdout():
         # Do not regenerate if the file was already done.
         generate = not os.path.exists(f"ast-{short_name}-fe.npy")
-        uncs = pipeline(f"ast-{short_name}", fname, Indicator.ell(radius, k22, k20), am, division,
+        uncs = pipeline(f"ast-{sys.argv[2]}-{short_name}", fname, Indicator.ell(radius, k22, k20), am, division,
             max_radius, False, used_bulk_am=None, generate=generate)
 
     if np.any(np.isnan(uncs)):
@@ -144,7 +161,7 @@ def scan_specific(directory, threshold):
     index_lengths = NAMES[directory]
     uncs = scan_directory(FILE_PATH + directory, index_lengths)
     print(uncs)
-    with open(directory + ".npy", 'wb') as f:
+    with open(directory+"-" + sys.argv[2]+".npy", 'wb') as f:
         np.save(f, uncs)
     if len(uncs.shape) == 1:
         where_more_than_one = np.where(uncs>threshold)[0]
