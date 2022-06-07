@@ -100,6 +100,9 @@ def mcmc_fit(theta_start, output_name, info, generate=True):
                         break
                     old_tau = tau
                     print(np.mean(sampler.get_last_sample().log_prob), tau)
+                    if np.mean(sampler.get_last_sample().log_prob) < -100:
+                        # MCMC will not converge.
+                        return None
 
             #sampler._previous_state = sample
 
@@ -188,6 +191,8 @@ def get_densities_mcmc(output_name, info, generate=True):
         if theta_start is None:
             return np.nan, np.nan
         sampler = mcmc_fit(theta_start, output_name, info, True)
+        if sampler is None:
+            return np.nan, np.nan
 
         tau = sampler.get_autocorr_time()
         max_tau = int(np.max(tau))
