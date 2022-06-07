@@ -124,3 +124,11 @@ I set the new spherical shell running in the supercomputer.
 ## June 6
 
 Pulled the spherical core run from the supercomputer and ran lots of fits to it. Mostly still running on the supercomputer, but their priors are 0.5-9 and they run full number of elements.
+
+## June 7
+
+The average appears to be going well. It had a core density of 3x the shell and prior 0.5-9. I'm a little confused as to why the core only appears to have density 2x the shell but I think it could be the fault of the prior or not taking enough averages. Rather than continue down this path, I moved to a core of 1.5x the shell and 0.25-3 prior. Currently extracting moments. I'm also upping the DIVISION from 99 to 49. The new moments are
+    Spherical core
+        K22 = -0.0515978274784774
+        K20 = -0.19599016007639866
+        aA = 978.4541044108308

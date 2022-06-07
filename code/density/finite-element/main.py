@@ -3,7 +3,7 @@ import numpy as np
 from scipy.linalg import pinvh, inv
 from matplotlib import pyplot as plt
 from multiprocessing import Pool, Lock
-from grids import get_grids_centroid
+import grids
 sys.path.append("..")
 from core import Asteroid, Indicator, TrueShape
 from scipy.optimize import minimize
@@ -304,7 +304,7 @@ def load(name, asteroid, surface_am, sample_path, division, generate=True):
         return None
     data_inv_covs = pinvh(cov)
     if generate:
-        masks = get_grids_centroid(N_ALL, asteroid.grid_line, asteroid.indicator_map, asteroid.indicator)[1]
+        masks = grids.get_grids_centroid(N_ALL, asteroid.grid_line, asteroid.indicator_map, asteroid.indicator)[1]
         with open(name + "-grids.npy", 'wb') as f:
             np.save(f, masks)
     else:
@@ -403,7 +403,7 @@ def pipeline(name, sample_path, indicator, surface_am, division, max_radius, map
         densities, uncertainty_ratios = get_map(asteroid_info, means, unc, asteroid)
         true_densities = asteroid.get_true_densities()
         true_densities[~asteroid.indicator_map] = np.nan
-        error = log_probability(means[:N_FREE_DIM], asteroid_info) / N_FREE_DIM * -2
+        error = log_probability(means[:N_FREE], asteroid_info) / N_FREE * -2
         display(densities, true_densities, uncertainty_ratios,
         asteroid.grid_line, error, name)
 

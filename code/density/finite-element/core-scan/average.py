@@ -6,7 +6,7 @@ from display import make_gif, make_slices
 from core import TrueShape
 
 NAME_START = "den-core-sph"
-NUM_DRAWS = 6
+NUM_DRAWS = 20
 NUM_CHOOSE = 1000
 ASTEROID_NAME = "avg-core"
 MAX_RADIUS = 2000
@@ -22,6 +22,9 @@ if GENERATE:
     num_grids = 0
 
     for i in range(NUM_DRAWS):
+        if not os.path.exists(f"{NAME_START}-{i}-fe.npy"):
+            # Run did not successfully complete
+            continue
         with open(f"{NAME_START}-{i}-grids.npy", 'rb') as f:
             grids = np.load(f)
         with open(f"{NAME_START}-{i}-fe.npy", 'rb') as f:
