@@ -13,3 +13,7 @@ I edited the code so that it would not do reruns of data already generated, and 
 I also realized that the output is pure uncertainty, not uncertainty ratio. So I changed it to uncertainty ratio.
 
 After my meeting with Julien, I changed the prior to 0.25-3 and adjusted the number of finite elements used. Then I ran all of these on the SC.
+
+## June 8
+
+I finished the DOF scan and found that fewer DOFs leads to less uncertainty, not more.

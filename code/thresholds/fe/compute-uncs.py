@@ -5,7 +5,7 @@ import numpy as np
 sys.path.append("../../density")
 from core import Indicator
 sys.path.append("../../density/finite-element")
-from main import pipeline, get_stats_from_long_samples
+from main import pipeline
 
 DIVISION = 99
 FILE_PATH = "../../../data/"

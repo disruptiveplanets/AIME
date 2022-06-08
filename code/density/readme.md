@@ -132,3 +132,9 @@ The average appears to be going well. It had a core density of 3x the shell and 
         K22 = -0.0515978274784774
         K20 = -0.19599016007639866
         aA = 978.4541044108308
+
+I also ran many density extractions on the new data.
+
+## June 8
+
+I finished averaging the new data, but I don't like it. The K3m moments are too high and they move the core off-center. I think it's because so few walkers converge; the image shows that the true values are outside the contours, and only 1 walker converged. I would like to achieve a better fit to these moments, so I reran the extraction. We will see what happens.

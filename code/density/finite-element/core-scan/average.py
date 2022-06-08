@@ -11,10 +11,14 @@ NUM_CHOOSE = 1000
 ASTEROID_NAME = "avg-core"
 MAX_RADIUS = 2000
 DURATION = 5
-GENERATE = False
-DIVISION = 99
+GENERATE = True
+DIVISION = 49
+PULL = True
 
 grid_line = np.arange(-MAX_RADIUS, MAX_RADIUS, DIVISION)
+
+if PULL:
+    os.system("scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/finite-element/core-scan/*.npy .")
 
 if GENERATE:
     density_grid_sum = 0
@@ -57,14 +61,13 @@ else:
         unc_grid = np.load(f)
 
 x,y,z = np.meshgrid(grid_line, grid_line, grid_line)
-true_densities = TrueShape.core_sph(3, 500)(x,y,z)
+true_densities = TrueShape.core_sph(1.5, 500)(x,y,z)
 true_densities = true_densities.astype(float)
 true_densities[np.isnan(mean_grid)] = np.nan
 
 unc_grid /= np.nanmean(mean_grid)
 mean_grid /= np.nanmean(mean_grid)
 true_densities /= np.nanmean(true_densities)
-
 
 
 if not os.path.isdir(f"../../figs/{ASTEROID_NAME}"):
@@ -83,8 +86,8 @@ make_slices(mean_grid, grid_line, "$\\rho$", 'plasma', f"../../figs/{ASTEROID_NA
 make_gif(mean_grid, grid_line, "$\\rho$", 'plasma', f"../../figs/{ASTEROID_NAME}/fe-d.gif", DURATION)
 
 print("Plotting ratios")
-make_slices(ratios, grid_line, "$\\Delta\\sigma$", 'coolwarm', f"../../figs/{ASTEROID_NAME}/fe-r", error, percentile=95, balance=True)
-make_gif(ratios, grid_line, "$\\Delta\\sigma$", 'coolwarm', f"../../figs/{ASTEROID_NAME}/fe-r.gif", duration=DURATION, percentile=95, balance=True)
+make_slices(ratios, grid_line, "$\\Delta \\rho / \\sigma_\\rho$", 'coolwarm', f"../../figs/{ASTEROID_NAME}/fe-r", error, percentile=95, balance=True)
+make_gif(ratios, grid_line, "$\\Delta \\rho / \\sigma_\\rho$", 'coolwarm', f"../../figs/{ASTEROID_NAME}/fe-r.gif", duration=DURATION, percentile=95, balance=True)
 
 print("Plotting uncertainty")
 make_slices(uncertainty_ratios, grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"../../figs/{ASTEROID_NAME}/fe-u", error, 95)

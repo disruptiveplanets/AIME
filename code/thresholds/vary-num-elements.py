@@ -10,9 +10,9 @@ if PULL:
         os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/thresholds/fe/probe-s-rho-{i}.npy {DIRECTORY}/")
 
 plt.figure()
-plt.title("Spin pole uncertainty")
-plt.xlabel("sigma theta")
-plt.ylabel("Uncertainty ratio")
+plt.title("Rotational period uncertainty")
+plt.xlabel("sigma rho")
+plt.ylabel("Uncertainty / local density")
 
 for i in range(9):
     fname = f"probe-s-rho-{i}.npy"

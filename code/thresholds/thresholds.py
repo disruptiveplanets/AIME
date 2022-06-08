@@ -4,14 +4,14 @@ import matplotlib.pyplot as plt
 
 THRESHOLDS = ((1, True), (0.2, False))
 INCREASING = {
-    #"observation-gap": True,
-    #"probe-s-rho": True,
-    #"probe-s-theta": True,
-    #"scan-am": False,
-    #"scan-cadence": True,
+    "observation-gap": True,
+    "probe-s-rho": True,
+    "probe-s-theta": True,
+    "scan-am": False,
+    "scan-cadence": True,
     "scan-perigee": True,
-    #"scan-period": False,
-    #"scan-vex": True,
+    "scan-period": False,
+    "scan-vex": True,
 }
 PULL = True
 DIRECTORY = "fe"

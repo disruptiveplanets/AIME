@@ -17,7 +17,7 @@ N_CONSTRAINED = 7
 N_FREE = N_FITTED_MOMENTS
 N_ALL = N_FREE + N_CONSTRAINED
 MAX_N_STEPS = 100_000
-DIVISION = 99
+DIVISION = 49
 RLM_EPSILON = 1e-20
 MAX_RADIUS = 2000
 SMALL_SIGMA = 1e-5
@@ -37,6 +37,7 @@ def get_cov(path):
         return None, None
     cov = np.cov(flat_samples.transpose())
     data = np.mean(flat_samples, axis=0)
+    print(data)
     return data, cov
 
 def get_theta_long(theta_short, info):
@@ -412,8 +413,7 @@ def pipeline(name, sample_path, indicator, surface_am, division, max_radius, map
 if __name__ == "__main__":
     k22, k20, surface_am = -0.05200629, -0.2021978, 1000 # For the shape
     pipeline(f"asym-ell", "../samples/den-asym-0-samples.npy", Indicator.ell(surface_am, k22, k20),
-        surface_am, DIVISION, MAX_RADIUS, True, used_bulk_am=surface_am)
+       surface_am, DIVISION, MAX_RADIUS, True, used_bulk_am=surface_am)
 
-    # for i in range(20):
-    #     pipeline(f"den-core-sph-{i}", "../samples/den-core-sph-0-samples.npy", Indicator.ell(surface_am, k22, k20),
-    #         surface_am, DIVISION, MAX_RADIUS, True, used_bulk_am=922.9234884822591)
+    # pipeline(f"den-core-sph", "../samples/den-core-sph-0-samples.npy", Indicator.ell(surface_am, k22, k20),
+    #     surface_am, DIVISION, MAX_RADIUS, True, used_bulk_am=978.4541044108308)
