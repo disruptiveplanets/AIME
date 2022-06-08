@@ -37,7 +37,6 @@ def get_cov(path):
         return None, None
     cov = np.cov(flat_samples.transpose())
     data = np.mean(flat_samples, axis=0)
-    print(data)
     return data, cov
 
 def get_theta_long(theta_short, info):

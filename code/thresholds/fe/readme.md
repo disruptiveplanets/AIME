@@ -16,4 +16,4 @@ After my meeting with Julien, I changed the prior to 0.25-3 and adjusted the num
 
 ## June 8
 
-I finished the DOF scan and found that fewer DOFs leads to less uncertainty, not more.
+I finished the DOF scan and found that fewer DOFs leads to less uncertainty, not more. Now I'm rerunning with only a few DOFs, averaging over many runs, and booting all those that fail. This is being parallelized.

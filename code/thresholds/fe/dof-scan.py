@@ -5,27 +5,23 @@ import numpy as np
 sys.path.append("../../density")
 from core import Indicator
 sys.path.append("../../density/finite-element")
-if "0" == sys.argv[2]:
-    from main import pipeline, get_stats_from_long_samples
-if "1" == sys.argv[2]:
-    from main_1 import pipeline, get_stats_from_long_samples
-if "2" == sys.argv[2]:
-    from main_2 import pipeline, get_stats_from_long_samples
-if "3" == sys.argv[2]:
-    from main_3 import pipeline, get_stats_from_long_samples
-if "4" == sys.argv[2]:
-    from main_4 import pipeline, get_stats_from_long_samples
-if "5" == sys.argv[2]:
-    from main_5 import pipeline, get_stats_from_long_samples
-if "6" == sys.argv[2]:
-    from main_6 import pipeline, get_stats_from_long_samples
-if "7" == sys.argv[2]:
-    from main_7 import pipeline, get_stats_from_long_samples
-if "8" == sys.argv[2]:
-    from main_8 import pipeline, get_stats_from_long_samples
+import main
 
+DOFS = [9, 7, 5, 3, 2]
+NUM_TRIALS = 5
+index = sys.argv[2]
+assert(0 <= index < len(DOFS) * NUM_TRIALS)
+NUM_DOF = DOFS[index % NUM_TRIALS]
+TRIAL_INDEX = index // NUM_TRIALS
 DIVISION = 99
 FILE_PATH = "../../../data/"
+MAX_REPEAT_COUNT = 100
+
+main.N_FREE = NUM_DOF
+
+print(f"{NUM_DOF} degrees of freedom")
+print(f"Trial {TRIAL_INDEX}")
+print(f"Division {DIVISION}")
 
 NAMES = {
     "scan-perigee": (2,), 
@@ -139,58 +135,33 @@ def get_unc_for_file(dname, fname):
     short_name = short_name[short_name.rfind('/')+1:]
     print(short_name)
 
-    with suppress_stdout():
-        # Do not regenerate if the file was already done.
-        generate = not os.path.exists(f"ast-{sys.argv[2]}-{short_name}-fe.npy")
-        uncs = pipeline(f"ast-{sys.argv[2]}-{short_name}", fname, Indicator.ell(radius, k22, k20), am, division,
-            max_radius, False, used_bulk_am=None, generate=generate)
+    # Do not regenerate if the file was already done.
+    generate = not os.path.exists(f"ast-{NUM_DOF}-{TRIAL_INDEX}-{short_name}-fe.npy")
+    repeat_num = 0
+    repeat = True
+    while repeat:
+        repeat = False
+        with suppress_stdout():
+            uncs = main.pipeline(f"ast-{NUM_DOF}-{TRIAL_INDEX}-{short_name}", fname, Indicator.ell(radius, k22, k20), am, division,
+                max_radius, False, used_bulk_am=None, generate=generate)
 
-    if np.any(np.isnan(uncs)):
-        return np.nan
+        if np.any(np.isnan(uncs)):
+            print("Failed. Had to repeat")
+            repeat = True
+            repeat_num += 1
+        if repeat_num == MAX_REPEAT_COUNT:
+            # Give up
+            return np.nan
 
     density_uncertainty = np.nanmedian(uncs)
     return density_uncertainty
 
-def scan_specific(directory, threshold):
+def scan_specific(directory):
     index_lengths = NAMES[directory]
     uncs = scan_directory(FILE_PATH + directory, index_lengths)
     print(uncs)
-    with open(directory+"-" + sys.argv[2]+".npy", 'wb') as f:
+    with open(f"{directory}-{NUM_DOF}-{TRIAL_INDEX}.npy", 'wb') as f:
         np.save(f, uncs)
-    if len(uncs.shape) == 1:
-        where_more_than_one = np.where(uncs>threshold)[0]
-        if len(where_more_than_one) > 0:
-            threshold_index_left = where_more_than_one[0]
-            threshold_index_right = where_more_than_one[-1]
-
-        else:
-            threshold_index_left = None
-            threshold_index_right = None
-        print("Increasing threshold", threshold_index_left, "\t", "Decreasing threshold", threshold_index_right)
-        
-def scan_all(thresholds):
-    print("Thresholds", thresholds)
-    for name, index_lengths in NAMES.items():
-        uncs = scan_directory(FILE_PATH + name, index_lengths)
-        print(uncs)
-        with open(name+".npy", 'wb') as f:
-            np.save(f, uncs)
-
-        if len(uncs.shape) == 1:
-            print(name, end='')
-            for threshold in thresholds:
-                where_more_than_one = np.where(uncs>threshold)[0]
-                if len(where_more_than_one) > 0:
-                    threshold_index_left = where_more_than_one[0]
-                    threshold_index_right = where_more_than_one[-1]
-
-                else:
-                    threshold_index_left = None
-                    threshold_index_right = None
-                    
-                print(f"\tinc.\t{threshold_index_left}\tdec.\t{threshold_index_right}")
 
 if __name__ == "__main__":
-    scan_specific(sys.argv[1], 1)
-    #scan_specific(sys.argv[1], 0.2)
-    #scan_all((1,))
+    scan_specific(sys.argv[1])
