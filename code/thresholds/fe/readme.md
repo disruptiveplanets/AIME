@@ -17,3 +17,11 @@ After my meeting with Julien, I changed the prior to 0.25-3 and adjusted the num
 ## June 8
 
 I finished the DOF scan and found that fewer DOFs leads to less uncertainty, not more. Now I'm rerunning with only a few DOFs, averaging over many runs, and booting all those that fail. This is being parallelized.
+
+## June 9
+
+A couple of the scans with full DOF completed and showed good sensitivity.
+
+I fixed some issues I was having with dof-scan by making it write to new files. Instead of being named `ast-*`, they're named `cast-*` (the `c` stands for coarse). Similarly, the results are stored in an npy file beginning with a c. That's three lines of code. I must change them back if I unify dof-scan and dof-scan-precise eventually.
+
+THIS ALSO MEANS THAT FOR A FEW MINUTES, DOF-SCAN AND DOF-SCAN-PRECISE WERE WRITING TO THE SAME H5 FILE. THIS COULD CORRUPT MY DATA.

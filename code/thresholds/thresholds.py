@@ -7,10 +7,10 @@ INCREASING = {
     "observation-gap": True,
     "probe-s-rho": True,
     "probe-s-theta": True,
-    "scan-am": False,
-    "scan-cadence": True,
-    "scan-perigee": True,
-    "scan-period": False,
+    #"scan-am": False,
+    #"scan-cadence": True,
+    #"scan-perigee": True,
+    #"scan-period": False,
     "scan-vex": True,
 }
 PULL = True

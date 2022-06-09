@@ -9,4 +9,4 @@ source /etc/profile
 
 module load anaconda/2022a
 
-python -u compute-uncs-underdetermined.py probe-s-rho $SLURM_ARRAY_TASK_ID
+python -u dof-scan.py probe-s-rho $SLURM_ARRAY_TASK_ID

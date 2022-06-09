@@ -9,7 +9,7 @@ import main
 
 DOFS = [9, 7, 5, 3, 2]
 NUM_TRIALS = 5
-index = sys.argv[2]
+index = int(sys.argv[2])
 assert(0 <= index < len(DOFS) * NUM_TRIALS)
 NUM_DOF = DOFS[index % NUM_TRIALS]
 TRIAL_INDEX = index // NUM_TRIALS
@@ -136,13 +136,13 @@ def get_unc_for_file(dname, fname):
     print(short_name)
 
     # Do not regenerate if the file was already done.
-    generate = not os.path.exists(f"ast-{NUM_DOF}-{TRIAL_INDEX}-{short_name}-fe.npy")
+    generate = not os.path.exists(f"cast-{NUM_DOF}-{TRIAL_INDEX}-{short_name}-fe.npy")
     repeat_num = 0
     repeat = True
     while repeat:
         repeat = False
         with suppress_stdout():
-            uncs = main.pipeline(f"ast-{NUM_DOF}-{TRIAL_INDEX}-{short_name}", fname, Indicator.ell(radius, k22, k20), am, division,
+            uncs = main.pipeline(f"cast-{NUM_DOF}-{TRIAL_INDEX}-{short_name}", fname, Indicator.ell(radius, k22, k20), am, division,
                 max_radius, False, used_bulk_am=None, generate=generate)
 
         if np.any(np.isnan(uncs)):
@@ -160,7 +160,7 @@ def scan_specific(directory):
     index_lengths = NAMES[directory]
     uncs = scan_directory(FILE_PATH + directory, index_lengths)
     print(uncs)
-    with open(f"{directory}-{NUM_DOF}-{TRIAL_INDEX}.npy", 'wb') as f:
+    with open(f"c{directory}-{NUM_DOF}-{TRIAL_INDEX}.npy", 'wb') as f:
         np.save(f, uncs)
 
 if __name__ == "__main__":
