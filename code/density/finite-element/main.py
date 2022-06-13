@@ -407,7 +407,7 @@ def pipeline(name, sample_path, indicator, surface_am, division, max_radius, map
         display(densities, true_densities, uncertainty_ratios,
         asteroid.grid_line, error, name)
 
-    return means - asteroid_info.mean_density, unc
+    return (means - asteroid_info.mean_density) / means, unc
     
 if __name__ == "__main__":
     k22, k20, surface_am = -0.05200629, -0.2021978, 1000 # For the shape
