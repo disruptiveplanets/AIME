@@ -130,7 +130,7 @@ Pulled the spherical core run from the supercomputer and ran lots of fits to it.
 The average appears to be going well. It had a core density of 3x the shell and prior 0.5-9. I'm a little confused as to why the core only appears to have density 2x the shell but I think it could be the fault of the prior or not taking enough averages. Rather than continue down this path, I moved to a core of 1.5x the shell and 0.25-3 prior. Currently extracting moments. I'm also upping the DIVISION from 99 to 49. The new moments are
     Spherical core
         K22 = -0.0515978274784774
-        K20 = -0.19599016007639866
+        K20 = -0.20060996601498285
         aA = 978.4541044108308
 
 I also ran many density extractions on the new data.
@@ -138,3 +138,7 @@ I also ran many density extractions on the new data.
 ## June 8
 
 I finished averaging the new data, but I don't like it. The K3m moments are too high and they move the core off-center. I think it's because so few walkers converge; the image shows that the true values are outside the contours, and only 1 walker converged. I would like to achieve a better fit to these moments, so I reran the extraction. We will see what happens.
+
+## June 13
+
+I'm also doing the average for the 3x density moments. These are stored in avg-core-1.5 and avg-core-3 for cores of 1.5 or 3x the surrounding density.

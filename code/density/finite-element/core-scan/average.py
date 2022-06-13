@@ -5,7 +5,7 @@ sys.path.append("../..")
 from display import make_gif, make_slices
 from core import TrueShape
 
-NAME_START = "den-core-sph"
+NAME_START = "den-core-sph-3"
 NUM_DRAWS = 20
 NUM_CHOOSE = 1000
 ASTEROID_NAME = "avg-core"
@@ -17,13 +17,41 @@ PULL = True
 
 grid_line = np.arange(-MAX_RADIUS, MAX_RADIUS, DIVISION)
 
+def get_moments(densities):
+    global asteroid
+    zero_densities = densities.copy()
+    zero_densities[np.isnan(zero_densities)] = 0
+    import core
+    k22, k20, surface_am = -0.05200629, -0.2021978, 1000 # For the shape
+    bulk_am = 978.4541044108308
+    asteroid = core.Asteroid("ast-test", f"../../samples/{NAME_START}-0-samples.npy", surface_am, DIVISION, MAX_RADIUS, core.Indicator.ell(surface_am, k22, k20), TrueShape.uniform(), bulk_am)
+    moment_field = asteroid.moment_field(surface_am) * asteroid.indicator_map
+
+    # Correct moment_field
+    moment_field[0] *= (bulk_am / surface_am)**2
+    moment_field[1:4] *= (bulk_am / surface_am)**1
+    moment_field[9:16] *= (bulk_am / surface_am)**(-1)
+
+    # Calculate klm
+    unscaled_klm = np.einsum("iabc,abc->i", moment_field, zero_densities)
+    radius_sqr = unscaled_klm[-1]
+    klms = unscaled_klm / radius_sqr
+
+    return klms
+
+
 if PULL:
     os.system("scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/finite-element/core-scan/*.npy .")
+    os.system("scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/finite-element/core-scan/*.png .")
 
 if GENERATE:
     density_grid_sum = 0
     density_grid_square_sum = 0
     num_grids = 0
+
+    # X, Y, Z = np.meshgrid(grid_line, grid_line, grid_line)
+    # radius_map = (X**2 + Y**2 + Z**2).astype(float)
+    # radius_map /= np.sum(radius_map)
 
     for i in range(NUM_DRAWS):
         if not os.path.exists(f"{NAME_START}-{i}-fe.npy"):
@@ -34,6 +62,7 @@ if GENERATE:
         with open(f"{NAME_START}-{i}-fe.npy", 'rb') as f:
             long_samples = np.load(f)
         densities = long_samples[np.random.randint(0, len(long_samples), NUM_CHOOSE),:]
+
         for d in densities:
             density_grid = np.einsum("ijkl,i->jkl", grids, d)
             density_grid_sum += density_grid
@@ -46,7 +75,6 @@ if GENERATE:
     # Insert nans
     indicator = np.sum(grids, axis=0)>0
     mean_grid[~indicator] = np.nan
-
     unc_grid = np.sqrt(density_grid_square_sum / num_grids - mean_grid**2)
     
 
@@ -59,6 +87,10 @@ else:
         mean_grid = np.load(f)
     with open("unc-grid.npy", 'rb') as f:
         unc_grid = np.load(f)
+
+moments = get_moments(mean_grid)
+for m, d in zip(moments, asteroid.data):
+    print(f"Got {m}\t\t Wanted {d}")
 
 x,y,z = np.meshgrid(grid_line, grid_line, grid_line)
 true_densities = TrueShape.core_sph(1.5, 500)(x,y,z)

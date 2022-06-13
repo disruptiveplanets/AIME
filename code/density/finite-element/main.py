@@ -320,17 +320,17 @@ def load(name, asteroid, surface_am, sample_path, division, generate=True):
     # Unconstrained
     rlm_mat[0, :] = rlm_mat_complex[8,:].real # K22
     rlm_mat[1, :] = rlm_mat_complex[6,:].real # K20
-    rlm_mat[2, :] = rlm_mat_complex[15,:].real / surface_am # R K33
-    rlm_mat[3, :] = rlm_mat_complex[15,:].imag / surface_am # I K33
-    rlm_mat[4, :] = rlm_mat_complex[14,:].real / surface_am # R K32
-    rlm_mat[5, :] = rlm_mat_complex[14,:].imag / surface_am # I K32
-    rlm_mat[6, :] = rlm_mat_complex[13,:].real / surface_am # R K31
-    rlm_mat[7, :] = rlm_mat_complex[13,:].imag / surface_am # I K31
-    rlm_mat[8, :] = rlm_mat_complex[12,:].real / surface_am # K30
+    rlm_mat[2, :] = rlm_mat_complex[15,:].real # R K33
+    rlm_mat[3, :] = rlm_mat_complex[15,:].imag # I K33
+    rlm_mat[4, :] = rlm_mat_complex[14,:].real # R K32
+    rlm_mat[5, :] = rlm_mat_complex[14,:].imag # I K32
+    rlm_mat[6, :] = rlm_mat_complex[13,:].real # R K31
+    rlm_mat[7, :] = rlm_mat_complex[13,:].imag # I K31
+    rlm_mat[8, :] = rlm_mat_complex[12,:].real # K30
     # Constrained
-    rlm_mat[9, :] = rlm_mat_complex[ 3,:].real * surface_am # R K11
-    rlm_mat[10, :] = rlm_mat_complex[3,:].imag * surface_am # I K11
-    rlm_mat[11, :] = rlm_mat_complex[2,:].real * surface_am # K10
+    rlm_mat[9, :] = rlm_mat_complex[ 3,:].real # R K11
+    rlm_mat[10, :] = rlm_mat_complex[3,:].imag # I K11
+    rlm_mat[11, :] = rlm_mat_complex[2,:].real # K10
     rlm_mat[12, :] = rlm_mat_complex[7,:].real # R K21
     rlm_mat[13, :] = rlm_mat_complex[7,:].imag # I K21
     rlm_mat[14, :] = rlm_mat_complex[8,:].imag # I K22

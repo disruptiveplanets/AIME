@@ -327,7 +327,7 @@ class Asteroid:
         return a.reshape(-1)[self.indicator_map.reshape(-1)]
 
 
-    def moment_field(self, max_l=None):
+    def moment_field(self, surface_am, max_l=None):
         if max_l is None:
             max_l = self.max_l
         if self.moments is None:
@@ -335,8 +335,9 @@ class Asteroid:
             self.moments = np.zeros((n, len(self.grid_line), len(self.grid_line), len(self.grid_line)), dtype=np.complex)
             i = 0
             for l in range(0, max_l+1):
+                renorm = surface_am**(2 - l) if l > 0 else 1
                 for m in range(-l, l+1):
-                    self.moments[i] = self.map_np(rlm_gen(l,m))
+                    self.moments[i] = self.map_np(rlm_gen(l,m)) * renorm
                     i += 1
             self.moments[i] = self.map_np(lambda x,y,z: x*x + y*y + z*z)
         return self.moments
