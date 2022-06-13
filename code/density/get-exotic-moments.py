@@ -43,11 +43,12 @@ asteroids = [
     #("out", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.out(ELLIPSOID_AM)),
     #("in-sph", Indicator.sph(ELLIPSOID_AM), TrueShape.in_sph(ELLIPSOID_AM)),
     #("out-sph", Indicator.sph(ELLIPSOID_AM), TrueShape.out_sph(ELLIPSOID_AM)),
-    ("blob", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -lump_shift), TrueShape.blob(ELLIPSOID_AM, k22a, k20a)),
+    ("blob", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -lump_shift), TrueShape.blob(ELLIPSOID_AM, k22a, k20a), False),
     #("rot-blob", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -lump_shift), TrueShape.rot_blob(ELLIPSOID_AM, k22a, k20a)),
+    #("core-ell", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core(ELLIPSOID_AM, k22a, k20a, 3, 0.65), False),
     ("core-sph-3", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core_sph(3, 500), False),
     ("core-sph-1.5", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core_sph(1.5, 500), False),
-    #("core-ell", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core(ELLIPSOID_AM, k22a, k20a, 3, 0.65), False),
+    ("core-move-3", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift), TrueShape.core_shift(3, 500, core_displacement), True),
     ("core-move-1.5", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift), TrueShape.core_shift(1.5, 500, core_displacement), True),
 ]
 

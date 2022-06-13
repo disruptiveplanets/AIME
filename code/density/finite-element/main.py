@@ -49,6 +49,7 @@ def get_klms(theta_long, info):
     #radius_sqr = 1000**2
     scaled_klms = np.array(unscaled_klms) / radius_sqr
     scaled_klms[-1] *= radius_sqr # Do not scale mass term
+    # Mass is already normalized
     return scaled_klms
 
 
@@ -87,23 +88,22 @@ def mcmc_fit(theta_start, output_name, info, generate=True):
 
             for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
                 if sampler.iteration % 500 == 0:
-                    # Compute the autocorrelation time so far
-                    # Using tol=0 means that we'll always get an estimate even
-                    # if it isn't trustworthy
-                    tau = sampler.get_autocorr_time(tol=0)
-
-                    # Check convergence
-                    converged = np.all(tau * 100 < sampler.iteration)
-                    converged &= np.all(np.abs(old_tau - tau) / tau < 0.01)
-                    if converged:
-                        print("Converged")
-                        break
-                    old_tau = tau
-
-                    print(np.mean(sampler.get_last_sample().log_prob), tau)
                     if np.mean(sampler.get_last_sample().log_prob) < -100:
                         # MCMC will not converge.
                         return None
+                    if sampler.iteration >= 10_000:
+                        # Check convergence
+
+                        tau = sampler.get_autocorr_time(tol=0)
+
+                        converged = np.all(tau * 100 < sampler.iteration)
+                        converged &= np.all(np.abs(old_tau - tau) / tau < 0.01)
+                        if converged:
+                            print("Converged")
+                            break
+                        old_tau = tau
+
+                        print(np.mean(sampler.get_last_sample().log_prob), tau)
 
             #sampler._previous_state = sample
 
@@ -311,7 +311,7 @@ def load(name, asteroid, surface_am, sample_path, division, generate=True):
         with open(name + "-grids.npy", 'rb') as f:
             masks = np.load(f)
     
-    rlms = asteroid.moment_field()
+    rlms = asteroid.moment_field(surface_am=surface_am)
 
     rlm_mat_complex = np.einsum("iabc,jabc->ji", masks, rlms) * division**3
 
@@ -407,7 +407,7 @@ def pipeline(name, sample_path, indicator, surface_am, division, max_radius, map
         display(densities, true_densities, uncertainty_ratios,
         asteroid.grid_line, error, name)
 
-    return unc
+    return means - asteroid_info.mean_density, unc
     
 if __name__ == "__main__":
     k22, k20, surface_am = -0.05200629, -0.2021978, 1000 # For the shape
