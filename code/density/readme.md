@@ -143,4 +143,6 @@ I finished averaging the new data, but I don't like it. The K3m moments are too 
 
 I'm also doing the average for the 3x density moments. These are stored in avg-core-1.5 and avg-core-3 for cores of 1.5 or 3x the surrounding density. Furthermore, I'm doing one for a moved core of 1.5x surrounding density, 500 m in radius (same core) but moved 300 m. 
 
+
+
 I had to adjust my get_exotic_moments file a bit, and main, in order to jive with the new moments. I'm going to do recompute all moments just to make things more certain. I also recomputed the blob moments to ensure that they match the old blob moments.

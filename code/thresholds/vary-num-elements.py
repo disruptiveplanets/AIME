@@ -22,9 +22,11 @@ ax_unc.set_ylabel("Uncertainty / local density")
 
 ax_mean_devs.set_xlabel("Observational uncertainty")
 ax_mean_devs.set_ylabel("Mean |(density deviation) / (uncertainty)|")
+ax_mean_devs.set_yscale("log")
 
 ax_max_devs.set_xlabel("Observational uncertainty")
 ax_max_devs.set_ylabel("Max |(density deviation) / (uncertainty)|")
+ax_max_devs.set_yscale("log")
 
 for dof_index, dof in enumerate(DOFS):
     all_mean_devs = []
