@@ -2,9 +2,9 @@
 
 import sys, os
 import numpy as np
-sys.path.append("../../density")
+sys.path.append("../../../density")
 from core import Indicator
-sys.path.append("../../density/finite-element")
+sys.path.append("../../../density/finite-element")
 import main
 
 DOFS = [9, 7, 5, 3, 2]
@@ -14,7 +14,7 @@ assert(0 <= index < len(DOFS) * NUM_TRIALS)
 NUM_DOF = DOFS[index % NUM_TRIALS]
 TRIAL_INDEX = index // NUM_TRIALS
 DIVISION = 99
-FILE_PATH = "../../../data/"
+FILE_PATH = "../../../../data/"
 MAX_REPEAT_COUNT = 100
 
 main.N_FREE = NUM_DOF
