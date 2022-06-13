@@ -137,7 +137,7 @@ class Method:
         densities = self.map_density()
         for l in range(0, self.asteroid.max_l + 1):
             for m in range(-l, l+1):
-                calc_rlms[index] = np.sum(rlms_field[index] * densities) / self.asteroid.surface_am ** (l - 2) * self.asteroid.division**3
+                calc_rlms[index] = np.sum(rlms_field[index] * densities) * self.asteroid.division**3
                 index += 1
         calc_rlms[index] = np.sum(rlms_field[index] * densities) * self.asteroid.division**3
 
@@ -407,10 +407,15 @@ class TrueShape:
             return 1 * (dist > 1) + density_ratio * (dist <= 1)
         return func
 
-    
     def core_sph(density_ratio, radius):
         def func(x, y, z):
             dist = x*x + y*y + z*z
+            return 1 * (dist > radius * radius) + density_ratio * (dist <= radius * radius)
+        return func
+
+    def core_shift(density_ratio, radius, shift):
+        def func(x, y, z):
+            dist = x*x + (y-shift)*(y-shift) + z*z
             return 1 * (dist > radius * radius) + density_ratio * (dist <= radius * radius)
         return func
 
