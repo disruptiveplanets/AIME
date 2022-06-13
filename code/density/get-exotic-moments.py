@@ -36,17 +36,19 @@ print("Core shift:", core_shift)
 asteroids = [
     #("sph", Indicator.sph(ELLIPSOID_AM), lambda x,y,z: 1),
     #("ells", Indicator.ell(ELLIPSOID_AM, k22s, k20s), lambda x,y,z: 1),
-    #("ella", Indicator.ell(ELLIPSOID_AM, k22a, k20a), lambda x,y,z: 1),
+    ("ella", Indicator.ell(ELLIPSOID_AM, k22a, k20a), lambda x,y,z: 1, False),
     #("tet", Indicator.tet(ELLIPSOID_AM), lambda x,y,z: 1),
     #("db", Indicator.dumbbell(ELLIPSOID_AM), lambda x,y,z: 1),
     #("in", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.in_(ELLIPSOID_AM)),
     #("out", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.out(ELLIPSOID_AM)),
     #("in-sph", Indicator.sph(ELLIPSOID_AM), TrueShape.in_sph(ELLIPSOID_AM)),
     #("out-sph", Indicator.sph(ELLIPSOID_AM), TrueShape.out_sph(ELLIPSOID_AM)),
-    #("blob", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -lump_shift), TrueShape.blob(ELLIPSOID_AM, k22a, k20a)),
+    ("blob", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -lump_shift), TrueShape.blob(ELLIPSOID_AM, k22a, k20a)),
     #("rot-blob", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -lump_shift), TrueShape.rot_blob(ELLIPSOID_AM, k22a, k20a)),
-    #("core-sph", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core_sph(ELLIPSOID_AM, 1.5, 500), False),
-    ("core-move", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift), TrueShape.core_shift(1.5, 500, core_displacement), True),
+    ("core-sph-3", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core_sph(3, 500), False),
+    ("core-sph-1.5", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core_sph(1.5, 500), False),
+    #("core-ell", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core(ELLIPSOID_AM, k22a, k20a, 3, 0.65), False),
+    ("core-move-1.5", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift), TrueShape.core_shift(1.5, 500, core_displacement), True),
 ]
 
 def get_klms(index):
@@ -55,11 +57,12 @@ def get_klms(index):
         asteroid = Asteroid(name, "", ELLIPSOID_AM, division, max_radius, indicator, None, used_bulk_am=ELLIPSOID_AM)
         rlms = asteroid.moment_field(max_l=3, surface_am=ELLIPSOID_AM)
         surface_am_sqr = np.sum(rlms[-1] * asteroid.indicator_map) / np.sum(asteroid.indicator_map)
-        am = np.sqrt(surface_am_sqr)
-        print("New am", am)
+        surface_am = np.sqrt(surface_am_sqr)
+        print("New surface_am", surface_am)
     else: 
-        am = ELLIPSOID_AM
-    asteroid = Asteroid(name, "", am, division, max_radius, indicator, None, used_bulk_am=am)
+        surface_am = ELLIPSOID_AM
+
+    asteroid = Asteroid(name, "", surface_am, division, max_radius, indicator, None, used_bulk_am=surface_am)
     density = asteroid.map_np(generator)
 
     # plt.imshow(density[len(density)//2, :, :])
@@ -69,7 +72,7 @@ def get_klms(index):
     # plt.imshow(density[:, :, len(density)//2])
     # plt.show()
 
-    rlms = asteroid.moment_field(max_l=3, surface_am=am)
+    rlms = asteroid.moment_field(max_l=3, surface_am=surface_am)
 
     i = 0
     klms = []
@@ -77,17 +80,19 @@ def get_klms(index):
         for m in range(-l, l+1):
             klms.append(np.sum(rlms[i] * density) * division**3)
             i += 1
-    am_this = np.sqrt(np.sum(rlms[i] * density) * division**3 / klms[0])
-    klms = np.array(klms) / klms[0]
+    bulk_am = np.sqrt(np.sum(rlms[i] * density) * division**3 / klms[0])
+    klms = np.array(klms)
+    klms[1:] /= bulk_am**2 # Add in nonlinear /a^2 term, but keep the first term as the mass.
+    klms /= klms[0] # Normalize by mass
 
-    # Rescale by am
-    i = 0
-    for l in range(0, 4):
+    # Convert to old am by getting rid of surface_am
+    i = 1
+    for l in range(1, 4):
         for m in range(-l, l+1):
-            klms[i] /= am_this**l
+            klms[i] *= (surface_am / bulk_am)**(l - 2)
             i += 1
 
-    return name, np.append(klms, am_this)
+    return name, np.append(klms, bulk_am)
 
 with Pool() as pool:
     results = pool.map(get_klms, range(len(asteroids)))
