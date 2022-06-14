@@ -143,6 +143,31 @@ I finished averaging the new data, but I don't like it. The K3m moments are too 
 
 I'm also doing the average for the 3x density moments. These are stored in avg-core-1.5 and avg-core-3 for cores of 1.5 or 3x the surrounding density. Furthermore, I'm doing one for a moved core of 1.5x surrounding density, 500 m in radius (same core) but moved 300 m. 
 
-
+    Spherical core x3
+        K22 = -0.05040959164683728
+        K20 = -0.19599016007639866
+        aA = 922.9234884822591
+    Spherical core x1.5
+        K22 = -0.05159782747847741
+        K20 = -0.20060996601498282
+        aA = 978.4541044108308
+    Moved core x3
+        K22 = -0.05203775196773803
+        K20 = -0.19716764233198797
+        IK33 = -0.0015577797254511872
+        IK31 = -0.007833505702120666
+        aA = 933.1648422811957
+        surface_aA = 1002.0081758422925
+    Moved core x1.5
+        K22 = -0.05195945615840046
+        K20 = -0.20085472167788565
+        IK33 = -0.0003845813086399978
+        IK31 = -0.0019368958923091067
+        aA = 980.8811439828254
+        surface_aA = 1000.1281468600504
 
 I had to adjust my get_exotic_moments file a bit, and main, in order to jive with the new moments. I'm going to do recompute all moments just to make things more certain. I also recomputed the blob moments to ensure that they match the old blob moments.
+
+## June 14
+
+The moments code was running out of memory, unbeknownst to me. I got it working, computed the moments, confirmed that the blob K2 and K3 moments are reproduced, then ran the moment extraction for all four core types.
