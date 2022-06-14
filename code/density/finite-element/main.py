@@ -393,11 +393,11 @@ def pipeline(name, sample_path, indicator, surface_am, division, max_radius, map
     asteroid_info = load(name, asteroid, surface_am, sample_path, division, generate)
 
     if asteroid_info is None:
-        return np.nan
+        return np.nan, np.nan
     
     means, unc = get_densities_mcmc(name+"-fe", asteroid_info, generate)
     if np.any(np.isnan(unc)):
-        return np.nan
+        return np.nan, np.nan
 
     if map:
         densities, uncertainty_ratios = get_map(asteroid_info, means, unc, asteroid)

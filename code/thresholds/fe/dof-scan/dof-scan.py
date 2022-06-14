@@ -98,7 +98,7 @@ def get_unc_for_file(dname, fname):
     # fname ends with -0-samples.npy
     with open(fname, 'rb') as f:
         array = np.load(f)
-        if len(array) == 0: return np.nan
+        if len(array) == 0: return np.nan, np.nan, np.nan
     
         # flat_samples = array.reshape(-1, array.shape[-1])
 
@@ -157,7 +157,7 @@ def get_unc_for_file(dname, fname):
             repeat_num += 1
         if repeat_num == MAX_REPEAT_COUNT:
             # Give up
-            return np.nan
+            return np.nan, np.nan, np.nan
 
     density_uncertainty = np.nanmedian(uncs)
     mean_dev_ratio = np.mean(np.abs(deviation / uncs))
