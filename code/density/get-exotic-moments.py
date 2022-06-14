@@ -27,29 +27,31 @@ core_displacement = 300
 core_rad = 500
 core_vol = np.pi * 4 / 3 * core_rad**3
 ellipsoid_vol = np.pi * 4 / 3 * a * b * c
-density_factor = 1.5
-core_shift = core_displacement * (core_vol * density_factor) / ellipsoid_vol
+density_factor_low = 0.5
+density_factor_high = 2
+core_shift_low = core_displacement * (core_vol * density_factor_low) / ellipsoid_vol
+core_shift_high = core_displacement * (core_vol * density_factor_high) / ellipsoid_vol
 print("Core mass fraction:", (core_vol * density_factor) / (core_vol * density_factor+ellipsoid_vol))
-print("Core shift:", core_shift)
+print(f"Core shift low: {core_shift_low}\tCore shift high: {core_shift_high}")
 
 
 asteroids = [
     #("sph", Indicator.sph(ELLIPSOID_AM), lambda x,y,z: 1),
     #("ells", Indicator.ell(ELLIPSOID_AM, k22s, k20s), lambda x,y,z: 1),
-    ("ella", Indicator.ell(ELLIPSOID_AM, k22a, k20a), lambda x,y,z: 1, False),
+    #("ella", Indicator.ell(ELLIPSOID_AM, k22a, k20a), lambda x,y,z: 1, False),
     #("tet", Indicator.tet(ELLIPSOID_AM), lambda x,y,z: 1),
     #("db", Indicator.dumbbell(ELLIPSOID_AM), lambda x,y,z: 1),
     #("in", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.in_(ELLIPSOID_AM)),
     #("out", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.out(ELLIPSOID_AM)),
     #("in-sph", Indicator.sph(ELLIPSOID_AM), TrueShape.in_sph(ELLIPSOID_AM)),
     #("out-sph", Indicator.sph(ELLIPSOID_AM), TrueShape.out_sph(ELLIPSOID_AM)),
-    ("blob", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -lump_shift), TrueShape.blob(ELLIPSOID_AM, k22a, k20a), False),
+    #("blob", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -lump_shift), TrueShape.blob(ELLIPSOID_AM, k22a, k20a), False),
     #("rot-blob", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -lump_shift), TrueShape.rot_blob(ELLIPSOID_AM, k22a, k20a)),
     #("core-ell", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core(ELLIPSOID_AM, k22a, k20a, 3, 0.65), False),
-    ("core-sph-3", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core_sph(3, 500), False),
-    ("core-sph-1.5", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core_sph(1.5, 500), False),
-    ("core-move-3", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift), TrueShape.core_shift(3, 500, core_displacement), True),
-    ("core-move-1.5", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift), TrueShape.core_shift(1.5, 500, core_displacement), True),
+    #("core-sph-3", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core_sph(3, 500), False),
+    #("core-sph-1.5", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core_sph(1.5, 500), False),
+    ("core-move-3", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high), TrueShape.core_shift(3, 500, core_displacement), True),
+    ("core-move-1.5", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.core_shift(1.5, 500, core_displacement), True),
 ]
 
 def get_klms(index):
