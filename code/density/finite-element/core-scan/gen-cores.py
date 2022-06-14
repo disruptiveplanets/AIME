@@ -4,13 +4,27 @@ sys.path.append("../..")
 import main
 from core import Indicator
 
-NAME_START = "den-core-sph-3"
 DIVISION = 49
 MAX_RADIUS = 2000
-AST_INDEX = sys.argv[1]
+RUN_NAME = sys.argv[1]
+AST_INDEX = sys.argv[2]
 main.grids.NUM_DRAWS = 0
 
-k22, k20, surface_am = -0.05200629, -0.2021978, 1000 # For the shape
+SURFACE_AMS = {
+    "sph-3": 1000,
+    "sph-1.5": 1000,
+    "move-3": 1002.0081758422925,
+    "move-1.5": 1000.1281468600504,
+}
 
-main.pipeline(f"den-core-sph-{AST_INDEX}", f"../../samples/{NAME_START}-0-samples.npy", Indicator.ell(surface_am, k22, k20),
-    surface_am, DIVISION, MAX_RADIUS, False, used_bulk_am=922.9234884822591)
+BULK_AMS = {
+    "sph-3": 922.9234884822591,
+    "sph-1.5": 978.4541044108308,
+    "move-3": 933.1648422811957,
+    "move-1.5": 980.8811439828254,
+}
+
+k22, k20, surface_am = -0.05200629, -0.2021978, SURFACE_AMS[RUN_NAME] # For the shape
+
+main.pipeline(f"den-core-{AST_INDEX}-{AST_INDEX}", f"../../samples/den-core-{RUN_NAME}-0-samples.npy", Indicator.ell(surface_am, k22, k20),
+    surface_am, DIVISION, MAX_RADIUS, False, used_bulk_am=BULK_AMS[RUN_NAME])
