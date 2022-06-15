@@ -32,11 +32,35 @@ MINIMIZATION_ATTEMPTS = 500
 
 def get_cov(path):
     with open(path, 'rb') as f:
-        flat_samples = np.load(f).reshape(-1, N_FITTED_MOMENTS + 1)[:, 1:]
+        data = np.load(f).reshape(-1, N_FITTED_MOMENTS + 1)
+        initial_rolls = data[:, 0]
+        flat_samples = data[:, 1:]
     if flat_samples.shape[0] == 0:
         return None, None
-    cov = np.cov(flat_samples.transpose())
-    data = np.mean(flat_samples, axis=0)
+    complex_samples = np.zeros((len(flat_samples), 6), dtype=np.complex)
+    complex_samples[:, 0] = flat_samples[:, 0] # K22
+    complex_samples[:, 1] = flat_samples[:, 1] # K20
+    complex_samples[:, 2] = flat_samples[:, 2] + 1j * flat_samples[:, 3] # K33
+    complex_samples[:, 3] = flat_samples[:, 4] + 1j * flat_samples[:, 5] # K32
+    complex_samples[:, 4] = flat_samples[:, 6] + 1j * flat_samples[:, 7] # K31
+    complex_samples[:, 5] = flat_samples[:, 8] # K30
+    ms = np.array([
+        0, # I chose not to apply to K22 because the correction is so small
+        0, 3, 2, 1, 0])
+    exponents = -1j * np.outer(initial_rolls - np.mean(initial_rolls), ms)
+    complex_hybrid_samples = complex_samples * np.exp(exponents)
+    real_hybrid_samples = np.zeros_like(flat_samples)
+    real_hybrid_samples[:, 0]  = complex_hybrid_samples[:, 0].real # K22
+    real_hybrid_samples[:, 1]  = complex_hybrid_samples[:, 1].real # K20
+    real_hybrid_samples[:, 2]  = complex_hybrid_samples[:, 2].real # R K33
+    real_hybrid_samples[:, 3]  = complex_hybrid_samples[:, 2].imag # I K33
+    real_hybrid_samples[:, 4]  = complex_hybrid_samples[:, 3].real # R K32
+    real_hybrid_samples[:, 5]  = complex_hybrid_samples[:, 3].imag # I K32
+    real_hybrid_samples[:, 6]  = complex_hybrid_samples[:, 4].real # R K31
+    real_hybrid_samples[:, 7]  = complex_hybrid_samples[:, 4].imag # I K31
+    real_hybrid_samples[:, 8]  = complex_hybrid_samples[:, 5].real # R K30
+    cov = np.cov(real_hybrid_samples.transpose())
+    data = np.mean(real_hybrid_samples, axis=0)
     return data, cov
 
 def get_theta_long(theta_short, info):
