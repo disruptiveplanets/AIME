@@ -78,16 +78,7 @@ Note that both $J_{\ell m}$ and $K_{\ell m}$ are unitless. We call them ``moment
 
 These moments share several key properties which we discuss before continuing. Firstly, for real mass density, properties of the spherical harmonics imply that $K_{\ell m} = (-1)^m K_{\ell, -m}^*$. Therefore, the set of $K_{\ell m}$ for $\ell < \ell_\text{max}$ contains $\ell_\text{max}^2$ degrees of freedom. However, some of these degrees of freedom are redundant with the choice of coordinates as we discuss next.
 
-By definition, $K_{00}=1$. Furthermore, $K_{1m} = 0$ since the body-fixed frame is centred on the asteroid centre of mass. Further calculation reveals that the alignment of the body-fixed frame with the asteroid principal axes also forces $K_{21}= 0$ and $\Im K_{22}=0$ and the same for $m<0$. The only physical density moments for $\ell \leq 2$ are therefore $K_{22}$ and $K_{20}$, which are related to the moment of inertia around each principal axis by
-\begin{equation}
-  \begin{split}
-    I_x &= \frac{2}{3}\mu_\mathcal{A} a_\mathcal{A}^2 \parens{K_{20} - 6 K_{22} + 1}\\
-    I_y &= \frac{2}{3}\mu_\mathcal{A} a_\mathcal{A}^2 \parens{K_{20} + 6 K_{22} + 1}\\
-    I_z &= \frac{2}{3}\mu_\mathcal{A} a_\mathcal{A}^2 \parens{-2K_{20} + 1}.
-  \end{split}
-  \label{eqn:moi}
-\end{equation}
-Incidentally, the definition of $a_\mathcal{A}$ was chosen to satisfy equation \ref{eqn:moi}.
+By definition, $K_{00}=1$. Furthermore, $K_{1m} = 0$ since the body-fixed frame is centred on the asteroid centre of mass. Further calculation reveals that the alignment of the body-fixed frame with the asteroid principal axes also forces $K_{21}= 0$ and $\Im K_{22}=0$ and the same for $m<0$. The only physical density moments for $\ell \leq 2$ are therefore $K_{22}$ and $K_{20}$, which are related to the moment of inertia around each principal axis by equation \ref{eqn:moi}. Incidentally, the definition of $a_\mathcal{A}$ was chosen to satisfy equation \ref{eqn:moi}.
 
 The physical meaning of $K_{22}$ and $K_{20}$ can also be interpreted via a special case: if the asteroid is a uniform-density triaxial ellipsoid, the moments of inertia are simple to compute in terms of the semi-axis lengths and can be compared to those found in equation \ref{eqn:moi}. This yields semi-axis lengths of 
 \begin{equation}
@@ -231,6 +222,14 @@ Except when otherwise mentioned, we use the following asteroid encounter paramet
 The surface of a spherical asteroid with this rotational period and $a_\mathcal{A}$ rotates at $\SI{25}{\centi\meter\per\second}$ at the equator. The asymmetric and symmetric ellipsoids have maximum equatorial velocities of $\SI{36}{\centi\meter\per\second}$ and $\SI{27}{\centi\meter\per\second}$ respectively.
 
 We use the asymmetric ellipsoid in nearly all runs, due to the degeneracy induced in our model when $K_{22} = 0$.
+
+
+
+\section{Additional density moments}
+
+A finite element model was defined in section \ref{sec:density-distro} to translate density moment constraints into density distribution constraints. However, other models are possible. Here, we outline three models that can be explored to further understand the underdetermined density distribution of the asteroid: the likelihood model, the harmonic model, and the lumpy model. The first two produce smooth distributions, unlike the discrete transitions that occur for the finite element model across the boundaries of the elements. The lumpy model produces discrete distributions like the finite element model, but the locations of the elements are included as free parameters.
+
+\jtd{Describe these}
 
 
 

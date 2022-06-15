@@ -45,6 +45,11 @@ Boué G.,  Laskar J.,  2009, \mn@doi [Icarus]
 Brown T.,  et~al., 2013, Publications of the Astronomical Society of the
   Pacific, 125, 1031
 
+\bibitem[\protect\citeauthoryear{Carroll \& Faber}{Carroll \&
+  Faber}{2018}]{carroll2018tidal}
+Carroll K.,  Faber D.,  2018, in Proceedings of the 69th International
+  Astronautical Congress.
+
 \bibitem[\protect\citeauthoryear{Descamps et~al.,}{Descamps
   et~al.}{2020}]{DESCAMPS2020113726}
 Descamps P.,  et~al., 2020, \mn@doi [Icarus]
@@ -183,11 +188,6 @@ Wright E.~L.,  et~al., 2010, The Astronomical Journal, 140, 1868
   Ballouz}{Yu et~al.}{2014}]{yu2014numerical}
 Yu Y.,  Richardson D.~C.,  Michel P.,  Schwartz S.~R.,   Ballouz R.-L.,  2014,
   Icarus, 242, 82
-
-\bibitem[\protect\citeauthoryear{de Wit, Gillon, Demory  \& Seager}{de~Wit
-  et~al.}{2012}]{de2012towards}
-de Wit J.,  Gillon M.,  Demory B.-O.,   Seager S.,  2012, Astronomy \&
-  Astrophysics, 548, A128
 
 \bibitem[\protect\citeauthoryear{van Gelderen}{van
   Gelderen}{1998}]{Gelderen1998TheSO}

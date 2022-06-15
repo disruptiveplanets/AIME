@@ -13,43 +13,43 @@ Warning--empty booktitle in Lee2022Apophis
 Warning--empty booktitle in Makarov2022ChaosOO
 You've used 38 entries,
             2881 wiz_defined-function locations,
-            986 strings with 16380 characters,
-and the built_in function-call counts, 18180 in all, are:
-= -- 1469
-> -- 1345
-< -- 85
-+ -- 588
-- -- 204
-* -- 2100
-:= -- 2880
+            985 strings with 16374 characters,
+and the built_in function-call counts, 18116 in all, are:
+= -- 1452
+> -- 1339
+< -- 87
++ -- 590
+- -- 200
+* -- 2089
+:= -- 2866
 add.period$ -- 0
 call.type$ -- 38
 change.case$ -- 77
 chr.to.int$ -- 38
 cite$ -- 40
-duplicate$ -- 904
-empty$ -- 927
+duplicate$ -- 909
+empty$ -- 937
 format.name$ -- 318
-if$ -- 3185
+if$ -- 3172
 int.to.chr$ -- 1
 int.to.str$ -- 0
 missing$ -- 39
 newline$ -- 128
 num.names$ -- 262
-pop$ -- 219
+pop$ -- 226
 preamble$ -- 1
 purify$ -- 152
 quote$ -- 0
-skip$ -- 545
+skip$ -- 547
 stack$ -- 0
-substring$ -- 1032
+substring$ -- 1008
 swap$ -- 435
 text.length$ -- 155
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 339
 warning$ -- 2
-while$ -- 284
+while$ -- 282
 width$ -- 0
-write$ -- 388
+write$ -- 387
 (There were 4 warnings)
