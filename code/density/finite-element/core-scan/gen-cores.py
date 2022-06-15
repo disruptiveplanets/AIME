@@ -26,5 +26,5 @@ BULK_AMS = {
 
 k22, k20, surface_am = -0.05200629, -0.2021978, SURFACE_AMS[RUN_NAME] # For the shape
 
-main.pipeline(f"den-core-{AST_INDEX}-{AST_INDEX}", f"../../samples/den-core-{RUN_NAME}-0-samples.npy", Indicator.ell(surface_am, k22, k20),
+main.pipeline(f"den-core-{RUN_NAME}-{AST_INDEX}", f"../../samples/den-core-{RUN_NAME}-0-samples.npy", Indicator.ell(surface_am, k22, k20),
     surface_am, DIVISION, MAX_RADIUS, False, used_bulk_am=BULK_AMS[RUN_NAME])
