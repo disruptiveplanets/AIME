@@ -3,7 +3,7 @@ import numpy as np
 from scipy.linalg import pinvh
 from multiprocessing import Pool, Lock
 sys.path.append("..")
-from core import Asteroid, Indicator, TrueShape
+from core import Asteroid
 from scipy.optimize import minimize
 from threading import Thread
 from display import make_gif, make_slices
@@ -19,7 +19,7 @@ MIN_DENSITY = 0.25
 
 UNCERTAINTY_RATIO = 0.25
 NUM_THREADS = os.cpu_count()
-MIN_LOG_LIKE = 1000# 100
+MIN_LOG_LIKE = 1000
 MINIMIZATION_ATTEMPTS = 500
 
 class MCMCMethod:
@@ -129,22 +129,23 @@ class DataStorage:
 
 def log_probability(theta_short, method, data_storage):
     theta_long = method.get_theta_long(theta_short)
+    free_klms = method.get_klms(theta_long)[:N_FITTED_MOMENTS]
     lp = method.log_prior(theta_long)
-    ll = log_like(theta_long, method, data_storage)
+    ll = log_like(free_klms, data_storage)
     return ll + lp
 
-def log_like(theta_long, method, data_storage):
-    diff_klms = method.get_klms(theta_long)[:N_FITTED_MOMENTS] - data_storage.data # Only need the unconstrained ones
+def log_like(free_klms, data_storage):
+    diff_klms = free_klms - data_storage.data # Only need the unconstrained ones
     return -0.5 * diff_klms.transpose() @ data_storage.data_inv_covs @ diff_klms
 
 
 
 class MCMCAsteroid:
-    def __init__(self, name, sample_path, indicator, surface_am, division, max_radius, dof, used_bulk_am, generate=True):
+    def __init__(self, name, sample_path, indicator, shape, surface_am, division, max_radius, dof, used_bulk_am):
         if used_bulk_am is None:
             used_bulk_am = surface_am
         self.name = name
-        self.asteroid = Asteroid(name, "", surface_am, division, max_radius, indicator, TrueShape.uniform(), used_bulk_am)
+        self.asteroid = Asteroid(name, "", surface_am, division, max_radius, indicator, shape, used_bulk_am)
         self.asteroid.max_l = MAX_L
         self.mean_density = 1 / (np.sum(self.asteroid.indicator_map) * division**3)
         self.data_storage = DataStorage(sample_path)
@@ -168,6 +169,7 @@ class MCMCAsteroid:
             error = log_probability(means[:self.n_free], method, self.data_storage) / self.n_free * -2
             self.display(densities, true_densities, uncertainty_ratios, error)
 
+        # Uncs are already normalized
         return (means - self.mean_density) / means, unc
 
     
@@ -316,14 +318,15 @@ class MCMCAsteroid:
     
 if __name__ == "__main__":
     import fe
+    sys.path.append("..")
+    from core import Indicator, TrueShape
     k22, k20, surface_am = -0.05200629, -0.2021978, 1000 
     DIVISION = 99
     MAX_RADIUS = 2000# For the shape
     DOF = 9
-    generate = True
 
-    asteroid = MCMCAsteroid("asym-ell", "../samples/den-asym-0-samples.npy", Indicator.ell(surface_am, k22, k20), surface_am, DIVISION, MAX_RADIUS, DOF, surface_am, generate=generate)
+    asteroid = MCMCAsteroid("asym-ell", "../samples/den-asym-0-samples.npy", Indicator.ell(surface_am, k22, k20), TrueShape.uniform(), surface_am, DIVISION, MAX_RADIUS, DOF, surface_am)
 
     # asteroid = MCMCAsteroid(f"den-core-sph", "../samples/den-core-sph-0-samples.npy", Indicator.ell(surface_am, k22, k20), surface_am, DIVISION, MAX_RADIUS, True, used_bulk_am=978.4541044108308)
 
-    print(asteroid.pipeline(fe.FiniteElement, True, generate=generate))
+    print(asteroid.pipeline(fe.FiniteElement, True, generate=True))

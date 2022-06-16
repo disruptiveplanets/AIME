@@ -1,19 +1,26 @@
 import os, sys
+from re import T
 import numpy as np
 import warnings
+sys.path.append("..")
 sys.path.append("../..")
+from mcmc_core import MCMCAsteroid, log_like
 from display import make_gif, make_slices
-from core import TrueShape
+from core import TrueShape, Indicator
 
-RUN_NAME = "sph-3"
+RUN_NAME = "move-1.5"
+PULL = False
+GENERATE = False
+
 NUM_DRAWS = 20
 NUM_CHOOSE = 1000
 ASTEROID_NAME = f"avg-{RUN_NAME}"
 MAX_RADIUS = 2000
 DURATION = 5
-GENERATE = True
 DIVISION = 49
-PULL = False
+k22a, k20a = -0.05200629, -0.2021978
+ELLIPSOID_AM = 1000
+
 
 SURFACE_AMS = {
     "sph-3": 1000,
@@ -29,16 +36,42 @@ BULK_AMS = {
     "move-1.5": 980.8811439828254,
 }
 
+a = np.sqrt(5/3) * ELLIPSOID_AM * np.sqrt(1 - 2 * k20a + 12 * k22a)
+b = np.sqrt(5/3) * ELLIPSOID_AM * np.sqrt(1 - 2 * k20a - 12 * k22a)
+c = np.sqrt(5/3) * ELLIPSOID_AM * np.sqrt(1 + 4 * k20a)
+core_displacement = 300
+core_rad = 500
+core_vol = np.pi * 4 / 3 * core_rad**3
+ellipsoid_vol = np.pi * 4 / 3 * a * b * c
+density_factor_low = 0.5
+density_factor_high = 2
+core_shift_low = core_displacement * (core_vol * density_factor_low) / ellipsoid_vol
+core_shift_high = core_displacement * (core_vol * density_factor_high) / ellipsoid_vol
+
+TRUE_SHAPES = {
+    "sph-3": TrueShape.core_sph(3, 500),
+    "sph-1.5": TrueShape.core_sph(1.5, 500),
+    "move-3": TrueShape.core_shift(3, 500, core_displacement),
+    "move-1.5": TrueShape.core_shift(1.5, 500, core_displacement),
+}
+INDICATORS = {
+    "sph-3": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
+    "sph-1.5": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
+    "move-3": Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high),
+    "move-1.5": Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low),
+}
+
 grid_line = np.arange(-MAX_RADIUS, MAX_RADIUS, DIVISION)
 
-def get_moments(densities):
-    global asteroid
+def check_moments(densities):
     zero_densities = densities.copy()
     zero_densities[np.isnan(zero_densities)] = 0
     import core
-    k22, k20, surface_am = -0.05200629, -0.2021978, SURFACE_AMS[RUN_NAME] # For the shape
+    asteroid = core.Asteroid("ast-test", f"../../samples/den-core-{RUN_NAME}-0-samples.npy", SURFACE_AMS[RUN_NAME], DIVISION, MAX_RADIUS,
+        INDICATORS[RUN_NAME], TRUE_SHAPES[RUN_NAME], BULK_AMS[RUN_NAME])
+    
+    surface_am = SURFACE_AMS[RUN_NAME]
     bulk_am = BULK_AMS[RUN_NAME]
-    asteroid = core.Asteroid("ast-test", f"../../samples/den-core-{RUN_NAME}-0-samples.npy", surface_am, DIVISION, MAX_RADIUS, core.Indicator.ell(surface_am, k22, k20), TrueShape.uniform(), bulk_am)
     moment_field = asteroid.moment_field(surface_am) * asteroid.indicator_map
 
     # Correct moment_field
@@ -51,7 +84,27 @@ def get_moments(densities):
     radius_sqr = unscaled_klm[-1]
     klms = unscaled_klm / radius_sqr
 
-    return klms
+    for m, d in zip(klms, asteroid.data):
+        print(f"Got {m}\t\t Wanted {d}")
+
+    # Find likelihood
+    mcmc_asteroid = MCMCAsteroid("ast-test", f"../../samples/den-core-{RUN_NAME}-0-samples.npy", INDICATORS[RUN_NAME], TRUE_SHAPES[RUN_NAME], surface_am, DIVISION, MAX_RADIUS, 9, bulk_am)
+
+    free_real_klms = np.array([
+        klms[4].real, # K22
+        klms[6].real, # K20
+        klms[15].real, # R K33
+        klms[15].imag, # I K33
+        klms[14].real, # R K32
+        klms[14].imag, # I K32
+        klms[13].real, # R K31
+        klms[13].imag, # I K31
+        klms[12].real, # K30
+    ])
+
+    likelihood = log_like(free_real_klms, mcmc_asteroid.data_storage)
+    print(f"Total likelihood: {likelihood}")
+
 
 
 if PULL:
@@ -102,19 +155,16 @@ else:
     with open(f"{RUN_NAME}/unc-grid.npy", 'rb') as f:
         unc_grid = np.load(f)
 
-moments = get_moments(mean_grid)
-for m, d in zip(moments, asteroid.data):
-    print(f"Got {m}\t\t Wanted {d}")
+check_moments(mean_grid)
 
 x,y,z = np.meshgrid(grid_line, grid_line, grid_line)
-true_densities = TrueShape.core_sph(1.5, 500)(x,y,z)
+true_densities = TRUE_SHAPES[RUN_NAME](x,y,z)
 true_densities = true_densities.astype(float)
 true_densities[np.isnan(mean_grid)] = np.nan
 
 unc_grid /= np.nanmean(mean_grid)
 mean_grid /= np.nanmean(mean_grid)
 true_densities /= np.nanmean(true_densities)
-
 
 if not os.path.isdir(f"../../figs/{ASTEROID_NAME}"):
     os.mkdir(f"../../figs/{ASTEROID_NAME}")

@@ -3,12 +3,16 @@
 import sys, os
 import numpy as np
 sys.path.append("../../density")
-from core import Indicator
-sys.path.append("../../density/finite-element")
-from main import pipeline
+from core import Indicator, TrueShape
+sys.path.append("../../density/mcmc")
+from mcmc_core import MCMCAsteroid
+from fe import FiniteElement
+from contextlib import contextmanager
 
 DIVISION = 99
 FILE_PATH = "../../../data/"
+NUM_TRIALS = 5
+DEGREES_OF_FREEDOM = 5
 
 NAMES = {
     "scan-perigee": (2,), 
@@ -24,8 +28,6 @@ NAMES = {
     "cad-speed-contour": (2,2)
 }
 
-from contextlib import contextmanager
-import sys, os
 
 @contextmanager
 def suppress_stdout():
@@ -130,9 +132,14 @@ def get_unc_for_file(dname, fname):
     #         uncs = get_stats_from_long_samples(long_samples)
     with suppress_stdout():
         # Do not regenerate if the file was already done.
-        generate = not os.path.exists(f"ast-{short_name}-fe.npy")
-        uncs = pipeline(f"ast-{short_name}", fname, Indicator.ell(radius, k22, k20), am, division,
-            max_radius, False, used_bulk_am=None, generate=generate)
+        uncs = []
+        for run_index in range(NUM_TRIALS):
+            generate = not os.path.exists(f"ast-{short_name}-{run_index}-fe.npy")
+            asteroid = MCMCAsteroid(f"ast-{short_name}-{run_index}", fname, Indicator.ell(radius, k22, k20), TrueShape.uniform(),
+                am, division, max_radius, DEGREES_OF_FREEDOM, am)
+            devs, these_uncs = asteroid.pipeline(FiniteElement, False, generate=generate)
+            uncs.append(these_uncs)
+        uncs = np.nanmean(uncs, axis=0)
 
     if np.any(np.isnan(uncs)):
         return np.nan

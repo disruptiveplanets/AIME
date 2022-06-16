@@ -2,10 +2,12 @@
 
 import sys, os
 import numpy as np
+from code.density.core import TrueShape
 sys.path.append("../../../density")
 from core import Indicator
-sys.path.append("../../../density/finite-element")
-import main
+sys.path.append("../../../density/mcmc")
+from mcmc_core import MCMCAsteroid
+from fe import FiniteElement
 
 DOFS = [9, 7, 5, 3, 2]
 NUM_TRIALS = 5
@@ -16,8 +18,6 @@ TRIAL_INDEX = index // NUM_TRIALS
 DIVISION = 99
 FILE_PATH = "../../../../data/"
 MAX_REPEAT_COUNT = 100
-
-main.N_FREE = NUM_DOF
 
 print(f"{NUM_DOF} degrees of freedom")
 print(f"Trial {TRIAL_INDEX}")
@@ -73,8 +73,7 @@ def scan_directory(directory, index_lengths):
     max_indices += 1
 
     uncs = np.ones(max_indices) * np.nan
-    mean_devs = np.ones(max_indices) * np.nan
-    max_devs = np.ones(max_indices) * np.nan
+    deviations = np.ones(max_indices) * np.nan
 
     for dname in os.listdir(directory):
         run_name = directory+'/'+dname
@@ -86,12 +85,11 @@ def scan_directory(directory, index_lengths):
             indices = tuple(get_indices(dname, index_lengths))
             if not np.isnan(uncs[indices]):
                 raise Exception(f"Index {indices} was already processed")
-            mean_dev, max_dev, unc = get_unc_for_file(run_name, run_name+'/'+fname)
+            deviation, unc = get_unc_for_file(run_name, run_name+'/'+fname)
             uncs[indices] = unc
-            mean_devs[indices] = mean_dev
-            max_devs[indices] = max_dev
+            deviations[indices] = deviation
 
-    return mean_devs, max_devs, uncs
+    return deviations, uncs
 
 
 def get_unc_for_file(dname, fname):
@@ -148,8 +146,9 @@ def get_unc_for_file(dname, fname):
     while repeat:
         repeat = False
         with suppress_stdout():
-            deviation, uncs = main.pipeline(f"cast-{NUM_DOF}-{TRIAL_INDEX}-{short_name}", fname, Indicator.ell(radius, k22, k20), am, division,
-                max_radius, False, used_bulk_am=None, generate=generate)
+            asteroid = MCMCAsteroid(f"cast-{NUM_DOF}-{TRIAL_INDEX}-{short_name}", fname, Indicator.ell(radius, k22, k20), TrueShape.usniform(),
+                am, division, max_radius, NUM_DOF, am, generate=generate)
+            deviation, uncs = asteroid.pipeline(FiniteElement, False, generate=generate)
 
         if np.any(np.isnan(uncs)):
             print("Failed. Had to repeat")
@@ -157,19 +156,16 @@ def get_unc_for_file(dname, fname):
             repeat_num += 1
         if repeat_num == MAX_REPEAT_COUNT:
             # Give up
-            return np.nan, np.nan, np.nan
+            return np.nan, np.nan
 
-    density_uncertainty = np.nanmedian(uncs)
-    mean_dev_ratio = np.mean(np.abs(deviation / uncs))
-    max_dev_ratio = np.max(np.abs(deviation / uncs))
-    return mean_dev_ratio, max_dev_ratio, density_uncertainty
+    return deviation, uncs
 
 def scan_specific(directory):
     index_lengths = NAMES[directory]
-    mean_devs, max_devs, uncs = scan_directory(FILE_PATH + directory, index_lengths)
+    devs, uncs = scan_directory(FILE_PATH + directory, index_lengths)
     print(uncs)
     with open(f"c{directory}-{NUM_DOF}-{TRIAL_INDEX}.npy", 'wb') as f:
-        np.save(f, (mean_devs, max_devs, uncs))
+        np.save(f, (devs, uncs))
 
 if __name__ == "__main__":
     scan_specific(sys.argv[1])

@@ -171,3 +171,7 @@ I had to adjust my get_exotic_moments file a bit, and main, in order to jive wit
 ## June 14
 
 The moments code was running out of memory, unbeknownst to me. I got it working, computed the moments, confirmed that the blob K2 and K3 moments are reproduced, then ran the moment extraction for all four core types.
+
+## June 16
+
+I rewrote mcmc so that it's flexible and can be executed for multiple models. I also pulled the core extractions but they had a bug.
