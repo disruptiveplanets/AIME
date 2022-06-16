@@ -13,7 +13,7 @@ MAX_RADIUS = 2000
 DURATION = 5
 GENERATE = True
 DIVISION = 49
-PULL = True
+PULL = False
 
 SURFACE_AMS = {
     "sph-3": 1000,
@@ -55,8 +55,8 @@ def get_moments(densities):
 
 
 if PULL:
-    os.system("scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/finite-element/core-scan/den-core-{RUN_NAME}*.npy {RUN_NAME}")
-    os.system("scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/finite-element/core-scan/den-core-{RUN_NAME}*.png {RUN_NAME}")
+    os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/finite-element/core-scan/den-core-{RUN_NAME}*.npy {RUN_NAME}")
+    os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/finite-element/core-scan/den-core-{RUN_NAME}*.png {RUN_NAME}")
 
 if GENERATE:
     density_grid_sum = 0
@@ -92,14 +92,14 @@ if GENERATE:
     unc_grid = np.sqrt(density_grid_square_sum / num_grids - mean_grid**2)
     
 
-    with open("{RUN_NAME}/avg-grid.npy", 'wb') as f:
+    with open(f"{RUN_NAME}/avg-grid.npy", 'wb') as f:
         np.save(f, mean_grid)
-    with open("{RUN_NAME}/unc-grid.npy", 'wb') as f:
+    with open(f"{RUN_NAME}/unc-grid.npy", 'wb') as f:
         np.save(f, unc_grid)
 else:
-    with open("{RUN_NAME}/avg-grid.npy", 'rb') as f:
+    with open(f"{RUN_NAME}/avg-grid.npy", 'rb') as f:
         mean_grid = np.load(f)
-    with open("{RUN_NAME}/unc-grid.npy", 'rb') as f:
+    with open(f"{RUN_NAME}/unc-grid.npy", 'rb') as f:
         unc_grid = np.load(f)
 
 moments = get_moments(mean_grid)
