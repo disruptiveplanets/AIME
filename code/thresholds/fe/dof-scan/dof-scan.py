@@ -2,9 +2,8 @@
 
 import sys, os
 import numpy as np
-from code.density.core import TrueShape
 sys.path.append("../../../density")
-from core import Indicator
+from core import Indicator, TrueShape
 sys.path.append("../../../density/mcmc")
 from mcmc_core import MCMCAsteroid
 from fe import FiniteElement
@@ -146,8 +145,8 @@ def get_unc_for_file(dname, fname):
     while repeat:
         repeat = False
         with suppress_stdout():
-            asteroid = MCMCAsteroid(f"cast-{NUM_DOF}-{TRIAL_INDEX}-{short_name}", fname, Indicator.ell(radius, k22, k20), TrueShape.usniform(),
-                am, division, max_radius, NUM_DOF, am, generate=generate)
+            asteroid = MCMCAsteroid(f"cast-{NUM_DOF}-{TRIAL_INDEX}-{short_name}", fname, Indicator.ell(radius, k22, k20), TrueShape.uniform(),
+                am, division, max_radius, NUM_DOF, am)
             deviation, uncs = asteroid.pipeline(FiniteElement, False, generate=generate)
 
         if np.any(np.isnan(uncs)):
