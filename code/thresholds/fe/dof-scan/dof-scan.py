@@ -14,7 +14,7 @@ index = int(sys.argv[2])
 assert(0 <= index < len(DOFS) * NUM_TRIALS)
 NUM_DOF = DOFS[index % NUM_TRIALS]
 TRIAL_INDEX = index // NUM_TRIALS
-DIVISION = 99
+DIVISION = 49
 FILE_PATH = "../../../../data/"
 MAX_REPEAT_COUNT = 100
 
@@ -144,7 +144,7 @@ def get_unc_for_file(dname, fname):
     repeat = True
     while repeat:
         repeat = False
-        if True:# with suppress_stdout():
+        with suppress_stdout():
             asteroid = MCMCAsteroid(f"cast-{NUM_DOF}-{TRIAL_INDEX}-{short_name}", fname, Indicator.ell(radius, k22, k20), TrueShape.uniform(),
                 am, division, max_radius, NUM_DOF, am)
             deviation, uncs = asteroid.pipeline(FiniteElement, False, generate=generate)
