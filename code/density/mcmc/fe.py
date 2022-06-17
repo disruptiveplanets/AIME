@@ -61,23 +61,6 @@ class FiniteElement(MCMCMethod):
         # Get the densities consistent with making the mass 1 and com 0 and rotation
         return np.append(theta_short, self.rlm_fixed_inv[:,-1] - self.rlm_prod @ theta_short)
 
-    def get_stats_from_long_samples(self, long_samples):
-        short_samples = long_samples[:, :self.n_free]
-
-        # Don't compute the mean; compute the middle of the data set.
-        least_dist = None
-        for i, point in enumerate(short_samples):
-            mean_dist = np.sum((short_samples - point)**2) / len(short_samples)
-            if least_dist is None or least_dist > mean_dist:
-                least_dist = mean_dist
-                least_point_index = i
-        
-        long_means = long_samples[least_point_index]
-        high_unc = np.percentile(long_samples, (100 + 68.27) / 2, axis=0) - long_means
-        low_unc = long_means - np.percentile(long_samples, (100 - 68.27) / 2, axis=0)
-
-        return long_means, (high_unc + low_unc) / 2
-
     def pick_parameters(self, local_rng):
         return [(local_rng.random() * 4 + 0.5) * self.mean_density for _ in range(self.n_free)]
 

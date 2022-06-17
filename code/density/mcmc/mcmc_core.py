@@ -38,9 +38,6 @@ class MCMCMethod:
     def get_theta_long(self, theta_short):
         raise NotImplementedError()
 
-    def get_stats_from_long_samples(self, long_samples):
-        raise NotImplementedError()
-
     def pick_parameters(self, local_rng):
         raise NotImplementedError()
 
@@ -199,13 +196,31 @@ class MCMCAsteroid:
             with open(output_name + ".npy", 'rb') as f:
                 long_samples = np.load(f)
 
-        long_means, unc = method.get_stats_from_long_samples(long_samples)
+        long_means, unc = self.get_stats_from_long_samples(long_samples)
 
         fig = corner.corner(long_samples / self.mean_density, truths=np.ones(self.n_all))
         corner.overplot_lines(fig, long_means / self.mean_density, color='C1')
         fig.savefig(output_name + ".png")
 
         return long_means, unc / long_means
+
+
+    def get_stats_from_long_samples(self, long_samples):
+        short_samples = long_samples[:, :self.n_free]
+
+        # Don't compute the mean; compute the middle of the data set.
+        least_dist = None
+        for i, point in enumerate(short_samples):
+            mean_dist = np.sum((short_samples - point)**2) / len(short_samples)
+            if least_dist is None or least_dist > mean_dist:
+                least_dist = mean_dist
+                least_point_index = i
+        
+        long_means = long_samples[least_point_index]
+        high_unc = np.percentile(long_samples, (100 + 68.27) / 2, axis=0) - long_means
+        low_unc = long_means - np.percentile(long_samples, (100 - 68.27) / 2, axis=0)
+
+        return long_means, (high_unc + low_unc) / 2
     
     def get_theta_start_mcmc(self, method):
         threads = []
