@@ -144,7 +144,7 @@ def get_unc_for_file(dname, fname):
     repeat = True
     while repeat:
         repeat = False
-        with suppress_stdout():
+        if True:# with suppress_stdout():
             asteroid = MCMCAsteroid(f"cast-{NUM_DOF}-{TRIAL_INDEX}-{short_name}", fname, Indicator.ell(radius, k22, k20), TrueShape.uniform(),
                 am, division, max_radius, NUM_DOF, am)
             deviation, uncs = asteroid.pipeline(FiniteElement, False, generate=generate)
