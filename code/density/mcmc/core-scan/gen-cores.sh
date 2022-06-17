@@ -2,7 +2,7 @@
 
 #SBATCH -ogen-cores-%a.log
 #SBATCH -a 0-19
-#SBATCH -c 4
+#SBATCH -c 8
 
 source /etc/profile
 
