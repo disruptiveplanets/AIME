@@ -13,6 +13,7 @@ DIVISION = 99
 FILE_PATH = "../../../data/"
 NUM_TRIALS = 5
 DEGREES_OF_FREEDOM = 5
+MAX_REPEAT_COUNT = 100
 
 NAMES = {
     "scan-perigee": (2,), 
@@ -124,23 +125,31 @@ def get_unc_for_file(dname, fname):
     short_name = short_name[short_name.rfind('/')+1:]
     print(short_name)
 
-    # # Check to see if this has already been processed. This code just pulls data and doesn't redo anything
-    # if os.path.exists(f"ast-{short_name}-fe.npy"):
-    #     print("Already run")
-    #     with open(f"ast-{short_name}-fe.npy", 'rb') as f:
-    #         long_samples = np.load(f);
-    #         uncs = get_stats_from_long_samples(long_samples)
-    with suppress_stdout():
-        # Do not regenerate if the file was already done.
-        uncs = []
-        for run_index in range(NUM_TRIALS):
+    # Do not regenerate if the file was already done.
+    uncs = []
+    for run_index in range(NUM_TRIALS):
+        repeat_num = 0
+        repeat = True
+        while repeat:
+            repeat = False
             generate = not os.path.exists(f"ast-{short_name}-{run_index}-fe.npy")
-            asteroid = MCMCAsteroid(f"ast-{short_name}-{run_index}", fname, Indicator.ell(radius, k22, k20), TrueShape.uniform(),
-                am, division, max_radius, DEGREES_OF_FREEDOM, am)
-            devs, these_uncs = asteroid.pipeline(FiniteElement, False, generate=generate)
+            print(f"Trial {run_index}. Generating: {generate}")
+            with suppress_stdout():
+                asteroid = MCMCAsteroid(f"ast-{short_name}-{run_index}", fname, Indicator.ell(radius, k22, k20), TrueShape.uniform(),
+                    am, division, max_radius, DEGREES_OF_FREEDOM, am)
+                devs, these_uncs = asteroid.pipeline(FiniteElement, False, generate=generate)
+            if np.any(np.isnan(uncs)):
+                print("Failed. Had to repeat")
+                repeat = True
+                repeat_num += 1
+            if repeat_num == MAX_REPEAT_COUNT:
+                # Give up. Keep repeat = True
+                break # Don't add anything to the uncs list
+        if not repeat:
+            # Success
             uncs.append(these_uncs)
-        uncs = np.nanmean(uncs, axis=0)
 
+    uncs = np.nanmean(uncs, axis=0)
     if np.any(np.isnan(uncs)):
         return np.nan
 

@@ -51,22 +51,22 @@ asteroids = [
     #("core-sph-3", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core_sph(3, 500), False),
     #("core-sph-1.5", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core_sph(1.5, 500), False),
     ("core-move-3", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high), TrueShape.core_shift(3, 500, core_displacement), True),
-    ("core-move-1.5", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.core_shift(1.5, 500, core_displacement), True),
+    #("core-move-1.5", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.core_shift(1.5, 500, core_displacement), True),
 ]
 
 def get_klms(index):
-    name, indicator, generator, recalc_am = asteroids[index]
+    name, indicator, true_shape, recalc_am = asteroids[index]
     if recalc_am: 
-        asteroid = Asteroid(name, "", ELLIPSOID_AM, division, max_radius, indicator, None, used_bulk_am=ELLIPSOID_AM)
-        rlms = asteroid.moment_field(max_l=3, surface_am=ELLIPSOID_AM)
+        asteroid = Asteroid(name, ELLIPSOID_AM, division, max_radius, indicator, None)
+        rlms = asteroid.moment_field(surface_am=ELLIPSOID_AM)
         surface_am_sqr = np.sum(rlms[-1] * asteroid.indicator_map) / np.sum(asteroid.indicator_map)
         surface_am = np.sqrt(surface_am_sqr)
         print("New surface_am", surface_am)
     else: 
         surface_am = ELLIPSOID_AM
 
-    asteroid = Asteroid(name, "", surface_am, division, max_radius, indicator, None, used_bulk_am=surface_am)
-    density = asteroid.map_np(generator)
+    asteroid = Asteroid(name, surface_am, division, max_radius, indicator, None)
+    density = asteroid.map_np(true_shape)
 
     # plt.imshow(density[len(density)//2, :, :])
     # plt.figure()
@@ -75,7 +75,7 @@ def get_klms(index):
     # plt.imshow(density[:, :, len(density)//2])
     # plt.show()
 
-    rlms = asteroid.moment_field(max_l=3, surface_am=surface_am)
+    rlms = asteroid.moment_field(surface_am=surface_am)
 
     i = 0
     klms = []

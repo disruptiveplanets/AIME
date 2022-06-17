@@ -5,7 +5,7 @@ import numpy as np
 sys.path.append("../../../density")
 from core import Indicator, TrueShape
 sys.path.append("../../../density/mcmc")
-from mcmc_core import MCMCAsteroid
+from mcmc_core import MCMCAsteroid, N_CONSTRAINED
 from fe import FiniteElement
 
 DOFS = [9, 7, 5, 3, 2]
@@ -70,9 +70,10 @@ def scan_directory(directory, index_lengths):
             indices = get_indices(dname, index_lengths)
             max_indices = np.maximum(max_indices, indices)
     max_indices += 1
-
-    uncs = np.ones(max_indices) * np.nan
-    deviations = np.ones(max_indices) * np.nan
+    
+    shape = np.append(max_indices, NUM_DOF + N_CONSTRAINED)
+    uncs = np.ones(shape) * np.nan
+    deviations = np.ones(shape) * np.nan
 
     for dname in os.listdir(directory):
         run_name = directory+'/'+dname
@@ -82,7 +83,7 @@ def scan_directory(directory, index_lengths):
             if not fname.endswith("-0-samples.npy"):
                 continue
             indices = tuple(get_indices(dname, index_lengths))
-            if not np.isnan(uncs[indices]):
+            if not np.all(np.isnan(uncs[indices])):
                 raise Exception(f"Index {indices} was already processed")
             deviation, unc = get_unc_for_file(run_name, run_name+'/'+fname)
             uncs[indices] = unc
@@ -140,6 +141,7 @@ def get_unc_for_file(dname, fname):
 
     # Do not regenerate if the file was already done.
     generate = not os.path.exists(f"cast-{NUM_DOF}-{TRIAL_INDEX}-{short_name}-fe.npy")
+    print(f"Generating: {generate}")
     repeat_num = 0
     repeat = True
     while repeat:

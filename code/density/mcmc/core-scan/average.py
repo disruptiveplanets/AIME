@@ -8,9 +8,9 @@ from mcmc_core import MCMCAsteroid, log_like
 from display import make_gif, make_slices
 from core import TrueShape, Indicator
 
-RUN_NAME = "move-1.5"
-PULL = False
-GENERATE = False
+RUN_NAME = "move-3"
+PULL = True
+GENERATE = True
 
 NUM_DRAWS = 20
 NUM_CHOOSE = 1000
@@ -67,29 +67,34 @@ def check_moments(densities):
     zero_densities = densities.copy()
     zero_densities[np.isnan(zero_densities)] = 0
     import core
-    asteroid = core.Asteroid("ast-test", f"../../samples/den-core-{RUN_NAME}-0-samples.npy", SURFACE_AMS[RUN_NAME], DIVISION, MAX_RADIUS,
-        INDICATORS[RUN_NAME], TRUE_SHAPES[RUN_NAME], BULK_AMS[RUN_NAME])
+    asteroid = core.Asteroid("ast-test", SURFACE_AMS[RUN_NAME], DIVISION, MAX_RADIUS, INDICATORS[RUN_NAME], TRUE_SHAPES[RUN_NAME])
     
     surface_am = SURFACE_AMS[RUN_NAME]
     bulk_am = BULK_AMS[RUN_NAME]
     moment_field = asteroid.moment_field(surface_am) * asteroid.indicator_map
-
-    # Correct moment_field
-    moment_field[0] *= (bulk_am / surface_am)**2
-    moment_field[1:4] *= (bulk_am / surface_am)**1
-    moment_field[9:16] *= (bulk_am / surface_am)**(-1)
 
     # Calculate klm
     unscaled_klm = np.einsum("iabc,abc->i", moment_field, zero_densities)
     radius_sqr = unscaled_klm[-1]
     klms = unscaled_klm / radius_sqr
 
-    for m, d in zip(klms, asteroid.data):
+    mcmc_asteroid = MCMCAsteroid("ast-test", f"../../samples/den-core-{RUN_NAME}-0-samples.npy", INDICATORS[RUN_NAME], TRUE_SHAPES[RUN_NAME], surface_am, DIVISION, MAX_RADIUS, 9, bulk_am)
+    k33 = mcmc_asteroid.data_storage.data[2] + mcmc_asteroid.data_storage.data[3] * 1j
+    k32 = mcmc_asteroid.data_storage.data[4] + mcmc_asteroid.data_storage.data[5] * 1j
+    k31 = mcmc_asteroid.data_storage.data[6] + mcmc_asteroid.data_storage.data[7] * 1j
+    k30 = mcmc_asteroid.data_storage.data[8]
+    complex_klms = [
+        1, 
+        0, 0, 0, 
+        mcmc_asteroid.data_storage.data[0], 0, mcmc_asteroid.data_storage.data[1], 0, mcmc_asteroid.data_storage.data[0],
+        -k33.conj(), k32.conj(), -k31.conj(), k30, k31, k32, k33
+    ]
+
+    for m, d in zip(klms, complex_klms):
         print(f"Got {m}\t\t Wanted {d}")
+    print(f"Got {np.sqrt(radius_sqr)}\t\t Wanted {bulk_am}")
 
     # Find likelihood
-    mcmc_asteroid = MCMCAsteroid("ast-test", f"../../samples/den-core-{RUN_NAME}-0-samples.npy", INDICATORS[RUN_NAME], TRUE_SHAPES[RUN_NAME], surface_am, DIVISION, MAX_RADIUS, 9, bulk_am)
-
     free_real_klms = np.array([
         klms[4].real, # K22
         klms[6].real, # K20

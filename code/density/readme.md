@@ -175,3 +175,7 @@ The moments code was running out of memory, unbeknownst to me. I got it working,
 ## June 16
 
 I rewrote mcmc so that it's flexible and can be executed for multiple models. I also pulled the core extractions but they had a bug.
+
+## June 17
+
+I fixed a couple flaws in the code that were failing for non-9 degrees of freedom. I also tried to figure out what was causing the move-3 and move-1.5 core extractions to fail. Their moments were different from the data moments.

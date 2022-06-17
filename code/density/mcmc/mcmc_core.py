@@ -88,7 +88,7 @@ class CompletedException(Exception):
     pass
 
 class DataStorage:
-    def __init__(self, sample_path):
+    def __init__(self, sample_path, surface_am, bulk_am):
         with open(sample_path, 'rb') as f:
             data = np.load(f).reshape(-1, N_FITTED_MOMENTS + 1)
             initial_rolls = data[:, 0]
@@ -110,15 +110,16 @@ class DataStorage:
         exponents = -1j * np.outer(initial_rolls - np.mean(initial_rolls), ms)
         complex_hybrid_samples = complex_samples * np.exp(exponents)
         real_hybrid_samples = np.zeros_like(flat_samples)
+
         real_hybrid_samples[:, 0]  = complex_hybrid_samples[:, 0].real # K22
         real_hybrid_samples[:, 1]  = complex_hybrid_samples[:, 1].real # K20
-        real_hybrid_samples[:, 2]  = complex_hybrid_samples[:, 2].real # R K33
-        real_hybrid_samples[:, 3]  = complex_hybrid_samples[:, 2].imag # I K33
-        real_hybrid_samples[:, 4]  = complex_hybrid_samples[:, 3].real # R K32
-        real_hybrid_samples[:, 5]  = complex_hybrid_samples[:, 3].imag # I K32
-        real_hybrid_samples[:, 6]  = complex_hybrid_samples[:, 4].real # R K31
-        real_hybrid_samples[:, 7]  = complex_hybrid_samples[:, 4].imag # I K31
-        real_hybrid_samples[:, 8]  = complex_hybrid_samples[:, 5].real # R K30
+        real_hybrid_samples[:, 2]  = complex_hybrid_samples[:, 2].real * (bulk_am / surface_am) # R K33
+        real_hybrid_samples[:, 3]  = complex_hybrid_samples[:, 2].imag * (bulk_am / surface_am) # I K33
+        real_hybrid_samples[:, 4]  = complex_hybrid_samples[:, 3].real * (bulk_am / surface_am) # R K32
+        real_hybrid_samples[:, 5]  = complex_hybrid_samples[:, 3].imag * (bulk_am / surface_am) # I K32
+        real_hybrid_samples[:, 6]  = complex_hybrid_samples[:, 4].real * (bulk_am / surface_am) # R K31
+        real_hybrid_samples[:, 7]  = complex_hybrid_samples[:, 4].imag * (bulk_am / surface_am) # I K31
+        real_hybrid_samples[:, 8]  = complex_hybrid_samples[:, 5].real * (bulk_am / surface_am) # R K30
         cov = np.cov(real_hybrid_samples.transpose())
         self.data = np.mean(real_hybrid_samples, axis=0)
 
@@ -139,16 +140,15 @@ def log_like(free_klms, data_storage):
     return -0.5 * diff_klms.transpose() @ data_storage.data_inv_covs @ diff_klms
 
 
-
 class MCMCAsteroid:
     def __init__(self, name, sample_path, indicator, shape, surface_am, division, max_radius, dof, used_bulk_am):
         if used_bulk_am is None:
             used_bulk_am = surface_am
         self.name = name
-        self.asteroid = Asteroid(name, "", surface_am, division, max_radius, indicator, shape, used_bulk_am)
+        self.asteroid = Asteroid(name, surface_am, division, max_radius, indicator, shape)
         self.asteroid.max_l = MAX_L
         self.mean_density = 1 / (np.sum(self.asteroid.indicator_map) * division**3)
-        self.data_storage = DataStorage(sample_path)
+        self.data_storage = DataStorage(sample_path, surface_am, used_bulk_am)
         self.n_free = dof
         self.n_all = dof + N_CONSTRAINED
         
@@ -162,9 +162,11 @@ class MCMCAsteroid:
         if np.any(np.isnan(unc)):
             return np.nan, np.nan
 
+        print("Mean klms:", method.get_klms(means))
+
         if map:
             densities, uncertainty_ratios = method.get_map(means, unc, self.asteroid)
-            true_densities = self.asteroid.get_true_densities()
+            true_densities = self.asteroid.get_true_densities().astype(float)
             true_densities[~self.asteroid.indicator_map] = np.nan
             error = log_probability(means[:self.n_free], method, self.data_storage) / self.n_free * -2
             self.display(densities, true_densities, uncertainty_ratios, error)
@@ -173,11 +175,10 @@ class MCMCAsteroid:
         return (means - self.mean_density) / means, unc
 
     
-    def get_densities_mcmc(self, method, generate=True):
+    def get_densities_mcmc(self, method, generate):
         output_name = self.name + "-" + method.short_name()
         if generate:
             theta_start = self.get_theta_start_mcmc(method)
-            print("Theta start:", theta_start)
             if theta_start is None:
                 return np.nan, np.nan
             sampler = self.mcmc_fit(theta_start, output_name, method, True)
@@ -229,7 +230,6 @@ class MCMCAsteroid:
             try:
                 min_result = minimize(self.minimize_func, x0=val, method="Nelder-Mead", args=(result, method), options = {"maxiter": 500 * len(val)})
             except CompletedException:
-                print("Thread bailed")
                 return
             if min_result.success and min_result.fun < MIN_LOG_LIKE:
                 print(f"Thread successfully completed with log like {min_result.fun}")
@@ -320,13 +320,29 @@ if __name__ == "__main__":
     import fe
     sys.path.append("..")
     from core import Indicator, TrueShape
-    k22, k20, surface_am = -0.05200629, -0.2021978, 1000 
+    
+    ELLIPSOID_AM = 1000
+    k22a, k20a = -0.05200629, -0.2021978
     DIVISION = 99
     MAX_RADIUS = 2000# For the shape
     DOF = 9
 
-    asteroid = MCMCAsteroid("asym-ell", "../samples/den-asym-0-samples.npy", Indicator.ell(surface_am, k22, k20), TrueShape.uniform(), surface_am, DIVISION, MAX_RADIUS, DOF, surface_am)
+    a = np.sqrt(5/3) * ELLIPSOID_AM * np.sqrt(1 - 2 * k20a + 12 * k22a)
+    b = np.sqrt(5/3) * ELLIPSOID_AM * np.sqrt(1 - 2 * k20a - 12 * k22a)
+    c = np.sqrt(5/3) * ELLIPSOID_AM * np.sqrt(1 + 4 * k20a)
+    core_displacement = 300
+    core_rad = 500
+    core_vol = np.pi * 4 / 3 * core_rad**3
+    ellipsoid_vol = np.pi * 4 / 3 * a * b * c
+    density_factor_low = 0.5
+    density_factor_high = 2
+    core_shift_low = core_displacement * (core_vol * density_factor_low) / ellipsoid_vol
+    core_shift_high = core_displacement * (core_vol * density_factor_high) / ellipsoid_vol
+
+    asteroid = MCMCAsteroid("asym-ell", "../samples/den-core-move-3-0-samples.npy", 
+        Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high), TrueShape.core_shift(3, 500, core_displacement),
+        1002.0081758422925, DIVISION, MAX_RADIUS, DOF, 933.1648422811957)
 
     # asteroid = MCMCAsteroid(f"den-core-sph", "../samples/den-core-sph-0-samples.npy", Indicator.ell(surface_am, k22, k20), surface_am, DIVISION, MAX_RADIUS, True, used_bulk_am=978.4541044108308)
 
-    print(asteroid.pipeline(fe.FiniteElement, True, generate=True))
+    print(asteroid.pipeline(fe.FiniteElement, True, generate=False))
