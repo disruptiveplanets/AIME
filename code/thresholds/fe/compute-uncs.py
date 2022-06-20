@@ -138,7 +138,7 @@ def get_unc_for_file(dname, fname):
                 asteroid = MCMCAsteroid(f"ast-{short_name}-{run_index}", fname, Indicator.ell(radius, k22, k20), TrueShape.uniform(),
                     am, division, max_radius, DEGREES_OF_FREEDOM, am)
                 devs, these_uncs = asteroid.pipeline(FiniteElement, False, generate=generate)
-            if np.any(np.isnan(uncs)):
+            if np.any(np.isnan(these_uncs)):
                 print("Failed. Had to repeat")
                 repeat = True
                 repeat_num += 1
