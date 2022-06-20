@@ -149,6 +149,7 @@ def get_unc_for_file(dname, fname):
             # Success
             uncs.append(these_uncs)
 
+    uncs = np.array(uncs)
     uncs = np.nanmean(uncs, axis=0)
     if np.any(np.isnan(uncs)):
         return np.nan

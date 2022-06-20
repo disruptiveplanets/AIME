@@ -76,7 +76,6 @@ class FiniteElement(MCMCMethod):
     def get_klms(self, theta_long):
         unscaled_klms = self.rlm_mat @ theta_long
         radius_sqr = self.radius_vec @ theta_long
-        #radius_sqr = 1000**2
         scaled_klms = np.array(unscaled_klms) / radius_sqr
         scaled_klms[-1] *= radius_sqr # Do not scale mass term
         # Mass is already normalized

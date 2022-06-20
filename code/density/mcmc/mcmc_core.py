@@ -159,6 +159,7 @@ class MCMCAsteroid:
         if np.any(np.isnan(unc)):
             return np.nan, np.nan
 
+        print("Means:", means)
         print("Mean klms:", method.get_klms(means))
 
         if map:
@@ -184,7 +185,6 @@ class MCMCAsteroid:
 
             tau = sampler.get_autocorr_time()
             max_tau = int(np.max(tau))
-            print("Autocorrelation time", tau)
             flat_samples = sampler.get_chain(discard=2 * max_tau, thin=max_tau // 2, flat=True)
 
             long_samples = np.array([method.get_theta_long(theta_short) for theta_short in flat_samples])
@@ -288,7 +288,7 @@ class MCMCAsteroid:
                                 print("Converged")
                                 break
                             old_tau = tau
-
+                        if sampler.iteration % 5000 == 500:
                             print(np.mean(sampler.get_last_sample().log_prob), tau)
 
         else:

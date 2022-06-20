@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 plt.style.use('jcap')
 
-PULL = False
+PULL = True
 DIRECTORY = "fe/dof-scan"
 DOFS = [9, 7, 5, 3, 2]
 NUM_TRIALS = 5

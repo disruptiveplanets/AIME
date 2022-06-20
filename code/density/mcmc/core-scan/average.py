@@ -5,10 +5,11 @@ import warnings
 sys.path.append("..")
 sys.path.append("../..")
 from mcmc_core import MCMCAsteroid, log_like
+from fe import FiniteElement
 from display import make_gif, make_slices
 from core import TrueShape, Indicator
 
-RUN_NAME = "move-3"
+RUN_NAME = "move-1.5"
 PULL = True
 GENERATE = True
 
@@ -65,20 +66,18 @@ grid_line = np.arange(-MAX_RADIUS, MAX_RADIUS, DIVISION)
 
 def check_moments(densities):
     zero_densities = densities.copy()
-    zero_densities[np.isnan(zero_densities)] = 0
-    import core
-    asteroid = core.Asteroid("ast-test", SURFACE_AMS[RUN_NAME], DIVISION, MAX_RADIUS, INDICATORS[RUN_NAME], TRUE_SHAPES[RUN_NAME])
+    zero_densities[np.isnan(densities)] = 0
     
-    surface_am = SURFACE_AMS[RUN_NAME]
-    bulk_am = BULK_AMS[RUN_NAME]
-    moment_field = asteroid.moment_field(surface_am) * asteroid.indicator_map
+    mcmc_asteroid = MCMCAsteroid("ast-test", f"../../samples/den-core-{RUN_NAME}-0-samples.npy", INDICATORS[RUN_NAME],
+        TRUE_SHAPES[RUN_NAME], SURFACE_AMS[RUN_NAME], DIVISION, MAX_RADIUS, 9, BULK_AMS[RUN_NAME])
+    moment_field = mcmc_asteroid.asteroid.moment_field(SURFACE_AMS[RUN_NAME])
 
     # Calculate klm
-    unscaled_klm = np.einsum("iabc,abc->i", moment_field, zero_densities)
-    radius_sqr = unscaled_klm[-1]
+    unscaled_klm = np.einsum("iabc,abc->i", moment_field, zero_densities) * DIVISION**3
+    radius_sqr = unscaled_klm[-1].real
     klms = unscaled_klm / radius_sqr
+    klms[0] *= radius_sqr
 
-    mcmc_asteroid = MCMCAsteroid("ast-test", f"../../samples/den-core-{RUN_NAME}-0-samples.npy", INDICATORS[RUN_NAME], TRUE_SHAPES[RUN_NAME], surface_am, DIVISION, MAX_RADIUS, 9, bulk_am)
     k33 = mcmc_asteroid.data_storage.data[2] + mcmc_asteroid.data_storage.data[3] * 1j
     k32 = mcmc_asteroid.data_storage.data[4] + mcmc_asteroid.data_storage.data[5] * 1j
     k31 = mcmc_asteroid.data_storage.data[6] + mcmc_asteroid.data_storage.data[7] * 1j
@@ -92,7 +91,7 @@ def check_moments(densities):
 
     for m, d in zip(klms, complex_klms):
         print(f"Got {m}\t\t Wanted {d}")
-    print(f"Got {np.sqrt(radius_sqr)}\t\t Wanted {bulk_am}")
+    print(f"Got {np.sqrt(radius_sqr)}\t\t Wanted {BULK_AMS[RUN_NAME]}")
 
     # Find likelihood
     free_real_klms = np.array([
@@ -113,8 +112,8 @@ def check_moments(densities):
 
 
 if PULL:
-    os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/finite-element/core-scan/den-core-{RUN_NAME}*.npy {RUN_NAME}")
-    os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/finite-element/core-scan/den-core-{RUN_NAME}*.png {RUN_NAME}")
+    os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/mcmc/core-scan/den-core-{RUN_NAME}*.npy {RUN_NAME}")
+    os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/mcmc/core-scan/den-core-{RUN_NAME}*.png {RUN_NAME}")
 
 if GENERATE:
     density_grid_sum = 0
@@ -133,10 +132,12 @@ if GENERATE:
             grids = np.load(f)
         with open(f"{RUN_NAME}/den-core-{RUN_NAME}-{i}-fe.npy", 'rb') as f:
             long_samples = np.load(f)
+
         densities = long_samples[np.random.randint(0, len(long_samples), NUM_CHOOSE),:]
 
         for d in densities:
             density_grid = np.einsum("ijkl,i->jkl", grids, d)
+            density_grid /= np.sum(density_grid)
             density_grid_sum += density_grid
             density_grid_square_sum += density_grid**2
             num_grids += 1
