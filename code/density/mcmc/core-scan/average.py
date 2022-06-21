@@ -9,7 +9,7 @@ from fe import FiniteElement
 from display import make_gif, make_slices
 from core import TrueShape, Indicator
 
-RUN_NAME = "move-1.5"
+RUN_NAME = "sph-3"
 PULL = True
 GENERATE = True
 

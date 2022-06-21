@@ -333,7 +333,7 @@ class MCMCAsteroid:
 
     
 if __name__ == "__main__":
-    import fe
+    import fe, lumpy
     sys.path.append("..")
     from core import Indicator, TrueShape
     
