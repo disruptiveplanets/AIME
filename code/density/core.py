@@ -203,7 +203,7 @@ class TrueMoments:
 
 class UncertaintyTracker:
     def __init__(self):
-        self.num_grids = 0
+        self.num_maps = 0
         self.density_map_sum = None
         self.density_map_square_sum = None
     
@@ -214,10 +214,10 @@ class UncertaintyTracker:
         else:
             self.density_map_sum += density_map
             self.density_map_square_sum += density_map**2
-        self.num_grids += 1
+        self.num_maps += 1
 
     def generate(self):
-        mean_map = self.density_map_sum / self.num_grids
+        mean_map = self.density_map_sum / self.num_maps
         return (mean_map, 
-            np.sqrt(self.density_grid_square_sum / self.num_grids - mean_map**2)
+            np.sqrt(self.density_map_square_sum / self.num_maps - mean_map**2)
         )

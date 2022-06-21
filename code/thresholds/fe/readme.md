@@ -29,3 +29,7 @@ THIS ALSO MEANS THAT FOR A FEW MINUTES, DOF-SCAN AND DOF-SCAN-PRECISE WERE WRITI
 ## June 13
 
 DOF scan completed. It looks great. 2 DOF failed because it's so few.
+
+## June 21
+
+Changed so that the average density is computed instead.

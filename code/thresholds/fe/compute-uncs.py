@@ -149,7 +149,7 @@ def get_unc_for_file(dname, fname):
             # Success
             unc_tracker.update(density_map)
 
-    density_map, uncertainty_map = unc_tracker.generates()
+    density_map, uncertainty_map = unc_tracker.generate()
     mean_uncertainty = np.nanmean(np.abs(uncertainty_map))
     return mean_uncertainty
 

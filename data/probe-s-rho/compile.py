@@ -55,6 +55,7 @@ for name in percentiles.keys():
     s_rho.append(sigma[0] * sigma[1])
 
 s_rho = np.array(s_rho)
+print(s_rho)
 
 #fig, axs = plt.subplots(figsize=(6, 19), ncols=1, nrows=10,  sharex=True)
 #axs = axs.reshape(-1)
