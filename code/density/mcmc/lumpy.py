@@ -55,7 +55,7 @@ class Lumpy(MCMCMethod):
             -complex_klms[3].real * 2,
             -complex_klms[3].imag * 2,
             complex_klms[2].real
-        ]) * complex_klms[-1] / asteroid.surface_am / self.shell_volume
+        ]) * asteroid.surface_am
         self.shell_free_klms = np.array([
             complex_klms[4].real,
             complex_klms[6].real,

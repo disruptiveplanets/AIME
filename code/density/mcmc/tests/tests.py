@@ -60,9 +60,9 @@ TRUE_SHAPES = {
     "move-1.5": TrueShape.core_shift(1.5, 500, core_displacement),
 }
 TRUE_MOMENTS = { # Moments of the known shape
-    "asym-ell": TrueMoments.asym_ell(),
-    "sph-3": TrueMoments.sph_3(),
-    "sph-1.5": TrueMoments.sph_1_5(),
+    "asym-ell": TrueMoments.ell(),
+    "sph-3": TrueMoments.ell(),
+    "sph-1.5": TrueMoments.ell(),
     "move-3": TrueMoments.move_3(),
     "move-1.5": TrueMoments.move_1_5(),
 }
@@ -86,4 +86,4 @@ SAMPLE_NAMES = {
 asteroid = MCMCAsteroid(f"{RUN_NAME}-{method_tag}", f"../../samples/{SAMPLE_NAMES[RUN_NAME]}-0-samples.npy", INDICATORS[RUN_NAME],
     TRUE_SHAPES[RUN_NAME], SURFACE_AMS[RUN_NAME], DIVISION, MAX_RADIUS, dof, BULK_AMS[RUN_NAME], TRUE_MOMENTS[RUN_NAME])
 
-asteroid.pipeline(method_class, True, generate=False)
+asteroid.pipeline(method_class, True, generate=True)

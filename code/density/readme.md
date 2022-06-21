@@ -179,3 +179,7 @@ I rewrote mcmc so that it's flexible and can be executed for multiple models. I 
 ## June 17
 
 I fixed a couple flaws in the code that were failing for non-9 degrees of freedom. I also tried to figure out what was causing the move-3 and move-1.5 core extractions to fail. Their moments were different from the data moments.
+
+## June 21
+
+I worked out all the programming bugs with the lumpy model and extracted representations of the moved and spherical lumps.

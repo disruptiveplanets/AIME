@@ -17,7 +17,7 @@ MAX_N_STEPS = 100_000
 MAX_DENSITY = 3 # Iron
 MIN_DENSITY = 0.25
 
-NUM_THREADS = 1#os.cpu_count()
+NUM_THREADS = os.cpu_count()
 MIN_LOG_LIKE = 1000
 MINIMIZATION_ATTEMPTS = 500
 EPSILON = 1e-10
@@ -165,15 +165,15 @@ class MCMCAsteroid:
         print("Means:", means)
         print("Mean klms:", method.get_klms(means))
 
+        densities, uncertainty_ratios = method.get_map(means, unc, self.asteroid)
+
         if make_map:
-            densities, uncertainty_ratios = method.get_map(means, unc, self.asteroid)
             true_densities = self.asteroid.get_true_densities().astype(float)
             true_densities[~self.asteroid.indicator_map] = np.nan
             error = log_probability(means[:self.n_free], method, self.data_storage) / self.n_free * -2
             self.display(densities, true_densities, uncertainty_ratios, error)
 
-        # Uncs are already normalized
-        #return (means - self.mean_density) / means, unc
+        return densities / np.nansum(densities)
 
     
     def get_densities_mcmc(self, method, generate):
@@ -186,9 +186,16 @@ class MCMCAsteroid:
             if sampler is None:
                 return np.nan, np.nan
 
-            tau = sampler.get_autocorr_time()
-            max_tau = int(np.max(tau))
-            samples = sampler.get_chain(discard=2 * max_tau, thin=max_tau // 2)
+            try:
+                tau = sampler.get_autocorr_time()
+            except Exception:
+                tau = None
+            if tau is not None:
+                max_tau = int(np.max(tau))
+                samples = sampler.get_chain(discard=2 * max_tau, thin=max_tau // 2)
+            else:
+                print("No convergence")
+                samples = sampler.get_chain(discard=1000, thin=32)
             sample_mask = sampler.get_last_sample().log_prob > -100
             print(f"Using {np.sum(sample_mask)}/{N_WALKERS} walkers")
             flat_samples = samples[:,sample_mask,:].reshape(-1, self.n_free)
@@ -283,7 +290,7 @@ class MCMCAsteroid:
 
                 for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
                     if sampler.iteration % 500 == 0:
-                        if np.min(sample.log_prob) < -100:
+                        if np.max(sample.log_prob) < -100:
                             # MCMC will not converge.
                             return None
                         if sampler.iteration >= 10_000:

@@ -174,50 +174,50 @@ class TrueShape:
         return lump
 
 class TrueMoments:
-    # Complex klms, bulk_klms
-    def asym_ell():
+    # Complex klms for the surface, bulk_klms
+    def ell():
         k22, k20 = -0.05200629, -0.2021978
         return np.array([
-            np.nan, 0, 0, 0,
+            1.0, 0, 0, 0,
             k22, 0, k20, 0, k22,
-            0, 0, 0, 0, 0, 0, 0, 
-            1000
-        ])
-    def sph_3():
-        k22, k20 = -0.05040959164683728, -0.19599016007639866
-        return np.array([
-            np.nan,
-            0, 0, 0,
-            k22, 0, k20, 0, k22,
-            0, 0, 0, 0, 0, 0, 0, 
-            922.9234884822591
-        ])
-    def sph_1_5():
-        k22, k20 = -0.05159782747847741, -0.20060996601498282
-        return np.array([
-            np.nan,
-            0, 0, 0,
-            k22, 0, k20, 0, k22,
-            0, 0, 0, 0, 0, 0, 0, 
-            978.4541044108308
+            0, 0, 0, 0, 0, 0, 0
         ])
     def move_3():
-        k22, k20 = -0.05203775196773803, -0.19716764233198797
-        ik31, ik33 = -0.007833505702120666, -0.0015577797254511872
+        k22, k20 = -0.052298941182752544, -0.2023903027848194
+        ik31, ik33 = -0.00801768900716791j, -0.0016420155228371945j
         return np.array([
-            np.nan,
-            0.036453389980818825j, 0, 0.036453389980818825j,
+            1.0,
+            0.031607016470795626j, 0, 0.031607016470795626j,
             k22, 0, k20, 0, k22,
-            ik33 * 1j, 0,ik31 * 1j, 0, ik31 * 1j, 0, ik33 * 1j, 
-            933.1648422811957
+            ik33 * 1j, 0,ik31 * 1j, 0, ik31 * 1j, 0, ik33 * 1j
         ])
     def move_1_5():
-        k22, k20 = -0.05203775196773803, -0.19716764233198797
-        ik31, ik33 = -0.0019368958923091067, -0.0003845813086399978
+        k22, k20 = -0.052024007380816216, -0.2022120206327561
+        ik31, ik33 = -0.0020127008643331624j, -0.00041162951899840697j
         return np.array([
-            np.nan,
-            0.008232775625084475j, 0, 0.008232775625084475j,
+            1.0,
+            0.007919641491764374j, 0, 0.007919641491764374j,
             k22, 0, k20, 0, k22,
-            ik33 * 1j, 0,ik31 * 1j, 0, ik31 * 1j, 0, ik33 * 1j, 
-            980.8811439828254
+            ik33 * 1j, 0,ik31 * 1j, 0, ik31 * 1j, 0, ik33 * 1j
         ])
+
+class UncertaintyTracker:
+    def __init__(self):
+        self.num_grids = 0
+        self.density_map_sum = None
+        self.density_map_square_sum = None
+    
+    def update(self, density_map):
+        if self.density_map_sum is None:
+            self.density_map_sum = density_map
+            self.density_map_square_sum = density_map**2
+        else:
+            self.density_map_sum += density_map
+            self.density_map_square_sum += density_map**2
+        self.num_grids += 1
+
+    def generate(self):
+        mean_map = self.density_map_sum / self.num_grids
+        return (mean_map, 
+            np.sqrt(self.density_grid_square_sum / self.num_grids - mean_map**2)
+        )

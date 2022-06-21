@@ -3,7 +3,7 @@
 import sys, os
 import numpy as np
 sys.path.append("../../density")
-from core import Indicator, TrueShape
+from core import Indicator, TrueShape, UncertaintyTracker
 sys.path.append("../../density/mcmc")
 from mcmc_core import MCMCAsteroid
 from fe import FiniteElement
@@ -126,7 +126,7 @@ def get_unc_for_file(dname, fname):
     print(short_name)
 
     # Do not regenerate if the file was already done.
-    uncs = []
+    unc_tracker = UncertaintyTracker()
     for run_index in range(NUM_TRIALS):
         repeat_num = 0
         repeat = True
@@ -137,8 +137,8 @@ def get_unc_for_file(dname, fname):
             with suppress_stdout():
                 asteroid = MCMCAsteroid(f"ast-{short_name}-{run_index}", fname, Indicator.ell(radius, k22, k20), TrueShape.uniform(),
                     am, division, max_radius, DEGREES_OF_FREEDOM, am)
-                devs, these_uncs = asteroid.pipeline(FiniteElement, False, generate=generate)
-            if np.any(np.isnan(these_uncs)):
+                density_map = asteroid.pipeline(FiniteElement, False, generate=generate)
+            if density_map is None:
                 print("Failed. Had to repeat")
                 repeat = True
                 repeat_num += 1
@@ -147,15 +147,11 @@ def get_unc_for_file(dname, fname):
                 break # Don't add anything to the uncs list
         if not repeat:
             # Success
-            uncs.append(these_uncs)
+            unc_tracker.update(density_map)
 
-    uncs = np.array(uncs)
-    uncs = np.nanmean(uncs, axis=0)
-    if np.any(np.isnan(uncs)):
-        return np.nan
-
-    density_uncertainty = np.nanmedian(uncs)
-    return density_uncertainty
+    density_map, uncertainty_map = unc_tracker.generates()
+    mean_uncertainty = np.nanmean(np.abs(uncertainty_map))
+    return mean_uncertainty
 
 def scan_specific(directory, threshold):
     index_lengths = NAMES[directory]
