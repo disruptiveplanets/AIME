@@ -288,8 +288,9 @@ class MCMCAsteroid:
                                 print("Converged")
                                 break
                             old_tau = tau
-                        if sampler.iteration % 5000 == 500:
-                            print(np.mean(sampler.get_last_sample().log_prob), tau)
+                    if sampler.iteration % 5000 == 500:
+                        tau = sampler.get_autocorr_time(tol=0)
+                        print(np.mean(sample.log_prob), tau)
 
         else:
             backend = emcee.backends.HDFBackend(output_name+".h5", read_only=True)
