@@ -5,20 +5,23 @@ sys.path.append("../../../density")
 from core import UncertaintyTracker
 
 N_RUNS = 48
-DOFS = [9, 7, 5, 3, 3]
+DOFS = [5]#[9, 7, 5, 3, 3]
 N_TRIALS = 5
 MIN_RUN = 0
 
 def average(dof, run):
     unc_tracker = UncertaintyTracker()
     for trial_num in range(N_TRIALS):
-        fname = f"cast-{dof}-{trial_num}-rho-{run}-map.npy"
+        fname = "cast-{}-{}-rho-{:02}-map.npy".format(dof, trial_num, run)
+        if not os.path.exists(fname):
+            return None
         with open(fname, 'rb') as f:
             this_map = np.load(f)
             unc_tracker.update(this_map)
     density_map, uncertainty_map = unc_tracker.generate()
     true_map = np.ones_like(density_map)
     true_map[np.isnan(density_map)] = np.nan
+    true_map /= np.nansum(true_map)
 
     deviation_map = density_map - true_map
     ratio_map = deviation_map / uncertainty_map
@@ -47,15 +50,15 @@ def single_plot(dof):
             avgs.append(avg)
     return avgs
 
-def scan(true_map):
-    fig, axs = plt.subplots(ncols=0, nrows=3)
+def scan():
+    fig, axs = plt.subplots(ncols=1, nrows=3, sharex=True, figsize=(6, 8))
     axs[2].set_xlabel("sigma P")
     axs[0].set_ylabel("Deviation")
     axs[1].set_ylabel("Uncertainty")
     axs[2].set_ylabel("Ratio")
     
     results = np.array([single_plot(dof) for dof in DOFS])
-    xs, = np.array([
+    xs = np.array([
         5.55495891e-09, 7.09682065e-09, 9.06664911e-09, 1.15832329e-08,
         1.47983320e-08, 1.89058298e-08, 2.41534250e-08, 3.08575685e-08,
         3.94225471e-08, 5.03648633e-08, 6.43443826e-08, 8.22041261e-08,
@@ -67,14 +70,17 @@ def scan(true_map):
         1.40908169e-05, 1.80019333e-05, 2.29986385e-05, 2.93822538e-05,
         3.75377368e-05, 4.79568958e-05, 6.12680478e-05, 7.82739087e-05,
         1.00000000e-04
-    ])[MIN_RUN:] * 3600 * 9
-    
+    ]) * 3600 * 9
+
     for i in range(3):
         for j, dof in enumerate(DOFS):
             axs[i].fill_between(xs, results[j, :,i,0], results[j, :,i,4], alpha=0.3, color=f"C{j}")
             axs[i].fill_between(xs, results[j, :,i,1], results[j, :,i,3], alpha=0.5, color=f"C{j}")
-            axs[i].plot(xs, results[j, :,i,2], color=f"C{j}")
+            axs[i].plot(xs, results[j, :,i,2], color=f"C{j}", label=str(dof))
     
     fig.tight_layout()
     fig.savefig("scan.png")
     #fig.savefig("scan.pdf")
+
+if __name__ == "__main__":
+    scan()
