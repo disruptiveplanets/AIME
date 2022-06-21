@@ -3,7 +3,7 @@ sys.path.append("..")
 sys.path.append("../..")
 from mcmc_core import MCMCAsteroid
 import fe, lumpy
-from core import Indicator, TrueShape
+from core import Indicator, TrueShape, TrueMoments
 import numpy as np
 
 DIVISION = 49
@@ -13,9 +13,11 @@ METHOD_NAME = sys.argv[2]
 if METHOD_NAME == "lumpy":
     method_class = lumpy.Lumpy
     method_tag = "lump"
-if METHOD_NAME == "fe":
+    dof = 2
+elif METHOD_NAME == "fe":
     method_class = fe.FiniteElement
     method_tag = "fe"
+    dof = 9
 else:
     raise Exception(f"{METHOD_NAME} is not a valid method")
 fe.grids.NUM_DRAWS = 0
@@ -57,6 +59,13 @@ TRUE_SHAPES = {
     "move-3": TrueShape.core_shift(3, 500, core_displacement),
     "move-1.5": TrueShape.core_shift(1.5, 500, core_displacement),
 }
+TRUE_MOMENTS = { # Moments of the known shape
+    "asym-ell": TrueMoments.asym_ell(),
+    "sph-3": TrueMoments.sph_3(),
+    "sph-1.5": TrueMoments.sph_1_5(),
+    "move-3": TrueMoments.move_3(),
+    "move-1.5": TrueMoments.move_1_5(),
+}
 INDICATORS = {
     "asym-ell": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
     "sph-3": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
@@ -75,6 +84,6 @@ SAMPLE_NAMES = {
 
 
 asteroid = MCMCAsteroid(f"{RUN_NAME}-{method_tag}", f"../../samples/{SAMPLE_NAMES[RUN_NAME]}-0-samples.npy", INDICATORS[RUN_NAME],
-    TRUE_SHAPES[RUN_NAME], SURFACE_AMS[RUN_NAME], DIVISION, MAX_RADIUS, 9, BULK_AMS[RUN_NAME])
+    TRUE_SHAPES[RUN_NAME], SURFACE_AMS[RUN_NAME], DIVISION, MAX_RADIUS, dof, BULK_AMS[RUN_NAME], TRUE_MOMENTS[RUN_NAME])
 
-asteroid.pipeline(method_class, True, generate=True)
+asteroid.pipeline(method_class, True, generate=False)

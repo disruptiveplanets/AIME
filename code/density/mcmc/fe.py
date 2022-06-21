@@ -4,6 +4,7 @@ import grids
 from scipy.linalg import inv
 
 VERY_LARGE_SLOPE = 1e30
+UNCERTAINTY_RATIO = 0.25
 
 
 class FiniteElement(MCMCMethod):
@@ -90,3 +91,9 @@ class FiniteElement(MCMCMethod):
         unc_ratios[~asteroid.indicator_map] = np.nan
 
         return densities, unc_ratios
+
+    def scatter_walkers(self, theta_start, n_walkers):
+        pos = np.zeros((n_walkers, self.n_free))
+        for i in range(self.n_free):
+            pos[:,i] = np.random.randn(n_walkers) * UNCERTAINTY_RATIO * self.mean_density + theta_start[i]
+        return pos

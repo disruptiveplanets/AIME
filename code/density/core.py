@@ -18,10 +18,11 @@ def rlm_gen(l,m):
     return lambda x,y,z: rlm(l,m,x,y,z)
 
 class Asteroid:
-    def __init__(self, name, surface_am, division, max_radius, indicator, true_shape):
+    def __init__(self, name, surface_am, division, max_radius, indicator, true_shape, true_moments=None):
         self.name = name
         self.surface_am = surface_am
         self.true_shape = true_shape
+        self.true_moments = true_moments
         self.true_densities = None
         self.division = division
         self.grid_line = np.arange(-max_radius, max_radius, division)
@@ -171,3 +172,52 @@ class TrueShape:
             o[diff[0]**2/a**2 + diff[1]**2/b**2 + diff[2]**2/c**2 < 1] += density_factor
             return o
         return lump
+
+class TrueMoments:
+    # Complex klms, bulk_klms
+    def asym_ell():
+        k22, k20 = -0.05200629, -0.2021978
+        return np.array([
+            np.nan, 0, 0, 0,
+            k22, 0, k20, 0, k22,
+            0, 0, 0, 0, 0, 0, 0, 
+            1000
+        ])
+    def sph_3():
+        k22, k20 = -0.05040959164683728, -0.19599016007639866
+        return np.array([
+            np.nan,
+            0, 0, 0,
+            k22, 0, k20, 0, k22,
+            0, 0, 0, 0, 0, 0, 0, 
+            922.9234884822591
+        ])
+    def sph_1_5():
+        k22, k20 = -0.05159782747847741, -0.20060996601498282
+        return np.array([
+            np.nan,
+            0, 0, 0,
+            k22, 0, k20, 0, k22,
+            0, 0, 0, 0, 0, 0, 0, 
+            978.4541044108308
+        ])
+    def move_3():
+        k22, k20 = -0.05203775196773803, -0.19716764233198797
+        ik31, ik33 = -0.007833505702120666, -0.0015577797254511872
+        return np.array([
+            np.nan,
+            0.036453389980818825j, 0, 0.036453389980818825j,
+            k22, 0, k20, 0, k22,
+            ik33 * 1j, 0,ik31 * 1j, 0, ik31 * 1j, 0, ik33 * 1j, 
+            933.1648422811957
+        ])
+    def move_1_5():
+        k22, k20 = -0.05203775196773803, -0.19716764233198797
+        ik31, ik33 = -0.0019368958923091067, -0.0003845813086399978
+        return np.array([
+            np.nan,
+            0.008232775625084475j, 0, 0.008232775625084475j,
+            k22, 0, k20, 0, k22,
+            ik33 * 1j, 0,ik31 * 1j, 0, ik31 * 1j, 0, ik33 * 1j, 
+            980.8811439828254
+        ])

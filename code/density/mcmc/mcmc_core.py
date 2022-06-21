@@ -17,10 +17,10 @@ MAX_N_STEPS = 100_000
 MAX_DENSITY = 3 # Iron
 MIN_DENSITY = 0.25
 
-UNCERTAINTY_RATIO = 0.25
-NUM_THREADS = os.cpu_count()
+NUM_THREADS = 1#os.cpu_count()
 MIN_LOG_LIKE = 1000
 MINIMIZATION_ATTEMPTS = 500
+EPSILON = 1e-10
 
 class MCMCMethod:
     def __init__(self, asteroid, mean_density, n_free, n_all, generate):
@@ -45,6 +45,9 @@ class MCMCMethod:
         raise NotImplementedError()
 
     def get_klms(self, theta_long):
+        raise NotImplementedError()
+
+    def scatter_walkers(self, theta_start, n_walkers):
         raise NotImplementedError()
 
 class MinResult:
@@ -138,18 +141,18 @@ def log_like(free_klms, data_storage):
 
 
 class MCMCAsteroid:
-    def __init__(self, name, sample_path, indicator, shape, surface_am, division, max_radius, dof, used_bulk_am):
+    def __init__(self, name, sample_path, indicator, shape, surface_am, division, max_radius, dof, used_bulk_am, true_moments=None):
         if used_bulk_am is None:
             used_bulk_am = surface_am
         self.name = name
-        self.asteroid = Asteroid(name, surface_am, division, max_radius, indicator, shape)
+        self.asteroid = Asteroid(name, surface_am, division, max_radius, indicator, shape, true_moments)
         self.asteroid.max_l = MAX_L
         self.mean_density = 1 / (np.sum(self.asteroid.indicator_map) * division**3)
         self.data_storage = DataStorage(sample_path, surface_am, used_bulk_am)
         self.n_free = dof
         self.n_all = dof + N_CONSTRAINED
         
-    def pipeline(self, method_class, map, generate=True):
+    def pipeline(self, method_class, make_map, generate=True):
         method = method_class(self.asteroid, self.mean_density, self.n_free, self.n_all, generate)
 
         if self.data_storage.data is None:
@@ -162,7 +165,7 @@ class MCMCAsteroid:
         print("Means:", means)
         print("Mean klms:", method.get_klms(means))
 
-        if map:
+        if make_map:
             densities, uncertainty_ratios = method.get_map(means, unc, self.asteroid)
             true_densities = self.asteroid.get_true_densities().astype(float)
             true_densities[~self.asteroid.indicator_map] = np.nan
@@ -170,7 +173,7 @@ class MCMCAsteroid:
             self.display(densities, true_densities, uncertainty_ratios, error)
 
         # Uncs are already normalized
-        return (means - self.mean_density) / means, unc
+        #return (means - self.mean_density) / means, unc
 
     
     def get_densities_mcmc(self, method, generate):
@@ -185,8 +188,10 @@ class MCMCAsteroid:
 
             tau = sampler.get_autocorr_time()
             max_tau = int(np.max(tau))
-            flat_samples = sampler.get_chain(discard=2 * max_tau, thin=max_tau // 2, flat=True)
-
+            samples = sampler.get_chain(discard=2 * max_tau, thin=max_tau // 2)
+            sample_mask = sampler.get_last_sample().log_prob > -100
+            print(f"Using {np.sum(sample_mask)}/{N_WALKERS} walkers")
+            flat_samples = samples[:,sample_mask,:].reshape(-1, self.n_free)
             long_samples = np.array([method.get_theta_long(theta_short) for theta_short in flat_samples])
 
             with open(output_name + ".npy", 'wb') as f:
@@ -198,11 +203,18 @@ class MCMCAsteroid:
 
         long_means, unc = self.get_stats_from_long_samples(long_samples)
 
-        fig = corner.corner(long_samples / self.mean_density, truths=np.ones(self.n_all))
-        corner.overplot_lines(fig, long_means / self.mean_density, color='C1')
+        dyn_range = []
+        for i in range(len(long_means)):
+            min_val, max_val = np.nanpercentile(long_means[i], 5), np.nanpercentile(long_means[i], 95)
+            if min_val == max_val:
+                min_val -= 1
+                max_val += 1
+            dyn_range.append((min_val, max_val))
+        fig = corner.corner(long_samples, range=dyn_range)
+        corner.overplot_lines(fig, long_means, color='C1')
         fig.savefig(output_name + ".png")
 
-        return long_means, unc / long_means
+        return long_means, unc / (long_means + EPSILON)
 
 
     def get_stats_from_long_samples(self, long_samples):
@@ -267,14 +279,11 @@ class MCMCAsteroid:
 
             with Pool() as pool:
                 sampler = emcee.EnsembleSampler(N_WALKERS, self.n_free, log_probability, args=(method, self.data_storage), backend=backend, pool=pool)
-
-                pos = np.zeros((N_WALKERS, self.n_free))
-                for i in range(self.n_free):
-                    pos[:,i] = np.random.randn(N_WALKERS) * UNCERTAINTY_RATIO * self.mean_density + theta_start[i]
+                pos = method.scatter_walkers(theta_start, N_WALKERS)
 
                 for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
                     if sampler.iteration % 500 == 0:
-                        if np.mean(sample.log_prob) < -100:
+                        if np.min(sample.log_prob) < -100:
                             # MCMC will not converge.
                             return None
                         if sampler.iteration >= 10_000:
@@ -302,8 +311,10 @@ class MCMCAsteroid:
     def display(self, densities, true_densities, uncertainty_ratios,
         error, duration=5):
 
-        if not os.path.isdir(f"../figs/{self.name}"):
-            os.mkdir(f"../figs/{self.name}")
+        FIG_DIRECTORY = "../../figs/"
+
+        if not os.path.isdir(f"{FIG_DIRECTORY}{self.name}"):
+            os.mkdir(f"{FIG_DIRECTORY}{self.name}")
 
         warnings.filterwarnings("ignore")
 
@@ -312,22 +323,22 @@ class MCMCAsteroid:
         if true_densities is not None:
             true_densities /= np.nanmean(true_densities)
             ratios = (densities - true_densities) / (densities * uncertainty_ratios)
-            make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"../figs/{self.name}/fe-r", error, percentile=95, balance=True)
-            make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"../figs/{self.name}/fe-r.gif", duration=duration, percentile=95, balance=True)
+            make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{FIG_DIRECTORY}{self.name}/fe-r", error, percentile=95, balance=True)
+            make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{FIG_DIRECTORY}{self.name}/fe-r.gif", duration=duration, percentile=95, balance=True)
             difference = (true_densities - densities)
 
         print("Plotting density")
-        make_slices(densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"../figs/{self.name}/fe-d", error)
-        make_gif(densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"../figs/{self.name}/fe-d.gif", duration)
+        make_slices(densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"{FIG_DIRECTORY}{self.name}/fe-d", error)
+        make_gif(densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"{FIG_DIRECTORY}{self.name}/fe-d.gif", duration)
         
         print("Plotting uncertainty")
-        make_slices(uncertainty_ratios, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"../figs/{self.name}/fe-u", error, 95)
-        make_gif(uncertainty_ratios, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"../figs/{self.name}/fe-u.gif", duration, 95)
+        make_slices(uncertainty_ratios, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{FIG_DIRECTORY}{self.name}/fe-u", error, 95)
+        make_gif(uncertainty_ratios, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{FIG_DIRECTORY}{self.name}/fe-u.gif", duration, 95)
 
         if true_densities is not None:
             print("Plotting differences")
-            make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr_r', f"../figs/{self.name}/fe-s", error, 95, balance=True)
-            make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr_r', f"../figs/{self.name}/fe-s.gif", duration, 95, balance=True)
+            make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr_r', f"{FIG_DIRECTORY}{self.name}/fe-s", error, 95, balance=True)
+            make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr_r', f"{FIG_DIRECTORY}{self.name}/fe-s.gif", duration, 95, balance=True)
 
         warnings.filterwarnings("default")
 
