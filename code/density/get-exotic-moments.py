@@ -50,7 +50,10 @@ asteroids = [
     #("core-ell", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core(ELLIPSOID_AM, k22a, k20a, 3, 0.65), False),
     #("core-sph-3", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core_sph(3, 500), False),
     #("core-sph-1.5", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.core_sph(1.5, 500), False),
-    ("core-move-3", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high), TrueShape.core_shift(3, 500, core_displacement), True),
+    #("core-move-3", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high), TrueShape.core_shift(3, 500, core_displacement), True),
+    ("moved-low", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.uniform(), True),
+    ("moved-high", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high), TrueShape.uniform(), True),
+
     #("core-move-1.5", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.core_shift(1.5, 500, core_displacement), True),
 ]
 
