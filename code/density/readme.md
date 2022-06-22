@@ -183,3 +183,12 @@ I fixed a couple flaws in the code that were failing for non-9 degrees of freedo
 ## June 21
 
 I worked out all the programming bugs with the lumpy model and extracted representations of the moved and spherical lumps.
+
+## June 22
+
+I finished the lumpy model, worked a bit on the paper, and pushed the double core model to the supercomputer. It has moments
+
+    Double core:
+        K22:-0.05337731641927746
+        K20:-0.2022901292396581
+        aBulk: 970.4652599064898

@@ -58,6 +58,7 @@ TRUE_SHAPES = {
     "sph-1.5": TrueShape.core_sph(1.5, 500),
     "move-3": TrueShape.core_shift(3, 500, core_displacement),
     "move-1.5": TrueShape.core_shift(1.5, 500, core_displacement),
+    "double": TrueShape.two_core(3, blob_rad, core_one, 3, blob_rad, core_two),
 }
 TRUE_MOMENTS = { # Moments of the known shape
     "asym-ell": TrueMoments.ell(),
@@ -65,6 +66,7 @@ TRUE_MOMENTS = { # Moments of the known shape
     "sph-1.5": TrueMoments.ell(),
     "move-3": TrueMoments.move_3(),
     "move-1.5": TrueMoments.move_1_5(),
+    "double": TrueMoments.ell(),
 }
 INDICATORS = {
     "asym-ell": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
@@ -72,6 +74,7 @@ INDICATORS = {
     "sph-1.5": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
     "move-3": Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high),
     "move-1.5": Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low),
+    "double": Indicator.ell_3_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_two),
 }
 SAMPLE_NAMES = {
     "asym-ell": "den-asym",
@@ -79,6 +82,7 @@ SAMPLE_NAMES = {
     "sph-1.5": "den-core-sph-1.5",
     "move-3": "den-core-move-3",
     "move-1.5": "den-core-move-1.5",
+    "double": "den-core-double",
 }
 
 

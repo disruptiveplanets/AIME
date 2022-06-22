@@ -345,11 +345,13 @@ In this section, we discuss the sensitivity of our results to the properties of 
 \subsection{Dependence of uncertainty on encounter properties}
 \label{sec:fit-uncertainty}
 
-In this section, we discuss how the precision of the best-fitting density moments is affected by various encounter properties. We call this precision ``posterior uncertainty,'' or $\sigma(K_{\ell m})$, defining 1$\sigma$  posterior uncertainty as the range containing 68.27\% of the PPD centred on the median. 2$\sigma$ posterior uncertainty is defined likewise for 95.45\% of the PPD. These are roughly equivalent to 1 or 2 times standard deviation of the PPD respectively. We use the configuration of the asymmetric reference asteroid (appendix \ref{app:reference-configs}) unless otherwise stated.
+Density density moment uncertainty is determined by the quality of the data set, but its physical relevance is not obvious. Uncertainty on the density distribution is much more physically motivated, but its value depends on the choice of model used. We therefore investigate the dependence of both uncertainties on encounter properties in this section.
 
-It will be useful to have a rule-of-thumb ``posterior uncertainty threshold,'' above which we say that posterior uncertainty $\sigma(K_{\ell m})$ is too large to yield meaningful estimates of density distribution. We define this posterior uncertainty threshold as the point at which the median of the ratio between the the local density uncertainty and local density  ($\rho_\sigma / \rho$) is equal to a fraction $f$. For this analysis, we investigate both $f=100\%$ (corresponding to an essentially unconstrained density distribution) and $f=20\%$.
+For the density moments, we define their $1\sigma$ uncertainty as the range containing 68.27\% of the PPD centred on the median. 2$\sigma$ posterior uncertainty is defined likewise for 95.45\% of the PPD. For the density distribution, we produce an uncertainty map which is the standard deviation of the densities produced by 1000 samples each from five different finite element extractions with different element layouts. We report the average uncertainty computed over this uncertainty map.
 
-We use this threshold because it has clear physical meaning, unlike the density moments. But the value of $\rho_\sigma / \rho$ depends on the model used, unlike $\sigma(K_{\ell m})$. In this analysis, we use the likelihood model, but choosing a different model with constraints added would reduce density uncertainty, and lead to less restrictive thresholds.
+The encounter parameters we discuss are a mix of properties of the observational campaign (i.e., the cadence of observations, gaps in data, and uncertainty in the spin pole and period of the asteroid), and the physical properties of the asteroid (i.e., the true density moments, rotational period, perigee, excess velocity, initial spin pole direction, and length). As a rule-of-thumb, we say that a parameter becomes too large (or small) to allow for useful constraints on asteroid density when the uncertainty on the density $\sigma_\rho$ becomes greater than some threshold value. We use both threshold values of $\sigma_\rho / \rho = 20\%$ and 100\%, and the resulting limits on the various encounter properties are displayed in table \ref{tab:threshold-summary}.
+
+\jtd{Discuss conclusions}. Each of these parameters is discussed in greater detail for the rest of this section.
 
 \begin{table}
   \centering
@@ -377,35 +379,9 @@ Figure \ref{fig:scan-vex} demonstrates that posterior uncertainty follows a slig
 
 The figure shows much stronger dependence of parameter uncertainty on perigee distance, as expected by the factor of $(a_\mathcal{A}/D)^{\ell'}$ present in equation \ref{eqn:tidal-torque} and mentioned in section \ref{sec:tidal-torque}. For $r_p =7.9$ Earth radii, $\sigma_\rho/\rho$ reaches the 100\% threshold. The 20\% threshold is reached at lower 4.7 Earth radii. Much of this uncertainty is dominated by uncertainty in $K_{30}$, which is the parameter least constrained by tidal torque analysis. At $r_p \approx 10$ Earth radii, $K_{30}$ fills the prior distribution with uncertainty ranging from -1 to 1, visible by the sudden cut-off in uncertainty increase and the discontinuity of the $\sigma(K_{\ell m})$ curve there.
 
-%Fitted to each of the curves in figure \ref{fig:scan-perigee} are power law uncertainties $\sigma \propto r_p^\alpha$. These fits were performed via the method of least squares, and all data with $\sigma > 0.7$ was removed due to its sensitivity to the arbitrarily-chosen boundary of the prior. The values of $\alpha$ are shown in table \ref{tab:scan-perigee-alpha}. These slope values express how much each parameter is dependent on $r_p$. It is observed that $\gamma_0$ is least dependent on $r_p$, with $\sigma(\gamma_0) \sim r_p^2$. The other two first-order parameters are much more strongly dependent, with $\sigma \sim r_p^{5.5}$. The second-order parameters have milder slopes between 3 and 4 (except for $K_{30}$) which is fortunate from the perspective of making precise observations, since lower $\alpha$ renders larger values of $r_p$ accessible to measuring $K_{3m}$.
-
-% \begin{table}
-%   \centering
-%   \begin{tabular}{l|c}
-%     \hline
-%     Parameter & $\alpha$ \\ \hline
-%     $\gamma_0$ & $2.05$ \\
-%     $K_{22}$ & $5.47$ \\
-%     $K_{20}$ & $5.47$ \\ \hline
-%     $\Re K_{33}$ & $3.35$ \\
-%     $\Im K_{33}$ & $3.37$ \\
-%     $\Re K_{32}$ & $3.05$ \\
-%     $\Im K_{32}$ & $3.27$ \\
-%     $\Re K_{31}$ & $3.53$ \\
-%     $\Im K_{31}$ & $4.02$ \\
-%     $K_{30}$ & $5.75$ \\ \hline
-%   \end{tabular}
-%   \caption{Power law slope values for the dependence of parameter uncertainty on perigee distance $r_p$. Slope is defined by $\sigma \propto r_p^\alpha$.}
-%   \label{tab:scan-perigee-alpha}
-% \end{table}
-
-
 The axes of figure \ref{fig:scan-perigee} show that parameters with large $m$ are more precisely determined than parameters with small $m$, as can be seen by comparing $K_{22}$ to $K_{20}$ and comparing $K_{33}$ to other $K_{3m}$ values. Large $m$ moments correspond to moments that control higher frequency fluctuations in density at the asteroid equator. This pattern of $\sigma(K_{\ell m})$ smaller for large $m$ is a general trend and will be seen in the following sections as well.
 
 The very strong dependence of $\sigma(K_{\ell m})$ on $r_p$ makes this analysis most useful to extract second-order moments on close encounters. Fortunately, in the case of Earth, these encounters are also likely to have the best associated observational uncertainty when above the horizon due to their proximity. The first-order moments can still be extracted at much larger perigee distances in our model.
-
-
-
 
 
 \afterpage{
@@ -508,11 +484,6 @@ The time between observations of asteroid angular velocity, or cadence, may vary
 Figure \ref{fig:scan-cadence} displays little dependence of uncertainty on cadence $\Delta t$ for $\Delta t \lesssim 40$ min. We also see flaring of uncertainty for very large cadence, largely driven by the paucity of data points. However, uncertainty dramatically increases for many parameters at about $\Delta t = 30-40$ min, a time scale which is likely characteristic of the asteroid system.  We name this rough cadence limit $T_\text{cad}$. $T_\text{cad}$ is also the location at which the $\sigma(K_{3m}$ threshold is crossed for all second-order moments except $K_{30}$, which exceeds the uncertainty threshold at $\Delta t \approx 5$ min.
 
 We expect this $T_\text{cad}$ to be a function of two dynamical time scales of the system: the rotational period of the asteroid $P_\omega$ and the dynamical time scale of the orbit (the latter can be estimated in multiple ways, since both $r_p / v_\infty$ and $v_\infty r_p^2 / \mu_\mathcal{B}$ have units of time and may be relevant). How these time scales affect $T_\text{cad}$ is discussed in appendix \ref{app:cadence-tests}.
-% \begin{equation}
-%   T_p \sim \frac{r_p}{v_\infty}\brackets{2\frac{\mu_\mathcal{B}}{r_pv_\infty^2}+1}^{-\frac{1}{2}}
-%   \label{eqn:tp}
-% \end{equation}
-% which is the ratio of the perigee radius to velocity at perigee. The exact choice of the formula of $T_p$ not obvious, and alternatives to equation \ref{eqn:tp} are possible. For the simulated asteroid, $P_\omega = 9$ hr and $T_p = 42$ min by this definition.
 
 Figure \ref{fig:scan-cadence} shows that as long as $\Delta t < T_\text{cad}$ is achieved, the influence of cadence on $\sigma$ is minimal, but shorter cadence leads to lower uncertainties.
 
@@ -608,8 +579,7 @@ This analysis suggests that large moons such as ours can improve fit quality, bu
 
 If sufficiently accurate spin pole data can be detected for non-Earth encounters, it may be possible to extract density moments for encounters with larger planets. In this section, we run our reference asteroid through a Jupiter encounter to analyze the differences in uncertainty.
 
-The physical parameters of the asteroid body are kept the same as the Earth encounter case (listed in appendix \ref{app:reference-configs}), as are the observational uncertainty and cadence. The orbit is adjusted for the Jupiter case by setting a perijove distance of $r_p=5$ Jupiter radii (compared to perigee radius $r_p=5$ Earth radii for the Earth encounter). The excess velocity does not strongly affect $\sigma(K_{\ell m})$ as shown in section \ref{sec:scan-orbit}, so we keep it at the reference value. % We perform two fits, each with a different value of $v_\infty$: in one case we keep the Earth-encounter value of $v_\infty = 6$ km s$^{-1}$, and in the other case we increase the velocity such that the eccentricity (and therefore the angle between the orbits' hyperbolic asymptotes) are the same for both encounters. The latter requires $v_\infty = \sqrt{G\mu_\mathcal{B}/r_p (e-1)}=32$ km s$^{-1}$. The rationale for these excess velocity values is that, for $v_\infty = 6$ km s$^{-1}$, we keep a physically typical encounter excess velocity at the expense of changing the orbit shape, whereas for $v_\infty =32$ km s$^{-1}$ the orbit shape is unchanged, although the asteroid speed is dramatically increased.
-%Section \ref{sec:scan-orbit} found that $v_\infty$ does not affect the posterior uncertainties, and indeed we find very little difference between the two $v_\infty$ cases. We therefore do not distinguish between the two cases further.
+The physical parameters of the asteroid body are kept the same as the Earth encounter case (listed in appendix \ref{app:reference-configs}), as are the observational uncertainty and cadence. The orbit is adjusted for the Jupiter case by setting a perijove distance of $r_p=5$ Jupiter radii (compared to perigee radius $r_p=5$ Earth radii for the Earth encounter). The excess velocity does not strongly affect $\sigma(K_{\ell m})$ as shown in section \ref{sec:scan-orbit}, so we keep it at the reference value.
 The ratio between the posterior uncertainties in the Jupiter and the Earth encounters are shown in table \ref{tab:jupiter-uncertainty}. In all cases, the Jupiter posteriors are more uncertain than Earth posteriors.
 
 \begin{table}
@@ -651,6 +621,8 @@ It was mentioned above that the observable perigee distance $r_p$ increases with
 In section \ref{sec:asym-density}, we displayed density distributions extracted via the lumpy model with $N=1$ lumps. When $N=1$, the model has two degrees of freedom, meaning that the density distribution can be determined only via the fit results for $K_{2m}$, rather than the relatively poorly constrained $K_{3m}$. Therefore, we also explore a density distribution with $N=2$ lumps, which has seven degrees of freedom.
 
 \jtd{Continue}
+
+\jtd{Possibly discuss moved core}
 
 \section{Conclusions}
 

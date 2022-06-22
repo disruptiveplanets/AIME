@@ -22,7 +22,7 @@ UNCERTAINTY_RATIO = 0.25
 
 # Theta long: [lump_a, lump_mass | lump_a, lump_mass, lump_pos | ..., shell_mass, lump_pos]
 
-MAX_LOG_PRIOR_LUMP = 1
+MAX_LOG_PRIOR_LUMP = 2
 
 def rlm(l,m,x,y,z):
     r = np.sqrt(np.maximum(RLM_EPSILON, x*x + y*y + z*z))
@@ -110,9 +110,22 @@ class Lumpy(MCMCMethod):
 
         # No lumps
         intersections.append(shell_density)
+
         # Single lumps
         for density in lump_densities:
             intersections.append(density + shell_density)
+
+        # Double lumps
+        lump_poses = [theta_long[-3:]]
+        for i in range(self.N - 1):
+            lump_poses.append(theta_long[(4 + i * 5):(7 + i * 5)])
+        for i, pos_i in enumerate(lump_poses):
+            radius_i = (theta_long[0] if i == 0 else theta_long[2 + 5 * i]) * np.sqrt(5 / 3)
+            for j, pos_j in enumerate(lump_poses[:i]):
+                radius_j = (theta_long[0] if j == 0 else theta_long[2 + 5 * j]) * np.sqrt(5 / 3)
+                dist_sqr = np.sum((pos_i - pos_j)**2)
+                if dist_sqr < (radius_i + radius_j)**2:
+                    intersections.append(lump_densities[i] + lump_densities[j] + shell_density)
 
         return min(0, np.min(intersections) - MIN_DENSITY) * VERY_LARGE_SLOPE + \
             min(0, MAX_DENSITY - np.max(intersections)) * VERY_LARGE_SLOPE

@@ -36,4 +36,4 @@ Changed so that the average density is computed instead.
 
 ## June 22
 
-The lumpy code works.
+Restarted thresholds to pull everything from the samples rather than the average position.
