@@ -304,11 +304,10 @@ class MCMCAsteroid:
 
                 for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
                     if sampler.iteration % 500 == 0:
-                        if sampler.iteration >= 1_000:
-                            if np.max(sample.log_prob) < -100:
-                                # MCMC will not converge.
-                                print("Log probs were", sample.log_prob)
-                                return None
+                        if np.max(sample.log_prob) < -1000:
+                            # MCMC will not converge.
+                            print("Log probs were", sample.log_prob)
+                            return None
                         if sampler.iteration >= 10_000:
                             # Check convergence
 
