@@ -52,13 +52,15 @@ density_factor_high = 2
 core_shift_low = core_displacement * (core_vol * density_factor_low) / ellipsoid_vol
 core_shift_high = core_displacement * (core_vol * density_factor_high) / ellipsoid_vol
 
+blob_rad = 300
+
 TRUE_SHAPES = {
     "asym-ell": TrueShape.uniform(),
     "sph-3": TrueShape.core_sph(3, 500),
     "sph-1.5": TrueShape.core_sph(1.5, 500),
     "move-3": TrueShape.core_shift(3, 500, core_displacement),
     "move-1.5": TrueShape.core_shift(1.5, 500, core_displacement),
-    "double": TrueShape.two_core(3, blob_rad, core_one, 3, blob_rad, core_two),
+    "double": TrueShape.two_core(3, blob_rad, [0, 500, 0], 3, blob_rad, [0, -500, 0]),
 }
 TRUE_MOMENTS = { # Moments of the known shape
     "asym-ell": TrueMoments.ell(),
@@ -74,7 +76,7 @@ INDICATORS = {
     "sph-1.5": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
     "move-3": Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high),
     "move-1.5": Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low),
-    "double": Indicator.ell_3_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_two),
+    "double": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
 }
 SAMPLE_NAMES = {
     "asym-ell": "den-asym",

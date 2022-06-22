@@ -186,7 +186,7 @@ class MCMCAsteroid:
             zero_densities = densities.copy()
             zero_densities[np.isnan(densities)] = 0
             
-            moment_field = self.asteroid.moment_field(self.surface_am)
+            moment_field = self.asteroid.moment_field(self.asteroid.surface_am)
 
             # Calculate klm
             unscaled_klm = np.einsum("iabc,abc->i", moment_field, zero_densities) * DIVISION**3
