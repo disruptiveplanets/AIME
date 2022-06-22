@@ -88,6 +88,12 @@ class Indicator:
         c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
         return lambda x,y,z: (x)**2/(a*a) + (y - y_shift)**2/(b*b) + z*z/(c*c) < 1
 
+    def ell_3_shift(am, k22, k20, shift):
+        a = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 + 12 * k22)
+        b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
+        c = np.sqrt(5/3) * am * np.sqrt(1 + 4 * k20)
+        return lambda x,y,z: (x - shift[0])**2/(a*a) + (y - shift[1])**2/(b*b) + (z - shift[2])**2 /(c*c) < 1
+
     def tet(am, tet_shrink=1):
         tet_corners = 1.82688329031 * am * np.array([
             (1, 0, -1/np.sqrt(2)*tet_shrink),
@@ -134,6 +140,13 @@ class TrueShape:
         def func(x, y, z):
             dist = x*x / (a*a) + y*y / (b*b) + z*z / (c*c)
             return 1 * (dist > 1) + density_ratio * (dist <= 1)
+        return func
+
+    def two_core(density_ratio_1, radius_1, pos_1, density_ratio_2, radius_2, pos_2):
+        def func(x, y, z):
+            dist1 = (x - pos_1[0])**2 + (y-pos_1[1])**2 + (z - pos_1[2])**2
+            dist2 = (x - pos_2[0])**2 + (y-pos_2[1])**2 + (z - pos_2[2])**2
+            return 1 + (density_ratio_1 - 1) * (dist1 <= radius_1 * radius_1) + (density_ratio_2 - 1) * (dist2 <= radius_2 * radius_2)
         return func
 
     def core_sph(density_ratio, radius):
