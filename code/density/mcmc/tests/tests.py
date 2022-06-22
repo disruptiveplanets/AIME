@@ -86,4 +86,6 @@ SAMPLE_NAMES = {
 asteroid = MCMCAsteroid(f"{RUN_NAME}-{method_tag}", f"../../samples/{SAMPLE_NAMES[RUN_NAME]}-0-samples.npy", INDICATORS[RUN_NAME],
     TRUE_SHAPES[RUN_NAME], SURFACE_AMS[RUN_NAME], DIVISION, MAX_RADIUS, dof, BULK_AMS[RUN_NAME], TRUE_MOMENTS[RUN_NAME])
 
-asteroid.pipeline(method_class, True, generate=True)
+result = None
+while result is None:
+    result = asteroid.pipeline(method_class, True, generate=True)

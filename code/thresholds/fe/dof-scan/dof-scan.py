@@ -17,6 +17,7 @@ TRIAL_INDEX = index // NUM_TRIALS
 DIVISION = 49
 FILE_PATH = "../../../../data/"
 MAX_REPEAT_COUNT = 100
+N_AVERAGE_SAMPLES = 1000
 
 print(f"{NUM_DOF} degrees of freedom")
 print(f"Trial {TRIAL_INDEX}")
@@ -120,9 +121,9 @@ def get_unc_for_file(dname, fname):
         with suppress_stdout():
             asteroid = MCMCAsteroid(f"cast-{NUM_DOF}-{TRIAL_INDEX}-{short_name}", fname, Indicator.ell(radius, k22, k20), TrueShape.uniform(),
                 am, division, max_radius, NUM_DOF, am)
-            density_map = asteroid.pipeline(FiniteElement, False, generate=generate)
+            unc_tracker = asteroid.pipeline(FiniteElement, False, generate=generate, n_samples=N_AVERAGE_SAMPLES)
 
-        if density_map is None:
+        if unc_tracker is None:
             print("Failed. Had to repeat")
             repeat = True
             repeat_num += 1
@@ -132,7 +133,7 @@ def get_unc_for_file(dname, fname):
 
     fname = f"cast-{NUM_DOF}-{TRIAL_INDEX}-{short_name}-map.npy"
     with open(fname, 'wb') as f:
-        np.save(f, density_map)
+        unc_tracker.save(f)
 
 def scan_specific(directory):
     index_lengths = NAMES[directory]

@@ -221,3 +221,28 @@ class UncertaintyTracker:
         return (mean_map, 
             np.sqrt(self.density_map_square_sum / self.num_maps - mean_map**2)
         )
+
+    def __iadd__(self, other_tracker):
+        if self.density_map_sum is None:
+            self.num_maps += other_tracker.num_maps
+            self.density_map_sum += other_tracker.density_map_sum
+            self.density_map_square_sum += other_tracker.density_map_square_sum
+        else:
+            self.num_maps = other_tracker.num_maps
+            self.density_map_sum = other_tracker.density_map_sum
+            self.density_map_square_sum = other_tracker.density_map_square_sum
+
+    def save(self, f):
+        np.save(f, (
+            self.density_map_sum, 
+            self.density_map_square_sum,
+            np.ones_like(self.density_map_sum) * self.num_maps)
+        )
+
+    def load(f):
+        map_sum, square_sum, nums = np.load(f)
+        unc_tracker = UncertaintyTracker()
+        unc_tracker.density_map_sum = map_sum
+        unc_tracker.density_map_square_sum = square_sum
+        unc_tracker.num_maps = nums[0, 0, 0]
+        return unc_tracker

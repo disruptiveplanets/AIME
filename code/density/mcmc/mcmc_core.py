@@ -3,7 +3,7 @@ import numpy as np
 from scipy.linalg import pinvh
 from multiprocessing import Pool, Lock
 sys.path.append("..")
-from core import Asteroid
+from core import Asteroid, UncertaintyTracker
 from scipy.optimize import minimize
 from threading import Thread
 from display import make_gif, make_slices
@@ -152,28 +152,41 @@ class MCMCAsteroid:
         self.n_free = dof
         self.n_all = dof + N_CONSTRAINED
         
-    def pipeline(self, method_class, make_map, generate=True):
+    def pipeline(self, method_class, make_map, generate=True, n_samples=None):
         method = method_class(self.asteroid, self.mean_density, self.n_free, self.n_all, generate)
 
         if self.data_storage.data is None:
-            return np.nan, np.nan
-        
-        means, unc = self.get_densities_mcmc(method, generate)
-        if np.any(np.isnan(unc)):
-            return np.nan, np.nan
+            return None
+
+        long_samples = self.get_densities_mcmc(method, generate)
+        if long_samples is None:
+            return None
 
         print("Means:", means)
         print("Mean klms:", method.get_klms(means))
 
-        densities, uncertainty_ratios = method.get_map(means, unc, self.asteroid)
 
         if make_map:
+            means, unc = self.get_stats_from_long_samples(long_samples)
+            unc /= means + EPSILON
+            densities, uncertainty_ratios = method.get_map(means, unc, self.asteroid)
             true_densities = self.asteroid.get_true_densities().astype(float)
             true_densities[~self.asteroid.indicator_map] = np.nan
             error = log_probability(means[:self.n_free], method, self.data_storage) / self.n_free * -2
             self.display(densities, true_densities, uncertainty_ratios, error)
 
-        return densities / np.nansum(densities)
+        unc_tracker = UncertaintyTracker()
+        if n_samples is not None:
+            print(f"Generating {n_samples} samples")
+            for i in range(n_samples):
+                # Pull random MCMC sample
+                sample = long_samples[np.random.randint(0, len(long_samples))]
+                # Extract the associated density distro
+                densities = method.get_map(sample, None, self.asteroid)
+                # Add it to the uncertainty tracker
+                unc_tracker.update(densities)
+
+        return unc_tracker
 
     
     def get_densities_mcmc(self, method, generate):
@@ -181,10 +194,10 @@ class MCMCAsteroid:
         if generate:
             theta_start = self.get_theta_start_mcmc(method)
             if theta_start is None:
-                return np.nan, np.nan
+                return None
             sampler = self.mcmc_fit(theta_start, output_name, method, True)
             if sampler is None:
-                return np.nan, np.nan
+                return None
 
             try:
                 tau = sampler.get_autocorr_time()
@@ -208,8 +221,9 @@ class MCMCAsteroid:
             with open(output_name + ".npy", 'rb') as f:
                 long_samples = np.load(f)
 
-        long_means, unc = self.get_stats_from_long_samples(long_samples)
 
+        # Plot corner plot
+        long_means, _ = self.get_stats_from_long_samples(long_samples)
         dyn_range = []
         for i in range(len(long_means)):
             min_val, max_val = np.nanpercentile(long_means[i], 5), np.nanpercentile(long_means[i], 95)
@@ -221,7 +235,7 @@ class MCMCAsteroid:
         corner.overplot_lines(fig, long_means, color='C1')
         fig.savefig(output_name + ".png")
 
-        return long_means, unc / (long_means + EPSILON)
+        return long_samples
 
 
     def get_stats_from_long_samples(self, long_samples):
@@ -290,9 +304,11 @@ class MCMCAsteroid:
 
                 for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
                     if sampler.iteration % 500 == 0:
-                        if np.max(sample.log_prob) < -100:
-                            # MCMC will not converge.
-                            return None
+                        if sampler.iteration >= 1_000:
+                            if np.max(sample.log_prob) < -100:
+                                # MCMC will not converge.
+                                print("Log probs were", sample.log_prob)
+                                return None
                         if sampler.iteration >= 10_000:
                             # Check convergence
 

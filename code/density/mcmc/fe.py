@@ -84,13 +84,14 @@ class FiniteElement(MCMCMethod):
 
     def get_map(self, means, unc, asteroid):
         densities = np.einsum("ijkl,i->jkl", self.masks, means)
-        unc_ratios = np.einsum("ijkl,i->jkl", self.masks, unc)
         densities = densities / np.nanmean(densities)
-
         densities[~asteroid.indicator_map] = np.nan
-        unc_ratios[~asteroid.indicator_map] = np.nan
-
-        return densities, unc_ratios
+        if unc is None:
+            return densities
+        else:
+            unc_ratios = np.einsum("ijkl,i->jkl", self.masks, unc)
+            unc_ratios[~asteroid.indicator_map] = np.nan
+            return densities, unc_ratios
 
     def scatter_walkers(self, theta_start, n_walkers):
         pos = np.zeros((n_walkers, self.n_free))

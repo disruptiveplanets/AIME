@@ -16,8 +16,7 @@ def average(dof, run):
         if not os.path.exists(fname):
             return None
         with open(fname, 'rb') as f:
-            this_map = np.load(f)
-            unc_tracker.update(this_map)
+            unc_tracker += UncertaintyTracker.load(f)
     density_map, uncertainty_map = unc_tracker.generate()
     true_map = np.ones_like(density_map)
     true_map[np.isnan(density_map)] = np.nan

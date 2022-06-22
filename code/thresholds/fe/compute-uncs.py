@@ -14,6 +14,7 @@ FILE_PATH = "../../../data/"
 NUM_TRIALS = 5
 DEGREES_OF_FREEDOM = 5
 MAX_REPEAT_COUNT = 100
+N_AVERAGE_SAMPLES = 1000
 
 NAMES = {
     "scan-perigee": (2,), 
@@ -137,7 +138,7 @@ def get_unc_for_file(dname, fname):
             with suppress_stdout():
                 asteroid = MCMCAsteroid(f"ast-{short_name}-{run_index}", fname, Indicator.ell(radius, k22, k20), TrueShape.uniform(),
                     am, division, max_radius, DEGREES_OF_FREEDOM, am)
-                density_map = asteroid.pipeline(FiniteElement, False, generate=generate)
+                this_unc_tracker = asteroid.pipeline(FiniteElement, False, generate=generate, n_samples=N_AVERAGE_SAMPLES)
             if density_map is None:
                 print("Failed. Had to repeat")
                 repeat = True
@@ -147,7 +148,7 @@ def get_unc_for_file(dname, fname):
                 break # Don't add anything to the uncs list
         if not repeat:
             # Success
-            unc_tracker.update(density_map)
+            unc_tracker += this_unc_tracker
 
     density_map, uncertainty_map = unc_tracker.generate()
     mean_uncertainty = np.nanmean(np.abs(uncertainty_map))

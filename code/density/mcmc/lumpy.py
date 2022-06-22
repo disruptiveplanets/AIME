@@ -146,7 +146,10 @@ class Lumpy(MCMCMethod):
             densities[(X - lump_pos[0]) ** 2 + (Y - lump_pos[1]) ** 2 + (Z - lump_pos[2]) ** 2 < (lump_length**2 * 5 / 3)] += lump_density
 
         densities[~asteroid.indicator_map] = np.nan
-        return densities, np.ones_like(densities)
+        if unc is None:
+            return densities
+        else:
+            return densities, np.ones_like(densities)
 
     def scatter_walkers(self, theta_start, n_walkers):
         pos = np.zeros((n_walkers, self.n_free))
