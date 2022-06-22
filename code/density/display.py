@@ -159,5 +159,8 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
     c.set_label(axis_name)
 
     fig.tight_layout()
-    fig.savefig(name+".pdf")
-    fig.savefig(name+".png")
+    try:
+        fig.savefig(name+".pdf")
+        fig.savefig(name+".png")
+    except Exception:
+        pass

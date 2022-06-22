@@ -163,13 +163,11 @@ class MCMCAsteroid:
         if long_samples is None:
             return None
 
-        print("Means:", means)
-        print("Mean klms:", method.get_klms(means))
-
-
         if make_map:
             means, unc = self.get_stats_from_long_samples(long_samples)
             unc /= means + EPSILON
+            print("Means:", means)
+            print("Mean klms:", method.get_klms(means))
             densities, uncertainty_ratios = method.get_map(means, unc, self.asteroid)
             true_densities = self.asteroid.get_true_densities().astype(float)
             true_densities[~self.asteroid.indicator_map] = np.nan
@@ -233,11 +231,11 @@ class MCMCAsteroid:
                 max_val += 1
             dyn_range.append((min_val, max_val))
 
-        warnings.filterwarnings("ignore")
+        sys.stderr = open(os.devnull, "w")  # silence stderr
         fig = corner.corner(long_samples, range=dyn_range)
         corner.overplot_lines(fig, long_means, color='C1')
         fig.savefig(output_name + ".png")
-        warnings.filterwarnings("default")
+        sys.stderr = sys.__stderr__  # unsilence stderr
 
         return long_samples
 

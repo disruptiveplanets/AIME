@@ -33,3 +33,7 @@ DOF scan completed. It looks great. 2 DOF failed because it's so few.
 ## June 21
 
 Changed so that the average density is computed instead.
+
+## June 22
+
+The lumpy code works.

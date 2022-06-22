@@ -223,14 +223,17 @@ class UncertaintyTracker:
         )
 
     def __iadd__(self, other_tracker):
+        if other_tracker.density_map_sum is None:
+            return
         if self.density_map_sum is None:
-            self.num_maps += other_tracker.num_maps
-            self.density_map_sum += other_tracker.density_map_sum
-            self.density_map_square_sum += other_tracker.density_map_square_sum
-        else:
             self.num_maps = other_tracker.num_maps
             self.density_map_sum = other_tracker.density_map_sum
             self.density_map_square_sum = other_tracker.density_map_square_sum
+        else:
+            self.num_maps += other_tracker.num_maps
+            self.density_map_sum += other_tracker.density_map_sum
+            self.density_map_square_sum += other_tracker.density_map_square_sum
+        return self
 
     def save(self, f):
         np.save(f, (

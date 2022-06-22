@@ -139,7 +139,7 @@ def get_unc_for_file(dname, fname):
                 asteroid = MCMCAsteroid(f"ast-{short_name}-{run_index}", fname, Indicator.ell(radius, k22, k20), TrueShape.uniform(),
                     am, division, max_radius, DEGREES_OF_FREEDOM, am)
                 this_unc_tracker = asteroid.pipeline(FiniteElement, False, generate=generate, n_samples=N_AVERAGE_SAMPLES)
-            if density_map is None:
+            if this_unc_tracker is None:
                 print("Failed. Had to repeat")
                 repeat = True
                 repeat_num += 1
