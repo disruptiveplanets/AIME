@@ -21,6 +21,7 @@ NUM_THREADS = os.cpu_count()
 MIN_LOG_LIKE = 1000
 MINIMIZATION_ATTEMPTS = 500
 EPSILON = 1e-10
+MINIMUM_LIKELIHOOD = -1000
 
 class MCMCMethod:
     def __init__(self, asteroid, mean_density, n_free, n_all, generate):
@@ -209,7 +210,7 @@ class MCMCAsteroid:
             else:
                 print("No convergence")
                 samples = sampler.get_chain(discard=1000, thin=32)
-            sample_mask = sampler.get_last_sample().log_prob > -100
+            sample_mask = sampler.get_last_sample().log_prob > MINIMUM_LIKELIHOOD
             print(f"Using {np.sum(sample_mask)}/{N_WALKERS} walkers")
             flat_samples = samples[:,sample_mask,:].reshape(-1, self.n_free)
             long_samples = np.array([method.get_theta_long(theta_short) for theta_short in flat_samples])
@@ -231,9 +232,12 @@ class MCMCAsteroid:
                 min_val -= 1
                 max_val += 1
             dyn_range.append((min_val, max_val))
+
+        warnings.filterwarnings("ignore")
         fig = corner.corner(long_samples, range=dyn_range)
         corner.overplot_lines(fig, long_means, color='C1')
         fig.savefig(output_name + ".png")
+        warnings.filterwarnings("default")
 
         return long_samples
 
@@ -304,7 +308,7 @@ class MCMCAsteroid:
 
                 for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
                     if sampler.iteration % 500 == 0:
-                        if np.max(sample.log_prob) < -1000:
+                        if np.max(sample.log_prob) < MINIMUM_LIKELIHOOD:
                             # MCMC will not converge.
                             print("Log probs were", sample.log_prob)
                             return None
