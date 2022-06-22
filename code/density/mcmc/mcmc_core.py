@@ -154,6 +154,9 @@ class MCMCAsteroid:
         self.n_all = dof + N_CONSTRAINED
         
     def pipeline(self, method_class, make_map, generate=True, n_samples=None):
+        if n_samples is None and make_map:
+            raise Exception("Number of samples cannot be none if make_map is true")
+
         method = method_class(self.asteroid, self.mean_density, self.n_free, self.n_all, generate)
 
         if self.data_storage.data is None:
@@ -162,17 +165,6 @@ class MCMCAsteroid:
         long_samples = self.get_densities_mcmc(method, generate)
         if long_samples is None:
             return None
-
-        if make_map:
-            means, unc = self.get_stats_from_long_samples(long_samples)
-            unc /= means + EPSILON
-            print("Means:", means)
-            print("Mean klms:", method.get_klms(means))
-            densities, uncertainty_ratios = method.get_map(means, unc, self.asteroid)
-            true_densities = self.asteroid.get_true_densities().astype(float)
-            true_densities[~self.asteroid.indicator_map] = np.nan
-            error = log_probability(means[:self.n_free], method, self.data_storage) / self.n_free * -2
-            self.display(densities, true_densities, uncertainty_ratios, error)
 
         unc_tracker = UncertaintyTracker()
         if n_samples is not None:
@@ -184,6 +176,41 @@ class MCMCAsteroid:
                 densities = method.get_map(sample, None, self.asteroid)
                 # Add it to the uncertainty tracker
                 unc_tracker.update(densities)
+
+        if make_map:
+            densities, uncertainty_ratios = unc_tracker.generate()
+            true_densities = self.asteroid.get_true_densities().astype(float)
+            true_densities[~self.asteroid.indicator_map] = np.nan
+
+
+            zero_densities = densities.copy()
+            zero_densities[np.isnan(densities)] = 0
+            
+            moment_field = self.asteroid.moment_field(self.surface_am)
+
+            # Calculate klm
+            unscaled_klm = np.einsum("iabc,abc->i", moment_field, zero_densities) * DIVISION**3
+            radius_sqr = unscaled_klm[-1].real
+            klms = unscaled_klm / radius_sqr
+            klms[0] *= radius_sqr
+
+            # Find likelihood
+            free_real_klms = np.array([
+                klms[4].real, # K22
+                klms[6].real, # K20
+                klms[15].real, # R K33
+                klms[15].imag, # I K33
+                klms[14].real, # R K32
+                klms[14].imag, # I K32
+                klms[13].real, # R K31
+                klms[13].imag, # I K31
+                klms[12].real, # K30
+            ])
+
+            likelihood = log_like(free_real_klms, self.data_storage)
+            error = -2 * likelihood / self.n_free
+
+            self.display(densities, true_densities, uncertainty_ratios, error)
 
         return unc_tracker
 

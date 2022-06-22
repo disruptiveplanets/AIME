@@ -88,4 +88,4 @@ asteroid = MCMCAsteroid(f"{RUN_NAME}-{method_tag}", f"../../samples/{SAMPLE_NAME
 
 result = None
 while result is None:
-    result = asteroid.pipeline(method_class, True, generate=True)
+    result = asteroid.pipeline(method_class, True, generate=False, n_samples=1000)
