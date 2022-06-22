@@ -33,12 +33,6 @@ core_shift_high = core_displacement * (core_vol * density_factor_high) / ellipso
 print("Core mass fraction:", (core_vol * density_factor) / (core_vol * density_factor+ellipsoid_vol))
 print(f"Core shift low: {core_shift_low}\tCore shift high: {core_shift_high}")
 
-core_one = np.array([0, 500, 0])
-core_two = np.array([500, 0, 0])
-core_com_two = blob_vol * density_factor_high * (core_one + core_two)
-core_shift_two = core_com_two / ellipsoid_vol
-print(f"Core shift two: {core_shift_two}")
-
 
 
 asteroids = [
@@ -59,8 +53,7 @@ asteroids = [
     #("core-move-3", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high), TrueShape.core_shift(3, core_rad, core_displacement), True),
     #("moved-low", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.uniform(), True),
     #("moved-high", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high), TrueShape.uniform(), True),
-    ("two-lump-u", Indicator.ell_3_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_two), TrueShape.uniform(), False),
-    ("two-lump", Indicator.ell_3_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_two), TrueShape.two_core(3, blob_rad, core_one, 3, blob_rad, core_two), False),
+    ("two-lump", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.two_core(3, blob_rad, [0, 500, 0], 3, blob_rad, [0, -500, 0]), False),
 
     #("core-move-1.5", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.core_shift(1.5, core_rad, core_displacement), True),
 ]
@@ -80,7 +73,7 @@ def get_klms(index):
 
     density = asteroid.map_np(true_shape)
 
-    # Throws when run from a thread
+    # # Throws when run from a thread
     # plt.imshow(density[len(density)//2, :, :])
     # plt.figure()
     # plt.imshow(density[:, len(density)//2, :])
