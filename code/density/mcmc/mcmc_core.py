@@ -178,7 +178,8 @@ class MCMCAsteroid:
                 unc_tracker.update(densities)
 
         if make_map:
-            densities, uncertainty_ratios = unc_tracker.generate()
+            densities, uncertainty = unc_tracker.generate()
+            uncertainty_ratios = uncertainty / densities
             true_densities = self.asteroid.get_true_densities().astype(float)
             true_densities[~self.asteroid.indicator_map] = np.nan
 
