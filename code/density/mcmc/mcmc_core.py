@@ -189,7 +189,7 @@ class MCMCAsteroid:
             moment_field = self.asteroid.moment_field(self.asteroid.surface_am)
 
             # Calculate klm
-            unscaled_klm = np.einsum("iabc,abc->i", moment_field, zero_densities) * DIVISION**3
+            unscaled_klm = np.einsum("iabc,abc->i", moment_field, zero_densities) * asteroid.division**3
             radius_sqr = unscaled_klm[-1].real
             klms = unscaled_klm / radius_sqr
             klms[0] *= radius_sqr
