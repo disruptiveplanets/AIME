@@ -174,6 +174,7 @@ class MCMCAsteroid:
                 sample = long_samples[np.random.randint(0, len(long_samples))]
                 # Extract the associated density distro
                 densities = method.get_map(sample, None, self.asteroid)
+                densities /= np.nansum(densities)
                 # Add it to the uncertainty tracker
                 unc_tracker.update(densities)
 

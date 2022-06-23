@@ -26,6 +26,7 @@ ELLIPSOID_AM = 1000
 
 SURFACE_AMS = {
     "asym-ell": 1000,
+    "double": 1000,
     "sph-3": 1000,
     "sph-1.5": 1000,
     "move-3": 1002.0081758422925,
@@ -34,6 +35,7 @@ SURFACE_AMS = {
 
 BULK_AMS = {
     "asym-ell": 1000,
+    "double": 970.4652599064898,
     "sph-3": 922.9234884822591,
     "sph-1.5": 978.4541044108308,
     "move-3": 933.1648422811957,
@@ -94,4 +96,4 @@ asteroid = MCMCAsteroid(f"{RUN_NAME}-{method_tag}", f"../../samples/{SAMPLE_NAME
 
 result = None
 while result is None:
-    result = asteroid.pipeline(method_class, True, generate=False, n_samples=1000)
+    result = asteroid.pipeline(method_class, True, generate=True, n_samples=1000)

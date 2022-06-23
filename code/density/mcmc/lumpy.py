@@ -106,6 +106,16 @@ class Lumpy(MCMCMethod):
         lump_densities = [theta_long[1] / theta_long[0]**3 / VOLUME_SCALE]
         for i in range(0, self.N - 1):
             lump_densities.append(theta_long[3 + i * 5] / theta_long[2 + i * 5]**3 / VOLUME_SCALE)
+
+        # Prior on a_m
+        am_limit = 0
+        for i in range(self.N):
+            length = theta_long[0] if i == 0 else theta_long[2 + 5 * i]
+            if length < 0:
+                am_limit += length * VERY_LARGE_SLOPE
+        if am_limit:
+            return am_limit
+            
         intersections = []
 
         # No lumps

@@ -10,8 +10,8 @@ from display import make_gif, make_slices
 from core import TrueShape, Indicator
 
 RUN_NAME = "asym"
-PULL = True
-GENERATE = True
+PULL = False
+GENERATE = False
 
 NUM_DRAWS = 20
 NUM_CHOOSE = 1000
@@ -20,6 +20,7 @@ MAX_RADIUS = 2000
 DURATION = 5
 DIVISION = 49
 k22a, k20a = -0.05200629, -0.2021978
+k22s, k20s = 0, -0.09766608
 ELLIPSOID_AM = 1000
 
 
@@ -70,7 +71,7 @@ TRUE_SHAPES = {
 
 }
 INDICATORS = {
-    "sym": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
+    "sym": Indicator.ell(ELLIPSOID_AM, k22s, k20s),
     "asym": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
     "sph-3": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
     "sph-1.5": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
@@ -191,6 +192,8 @@ check_moments(mean_grid)
 
 x,y,z = np.meshgrid(grid_line, grid_line, grid_line)
 true_densities = TRUE_SHAPES[RUN_NAME](x,y,z)
+if type(true_densities) == float:
+    true_densities = true_densities * np.ones_like(x)
 true_densities = true_densities.astype(float)
 true_densities[np.isnan(mean_grid)] = np.nan
 

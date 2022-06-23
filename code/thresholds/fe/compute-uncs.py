@@ -151,6 +151,7 @@ def get_unc_for_file(dname, fname):
             unc_tracker += this_unc_tracker
 
     density_map, uncertainty_map = unc_tracker.generate()
+    uncertainty_ratio = uncertainty_map / density_map
     mean_uncertainty = np.nanmean(np.abs(uncertainty_map))
     return mean_uncertainty
 
