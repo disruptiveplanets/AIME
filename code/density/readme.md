@@ -198,3 +198,5 @@ I finished the lumpy model, worked a bit on the paper, and pushed the double cor
 I changed the lumpy model so that it has a prior on a_a and reran everything. I also ran average on asym and had to redo sym because I used the wrong shape.
 
 The lumpy model finally worked. I also wrote the other density models into the appendix.
+
+However, the lumpy model needs really low division to get a good redchi. Changed this.

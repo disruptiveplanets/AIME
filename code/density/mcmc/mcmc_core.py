@@ -152,8 +152,10 @@ class MCMCAsteroid:
         self.data_storage = DataStorage(sample_path, surface_am, used_bulk_am)
         self.n_free = dof
         self.n_all = dof + N_CONSTRAINED
+
         
     def pipeline(self, method_class, make_map, generate=True, n_samples=None):
+
         if n_samples is None and make_map:
             raise Exception("Number of samples cannot be none if make_map is true")
 
@@ -225,6 +227,7 @@ class MCMCAsteroid:
         output_name = self.name + "-" + method.short_name()
         if generate:
             theta_start = self.get_theta_start_mcmc(method)
+
             if theta_start is None:
                 print("Bailed")
                 return None
@@ -315,7 +318,7 @@ class MCMCAsteroid:
                 min_result = minimize(self.minimize_func, x0=val, method="Nelder-Mead", args=(result, method), options = {"maxiter": 500 * len(val)})
             except CompletedException:
                 return
-            if min_result.success and min_result.fun < MIN_LOG_LIKE:
+            if min_result.fun < MIN_LOG_LIKE:
                 print(f"Thread successfully completed with log like {min_result.fun}")
                 result.set(min_result.x)
                 return
@@ -333,6 +336,7 @@ class MCMCAsteroid:
             backend = emcee.backends.HDFBackend(output_name+".h5")
             backend.reset(N_WALKERS, self.n_free)
             old_tau = np.inf
+
 
             with Pool() as pool:
                 sampler = emcee.EnsembleSampler(N_WALKERS, self.n_free, log_probability, args=(method, self.data_storage), backend=backend, pool=pool)

@@ -6,7 +6,6 @@ import fe, lumpy
 from core import Indicator, TrueShape, TrueMoments
 import numpy as np
 
-DIVISION = 49
 MAX_RADIUS = 2000
 RUN_NAME = sys.argv[1]
 METHOD_NAME = sys.argv[2]
@@ -14,7 +13,12 @@ if METHOD_NAME == "lumpy":
     method_class = lumpy.Lumpy
     method_tag = "lump"
     dof = 2
+    DIVISION = 49#9
+    if RUN_NAME == "double":
+        lumpy.MODEL_N = 2
+        dof = 7
 elif METHOD_NAME == "fe":
+    DIVISION = 49
     method_class = fe.FiniteElement
     method_tag = "fe"
     dof = 9
@@ -96,4 +100,8 @@ asteroid = MCMCAsteroid(f"{RUN_NAME}-{method_tag}", f"../../samples/{SAMPLE_NAME
 
 result = None
 while result is None:
-    result = asteroid.pipeline(method_class, True, generate=True, n_samples=1000)
+    if len(sys.argv) >= 3:
+        generate = True if sys.argv[3] == "True" else False
+        result = asteroid.pipeline(method_class, True, generate=generate, n_samples=1000)
+    else:
+        result = asteroid.pipeline(method_class, True, generate=False, n_samples=1000)
