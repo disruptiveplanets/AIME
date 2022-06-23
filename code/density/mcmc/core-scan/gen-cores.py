@@ -11,7 +11,8 @@ MAX_RADIUS = 2000
 RUN_NAME = sys.argv[1]
 AST_INDEX = sys.argv[2]
 fe.grids.NUM_DRAWS = 0
-k22a, k20a = -0.05200629, -0.2021978 # Surface
+k22a, k20a = -0.05200629, -0.2021978
+k22s, k20s = 0, -0.09766608
 ELLIPSOID_AM = 1000
 
 SURFACE_AMS = {
@@ -60,7 +61,7 @@ TRUE_SHAPES = {
     "double": TrueShape.two_core(3, blob_rad, core_one, 3, blob_rad, core_two),
 }
 INDICATORS = {
-    "sym": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
+    "sym": Indicator.ell(ELLIPSOID_AM, k22s, k20s),
     "asym": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
     "sph-3": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
     "sph-1.5": Indicator.ell(ELLIPSOID_AM, k22a, k20a),

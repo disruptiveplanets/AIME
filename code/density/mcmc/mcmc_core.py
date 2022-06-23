@@ -220,6 +220,7 @@ class MCMCAsteroid:
         if generate:
             theta_start = self.get_theta_start_mcmc(method)
             if theta_start is None:
+                print("Bailed")
                 return None
             sampler = self.mcmc_fit(theta_start, output_name, method, True)
             if sampler is None:

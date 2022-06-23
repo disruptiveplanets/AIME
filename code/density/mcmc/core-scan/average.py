@@ -9,7 +9,7 @@ from fe import FiniteElement
 from display import make_gif, make_slices
 from core import TrueShape, Indicator
 
-RUN_NAME = "sym"
+RUN_NAME = "asym"
 PULL = True
 GENERATE = True
 
