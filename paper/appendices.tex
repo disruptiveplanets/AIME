@@ -227,40 +227,58 @@ We use the asymmetric ellipsoid in nearly all runs, due to the degeneracy induce
 
 \section{Additional density distribution models}
 
-Two models were discussed in section \ref{sec:density-distro} to translate density moment constraints into density distribution constraints. Here we outline two additional models, the prior and the harmonic models, which are less conventional but still useable for extracting density distribution properties. Unlike the finite element and lumpy models discussed in the main text, these models will yield smooth distributions with no discrete transitions. They also rely on a known surface for the asteroid.
+Two models were discussed in section \ref{sec:density-distro} to translate density moment constraints into density distribution constraints. Here we outline two additional models, the nearly-uniform and the harmonic models, which are less conventional but still useable for extracting density distribution properties. Unlike the finite element and lumpy models discussed in the main text, these models will yield smooth distributions with no discrete transitions. They also rely on a known surface for the asteroid.
 
-\subsection{Prior model}
-In the likelihood model, we seek to pick one density distribution from the many distributions consistent with the data by maximizing a prior distribution $f(\rho(\bm r))$, which can be chosen manually. Any prior distribution can be chosen, but a Gaussian prior preferring uniform distributions is both interesting and numerically efficient.
+\subsection{Nearly-uniform model}
+In this nearly-uniform model, we seek to pick one density distribution from the many distributions consistent with the data by maximizing a prior distribution $f[\rho(\bm r)]$, which can be chosen manually. Any prior distribution can be chosen, but the following prior is both interesting and numerically efficient.
+
+As part of our prior, we require that the asteroid density distribution satisfy $I_\mathcal{A} = \mu_\mathcal{A} a_\mathcal{A}^2$. This constraint is desirable as it encourages nearly uniform density distributions; recall that a perfectly uniform asteroid always satisfies this constraint. To define the prior, we divide the asteroid into $n \gg 1$ small regions of volume $V$, each with position $\bm r_i$ and density $\rho_i = \delta_i + 1$. Setting the mass of the asteroid equal to its volume, the average density is 1, so $\delta_i$ is the difference between the average and local density. We set $f[\rho(\bm r)]$ to be a multivariate-Gaussian distribution on $\delta_i$ centred on zero to minimize non-uniformity, i.e.
+\begin{equation}
+  f[\rho(\bm r)] \propto \prod_i \frac{\delta_i^2}{2\sigma^2}
+\end{equation}
+where $\sigma$ is an irrelevant constant. The The density moments, MOI scale, and mass are 
+\begin{equation}
+  K_{\ell m} = \frac{V}{\mu_\mathcal{A}a_\mathcal{A}^{\ell}} \sum_i (\delta_i + 1) R_{\ell m}(\bm r_i)
+  \label{eqn:nu-klm}
+\end{equation}
+\begin{equation}
+  I_\mathcal{A} = \mu_\mathcal{A} a_\mathcal{A}^2 = V \sum_i (\delta_i + 1) r_i^2
+  \label{eqn:nu-ia}
+\end{equation}
+\begin{equation}
+  \mu_\mathcal{A} = V\sum_i (\delta_i + 1) \implies 0 = \sum_i \delta_i.
+  \label{eqn:nu-mass}
+\end{equation}
+Writing $\delta_i$ as an $n$-dimensional vector $\bm \delta$, equation \ref{eqn:nu-klm} is a matrix equation for $K_{\ell m}$ and equations \ref{eqn:nu-ia} and \ref{eqn:nu-mass} are vector dot product equations. Combining $K_{\ell m}$, $I_\mathcal{A}$, and $0$ into a single vector $\bm K$, these equations can be written as a single underdetermined matrix equation we denote as $\bm K = M \bm \delta + \bm C$, where the components of constant matrix $M$ and constant vector $\bm C$ are known given a fixed layout of the $n$ regions. Some of the components of $\bm K$, such as $I_\mathcal{A}$, $\mu_\mathcal{A}$, and $K_{1m}$, are constraints. We treat the other components as parameters of the model. The task is then to find $\bm \delta$ that satisfies this matrix equation and minimizes $f(\bm \delta) \propto |\bm \delta|^2$. The Moore-Penrose inverse satisfies these properties:
+\begin{equation}
+  \bm \delta = M^+ (\bm K - \bm C); \qquad M^+ = M^\dagger(M M^\dagger)^{-1}
+  \label{eqn:nu-delta}
+\end{equation}
+where $M^\dagger$ is the adjoint of $M$.
+
+The probability distribution of $\bm K$ is given by the output of the fit described in section \ref{sec:fit}. The parameters of this model, $\bm K$, might differ from this distribution due to the additional constraint that the density fall in realistic values. This can be implemented by individually checking the components $\bm \delta$ computed by equation \ref{eqn:nu-delta} and confirming that $1 + \delta_i$ lies within the acceptable range of densities.
 
 
 \subsection{Harmonic model}
 For the harmonic model, we limit ourselves to density distributions that are harmonic; i.e., they satisfy $\nabla^2 \rho(\bm r) = 0$. We have no physical justification for why this assumption should be true, but it is useful as a simplification to gain qualitative insight into the properties of the asteroid density distribution.
 
-A harmonic density distribution can be expanded in terms of the spherical harmonics as $\rho(\bm r) = \sum_{\ell m} C_{\ell m} R_{\ell m}(\bm r)^*$ where $C_{\ell m}$ are complex, free parameters. This series can be truncated at some maximum $\ell$. The density moments can then be explicitly computed as a function of $C_{\ell m}$:
+A harmonic density distribution can be expanded in terms of the spherical harmonics as $\rho(\bm r) = \sum_{\ell m} C_{\ell m} R_{\ell m}(\bm r)^*$ where $C_{\ell m}$ are complex, free parameters. This series can be truncated at some maximum $\ell$. The density moments, MOI scale, and mass can then be explicitly computed as a function of $C_{\ell m}$:
 \begin{equation}
-  K_{\ell m} = \frac{a_\mathcal{A}^{2-\ell}}{I_\mathcal{A}} \sum_{\ell m} C_{\ell' m'} \int_\mathcal{A} d^3 r R_{\ell' m'}(\bm r)^* R_{\ell m}(\bm r).
+  K_{\ell m} = \frac{a_\mathcal{A}^{2-\ell}}{I_\mathcal{A}} \sum_{\ell m} C_{\ell' m'} \int_\mathcal{A} d^3 r R_{\ell' m'}(\bm r)^* R_{\ell m}(\bm r)
   \label{eqn:harmonic-klm}
 \end{equation}
 \begin{equation}
-  I_\mathcal{A} = \sum_{\ell m} C_{\ell m} \int_\mathcal{A} d^3 r R_{\ell m}(\bm r)^* r^2.
+  I_\mathcal{A} = \sum_{\ell m} C_{\ell m} \int_\mathcal{A} d^3 r R_{\ell m}(\bm r)^* r^2
   \label{eqn:harmonic-ia}
+\end{equation}
+\begin{equation}
+  \mu_\mathcal{A} = \sum_{\ell m} C_{\ell m} \int_\mathcal{A} d^3 r R_{\ell m}(\bm r)^*.
+  \label{eqn:harmonic-mass}
 \end{equation}
 These integrals can be pre-computed given a known asteroid shape $\mathcal{A}$, so that computing $C_{\ell m}$ to match a given $K_{\ell m}$ is fast. Furthermore, their values when $\mathcal{A}$ is spherical gives us insight into the influence of $K_{\ell m}$ on density distributions. In this case, $I_\mathcal{A} \propto C_{00}$ and the integral of equation \ref{eqn:harmonic-klm} is nonzero only when $\ell' = \ell$ and $m'=m$. Therefore, $C_{\ell m}$ is proportional to $K_{\ell m}$. The density distribution can be immediately visualized given the density moments as a sum of the solid spherical harmonics weighted by $K_{\ell m}$. When the asteroid is non-spherical, the shape itself contributes to $K_{\ell m}$ so as to break this picture.
 
-Imposing constraints on these moments is also necessary. The asteroid mass is given by
-\begin{equation}
-  \mu_\mathcal{A} = \sum_{\ell m} C_{\ell m} \int_\mathcal{A} d^3 r R_{\ell m}(\bm r)^*
-  \label{eqn:harmonic-mass}
-\end{equation}
-and these integrals can again be precomputed such that $C_{\ell m}$ can be constrained by fixing the asteroid mass. We impose bounds on $\rho(\bm r)$ by defining an indicator function $\mathds{1}(\bm r) = \mathds{1}(\rho(\bm r))$ which is zero when $\rho(\bm r)$ lies within the bounds and one otherwise. Then the integral of $\mathds{1}$ over the asteroid is
-\begin{equation}
-  \langle\mathds{1}\rangle = \int_\mathcal{A} d^3 r \mathds{1}\parens{\sum_{\ell m} C_{\ell m} R_{\ell m}(\bm r)^*}.
-\end{equation}
-Except where $\rho(\bm r)$ is at the edge of its bounds, $\mathds{1}(\bm r)$ is flat and therefore harmonic. We can write it as 
-\begin{equation}
-  \mathds{1}(\bm r) = \sum_{\ell m} A_{\ell m} R_{\ell m}(\bm r) + B_{\ell m} S_{\ell m}(\bm r)
-\end{equation}
-in these regions, where the complex-valued constants $A_{\ell m}$ and $B_{\ell m}$ are evaluated by the fact that
+Imposing constraints on these moments is also necessary. The choice of mass is enforced merely by enforcing equation \ref{eqn:harmonic-mass}. We impose bounds on $\rho(\bm r)$ by acknowledging that harmonic functions such as $\rho(\bm r)$ in a region such as $\mathcal{A}$ attain their maxima on the boundary of the region, so that it is only necessary to ensure that $\rho$ lies within the allowed range on the asteroid boundary rather than within the entire asteroid. This can be done by parametrizing the asteroid surface as a function of two variables and minimizing and maximizing $\rho$ with respect to those variables, ensuring these minima and maxima are within the allowed range.
+
 
 
 \section{The cadence cut-off}
@@ -283,58 +301,6 @@ Figure \ref{fig:cad-contour} demonstrates that large rotational period produces 
  The relative orbit speed $t_\text{spin} / t_\text{orbit}$ was defined by un-physically increasing or decreasing the time at which the asteroid moved through the orbit determined by the equations of motion (but leaving the orbit shape unchanged). The equations of motion affecting the orientation and spin of the asteroid however were unaffected. $t_\text{spin} / t_\text{orbit} > 1$ corresponds to a faster orbit, and $t_\text{spin} / t_\text{orbit} < 1$ corresponds to a slower orbit. With this unphysical process, we isolate the effect of the amount of time spent near perigee on posterior uncertainty, without inheriting additional affects that would have been caused by the orbit changing shape.
 
 The right panel of figure \ref{fig:cad-contour} shows a stronger and more monotonic dependence of $T_\text{cad}$ on $t_\text{spin} / t_\text{orbit}$. It appears that even slightly slower orbits sharply increases $T_\text{cad}$. This effect is both due to the asteroid spending greater time in the high-torque, near-perigee region, and the larger data set that can be collected for slow orbits. However, if the orbit speed is changed by adjusting its parameters ($v_\infty$, $r_p$) or the central body mass $\mu_\mathcal{B}$, then the orbit shape will also change. This induces other effects studied in the main text and will complicate the trend observed here. Unlike the $P_\omega$ case, the cadence cut-off does not visibly broaden as a function of $t_\text{spin} / t_\text{orbit}$. It appears that the increased orbit speed merely shifts $T_\text{cad}$ rather than changing its sharpness.
-
-
-  
-
-\section{Computing asteroid shape from density moments}
-\label{app:find-surface}
-
-\begin{figure*}
-  \centering
-  \includegraphics[width=0.45\textwidth]{figs/high-surface.pdf}\hfill
-  \includegraphics[width=0.45\textwidth]{figs/high-likelihood.pdf}
-  \caption{\textit{Left}: the surface of a near-spherical asteroid with uniform density distribution extracted via the surface model. \textit{Right}: the density distribution extracted via the likelihood model for the same density moments but a spherical surface. The same length scale is used in both figures. This new shape model successfully estimates an asteroid shape which is qualitatively consistent with the distributions extracted via models from the main text.}
-  \label{fig:surface-density}
-\end{figure*}
-
-In section \ref{sec:density-distro}, we mention that the shape of the asteroid can be computed from observations of the density moments and $a_\mathcal{A}$ if a uniform density distribution is assumed. We did not further describe the model in the main text because it is unlike the other three models in the nature of its assumptions, and in the fact that it is non-linear. However, it may be a useful technique so it is mentioned here; we call it the ``surface'' model. A similar model was also studied in Ref.~\cite{BAXANSKY2007756}.
-
-Suppose our asteroid has constant density $\rho_0$ and known parameters $K_{\ell m}$ and $a_\mathcal{A}^2$, and that the asteroid is ``star shaped'' in that every ray originating from the centre of mass of the asteroid (the origin of the body-fixed frame) passes through the surface of the asteroid exactly once, at distance $r(\theta, \phi)$ written in spherical coordinates. By the divergence theorem, we write
-\begin{equation}
-  K_{\ell m} = \frac{\rho_0}{\mu_\mathcal{A} a_\mathcal{A}^\ell} \oint_{\partial \mathcal{A}} d^2 \bm r \cdot \bm v (\bm r)
-\end{equation}
-where $\bm v (\bm r) = \unit r R_{\ell m} (\bm r) r / (3+\ell) $ so that $\nabla \cdot \bm v(\bm r) = R_{\ell m}(\bm r)$. The integral is carried out over the surface of the asteroid. We know the area element satisfies $d^2 \bm r = (\partial \bm r / \partial \theta \times \partial \bm r / \partial \phi) d\theta d\phi$ in our coordinates, and when dotted with $\bm v \parallel \unit r$, this gives
-\begin{equation}
-  K_{\ell m} = \frac{\rho_0 }{\mu_\mathcal{A} a_\mathcal{A}^\ell (3 + \ell)} \int d\Omega r(\theta, \phi)^3 R_{\ell m}(r(\theta, \phi), \theta, \phi).
-  \label{eqn:surface-klm}
-\end{equation}
-where the integral is carried out over the unit sphere. Note that the integrand of each $K_{\ell m}$ is proportional to $r(\theta, \phi)^{(3+\ell)}$ times constants and a spherical harmonic.
-
-We write 
-\begin{equation}
-  r(\theta, \phi) = \sum_{\ell m} Y_{\ell m}^* C_{\ell m}
-\end{equation}
-without loss of generality. To keep $r(\theta, \phi) \in \mathds{R}$, we require $C_{\ell m}^* = (-1)^m C_{l,-m} (\ell-m)!/(\ell+m)$. With this definition, equation \ref{eqn:surface-klm} becomes a polynomial of degree $3+\ell$ in terms of $C_{\ell m}$ and integrals of products of spherical harmonics. These integrals can be pre-computed so that equation \ref{eqn:surface-klm} can then be numerically solved via standard polynomial solution methods to find $C_{\ell m}$. A similar equation to equation \ref{eqn:surface-klm} can be written for $a_\mathcal{A}$
-\begin{equation}
-  a_\mathcal{A}^2 = \frac{\rho_0}{5\mu_\mathcal{A}}\int d\Omega r(\theta, \phi)^5
-  \label{eqn:surface-am}
-\end{equation}
-which can also be solved via polynomial methods.
-
-Equations \ref{eqn:surface-klm} and \ref{eqn:surface-am} form $(\ell_\text{max} + 1)^2 + 1$ constraints, where $\ell_\text{max}$ is the maximum degree of $C_{\ell m}$. By setting the same maximum degree as for the known $K_{\ell m}$, the system is well-determined and will yield finitely many solutions. These solutions can be filtered by removing those that produce $r(\theta, \phi) < 0$ for any $\theta, \phi$, which is unphysical.
-
-To test the model, this process was run for an asteroid with $K_{1m}=K_{2m'}=0$, but randomly chosen $K_{3m}$ in the range 0.01 to -0.01. The resulting surface is shown in figure \ref{fig:surface-density}. The figure shows a near-spherical asteroid, which is expected for $K_{\ell m} = 0$ for $\ell > 0$. However, the additional $K_{3m}$ components clearly induce non-sphericity in the asteroid which is captured by the surface model.
-
-To give an alternate view of the non-sphericities found via this new surface model, figure \ref{fig:surface-density} also displays the density distribution extracted via the likelihood model assuming a spherical asteroid shape, but with the same density moments. (Uncertainty in the moments is not modelled in this figure, to better compare the two.) Where the likelihood model displays low density, the surface model clearly retracts into the asteroid. Where the likelihood model yields high density, the surface model extends. Thus, the connection made in section \ref{sec:spherical-density} between non-uniformities in extracted densities at the asteroid surface and inaccuracies in the surface shape is more firmly represented.
-
-This surface model could, in principle, be used to improve estimates of the surface of an asteroid made by light curve analysis, since it connects rotational data to the asteroid surface which reflects the light we observe. Thus, uncertainties either in the density moments or the asteroid surface (or both), could be reduced. However, light-curve analysis is beyond the scope of this paper.
-
-
-
-
-
-
 
 
 
