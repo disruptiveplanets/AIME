@@ -9,9 +9,9 @@ from fe import FiniteElement
 from display import make_gif, make_slices
 from core import TrueShape, Indicator
 
-RUN_NAME = "asym"
-PULL = False
-GENERATE = False
+RUN_NAME = "sym"
+PULL = True
+GENERATE = True
 
 NUM_DRAWS = 20
 NUM_CHOOSE = 1000

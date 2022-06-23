@@ -192,3 +192,7 @@ I finished the lumpy model, worked a bit on the paper, and pushed the double cor
         K22:-0.05337731641927746
         K20:-0.2022901292396581
         aBulk: 970.4652599064898
+
+## June 23
+
+I changed the lumpy model so that it has a prior on a_a and reran everything. I also ran average on asym and had to redo sym because I used the wrong shape.

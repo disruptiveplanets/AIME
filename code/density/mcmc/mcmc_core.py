@@ -212,6 +212,10 @@ class MCMCAsteroid:
             likelihood = log_like(free_real_klms, self.data_storage)
             error = -2 * likelihood / self.n_free
 
+            print("Real klms:", free_real_klms)
+            print("Data klms:", self.data_storage.data)
+            print("Redchi", error)
+
             self.display(densities, true_densities, uncertainty_ratios, error)
 
         return unc_tracker
