@@ -8,7 +8,7 @@ from mcmc_core import MCMCAsteroid, log_like
 from display import make_gif, make_slices
 from core import TrueShape, Indicator
 
-RUN_NAME = "move-1.5"
+RUN_NAME = "sym"
 PULL = False
 GENERATE = False
 

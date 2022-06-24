@@ -318,6 +318,16 @@ Figure \ref{fig:example-corner} shows a corner plot of the PPDs of the ten param
 
 Density moments of the kind described above were extracted for the asymmetric and symmetric reference asteroids. The finite element model was then used to extract density distributions from these moments, and propagate uncertainties. Five DOF were used rather than the maximum possible number of nine, and 20 different finite element layouts were used to generate sample density distributions to avoid dependence on the manually-chosen layout. The resulting density distributions and uncertainties are displayed in figure \ref{fig:uniform}.
 \begin{figure*}
+  \includegraphics[width=0.24\linewidth]{figs/asym-fe-d}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/asym-fe-s}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/asym-fe-u}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/asym-fe-r}
+
+  \includegraphics[width=0.24\linewidth]{figs/sym-fe-d}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/sym-fe-s}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/sym-fe-u}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/sym-fe-r}
+
   \caption{Cross-sectional slices of the density distributions extracted via the finite element model for the asymmetric (\textit{top}) and symmetric (\textit{bottom}) reference asteroids. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted.}
   \label{fig:uniform}
 \end{figure*}
@@ -328,7 +338,17 @@ The lumpy model, however, fails for a uniform asteroid. This is because the data
 
 We also analyze asteroids of non-uniform density to assess the features our density-extraction models are most sensitive to. We employ an asteroid of the same shape as the asymmetric asteroid, and in the same flyby scenario. But we place a solid core of radius $\SI{500}{\meter}$ and density three times the surrounding density at the center of the asteroid, which changes the asteroid density moments. New density moments are extracted via the process described in section \ref{sec:fit} and the finite-element and lumpy models are used to extract density distributions shown in figure \ref{fig:center-core}.
 \begin{figure*}
-  \caption{Cross-sectional slices of the density distributions extracted via the finite-element (\textit{top}) and lumpy (\textit{bottom}) models for an asteroid with a centered core. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted.}
+  \includegraphics[width=0.24\linewidth]{figs/sph-3-fe-d}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/sph-3-fe-s}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/sph-3-fe-u}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/sph-3-fe-r}
+
+  \includegraphics[width=0.24\linewidth]{figs/sph-3-l-d}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/sph-3-l-s}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/sph-3-l-u}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/sph-3-l-r}
+
+  \caption{Cross-sectional slices of the density distributions extracted via the finite-element (\textit{top}) and lumpy (\textit{bottom}) models for an asteroid with a centred core. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted.}
   \label{fig:center-core}
 \end{figure*}
 
@@ -376,33 +396,33 @@ Uncertainties on the density moments, which do not depend on models used, are di
 Additional data and analysis and description for this relationship between encounter parameters and uncertainties are given in appendix \ref{app:uncertainty-dependence}
 
 
-\afterpage{
-  \begin{landscape}
-    \begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{figs/scan-all1.pdf}
-    \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of (left to right) perigee, excess velocity, spin pole uncertainty, and period uncertainty. The vertical dashed line indicates the reference asteroid values. The red vertical lines indicate when $\sigma(K_{3m}) =0.01$.}
-    \label{fig:scan-perigee}
-    \label{fig:scan-vex}
-    \label{fig:scan-theta}
-    \label{fig:scan-rho}
-    \end{figure}
-  \end{landscape}
-}
+% \afterpage{
+%   \begin{landscape}
+%     \begin{figure}
+%     \centering
+%     \includegraphics[width=\linewidth]{figs/scan-all1.pdf}
+%     \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of (left to right) perigee, excess velocity, spin pole uncertainty, and period uncertainty. The vertical dashed line indicates the reference asteroid values. The red vertical lines indicate when $\sigma(K_{3m}) =0.01$.}
+%     \label{fig:scan-perigee}
+%     \label{fig:scan-vex}
+%     \label{fig:scan-theta}
+%     \label{fig:scan-rho}
+%     \end{figure}
+%   \end{landscape}
+% }
 
-\afterpage{
-  \begin{landscape}
-    \begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{figs/scan-all2.pdf}
-    \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of (left to right) asteroid length, observational cadence, data gap at perigee, and rotational period. The vertical dashed line indicates the reference asteroid values. The red vertical lines indicate when $\sigma(K_{3m}) =0.01$.}
-    \label{fig:scan-am}
-    \label{fig:scan-cadence}
-    \label{fig:scan-period}
-    \label{fig:observation-gap}
-    \end{figure}
-  \end{landscape}
-}                                                            
+% \afterpage{
+%   \begin{landscape}
+%     \begin{figure}
+%     \centering
+%     \includegraphics[width=\linewidth]{figs/scan-all2.pdf}
+%     \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of (left to right) asteroid length, observational cadence, data gap at perigee, and rotational period. The vertical dashed line indicates the reference asteroid values. The red vertical lines indicate when $\sigma(K_{3m}) =0.01$.}
+%     \label{fig:scan-am}
+%     \label{fig:scan-cadence}
+%     \label{fig:scan-period}
+%     \label{fig:observation-gap}
+%     \end{figure}
+%   \end{landscape}
+% }                                                            
 
 
 

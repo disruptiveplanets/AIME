@@ -1,17 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
-from multiprocessing import Pool
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 #plt.style.use("jcap")
 
-FONT_SIZE = 20
+FONT_SIZE = 16
 
 import matplotlib as mpl
 mpl.rcParams["font.family"] = "serif"
 mpl.rcParams["font.monospace"] = "Roboto mono"
 mpl.rcParams["text.usetex"] = "true"
-mpl.rcParams["figure.figsize"] = (6.5, 4.00)
+mpl.rcParams["figure.figsize"] = (4.25, 4)
 mpl.rcParams["legend.framealpha"] = 0.5
 mpl.rcParams["lines.linewidth"] = 2
 mpl.rcParams["lines.markersize"] = 4
@@ -23,6 +23,7 @@ NUM_SLICES = 6
 EXPAND_X=1.15 # Scale along x and y so that spheres look circular
 AXIS_LIMIT = 1000
 EPSILON = 0.00000001
+NUM_CONTOURS = 6
 
 
 def latexify(number):
@@ -89,7 +90,7 @@ def make_frame(densities, pos_array, axis_name, cmap, percentile, balance, z_ind
     return fig
 
 def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percentile=99, balance=False):
-    fig = plt.figure(figsize=(6.5,5))
+    fig = plt.figure()
     ax = fig.gca(projection='3d')
     ax.set_axis_off()
     ax.grid(False)
@@ -118,9 +119,9 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
 
 
     if want_min != want_max:
-        levels = np.linspace(want_min, want_max, 10)
+        levels = np.linspace(want_min, want_max, NUM_CONTOURS + 1)
     else:
-        levels = np.linspace(0.99, 1.01, 10)
+        levels = np.linspace(0.99, 1.01, NUM_CONTOURS + 1)
 
     mins = np.min(np.where(~np.isnan(densities)), axis=1)
     maxes = np.max(np.where(~np.isnan(densities)), axis=1)
@@ -153,10 +154,20 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
     ax.set_ylabel("$y$")
     ax.set_zlabel("$z$")
 
-    ax.set_title(f"$\\chi^2_r={str(klm_error)[:4]}$", y=0.1, fontdict={'fontsize': FONT_SIZE})
+    ax.set_title(f"$\\chi^2_r={str(klm_error)[:4]}$", y=0.9, fontdict={'fontsize': FONT_SIZE})
 
-    c = fig.colorbar(contour_handle, ax=ax, extend=extend)
+    axins = inset_axes(ax,
+                    width="100%",  
+                    height="5%",
+                    loc='lower center',
+                    borderpad=-6
+                    )
+
+    from matplotlib.ticker import FuncFormatter
+    fmt = lambda x, pos: round(x, 2)
+    c = fig.colorbar(contour_handle, ax=axins, extend=extend, orientation="horizontal", format=FuncFormatter(fmt))
     c.set_label(axis_name)
+
 
     fig.tight_layout()
     try:
