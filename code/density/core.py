@@ -230,6 +230,8 @@ class UncertaintyTracker:
         self.num_maps += 1
 
     def generate(self):
+        if self.num_maps == 0:
+            return None, None
         mean_map = self.density_map_sum / self.num_maps
         return (mean_map, 
             np.sqrt(self.density_map_square_sum / self.num_maps - mean_map**2)

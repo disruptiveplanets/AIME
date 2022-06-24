@@ -151,8 +151,10 @@ def get_unc_for_file(dname, fname):
             unc_tracker += this_unc_tracker
 
     density_map, uncertainty_map = unc_tracker.generate()
+    if density_map is None:
+        return np.nan
     uncertainty_ratio = uncertainty_map / density_map
-    mean_uncertainty = np.nanmean(np.abs(uncertainty_map))
+    mean_uncertainty = np.nanmean(np.abs(uncertainty_ratio))
     return mean_uncertainty
 
 def scan_specific(directory, threshold):

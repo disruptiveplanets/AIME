@@ -18,6 +18,8 @@ def average(dof, run):
         with open(fname, 'rb') as f:
             unc_tracker += UncertaintyTracker.load(f)
     density_map, uncertainty_map = unc_tracker.generate()
+    if density_map is None:
+        raise Exception("No samples in the unc tracker")
     true_map = np.ones_like(density_map)
     true_map[np.isnan(density_map)] = np.nan
     true_map /= np.nansum(true_map)

@@ -182,6 +182,8 @@ class MCMCAsteroid:
 
         if make_map:
             densities, uncertainty = unc_tracker.generate()
+            if densities is None:
+                raise Exception("No samples were found in the unc tracker")
             uncertainty_ratios = uncertainty / densities
             true_densities = self.asteroid.get_true_densities().astype(float)
             true_densities[~self.asteroid.indicator_map] = np.nan
