@@ -5,13 +5,12 @@ import warnings
 sys.path.append("..")
 sys.path.append("../..")
 from mcmc_core import MCMCAsteroid, log_like
-from fe import FiniteElement
 from display import make_gif, make_slices
 from core import TrueShape, Indicator
 
-RUN_NAME = "sym"
-PULL = True
-GENERATE = True
+RUN_NAME = "move-1.5"
+PULL = False
+GENERATE = False
 
 NUM_DRAWS = 20
 NUM_CHOOSE = 1000
@@ -139,8 +138,8 @@ def check_moments(densities):
 
 
 if PULL:
-    os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/mcmc/core-scan/den-core-{RUN_NAME}*.npy {RUN_NAME}")
-    os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/mcmc/core-scan/den-core-{RUN_NAME}*.png {RUN_NAME}")
+    os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/mcmc/core-scan/den-core-{RUN_NAME}*.npy {RUN_NAME}/den-core-{RUN_NAME}*.npy")
+    os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/mcmc/core-scan/den-core-{RUN_NAME}*.png {RUN_NAME}/den-core-{RUN_NAME}*.png")
 
 if GENERATE:
     density_grid_sum = 0

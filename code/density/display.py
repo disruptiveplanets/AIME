@@ -153,7 +153,7 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
     ax.set_ylabel("$y$")
     ax.set_zlabel("$z$")
 
-    ax.set_title(f"$\\chi^2_r={klm_error}$", y=0.1, fontdict={'fontsize': FONT_SIZE})
+    ax.set_title(f"$\\chi^2_r={str(klm_error)[:4]}$", y=0.1, fontdict={'fontsize': FONT_SIZE})
 
     c = fig.colorbar(contour_handle, ax=ax, extend=extend)
     c.set_label(axis_name)
