@@ -162,7 +162,6 @@ class MCMCAsteroid:
 
         
     def pipeline(self, method_class, make_map, generate=True, n_samples=None):
-
         if n_samples is None and make_map:
             raise Exception("Number of samples cannot be none if make_map is true")
 

@@ -6,6 +6,14 @@ import fe, lumpy
 from core import Indicator, TrueShape, TrueMoments
 import numpy as np
 
+
+if len(sys.argv) >= 3:
+    generate = True if sys.argv[3] == "True" else False
+else:
+    generate = False
+make_map = not generate
+
+
 MAX_RADIUS = 2000
 RUN_NAME = sys.argv[1]
 METHOD_NAME = sys.argv[2]
@@ -13,7 +21,10 @@ if METHOD_NAME == "lumpy":
     method_class = lumpy.Lumpy
     method_tag = "lump"
     dof = 2
-    DIVISION = 9
+    if make_map:
+        DIVISION = 9
+    else:
+        DIVISION = 99
     if RUN_NAME == "double":
         lumpy.MODEL_N = 2
         dof = 7
@@ -109,11 +120,7 @@ asteroid = mcmc_core.MCMCAsteroid(f"{RUN_NAME}-{method_tag}", f"../../samples/{S
 
 result = None
 while result is None:
-    if len(sys.argv) >= 3:
-        generate = True if sys.argv[3] == "True" else False
-        result = asteroid.pipeline(method_class, True, generate=generate, n_samples=1000)
-    else:
-        result = asteroid.pipeline(method_class, True, generate=False, n_samples=1000)
+    result = asteroid.pipeline(method_class, make_map, generate=generate, n_samples=1000)
     
 with open(f"{RUN_NAME}-{method_tag}-unc-tracker.npy", 'wb') as f:
     result.save(f)

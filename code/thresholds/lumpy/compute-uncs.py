@@ -3,7 +3,7 @@
 import sys, os
 import numpy as np
 sys.path.append("../../density")
-from core import Indicator, TrueShape, UncertaintyTracker
+from core import Indicator, TrueShape, TrueMoments, UncertaintyTracker
 sys.path.append("../../density/mcmc")
 from mcmc_core import MCMCAsteroid
 from lumpy import Lumpy
@@ -12,7 +12,7 @@ from contextlib import contextmanager
 DIVISION = 99
 FILE_PATH = "../../../data/"
 NUM_TRIALS = 5
-DEGREES_OF_FREEDOM = 5
+DEGREES_OF_FREEDOM = 2
 MAX_REPEAT_COUNT = 100
 N_AVERAGE_SAMPLES = 1000
 
@@ -135,9 +135,9 @@ def get_unc_for_file(dname, fname):
             repeat = False
             generate = not os.path.exists(f"ast-{short_name}-{run_index}-fe.npy")
             print(f"Trial {run_index}. Generating: {generate}")
-            with suppress_stdout():
+            if True:#with suppress_stdout():
                 asteroid = MCMCAsteroid(f"ast-{short_name}-{run_index}", fname, Indicator.ell(radius, k22, k20), TrueShape.uniform(),
-                    am, division, max_radius, DEGREES_OF_FREEDOM, am)
+                    am, division, max_radius, DEGREES_OF_FREEDOM, am, true_moments=TrueMoments.ell(k22, k20))
                 this_unc_tracker = asteroid.pipeline(Lumpy, False, generate=generate, n_samples=N_AVERAGE_SAMPLES)
             if this_unc_tracker is None:
                 print("Failed. Had to repeat")

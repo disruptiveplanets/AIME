@@ -120,6 +120,8 @@ class Lumpy(MCMCMethod):
             length = theta_long[0] if i == 0 else theta_long[-3 + 5 * i]
             if length < 0:
                 am_limit += length * VERY_LARGE_SLOPE
+            if length > 2 * self.surface_am:
+                am_limit += (2 * self.surface_am - length) * VERY_LARGE_SLOPE
         if am_limit:
             return am_limit
 

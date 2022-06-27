@@ -188,8 +188,7 @@ class TrueShape:
 
 class TrueMoments:
     # Complex klms for the surface, bulk_klms
-    def ell():
-        k22, k20 = -0.05200629, -0.2021978
+    def ell(k22=-0.05200629, k20=-0.2021978):
         return np.array([
             1.0, 0, 0, 0,
             k22, 0, k20, 0, k22,
