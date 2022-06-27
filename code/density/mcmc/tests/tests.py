@@ -1,7 +1,7 @@
 import sys
 sys.path.append("..")
 sys.path.append("../..")
-from mcmc_core import MCMCAsteroid
+import mcmc_core
 import fe, lumpy
 from core import Indicator, TrueShape, TrueMoments
 import numpy as np
@@ -17,6 +17,7 @@ if METHOD_NAME == "lumpy":
     if RUN_NAME == "double":
         lumpy.MODEL_N = 2
         dof = 7
+        mcmc_core.NUM_SUCCESSES = 48
 elif METHOD_NAME == "fe":
     DIVISION = 49
     method_class = fe.FiniteElement
@@ -95,7 +96,7 @@ SAMPLE_NAMES = {
 
 
 
-asteroid = MCMCAsteroid(f"{RUN_NAME}-{method_tag}", f"../../samples/{SAMPLE_NAMES[RUN_NAME]}-0-samples.npy", INDICATORS[RUN_NAME],
+asteroid = mcmc_core.MCMCAsteroid(f"{RUN_NAME}-{method_tag}", f"../../samples/{SAMPLE_NAMES[RUN_NAME]}-0-samples.npy", INDICATORS[RUN_NAME],
     TRUE_SHAPES[RUN_NAME], SURFACE_AMS[RUN_NAME], DIVISION, MAX_RADIUS, dof, BULK_AMS[RUN_NAME], TRUE_MOMENTS[RUN_NAME])
 
 result = None

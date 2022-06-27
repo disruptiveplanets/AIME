@@ -1,15 +1,15 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import sys, os
 sys.path.append("../../../density")
 from core import UncertaintyTracker
 
 N_RUNS = 48
-DOFS = [5]#[9, 7, 5, 3, 3]
+DOFS = [9, 7, 5, 3, 2]
 N_TRIALS = 5
 MIN_RUN = 0
 
 def average(dof, run):
+    print(f"DOF: {dof}, run: {run}")
     unc_tracker = UncertaintyTracker()
     for trial_num in range(N_TRIALS):
         fname = "cast-{}-{}-rho-{:02}-map.npy".format(dof, trial_num, run)
@@ -31,13 +31,13 @@ def average(dof, run):
         uncertainty_map / density_map,
         ratio_map,
     ]
-    return [(
+    return np.array([(
             np.nanpercentile(m, 100 - (100 - 68.27) / 2),
             np.nanpercentile(m, 100 - (100 - 95.45) / 2),
             np.nanpercentile(m, 50),
             np.nanpercentile(m, (100 - 95.45) / 2),
             np.nanpercentile(m, (100 - 68.27) / 2),
-        ) for m in maps]
+        ) for m in maps])
 
 def single_plot(dof):
     global MIN_RUN
@@ -49,16 +49,21 @@ def single_plot(dof):
             continue
         else:
             avgs.append(avg)
-    return avgs
+    return np.array(avgs)
 
 def scan():
+    results = np.array([single_plot(dof) for dof in DOFS])
+    with open("finish.npy", 'wb') as f:
+        np.save(f, results)
+
+def draw():
+    import matplotlib.pyplot as plt
     fig, axs = plt.subplots(ncols=1, nrows=3, sharex=True, figsize=(6, 8))
     axs[2].set_xlabel("sigma P")
     axs[0].set_ylabel("Deviation")
     axs[1].set_ylabel("Uncertainty")
     axs[2].set_ylabel("Ratio")
-    
-    results = np.array([single_plot(dof) for dof in DOFS])
+
     xs = np.array([
         5.55495891e-09, 7.09682065e-09, 9.06664911e-09, 1.15832329e-08,
         1.47983320e-08, 1.89058298e-08, 2.41534250e-08, 3.08575685e-08,
@@ -73,6 +78,11 @@ def scan():
         1.00000000e-04
     ]) * 3600 * 9
 
+    os.system("scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/thresholds/fe/dof-scan/finish.npy .")
+
+    with open("finish.npy", 'wb') as f:
+        results = np.load(f)
+
     for i in range(3):
         for j, dof in enumerate(DOFS):
             axs[i].fill_between(xs, results[j, :,i,0], results[j, :,i,4], alpha=0.3, color=f"C{j}")
@@ -85,3 +95,4 @@ def scan():
 
 if __name__ == "__main__":
     scan()
+    #draw()

@@ -23,6 +23,8 @@ MINIMIZATION_ATTEMPTS = 500
 EPSILON = 1e-10
 MINIMUM_LIKELIHOOD = -1000
 
+NUM_SUCCESSES = 1
+
 class MCMCMethod:
     def __init__(self, asteroid, mean_density, n_free, n_all, generate):
         self.mean_density = mean_density
@@ -54,12 +56,17 @@ class MCMCMethod:
 class MinResult:
     def __init__(self):
         self.lock = Lock()
-        self.val = None
+        self.x = None
+        self.y = None
         self.attempts = 0
+        self.successes = 0
     
-    def set(self, v):
+    def set(self, x, y):
         self.lock.acquire()
-        self.val = v
+        if self.x is None or y < self.y:
+            self.y = y
+            self.x = x
+        self.successes += 1
         self.lock.release()
 
     def increment(self):
@@ -67,21 +74,21 @@ class MinResult:
         self.attempts += 1
         self.lock.release()
 
-    def query(self, threshold):
+    def query_exceeded_attempts(self, threshold):
         self.lock.acquire()
         greater = self.attempts > threshold
         self.lock.release()
         return greater
 
-    def get(self):
+    def get_value(self):
         self.lock.acquire()
-        v = self.val
+        v = self.x, self.y
         self.lock.release()
         return v
 
-    def is_set(self):
+    def is_satisfied(self):
         self.lock.acquire()
-        result = False if self.val is None else True
+        result = self.successes >= NUM_SUCCESSES
         self.lock.release()
         return result
 
@@ -307,14 +314,15 @@ class MCMCAsteroid:
             threads.append(t)
         for t in threads:
             t.join()
-        result = result.get()
+        result, f_value = result.get_value()
+        print(f"Starting from point {result} with likelihood -{f_value} after {NUM_SUCCESSES} successful minima")
         #print(Hessian(lambda theta: -log_probability(theta))(result))
         return result
 
     def min_func_mcmc(self, seed, method, result):
         local_rng = random.Random()
         local_rng.seed(seed)
-        while not result.is_set():
+        while not result.is_satisfied():
             val = method.pick_parameters(local_rng)
             try:
                 min_result = minimize(self.minimize_func, x0=val, method="Nelder-Mead", args=(result, method), options = {"maxiter": 500 * len(val)})
@@ -322,14 +330,13 @@ class MCMCAsteroid:
                 return
             if min_result.fun < MIN_LOG_LIKE:
                 print(f"Thread successfully completed with log like {min_result.fun}")
-                result.set(min_result.x)
-                return
+                result.set(min_result.x, min_result.fun)
             else:
                 print(f"Attempt failed with log like {min_result.fun}")
                 result.increment()
 
     def minimize_func(self, theta, result, method):
-        if result.is_set() or result.query(MINIMIZATION_ATTEMPTS):
+        if result.is_satisfied() or result.query_exceeded_attempts(MINIMIZATION_ATTEMPTS):
             raise CompletedException
         return -log_probability(theta, method, self.data_storage)
 
