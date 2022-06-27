@@ -234,9 +234,10 @@ In this nearly-uniform model, we seek to pick one density distribution from the 
 
 As part of our prior, we require that the asteroid density distribution satisfy $I_\mathcal{A} = \mu_\mathcal{A} a_\mathcal{A}^2$. This constraint is desirable as it encourages nearly uniform density distributions; recall that a perfectly uniform asteroid always satisfies this constraint. To define the prior, we divide the asteroid into $n \gg 1$ small regions of volume $V$, each with position $\bm r_i$ and density $\rho_i = \delta_i + 1$. Setting the mass of the asteroid equal to its volume, the average density is 1, so $\delta_i$ is the difference between the average and local density. We set $f[\rho(\bm r)]$ to be a multivariate-Gaussian distribution on $\delta_i$ centred on zero to minimize non-uniformity, i.e.
 \begin{equation}
-  f[\rho(\bm r)] \propto \prod_i \frac{\delta_i^2}{2\sigma^2}
+  f[\rho(\bm r)] \propto \prod_i \exp\parens{-\frac{\delta_i^2}{2\sigma^2}} \implies \ln f[\rho(\bm r)] \simeq -\sum_i \delta_i^2
+  \label{eqn:nu-f}
 \end{equation}
-where $\sigma$ is an irrelevant constant. The The density moments, MOI scale, and mass are 
+where $\sigma$ is an irrelevant constant. The density moments, MOI scale, and mass are 
 \begin{equation}
   K_{\ell m} = \frac{V}{\mu_\mathcal{A}a_\mathcal{A}^{\ell}} \sum_i (\delta_i + 1) R_{\ell m}(\bm r_i)
   \label{eqn:nu-klm}
@@ -249,7 +250,7 @@ where $\sigma$ is an irrelevant constant. The The density moments, MOI scale, an
   \mu_\mathcal{A} = V\sum_i (\delta_i + 1) \implies 0 = \sum_i \delta_i.
   \label{eqn:nu-mass}
 \end{equation}
-Writing $\delta_i$ as an $n$-dimensional vector $\bm \delta$, equation \ref{eqn:nu-klm} is a matrix equation for $K_{\ell m}$ and equations \ref{eqn:nu-ia} and \ref{eqn:nu-mass} are vector dot product equations. Combining $K_{\ell m}$, $I_\mathcal{A}$, and $0$ into a single vector $\bm K$, these equations can be written as a single underdetermined matrix equation we denote as $\bm K = M \bm \delta + \bm C$, where the components of constant matrix $M$ and constant vector $\bm C$ are known given a fixed layout of the $n$ regions. Some of the components of $\bm K$, such as $I_\mathcal{A}$, $\mu_\mathcal{A}$, and $K_{1m}$, are constraints. We treat the other components as parameters of the model. The task is then to find $\bm \delta$ that satisfies this matrix equation and minimizes $f(\bm \delta) \propto |\bm \delta|^2$. The Moore-Penrose inverse satisfies these properties:
+Writing $\delta_i$ as an $n$-dimensional vector $\bm \delta$, equation \ref{eqn:nu-klm} is a matrix equation for $K_{\ell m}$ and equations \ref{eqn:nu-ia} and \ref{eqn:nu-mass} are vector dot product equations. Combining $K_{\ell m}$, $I_\mathcal{A}$, and $0$ into a single vector $\bm K$, these equations can be written as a single underdetermined matrix equation we denote as $\bm K = M \bm \delta + \bm C$, where the components of constant matrix $M$ and constant vector $\bm C$ are known given a fixed layout of the $n$ regions. Some of the components of $\bm K$, such as $I_\mathcal{A}$, $\mu_\mathcal{A}$, and $K_{1m}$, are constraints. We treat the other components as parameters of the model. The task is then to find $\bm \delta$ that satisfies this matrix equation and maximizes $f(\bm \delta)$. But the form of equation \ref{eqn:nu-f} shows that the maximum of $\ln f$ (and the maximum of $f$) is the minimum of $|\bm \delta|^2$. The value of $\bm \delta$ that obeys the constraints and minimizes its norm is given by the Moore-Penrose inverse:
 \begin{equation}
   \bm \delta = M^+ (\bm K - \bm C); \qquad M^+ = M^\dagger(M M^\dagger)^{-1}
   \label{eqn:nu-delta}

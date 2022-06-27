@@ -18,9 +18,13 @@ VOLUME_SCALE = 4 / 3 * np.pi * (5/3)**(3/2)
 RLM_EPSILON = 1e-20
 UNCERTAINTY_RATIO = 0.25
 
+MIN_MASS = 1e-10
+
 # Made for spherical lumps
 
 # Theta long: [lump_a, lump_mass | lump_a, lump_mass, lump_pos | ..., shell_mass, lump_pos]
+
+# Positions are mass_weighted
 
 MAX_LOG_PRIOR_LUMP = 2
 MODEL_N = 1
@@ -84,8 +88,8 @@ class Lumpy(MCMCMethod):
         shell_mass = self.shell_volume - mass_sum
         pos_sum = self.shell_com * shell_mass
         for i in range(MODEL_N - 1):
-            pos_sum += theta_short[(4 + i * 5):(7 + i * 5)] * theta_short[3 + i * 5]
-        return np.append(theta_short, np.append([shell_mass], -pos_sum / theta_short[1]))
+            pos_sum += theta_short[(4 + i * 5):(7 + i * 5)]
+        return np.append(theta_short, np.append([shell_mass], -pos_sum))
 
     def pick_parameters(self, local_rng):
         params = np.array([
@@ -93,12 +97,14 @@ class Lumpy(MCMCMethod):
             (local_rng.random() - 0.5) * 2 * self.shell_volume
         ])
         for i in range(MODEL_N - 1):
+            mass = (local_rng.random() - 0.5) * 2 * self.shell_volume
             params = np.append(params, [
                 local_rng.random() * self.surface_am,
-                (local_rng.random() - 0.5) * 2 * self.shell_volume,
-                (local_rng.random() - 0.5) * 2 * self.surface_am,
-                (local_rng.random() - 0.5) * 2 * self.surface_am,
-                (local_rng.random() - 0.5) * 2 * self.surface_am])
+                mass,
+                (local_rng.random() - 0.5) * 2 * self.surface_am * mass,
+                (local_rng.random() - 0.5) * 2 * self.surface_am * mass,
+                (local_rng.random() - 0.5) * 2 * self.surface_am * mass
+            ])
         return params
 
     def log_prior(self, theta_long):
@@ -116,6 +122,12 @@ class Lumpy(MCMCMethod):
                 am_limit += length * VERY_LARGE_SLOPE
         if am_limit:
             return am_limit
+
+        # Prior on mass
+        for i in range(MODEL_N):
+            lump_mass = theta_long[1] if i == 0 else theta_long[-2 + 5 * i]
+            if abs(lump_mass) < MIN_MASS:
+                return (abs(lump_mass) - MIN_MASS) / MIN_MASS * VERY_LARGE_SLOPE
             
         intersections = []
 
@@ -127,9 +139,9 @@ class Lumpy(MCMCMethod):
             intersections.append(density + shell_density)
 
         # Double lumps
-        lump_poses = [theta_long[-3:]]
+        lump_poses = [theta_long[-3:] / theta_long[-4]]
         for i in range(MODEL_N - 1):
-            lump_poses.append(theta_long[(4 + i * 5):(7 + i * 5)])
+            lump_poses.append(theta_long[(4 + i * 5):(7 + i * 5)] / theta_long[3 + 5 * i])
         for i, pos_i in enumerate(lump_poses):
             radius_i = (theta_long[0] if i == 0 else theta_long[-3 + 5 * i]) * np.sqrt(5 / 3)
             for j, pos_j in enumerate(lump_poses[:i]):
@@ -143,28 +155,28 @@ class Lumpy(MCMCMethod):
 
     def get_klms(self, theta_long):
         denom = self.surface_am ** 2 * theta_long[-4] # Shell moi
-        denom += theta_long[1] * (theta_long[0]**2 + theta_long[-1]**2 + theta_long[-2]**2 + theta_long[-3]**2)# Lump 1 moi
+        denom += theta_long[1] * theta_long[0]**2 + (theta_long[-1]**2 + theta_long[-2]**2 + theta_long[-3]**2) / theta_long[1]# Lump 1 moi
         for i in range(MODEL_N - 1):
-            denom += theta_long[5 * i + 3] * (theta_long[5 * i + 2]**2 + theta_long[5 * i + 4]**2 + theta_long[5 * i + 5]**2 + theta_long[5 * i + 6]**2)
+            denom += theta_long[5 * i + 3] * theta_long[5 * i + 2]**2 + (theta_long[5 * i + 4]**2 + theta_long[5 * i + 5]**2 + theta_long[5 * i + 6]**2) / theta_long[5 * i + 3]
         # Surface
         klms = theta_long[-4] * self.shell_free_klms
         # Lumps
         for i in range(MODEL_N):
             lump_mass = theta_long[1] if i == 0 else theta_long[-2 + 5 * i]
-            lump_pos = theta_long[-3:] if i == 0 else theta_long[(-1 + i * 5):(2 + i * 5)]
+            lump_pos = (theta_long[-3:] if i == 0 else theta_long[(-1 + i * 5):(2 + i * 5)]) / lump_mass
             for j, (l, m, is_real) in enumerate(LMS):
                 rlm_val = rlm(l, m, lump_pos[0], lump_pos[1], lump_pos[2])
                 klms[j] += lump_mass / self.surface_am**l * (rlm_val.real if is_real else rlm_val.imag)
 
         return klms / denom * self.surface_am**2
 
-    def get_map(self, means, unc, asteroid):
-        densities = np.ones_like(asteroid.indicator_map) * means[-4] / self.shell_volume
+    def get_map(self, theta_long, unc, asteroid):
+        densities = np.ones_like(asteroid.indicator_map) * theta_long[-4] / self.shell_volume
 
         for i in range(MODEL_N):
-            lump_pos = means[-3:] if i == 0 else means[(-1 + i * 5):(2 + i * 5)]
-            lump_length = means[0] if i == 0 else means[-3 + 5 * i]
-            lump_mass = means[1] if i == 0 else means[-2 + 5 * i]
+            lump_mass = theta_long[1] if i == 0 else theta_long[-2 + 5 * i]
+            lump_pos = (theta_long[-3:] if i == 0 else theta_long[(-1 + i * 5):(2 + i * 5)]) / lump_mass
+            lump_length = theta_long[0] if i == 0 else theta_long[-3 + 5 * i]
             lump_density = lump_mass / lump_length**3 / VOLUME_SCALE
             densities[(self.X - lump_pos[0]) ** 2 + (self.Y - lump_pos[1]) ** 2 + (self.Z - lump_pos[2]) ** 2 < (lump_length**2 * 5 / 3)] += lump_density
 
@@ -180,6 +192,8 @@ class Lumpy(MCMCMethod):
         for i in range(self.n_free):
             if i == 1 or i % 5 == 3:
                 scale = self.shell_volume
+            elif i >=2 and i % 5 in [4, 0, 1]:
+                scale = self.shell_volume * self.surface_am
             else:
                 scale = self.surface_am
             pos[:,i] = np.random.randn(n_walkers) * UNCERTAINTY_RATIO * scale + theta_start[i]

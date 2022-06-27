@@ -13,7 +13,7 @@ if METHOD_NAME == "lumpy":
     method_class = lumpy.Lumpy
     method_tag = "lump"
     dof = 2
-    DIVISION = 9
+    DIVISION = 49
     if RUN_NAME == "double":
         lumpy.MODEL_N = 2
         dof = 7
@@ -22,7 +22,7 @@ elif METHOD_NAME == "fe":
     DIVISION = 49
     method_class = fe.FiniteElement
     method_tag = "fe"
-    dof = 9
+    dof = 5
 else:
     raise Exception(f"{METHOD_NAME} is not a valid method")
 fe.grids.NUM_DRAWS = 0

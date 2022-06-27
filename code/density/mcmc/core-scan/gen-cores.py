@@ -81,6 +81,6 @@ SAMPLE_NAME = {
 
 
 asteroid = MCMCAsteroid(f"den-core-{RUN_NAME}-{AST_INDEX}", f"../../samples/{SAMPLE_NAME[RUN_NAME]}-0-samples.npy", INDICATORS[RUN_NAME],
-    TRUE_SHAPES[RUN_NAME], SURFACE_AMS[RUN_NAME], DIVISION, MAX_RADIUS, 9, BULK_AMS[RUN_NAME])
+    TRUE_SHAPES[RUN_NAME], SURFACE_AMS[RUN_NAME], DIVISION, MAX_RADIUS, 5, BULK_AMS[RUN_NAME])
 
 asteroid.pipeline(fe.FiniteElement, False, generate=True)

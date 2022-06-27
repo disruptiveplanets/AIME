@@ -200,3 +200,9 @@ I changed the lumpy model so that it has a prior on a_a and reran everything. I 
 The lumpy model finally worked. I also wrote the other density models into the appendix.
 
 However, the lumpy model needs really low division to get a good redchi. Changed this.
+
+## June 27
+
+Redoing all the finite element stuff because it was 9 dof.
+
+Working on reparameterizing lumpy so that uniform is nondegenerate.

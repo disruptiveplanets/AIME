@@ -176,6 +176,7 @@ class MCMCAsteroid:
             return None
 
         unc_tracker = UncertaintyTracker()
+        
         if n_samples is not None:
             print(f"Generating {n_samples} samples")
             for i in range(n_samples):
