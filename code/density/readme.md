@@ -205,4 +205,4 @@ However, the lumpy model needs really low division to get a good redchi. Changed
 
 Redoing all the finite element stuff because it was 9 dof.
 
-Working on reparameterizing lumpy so that uniform is nondegenerate.
+Working on reparameterizing lumpy so that uniform is nondegenerate. Test
