@@ -123,6 +123,13 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
     else:
         levels = np.linspace(0.99, 1.01, NUM_CONTOURS + 1)
 
+
+    exponent = None
+    if np.nanmax(densities) < 0.05:
+        exponent = int(np.log10(np.nanmax(densities))) - 1
+        densities /= 10**exponent
+        levels /= 10**exponent
+
     mins = np.min(np.where(~np.isnan(densities)), axis=1)
     maxes = np.max(np.where(~np.isnan(densities)), axis=1)
 
@@ -166,7 +173,11 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
     from matplotlib.ticker import FuncFormatter
     fmt = lambda x, pos: round(x, 2)
     c = fig.colorbar(contour_handle, ax=axins, extend=extend, orientation="horizontal", format=FuncFormatter(fmt))
-    c.set_label(axis_name)
+    
+    tag = ""
+    if exponent is not None:
+        tag = f" ($\\times 10^{{{exponent}}}$)"
+    c.set_label(axis_name + tag)
 
 
     fig.tight_layout()

@@ -357,7 +357,7 @@ class MCMCAsteroid:
                             # MCMC will not converge.
                             print("Log probs were", sample.log_prob)
                             return None
-                        if sampler.iteration >= 10_000:
+                        if sampler.iteration >= 5_000:
                             # Check convergence
 
                             tau = sampler.get_autocorr_time(tol=0)
