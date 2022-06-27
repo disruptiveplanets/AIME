@@ -62,7 +62,7 @@ def scan_directory(directory, index_lengths):
             indices = get_indices(dname, index_lengths)
             max_indices = np.maximum(max_indices, indices)
     max_indices += 1
-    uncs = np.ones((max_indices, 5)) * np.nan
+    uncs = np.ones(np.append(max_indices, [5])) * np.nan
 
     for dname in os.listdir(directory):
         run_name = directory+'/'+dname
@@ -72,7 +72,7 @@ def scan_directory(directory, index_lengths):
             if not fname.endswith("-0-samples.npy"):
                 continue
             indices = tuple(get_indices(dname, index_lengths))
-            if not np.isnan(uncs[indices]):
+            if not np.all(np.isnan(uncs[indices])):
                 raise Exception(f"Index {indices} was already processed")
             unc = get_unc_for_file(run_name, run_name+'/'+fname)
             uncs[indices] = unc

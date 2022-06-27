@@ -35,8 +35,12 @@ for fname in os.listdir(DIRECTORY):
             print(fname[:-4], end='\t')
         
         plt.figure()
-        plt.plot(uncs, label=fname[:-4])
+        xs = np.arange(len(uncs))
+        plt.plot(xs, uncs[:,2], label=fname[:-4], color="k")
+        plt.fill_between(xs, uncs[:,1], uncs[:,3], alpha=0.3, color="C0")
+        plt.fill_between(xs, uncs[:,0], uncs[:,4], alpha=0.3, color="C0")
         plt.title(fname[:-4])
+
         for threshold, wait in THRESHOLDS:
             #plt.axhline(y=threshold, c='r')
 

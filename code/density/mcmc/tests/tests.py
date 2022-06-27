@@ -13,7 +13,7 @@ if METHOD_NAME == "lumpy":
     method_class = lumpy.Lumpy
     method_tag = "lump"
     dof = 2
-    DIVISION = 49#9
+    DIVISION = 9
     if RUN_NAME == "double":
         lumpy.MODEL_N = 2
         dof = 7
@@ -106,3 +106,6 @@ while result is None:
         result = asteroid.pipeline(method_class, True, generate=generate, n_samples=1000)
     else:
         result = asteroid.pipeline(method_class, True, generate=False, n_samples=1000)
+    
+with open(f"{RUN_NAME}-{method_tag}-unc-tracker.npy", 'wb') as f:
+    result.save(f)
