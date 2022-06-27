@@ -37,3 +37,7 @@ Changed so that the average density is computed instead.
 ## June 22
 
 Restarted thresholds to pull everything from the samples rather than the average position.
+
+## June 27
+
+Finished DOF scan. Everything is roughly as I had expected, given previous data.

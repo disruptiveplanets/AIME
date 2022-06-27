@@ -4,9 +4,16 @@ sys.path.append("../../../density")
 from core import UncertaintyTracker
 
 N_RUNS = 48
-DOFS = [9, 7, 5, 3, 2]
+DOFS = [2, 3, 5, 7, 9]
 N_TRIALS = 5
 MIN_RUN = 0
+COLORS = {
+    9: "royalblue",
+    7: "darkorange",
+    5: "seagreen",
+    3: "palevioletred",
+    2: "darkgray",
+}
 
 def average(dof, run):
     print(f"DOF: {dof}, run: {run}")
@@ -18,17 +25,21 @@ def average(dof, run):
         with open(fname, 'rb') as f:
             unc_tracker += UncertaintyTracker.load(f)
     density_map, uncertainty_map = unc_tracker.generate()
+    normalization = 1 / np.nansum(density_map)
+    density_map *= normalization
+    uncertainty_map *= normalization
+
     if density_map is None:
         raise Exception("No samples in the unc tracker")
     true_map = np.ones_like(density_map)
     true_map[np.isnan(density_map)] = np.nan
     true_map /= np.nansum(true_map)
 
-    deviation_map = density_map - true_map
+    deviation_map = np.abs(density_map - true_map)
     ratio_map = deviation_map / uncertainty_map
     maps = [
-        deviation_map / density_map,
         uncertainty_map / density_map,
+        deviation_map / density_map,
         ratio_map,
     ]
     return np.array([(
@@ -56,13 +67,14 @@ def scan():
     with open("finish.npy", 'wb') as f:
         np.save(f, results)
 
-def draw():
+def plot():
     import matplotlib.pyplot as plt
     fig, axs = plt.subplots(ncols=1, nrows=3, sharex=True, figsize=(6, 8))
-    axs[2].set_xlabel("sigma P")
-    axs[0].set_ylabel("Deviation")
-    axs[1].set_ylabel("Uncertainty")
-    axs[2].set_ylabel("Ratio")
+    axs[2].set_xlabel("Observational precision ($\sigma_P$) [s]")
+    axs[2].set_xscale("log")
+    axs[0].set_ylabel("Uncertainty ($\sigma_\\rho / \\rho$)")
+    axs[1].set_ylabel("Deviation ($\Delta \\rho / \\rho$)")
+    axs[2].set_ylabel("Significance ($\Delta \\rho / \sigma_\\rho$)")
 
     xs = np.array([
         5.55495891e-09, 7.09682065e-09, 9.06664911e-09, 1.15832329e-08,
@@ -80,19 +92,37 @@ def draw():
 
     os.system("scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/thresholds/fe/dof-scan/finish.npy .")
 
-    with open("finish.npy", 'wb') as f:
+    with open("finish.npy", 'rb') as f:
         results = np.load(f)
 
     for i in range(3):
         for j, dof in enumerate(DOFS):
-            axs[i].fill_between(xs, results[j, :,i,0], results[j, :,i,4], alpha=0.3, color=f"C{j}")
-            axs[i].fill_between(xs, results[j, :,i,1], results[j, :,i,3], alpha=0.5, color=f"C{j}")
-            axs[i].plot(xs, results[j, :,i,2], color=f"C{j}", label=str(dof))
+            #axs[i].fill_between(xs, results[j, :,i,1], results[j, :,i,3], alpha=0.3, color=COLORS[dof])
+            axs[i].fill_between(xs, results[j, :,i,0], results[j, :,i,4], alpha=0.1, color=COLORS[dof])
+            axs[i].plot(xs, results[j, :,i,0], color=COLORS[dof], linewidth=1, linestyle='dashed')
+            axs[i].plot(xs, results[j, :,i,4], color=COLORS[dof], linewidth=1, linestyle='dashed')
+            if i == 0:
+                label = f"DOF: {dof}"
+            else:
+                label = None
+            axs[i].plot(xs, results[j, :,i,2], color=COLORS[dof], label=label)
     
+    axs[1].set_ylim(0, 0.2)
+    axs[2].set_ylim(0, 1.2)
+    axs[2].set_xlim(np.min(xs), np.max(xs))
+
+    handles, labels = axs[0].get_legend_handles_labels()
+    fig.legend(handles[::-1], labels[::-1], ncol=5, loc="lower center")
     fig.tight_layout()
+    fig.subplots_adjust(bottom=0.12)
     fig.savefig("scan.png")
-    #fig.savefig("scan.pdf")
+    fig.savefig("scan.pdf")
+    plt.show()
 
 if __name__ == "__main__":
-    scan()
-    #draw()
+    if sys.argv[1] == "scan":
+        scan()
+    elif sys.argv[1] == "plot":
+        plot()
+    else:
+        raise Exception("Second argument must be scan or plot.")

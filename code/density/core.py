@@ -239,7 +239,7 @@ class UncertaintyTracker:
 
     def __iadd__(self, other_tracker):
         if other_tracker.density_map_sum is None:
-            return
+            return self
         if self.density_map_sum is None:
             self.num_maps = other_tracker.num_maps
             self.density_map_sum = other_tracker.density_map_sum
@@ -258,7 +258,12 @@ class UncertaintyTracker:
         )
 
     def load(f):
-        map_sum, square_sum, nums = np.load(f)
+        data = np.load(f)
+        if len(data) == 3:
+            map_sum, square_sum, nums = data
+        else:
+            print(f"Improperly formatted file: {data}")
+            return UncertaintyTracker()
         unc_tracker = UncertaintyTracker()
         unc_tracker.density_map_sum = map_sum
         unc_tracker.density_map_square_sum = square_sum
