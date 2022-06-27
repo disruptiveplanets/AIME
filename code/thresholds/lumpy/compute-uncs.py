@@ -135,7 +135,7 @@ def get_unc_for_file(dname, fname):
             repeat = False
             generate = not os.path.exists(f"ast-{short_name}-{run_index}-fe.npy")
             print(f"Trial {run_index}. Generating: {generate}")
-            if True:#with suppress_stdout():
+            with suppress_stdout():
                 asteroid = MCMCAsteroid(f"ast-{short_name}-{run_index}", fname, Indicator.ell(radius, k22, k20), TrueShape.uniform(),
                     am, division, max_radius, DEGREES_OF_FREEDOM, am, true_moments=TrueMoments.ell(k22, k20))
                 this_unc_tracker = asteroid.pipeline(Lumpy, False, generate=generate, n_samples=N_AVERAGE_SAMPLES)

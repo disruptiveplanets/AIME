@@ -22,9 +22,9 @@ MIN_MASS = 1e-10
 
 # Made for spherical lumps
 
-# Theta long: [lump_a, lump_mass | lump_a, lump_mass, lump_pos | ..., shell_mass, lump_pos]
+# Theta long: [lump_a, lump_mass | lump_a, lump_mass, lump_pos | ..., | shell_mass, lump_pos]
 
-# Positions are mass_weighted
+# Positions and lengths are mass_weighted
 
 MAX_LOG_PRIOR_LUMP = 2
 MODEL_N = 1
@@ -99,7 +99,7 @@ class Lumpy(MCMCMethod):
         for i in range(MODEL_N - 1):
             mass = (local_rng.random() - 0.5) * 2 * self.shell_volume
             params = np.append(params, [
-                local_rng.random() * self.surface_am,
+                local_rng.random() * self.surface_am * mass,
                 mass,
                 (local_rng.random() - 0.5) * 2 * self.surface_am * mass,
                 (local_rng.random() - 0.5) * 2 * self.surface_am * mass,
@@ -110,14 +110,15 @@ class Lumpy(MCMCMethod):
     def log_prior(self, theta_long):
         # What are the pairs that are overlapping?
         shell_density = theta_long[-4] / self.shell_volume
-        lump_densities = [theta_long[1] / theta_long[0]**3 / VOLUME_SCALE]
+        lump_densities = [theta_long[1]**4 / theta_long[0]**3 / VOLUME_SCALE]
         for i in range(0, MODEL_N - 1):
-            lump_densities.append(theta_long[3 + i * 5] / theta_long[2 + i * 5]**3 / VOLUME_SCALE)
+            lump_densities.append(theta_long[3 + i * 5]**4 / theta_long[2 + i * 5]**3 / VOLUME_SCALE)
 
         # Prior on a_m
         am_limit = 0
         for i in range(MODEL_N):
-            length = theta_long[0] if i == 0 else theta_long[-3 + 5 * i]
+            lump_mass = theta_long[1] if i == 0 else theta_long[-2 + 5 * i]
+            length = (theta_long[0] if i == 0 else theta_long[-3 + 5 * i]) / lump_mass
             if length < 0:
                 am_limit += length * VERY_LARGE_SLOPE
             if length > 2 * self.surface_am:
@@ -145,9 +146,11 @@ class Lumpy(MCMCMethod):
         for i in range(MODEL_N - 1):
             lump_poses.append(theta_long[(4 + i * 5):(7 + i * 5)] / theta_long[3 + 5 * i])
         for i, pos_i in enumerate(lump_poses):
-            radius_i = (theta_long[0] if i == 0 else theta_long[-3 + 5 * i]) * np.sqrt(5 / 3)
+            lump_mass_i = theta_long[1] if i == 0 else theta_long[-2 + 5 * i]
+            radius_i = (theta_long[0] if i == 0 else theta_long[-3 + 5 * i]) * np.sqrt(5 / 3) / lump_mass_i
             for j, pos_j in enumerate(lump_poses[:i]):
-                radius_j = (theta_long[0] if j == 0 else theta_long[-3 + 5 * j]) * np.sqrt(5 / 3)
+                lump_mass_j = theta_long[1] if j == 0 else theta_long[-2 + 5 * j]
+                radius_j = (theta_long[0] if j == 0 else theta_long[-3 + 5 * j]) * np.sqrt(5 / 3) / lump_mass_j
                 dist_sqr = np.sum((pos_i - pos_j)**2)
                 if dist_sqr < (radius_i + radius_j)**2:
                     intersections.append(lump_densities[i] + lump_densities[j] + shell_density)
@@ -157,9 +160,9 @@ class Lumpy(MCMCMethod):
 
     def get_klms(self, theta_long):
         denom = self.surface_am ** 2 * theta_long[-4] # Shell moi
-        denom += theta_long[1] * theta_long[0]**2 + (theta_long[-1]**2 + theta_long[-2]**2 + theta_long[-3]**2) / theta_long[1]# Lump 1 moi
+        denom += (theta_long[0]**2 + theta_long[-1]**2 + theta_long[-2]**2 + theta_long[-3]**2) / theta_long[1]# Lump 1 moi
         for i in range(MODEL_N - 1):
-            denom += theta_long[5 * i + 3] * theta_long[5 * i + 2]**2 + (theta_long[5 * i + 4]**2 + theta_long[5 * i + 5]**2 + theta_long[5 * i + 6]**2) / theta_long[5 * i + 3]
+            denom += (theta_long[5 * i + 2]**2 + theta_long[5 * i + 4]**2 + theta_long[5 * i + 5]**2 + theta_long[5 * i + 6]**2) / theta_long[5 * i + 3]
         # Surface
         klms = theta_long[-4] * self.shell_free_klms
         # Lumps
@@ -178,7 +181,7 @@ class Lumpy(MCMCMethod):
         for i in range(MODEL_N):
             lump_mass = theta_long[1] if i == 0 else theta_long[-2 + 5 * i]
             lump_pos = (theta_long[-3:] if i == 0 else theta_long[(-1 + i * 5):(2 + i * 5)]) / lump_mass
-            lump_length = theta_long[0] if i == 0 else theta_long[-3 + 5 * i]
+            lump_length = (theta_long[0] if i == 0 else theta_long[-3 + 5 * i]) / lump_mass
             lump_density = lump_mass / lump_length**3 / VOLUME_SCALE
             densities[(self.X - lump_pos[0]) ** 2 + (self.Y - lump_pos[1]) ** 2 + (self.Z - lump_pos[2]) ** 2 < (lump_length**2 * 5 / 3)] += lump_density
 
@@ -192,11 +195,5 @@ class Lumpy(MCMCMethod):
     def scatter_walkers(self, theta_start, n_walkers):
         pos = np.zeros((n_walkers, self.n_free))
         for i in range(self.n_free):
-            if i == 1 or i % 5 == 3:
-                scale = self.shell_volume
-            elif i >=2 and i % 5 in [4, 0, 1]:
-                scale = self.shell_volume * self.surface_am
-            else:
-                scale = self.surface_am
-            pos[:,i] = np.random.randn(n_walkers) * UNCERTAINTY_RATIO * scale + theta_start[i]
+            pos[:,i] = np.random.randn(n_walkers) * UNCERTAINTY_RATIO * theta_start[i] + theta_start[i]
         return pos
