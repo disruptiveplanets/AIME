@@ -6,7 +6,7 @@ THRESHOLDS = ((1, True), (0.2, False))
 INCREASING = {
     "observation-gap": True,
     "probe-s-rho": True,
-    "probe-s-theta": True,
+    #"probe-s-theta": True,
     "scan-am": False,
     "scan-cadence": True,
     "scan-perigee": True,
@@ -38,7 +38,7 @@ for fname in os.listdir(DIRECTORY):
         plt.plot(uncs, label=fname[:-4])
         plt.title(fname[:-4])
         for threshold, wait in THRESHOLDS:
-            plt.axhline(y=threshold, c='r')
+            #plt.axhline(y=threshold, c='r')
 
             if INCREASING[fname[:-4]]:
                 where_more_than_one = np.where(uncs>threshold)[0]
@@ -50,7 +50,7 @@ for fname in os.listdir(DIRECTORY):
                 fraction = (threshold - uncs[thresh_index-1]) / (uncs[thresh_index] - uncs[thresh_index-1])
                 thresh = thresh_index - 1 + fraction
                 
-                plt.axvline(x=thresh, c='k')
+                #plt.axvline(x=thresh, c='k')
                 print(f"inc.\t{thresh}", end='\t')
 
             else:
@@ -77,10 +77,10 @@ for fname in os.listdir(DIRECTORY):
                     continue
                 fraction = (threshold - uncs[thresh_index]) / (uncs[thresh_index - 1] - uncs[thresh_index])
                 thresh = thresh_index - fraction
-                plt.axvline(x=thresh, c='k')
+                #plt.axvline(x=thresh, c='k')
                 print(f"dec.\t{thresh}", end='\t')
         print()
         plt.xlabel("Index")
-        plt.ylabel("Uncertainty ratio")
+        plt.ylabel("Uncertainty")
         plt.savefig(f"{fname[:-4]}.png")
 plt.show()
