@@ -254,13 +254,7 @@ Given values of $K_{\ell m}^\mathrm{body-fixed}$ and their uncertainties extract
 
 The size and location of the elements must be chosen before extracting their densities. Best results generally require elements of equal size to be chosen. To remove the dependence on this choice, density distributions for many distinct element layouts can be extracted and the density of each point in the asteroid can be randomly sampled from any of these solutions to yield estimates for the mean density and uncertainty in density at each point.
 
-The value of $N$ must be carefully chosen, since it embodies a balance between the precision and accuracy of the resulting distribution. If $N$ is set equal to the number of data points, an accurate solution is  guaranteed, but uncertainties are inflated. If $N$ is chosen lower, the choice of element layout might exclude a distribution that exactly matches $K_{\ell m}$, but uncertainties are diminished due to less redundancy in the model. To select our value of $N$, we extract density distributions for moments extracted from simulated flyby data of the reference asteroid. We assume an ellipsoidal shape consistent with uniform asteroid density and extract 5 density distributions for it using this finite element model. We do this for multiple values of observational precision on the rotational period of the asteroid. Figure \ref{fig:dof-scan} displays the resulting average uncertainty on $\rho_i$ for each of the five extractions ($\sigma_\rho / \rho$), as well as the average deviation from the truth  ($\Delta \rho / \rho$), and displays the maximum and mean significance of these deviations ($\Delta_\rho / \sigma_\rho$).
-s\begin{figure}
-  \centering
-  \caption{Uncertainty in density, deviations from the true density, and maximum and mean significance of these deviations are plotted as a function of the observational precision of the flyby data. Five density distributions are computed for each value of observational precision (light dots) and their average is displayed (solid dots and lines). Each line represents a different choice in the number of free parameters used, with nine being maximal. Results show that few free parameters yield precise but inaccurate results, and that more yield imprecise but accurate results.}
-  \label{fig:dof-scan}
-\end{figure}
-The figure demonstrates that model accuracy is not a significant effect until the number of DOF is $\lesssim 3$, at which point $\Delta_\rho / \sigma_\rho$ rises greatly. Uncertainty, however, is lower for 7 or 5 DOF than it is for 9. To balance accuracy and precision, we choose to use this lumpy model with 5 DOF henceforth, meaning we choose $N=12$ finite elements (using the $K_{21} = \Im K_{21} = 0$ constraint).
+The value of $N$ must be carefully chosen, since it embodies a balance between the precision and accuracy of the resulting distribution. If $N$ is set equal to the number of data points, an accurate solution is  guaranteed, but uncertainties are inflated. If $N$ is chosen lower, the choice of element layout might exclude a distribution that exactly matches $K_{\ell m}$, but uncertainties are diminished due to less redundancy in the model. An analysis of which value of $N$ is appropriate for our purposes is given in section \ref{sec:dof-scan}.
 
 \subsubsection{Lumpy model}
 
@@ -282,7 +276,7 @@ where the sum limits are $0 \leq l' \leq l$ and $-\ell' \leq m' \leq \ell'$. We 
 \begin{equation}
   \mu_\mathcal{A} = \sum_{i=0}^N \mu_i,  \qquad 0 = \sum_{i=0}^N \mu_i \bm r_i.
 \end{equation}
-Additional constraints can be imposed on $K_{\ell m}^{(i)}$ if desired. For example, we can require that the lumps be ellipsoids, so that $K_{3 m}^{(i)} = 0$. Additional rotational symmetries also constrain $K$, with the most extreme case being that spherical lumps have $K_{\ell m} = 0$ for $\ell > 0$. However, $K_{00}=1$ is guaranteed by definition, meaning that each spherical lump has only five DOF ($a_i$, $\mu_i$, and $\bm r_i$). The substrate has one degree of freedom, since only $\mu_0$ is unknown. Thus, this lumpy model has $5N - 3$ total DOF.
+Additional constraints can be imposed on $K_{\ell m}^{(i)}$ if desired. For example, we can require that the lumps be ellipsoids, so that $K_{3 m}^{(i)} = 0$. Additional rotational symmetries also constrain $K$, with the most extreme case being that spherical lumps have $K_{\ell m} = 0$ for $\ell > 0$. However, $K_{00}=1$ is guaranteed by definition, meaning that each spherical lump has only five DOF ($a_i$, $\mu_i$, and $\bm r_i$). The substrate has one degree of freedom, since only $\mu_0$ is unknown. Thus, this lumpy model has $5N - 3$ total DOF. Again, the choice of $N$ affects the accuracy and uncertainty of the model results, which is discussed in section \ref{sec:density-compare}.
 
 
 
@@ -293,12 +287,12 @@ To demonstrate our interior-probing methodology, we provide a full density distr
 
 \subsection{Density moments}
 \label{sec:example-fit}
-\begin{figure*}
+\begin{figure}
   \centering
-  \includegraphics[width=0.6\textwidth]{figs/example-residuals.pdf}
+  \includegraphics[width=\linewidth]{figs/example-residuals.pdf}
   \caption{Data, best-fitting results, and residuals for a fit to synthetic data simulated for an asymmetric reference asteroid. Uncertainty bands are also shown. The best fit results appear consistent with the data.}
   \label{fig:example-residuals}
-\end{figure*}
+\end{figure}
 
 \begin{figure*}
   \centering
@@ -328,15 +322,15 @@ Density moments of the kind described above were extracted for the asymmetric an
   \includegraphics[width=0.24\linewidth]{figs/sym-fe-u}\hfill
   \includegraphics[width=0.24\linewidth]{figs/sym-fe-r}
 
-  \caption{Cross-sectional slices of the density distributions extracted via the finite element model for the asymmetric (\textit{top}) and symmetric (\textit{bottom}) reference asteroids. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted.}
+  \caption{Cross-sectional slices of the density distributions extracted via the finite element model for the asymmetric (\textit{top}) and symmetric (\textit{bottom}) reference asteroids. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted. Extracted densities are generally within 10\% of the truth.}
   \label{fig:uniform}
 \end{figure*}
 
-The figure demonstrates that the finite element model successfully extracts a uniform density distribution. This property of the model was observed to be robust even for asteroids of different shapes. For the reference asteroid observational set-up, the uncertainty on observations is such that the density distribution is constrained to about \jtd{number}. The dependence of this constraint on the observational set-up is discussed in section \ref{sec:fit-uncertainty}.
+The figure demonstrates that the finite element model successfully extracts density distributions consistent with the extracted density moments, as shown by the $\chi^2$ value per degree of freedom, $\chi^2_r$, depicted in the figure. These express the agreement of the density moments of the shown distributions with the posterior distributions for the density moments, produced by the MCMC described in section \ref{sec:fit}. $\chi^2_r = 0$ indicates that the moments of the shown distributions are exactly equal to the means of the moment posterior extracted by the MCMC. The accuracy of this model is robust for additional shapes, including non-ellipsoidal shapes. 
 
-The lumpy model, however, fails for a uniform asteroid. This is because the data is consistent with a massless lump placed anywhere in the asteroid, such that the model is underdetermined even when only one lump is attempted to be extracted. This failure of the lumpy model can be interpreted as evidence that the true density of the asteroid is close to uniform.
+Furthermore, these density distributions are consistent with uniform, which is the true density distribution of the asteroid. For the reference asteroid observational set-up, the uncertainty on observations is such that the density distribution is generally within 10\% of the true density (second column) while the density uncertainty is generally less than 40-50\% of the density value at any point in the asteroid (third column). The dependence of this constraint on the observational set-up is discussed in section \ref{sec:fit-uncertainty}. In no place is the significance of these deviations from the true distribution greater than $0.3 \sigma$ (last column).
 
-We also analyze asteroids of non-uniform density to assess the features our density-extraction models are most sensitive to. We employ an asteroid of the same shape as the asymmetric asteroid, and in the same flyby scenario. But we place a solid core of radius $\SI{500}{\meter}$ and density three times the surrounding density at the center of the asteroid, which changes the asteroid density moments. New density moments are extracted via the process described in section \ref{sec:fit} and the finite-element and lumpy models are used to extract density distributions shown in figure \ref{fig:center-core}.
+The lumpy model (not shown) fails for a uniform asteroid. This is because the data is consistent with a massless lump placed anywhere in the asteroid, such that the model is underdetermined even when only one lump is attempted to be extracted. This failure of the lumpy model can be interpreted as evidence that the true density of the asteroid is close to uniform. Therefore, we also analyze asteroids of non-uniform density. We employ an asteroid of the same shape as the asymmetric asteroid, and in the same flyby scenario, but we place a solid core of radius $\SI{500}{\meter}$ and density three times the surrounding density at the center of the asteroid. This changes the asteroid density moments. New density moments are extracted via the process described in section \ref{sec:fit} and the finite-element and lumpy models are used to extract density distributions shown in figure \ref{fig:center-core}.
 \begin{figure*}
   \includegraphics[width=0.24\linewidth]{figs/sph-3-fe-d}\hfill
   \includegraphics[width=0.24\linewidth]{figs/sph-3-fe-s}\hfill
@@ -348,11 +342,13 @@ We also analyze asteroids of non-uniform density to assess the features our dens
   \includegraphics[width=0.24\linewidth]{figs/sph-3-l-u}\hfill
   \includegraphics[width=0.24\linewidth]{figs/sph-3-l-r}
 
-  \caption{Cross-sectional slices of the density distributions extracted via the finite-element (\textit{top}) and lumpy (\textit{bottom}) models for an asteroid with a centred core. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted.}
+  \caption{Cross-sectional slices of the density distributions extracted via the finite-element (\textit{top}) and lumpy (\textit{bottom}) models for an asteroid with a centred core. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted. The core is successfully extracted in all cases.}
   \label{fig:center-core}
 \end{figure*}
 
-Figure \ref{fig:center-core} demonstrates disagreement between the models caused by their different assumptions. The finite element model produces a density distribution with a more massive center, but the density of the core has been spread throughout the asteroid such that the density at the center is much less than three times the surrounding density. However, the lumpy model is designed to detect discrete changes in density distribution, and identifies the boundary of the core very accurately. The same density moments can be achieved via a smoothed density distribution, similar to the one produced by the finite element model. Therefore, neither model is more correct in the general case, but they can be used to explore different scenarios.
+Once again, figure \ref{fig:center-core} shows that the model results are successful in that they reproduce the extracted density moments ($\chi^2_r$ is low). However, the density distributions extracted by the finite model match the true distributions less well. The deviation the true density extends to as much as 35\% in some locations, leading to a maximum significance of $0.86\sigma$. The distributions are consistent with the true distribution, but the finite element model has distributed the core into the rest of the asteroid so that the peak density is lowered.
+
+However, the lumpy model is designed to detect discrete changes in density distribution, and identifies the boundary of the core very accurately. Deviations from the truth are less than 0.2\%, with uncertainties about 10\% of the local density at maximum and usually much lower. THe significance of the deviations is around 20\%, as it was in figure \ref{fig:uniform} where the extracted distribution again matched the truth. The low uncertainty is caused by the small number of degrees of freedom (2) of the lumpy model. A consequence is that if the core had been non-spherical, the lumpy model would be inaccurate, with significant deviations from the truth. Therefore, neither model is more correct in the general case, but each can be used to explore different scenarios.
 
 
 
@@ -364,6 +360,36 @@ In this section, we discuss the sensitivity of our results to the properties of 
 
 \subsection{Dependence of uncertainty on encounter properties}
 \label{sec:fit-uncertainty}
+
+
+
+\afterpage{
+  \begin{landscape}
+    \begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figs/scan-all1.pdf}
+    \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of (left to right) perigee, excess velocity, spin pole uncertainty, and period uncertainty. The vertical dashed line indicates the reference asteroid values. The red vertical lines indicate when $\sigma(K_{3m}) =0.01$.}
+    \label{fig:scan-perigee}
+    \label{fig:scan-vex}
+    \label{fig:scan-theta}
+    \label{fig:scan-rho}
+    \end{figure}
+  \end{landscape}
+}
+
+\afterpage{
+  \begin{landscape}
+    \begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figs/scan-all2.pdf}
+    \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of (left to right) asteroid length, observational cadence, data gap at perigee, and rotational period. The vertical dashed line indicates the reference asteroid values. The red vertical lines indicate when $\sigma(K_{3m}) =0.01$.}
+    \label{fig:scan-am}
+    \label{fig:scan-cadence}
+    \label{fig:scan-period}
+    \label{fig:observation-gap}
+    \end{figure}
+  \end{landscape}
+}
 
 Density density moment uncertainty is determined by the quality of the data set, but its physical relevance is not obvious. Uncertainty on the density distribution is much more physically motivated, but its value depends on the choice of model used. We therefore investigate the dependence of both uncertainties on encounter properties in this section.
 
@@ -394,35 +420,7 @@ Uncertainties on the density moments, which do not depend on models used, are di
 \jtd{Discuss conclusions}.
 
 Additional data and analysis and description for this relationship between encounter parameters and uncertainties are given in appendix \ref{app:uncertainty-dependence}
-
-
-% \afterpage{
-%   \begin{landscape}
-%     \begin{figure}
-%     \centering
-%     \includegraphics[width=\linewidth]{figs/scan-all1.pdf}
-%     \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of (left to right) perigee, excess velocity, spin pole uncertainty, and period uncertainty. The vertical dashed line indicates the reference asteroid values. The red vertical lines indicate when $\sigma(K_{3m}) =0.01$.}
-%     \label{fig:scan-perigee}
-%     \label{fig:scan-vex}
-%     \label{fig:scan-theta}
-%     \label{fig:scan-rho}
-%     \end{figure}
-%   \end{landscape}
-% }
-
-% \afterpage{
-%   \begin{landscape}
-%     \begin{figure}
-%     \centering
-%     \includegraphics[width=\linewidth]{figs/scan-all2.pdf}
-%     \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of (left to right) asteroid length, observational cadence, data gap at perigee, and rotational period. The vertical dashed line indicates the reference asteroid values. The red vertical lines indicate when $\sigma(K_{3m}) =0.01$.}
-%     \label{fig:scan-am}
-%     \label{fig:scan-cadence}
-%     \label{fig:scan-period}
-%     \label{fig:observation-gap}
-%     \end{figure}
-%   \end{landscape}
-% }                                                            
+                                             
 
 
 
@@ -491,18 +489,20 @@ It was mentioned above that the observable perigee distance $r_p$ increases with
 
 
 \subsection{Finite element model DOF}
+\label{sec:dof-scan}
 The number of elements $N$ used for the finite element model can be freely chosen. As discussed in section \ref{sec:finite-element}, seven of these are fixed by various constraints on the asteroid density distribution. There are 16 density moments with $\ell \leq 3$, so $N=16$ with nine DOF is the largest number of parameters the model can support. However, maximizing the DOF adds model-induced uncertainty to our results. This uncertainty can be reduced by reducing $N$, but with $N < 16$, a solution perfectly matching the extracted moments is not guaranteed. There is therefore a trade-off between the average density uncertainty $\sigma_\rho$ and the accuracy, which can be represented as the deviation of the density distribution from the true distribution $\Delta \rho$.
 
-We investigate this trade-off by extracting five density distributions with five different finite-element layouts from moments extracted from synthetic data of the asymmetric reference asteroid. For each point in the asteroid, 1000 samples are drawn from each of the five density distributions. We use the standard deviation of the 5000 samples as the uncertainty at that point, and the mean of the samples as the density. We then compute $\sigma_\rho$ and $\Delta \rho$ by averaging over every point in the asteroid. We do this for 9 (maximal), 7, 5, 3, and 2 DOF. Additionally, we vary the precision $\sigma_P$ of the data set used to extract the density moments, and plot $\sigma_\rho$ and $\Delta \rho$ as a function of $\sigma_P$. The result is shown in figure \ref{fig:dof-scan}
+We investigate this trade-off by extracting five density distributions with five different finite-element layouts from moments extracted from synthetic data of the asymmetric reference asteroid. For each point in the asteroid, 1000 samples are drawn from each of the five density distributions. We use the standard deviation of the 5000 samples as the uncertainty $\sigma_\rho$ at that point, and the mean of the samples as the density $\rho$. Modelling the asteroid as having a uniform true density, we compute the deviation of the density from the truth $\Delta \rho$ over the asteroid. We do this for 9 (maximal), 7, 5, 3, and 2 DOF. Additionally, we vary the precision $\sigma_P$ of the data set used to extract the density moments, and plot $\sigma_\rho$ and $\Delta \rho$ as a function of $\sigma_P$. Figure \ref{fig:dof-scan} displays the distribution of $\sigma_\rho$, $\Delta \rho$, and the significance of the deviations from the truth ($\Delta \rho / \sigma_\rho$) over the asteroid.
 
 \begin{figure}
+  \includegraphics[width=\linewidth]{figs/dof-scan.pdf}
   \caption{The average uncertainty $\sigma_\rho$ and deviation from the truth $\Delta \rho$ of density distributions extracted by the finite element model with varying degrees of freedom. 5 DOF appears to optimize the trade-off between the model-induced uncertainty caused by too many DOF and the inaccuracy caused by too few.}
   \label{fig:dof-scan}
 \end{figure}
 
-The figure demonstrates the expected behaviour that the uncertainty of the result increases with additional degrees of freedom, and its accuracy decreases. \jtd{Comment}. For these reasons, we use 5 DOF which corresponds to $N=12$ throughout this paper.
+The figure demonstrates the expected behaviour that few degrees of freedom results in low uncertainty but large $\Delta \rho / \sigma$, wile many degrees of freedom is more accurate but also more uncertain. The trend of uncertainty, deviation, and significance as a function of $\sigma_P$ is also discontinuous for few DOF, because in these cases the properties of the output distribution are strongly dependent on the initial choice of uncertainty of the initial choice of grids, and more than five grids are necessary to remove that dependence. This discontinuity is most noticeable for 3 and 2 DOFs, which also produce deviations from the true density distribution of the highest significance. We use 5 DOFs throughout this paper, produce the most precise results while still accurately reproducing the asteroid density distribution. 5 DOFs corresponds to $N=12$ finite elements.
 
-Figure \ref{fig:dof-scan} also demonstrates that $\sigma_\rho$ reaches a plateau for large $\sigma_P$. For data this uncertain, the prior constraints that the density of the asteroid take on physically meaningful values are more constraining than the actual data, leading to less dependence on the data quality. \jtd{Further comment}.
+The top panel of \ref{fig:dof-scan} also demonstrates that $\sigma_\rho$ reaches a plateau for large $\sigma_P$. In that regime, the prior constraints that the density of the asteroid take on physically meaningful values are more constraining than the actual data, leading to less dependence on the data quality. This is a further example of how the extracted asteroid density distribution is strongly dependent on the choice of model, and one of the reasons why we display the uncertainties of density moments in section \ref{sec:fit-uncertainty} rather than density distribution uncertainty. This moment uncertainty is not prone to the same model-dependent plateau.
 
 
 \subsection{Comparisons between density distribution models}

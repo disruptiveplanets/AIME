@@ -302,7 +302,7 @@ class Display:
         mean_res = np.array(mean_res)
         uncertainties = np.array([2 * np.sqrt(np.diagonal(pinvh(a))) for a in self.true_uncs])
 
-        fig, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(12, 6), sharex=True)
+        fig, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(9, 6), sharex=True)
 
         x_display = np.arange(len(self.true_results)) * self.cadence / 3600.0
         ax1.scatter(x_display, self.true_results[:,0] * 3600, label = 'true x', alpha=0.5, color='C0', s=1)
