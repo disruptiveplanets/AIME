@@ -13,7 +13,7 @@ if METHOD_NAME == "lumpy":
     method_class = lumpy.Lumpy
     method_tag = "lump"
     dof = 2
-    DIVISION = 49
+    DIVISION = 9
     if RUN_NAME == "double":
         lumpy.MODEL_N = 2
         dof = 7
@@ -26,11 +26,14 @@ elif METHOD_NAME == "fe":
 else:
     raise Exception(f"{METHOD_NAME} is not a valid method")
 fe.grids.NUM_DRAWS = 0
-k22a, k20a = -0.05200629, -0.2021978 # Surface
+k22a, k20a = -0.05200629, -0.2021978
+k22s, k20s = 0, -0.09766608
+
 ELLIPSOID_AM = 1000
 
 SURFACE_AMS = {
-    "asym-ell": 1000,
+    "asym": 1000,
+    "sym": 1000,
     "double": 1000,
     "sph-3": 1000,
     "sph-1.5": 1000,
@@ -39,7 +42,8 @@ SURFACE_AMS = {
 }
 
 BULK_AMS = {
-    "asym-ell": 1000,
+    "asym": 1000,
+    "sym": 1000,
     "double": 970.4652599064898,
     "sph-3": 922.9234884822591,
     "sph-1.5": 978.4541044108308,
@@ -62,7 +66,8 @@ core_shift_high = core_displacement * (core_vol * density_factor_high) / ellipso
 blob_rad = 300
 
 TRUE_SHAPES = {
-    "asym-ell": TrueShape.uniform(),
+    "asym": TrueShape.uniform(),
+    "sym": TrueShape.uniform(),
     "sph-3": TrueShape.core_sph(3, 500),
     "sph-1.5": TrueShape.core_sph(1.5, 500),
     "move-3": TrueShape.core_shift(3, 500, core_displacement),
@@ -70,7 +75,8 @@ TRUE_SHAPES = {
     "double": TrueShape.two_core(3, blob_rad, [0, 500, 0], 3, blob_rad, [0, -500, 0]),
 }
 TRUE_MOMENTS = { # Moments of the known shape
-    "asym-ell": TrueMoments.ell(),
+    "asym": TrueMoments.ell(),
+    "sym": TrueMoments.sph(),
     "sph-3": TrueMoments.ell(),
     "sph-1.5": TrueMoments.ell(),
     "move-3": TrueMoments.move_3(),
@@ -78,7 +84,8 @@ TRUE_MOMENTS = { # Moments of the known shape
     "double": TrueMoments.ell(),
 }
 INDICATORS = {
-    "asym-ell": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
+    "asym": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
+    "sym": Indicator.ell(ELLIPSOID_AM, k22s, k20s),
     "sph-3": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
     "sph-1.5": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
     "move-3": Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high),
@@ -86,7 +93,8 @@ INDICATORS = {
     "double": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
 }
 SAMPLE_NAMES = {
-    "asym-ell": "den-asym",
+    "asym": "den-asym",
+    "sym": "den-sym",
     "sph-3": "den-core-sph-3",
     "sph-1.5": "den-core-sph-1.5",
     "move-3": "den-core-move-3",
