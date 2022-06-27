@@ -92,9 +92,10 @@ class Lumpy(MCMCMethod):
         return np.append(theta_short, np.append([shell_mass], -pos_sum))
 
     def pick_parameters(self, local_rng):
+        mass = (local_rng.random() - 0.5) * 2 * self.shell_volume
         params = np.array([
-            local_rng.random() * self.surface_am,
-            (local_rng.random() - 0.5) * 2 * self.shell_volume
+            local_rng.random() * self.surface_am * mass,
+            mass
         ])
         for i in range(MODEL_N - 1):
             mass = (local_rng.random() - 0.5) * 2 * self.shell_volume
@@ -119,8 +120,8 @@ class Lumpy(MCMCMethod):
         for i in range(MODEL_N):
             lump_mass = theta_long[1] if i == 0 else theta_long[-2 + 5 * i]
             length = (theta_long[0] if i == 0 else theta_long[-3 + 5 * i]) / lump_mass
-            if length < 0:
-                am_limit += length * VERY_LARGE_SLOPE
+            if length < MIN_MASS:
+                am_limit += (length - MIN_MASS) * VERY_LARGE_SLOPE / MIN_MASS
             if length > 2 * self.surface_am:
                 am_limit += (2 * self.surface_am - length) * VERY_LARGE_SLOPE
         if am_limit:
