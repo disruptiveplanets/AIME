@@ -22,10 +22,6 @@
 \usepackage{caption}
 \usepackage{subcaption}
 
-% For the sideways figure
-\usepackage{pdflscape}
-\usepackage{afterpage}
-
 \usetikzlibrary{arrows.meta}
 
 
@@ -130,14 +126,14 @@ where $V_\mathcal{A}$ is the asteroid volume. We call these MOI and length scale
 The tidal torque experienced by an asteroid is 
 \begin{equation}
   \begin{split}
-  \bm \tau = & G\frac{\mu_\mathcal{B}}{2}\left[I_\mathcal{A} \sum_{\ell m} a_\mathcal{B}^\ell J_{\ell m} \sum_{\ell' m'}a_\text{surf}^{\ell' - 2}S^*_{\ell+\ell', m + m'} (\bm D) (-1)^{\ell'}\right.\\
+  \bm \tau = & G\frac{I_\mathcal{A}I_\mathcal{B}}{2 a_\mathcal{A}^2a_\mathcal{B}^2}\left[\sum_{\ell m} a_\mathcal{B}^\ell J_{\ell m} \sum_{\ell' m'}a_\mathcal{A}^{\ell'}S^*_{\ell+\ell', m + m'} (\bm D) (-1)^{\ell'}\right.\\
   \times & \left.\sum_{m''=-\ell'}^{\ell'} \sqrt{\frac{(\ell'-m'')!(\ell'+m'')!}{(\ell'-m')!(\ell'+m')!}}  \mathcal{D}^{\ell'}_{m'm''}(\alpha, \beta, \gamma)^* \right. \\
   \times & \Big((i\unit x - \unit y)(\ell'-m''+1)K_{\ell',m''-1} \\
   & +(i\unit x+\unit y)(\ell'+m''+1)K_{\ell',m''+1}+2im''\unit z K_{\ell'm''}\Big) \Bigg],
   \end{split}
   \label{eqn:tidal-torque}
 \end{equation}
-where $\bm D$ is the position of the asteroid; $\alpha$, $\beta$, and $\gamma$ are $z-y-z$ Euler angles expressing the orientation of the asteroid; $S_{\ell m}$ are the irregular solid spherical harmonics; and $\mu_\mathcal{B}$ and $a_\mathcal{B}$ are the mass and radius of the central body while $J_{\ell m}$ are the density moments of the central body, with the $a_\text{bulk}$ and $a_\text{surf}$ of equation \ref{eqn:klm} replaced by $a_\mathcal{B}$. Equation \ref{eqn:tidal-torque} is derived in appendix \ref{app:eom}, assuming a rigid asteroid and no third-body perturbations. 
+where $\bm D$ is the position of the asteroid; $\alpha$, $\beta$, and $\gamma$ are $z-y-z$ Euler angles expressing the orientation of the asteroid; $S_{\ell m}$ are the irregular solid spherical harmonics; and $\mu_\mathcal{B}$ and $a_\mathcal{B}$ are the mass and radius of the central body while $J_{\ell m}$ are the density moments of the central body, with the $a_\text{bulk}$ and $a_\text{surf}$ of equation \ref{eqn:klm} replaced by $a_\mathcal{B}$. Equation \ref{eqn:tidal-torque} is derived in appendix \ref{app:eom}, assuming a rigid asteroid and no distant third-body perturbations. 
 
 Since it is the angular acceleration of the asteroid that is observable, rather than the torque applied, we also compute the MOI of the asteroid around the principal axes: 
 \begin{equation}
@@ -151,7 +147,7 @@ Since it is the angular acceleration of the asteroid that is observable, rather 
 
 The angular acceleration of the asteroid is proportional to $\bm \tau / I$ (equation \ref{eqn:omega-eom}), such that the $I_\mathcal{A}$ factor of equation \ref{eqn:tidal-torque} is canceled out. Thus, the observables do not depend explicitly on $I_\mathcal{A}$, nor on the asteroid mass.
 
-Throughout the paper, we refer to the ``inertial frame'' (the frame in which the orbit is fixed) and the ``body-fixed frame'' (the frame in which the asteroid is fixed), which are also defined in appendix \ref{app:eom}.
+Throughout the paper, we refer to the ``inertial frame'' (the frame in which the orbit is fixed) and the ``body-fixed frame'' (the frame in which the asteroid is fixed and in which $K_{\ell m}$, $I_\mathcal{A}$, and $a_\mathcal{A}$ are computed), which are also defined in appendix \ref{app:eom}.
 
 \subsection{Simulation design}
 \label{sec:sim}
@@ -244,7 +240,7 @@ by equation \ref{eqn:ylm-rotation}. Thus, uncertainty on $K_{\ell m}^\mathrm{bod
 
 When the $K_{3m}$ are extracted, 15 moments are known (excluding $K_{00}$). Since the asteroid mass cannot be determiend by this analysis, it is convenient to additionally set the mass equal to its volume, so that the average density is one and thus the extracted densities can be interpreted as ratios of $\rho / \rho_\text{avg}$. Three more moments are redundant with the center of mass, such that only twelve finite elements are free. In cases where $\gamma_0$ is known very accurately such that the correction imposed by equation \ref{eqn:body-fixed-to-hybrid} is very small, it is numerically favourable not to impose this equation on $K_{2m}$. In this case, the three orientation constraints that set $K_{21}=\Im K_{22} = 0$ carry over to the hybrid frame so that there are nine degrees of freedom (DOF). Since $\gamma_0$ is precisely known for all cases studied in this paper, we will always study this case. We also place additional constraints that $0.25 < \rho < 3$ to ensure realistic densities.
 
-To extract a density distribution, we use another MCMC given one of the two parametrizations of density distributions discussed below. The prior is set to be flat and nonzero for all configurations that obey the $0.25 < \rho < 3$ constraint. The likelihood used is set equal to the multivariate-Gaussian approximation of the posterior distribution for $K_{\ell m}$, extracted from flyby data. Otherwise, the MCMC parameters chosen were identical to those discussed in section \ref{sec:fit}.
+To extract a density distribution, we use another MCMC given one of the two parametrizations of density distributions discussed below. The prior is set to be flat and nonzero for all configurations that obey the $0.25 < \rho < 3$ constraint. The likelihood used is set equal to the multivariate-Gaussian approximation of the posterior distribution for $K_{\ell m}$, extracted from flyby data. Otherwise, the MCMC parameters chosen were identical to those discussed in section \ref{sec:fit}. We also present two further models in appendix \ref{app:more-models} which are viable substitutes for the following two models but are not used in the main text.
 
 
 
@@ -380,11 +376,6 @@ Specifically, we highlight both the uncertainties on the density moments and unc
 
 We therefore investigate both the moment uncertainty and the density distribution uncertainty. Figure \ref{fig:scan-physical} displays the dependence of moment uncertainty on four asteroid physical parameters and and \ref{fig:scan-observational} displays dependence on observational parameters. Additionally, figures \ref{fig:scan-space-sigma} and \ref{fig:scan-spin} display dependence on asteroid shape and initial spin direction. These are useful as a sensitive and model-independent measure of the relationship between the encounter properties and the methodology uncertainty.
 
-In table \ref{tab:threshold-summary}, we present the property ``thresholds'' required in order to obtain meaningful information about the asteroid density distribution. These are collected by \jtd{Explain}. Their values are also shown in figures \ref{fig:scan-physical} to \ref{fig:scan-observational} as vertical red lines. These thresholds are more physically relevant, but they should be understood as moveable, since making different model choices can drastically change their locations.
-
-
-
-Table \ref{tab:threshold-summary} reveals that the most limiting physical properties of the asteroid are its perigee and its length. \jtd{Further discuss}. Figure \ref{fig:scan-physical} demonstrates that the asteroid length cut-off is particularly sharp, since the density moment uncertainty $\sigma_{K_{3m}}$ is very steep there. However, precision on the moment of inertia ratios of the asteroid $K_{2m}$ are not affected by asteroid length; these may still be collected even for small asteroids.
 
 \begin{table}
   \centering
@@ -404,37 +395,31 @@ Table \ref{tab:threshold-summary} reveals that the most limiting physical proper
   \label{tab:threshold-summary}
 \end{table}
 
-The excess velocity and rotational period of the asteroid do not drastically affect the moment uncertainty and therefore do not impose strict thresholds, except for a dramatic increase in $\sigma(K_{2m})$ visible in figure \ref{fig:scan-physical} for rotational period $P_\omega \approx 4$ hr. The location of this threshold is likely dependent on other dynamical time scales of the system such as the cadence of observations and possibly the orbital time scales of $v_\infty / r_p$ and $\mu_\mathcal{A} / (v_\infty^2 r_p)$.
+In table \ref{tab:threshold-summary}, we present the property ``thresholds'' required in order to obtain meaningful information about the asteroid density distribution. These are collected by \jtd{Explain}. Their values are also shown in figures \ref{fig:scan-physical} to \ref{fig:scan-observational} as vertical red lines. These thresholds are more physically relevant, but they should be understood as moveable, since making different model choices can drastically change their locations.
 
+\begin{figure*}
+  \newpage
+  \centering
+  \includegraphics[angle=90, origin=c, width=\linewidth]{figs/scan-all1.pdf}
+  \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of (left to right) perigee, excess velocity, spin pole uncertainty, and period uncertainty. The vertical dashed line indicates the reference asteroid values. The red vertical lines indicate when $\sigma(K_{3m}) =0.01$.}
+  \label{fig:scan-perigee}
+  \label{fig:scan-vex}
+  \label{fig:scan-am}
+  \label{fig:scan-period}
+  \label{fig:scan-physical}
+\end{figure*}
 
-\afterpage{
-  \begin{landscape}
-    \begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{figs/scan-all2.pdf}
-    \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of (left to right) asteroid length, observational cadence, data gap at perigee, and rotational period. The vertical dashed line indicates the reference asteroid values. The red vertical lines indicate when $\sigma(K_{3m}) =0.01$.}
+\begin{figure*}
+  \newpage
+  \centering
+  \includegraphics[angle=90, origin=c, width=\linewidth]{figs/scan-all2.pdf}
+  \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of (left to right) asteroid length, observational cadence, data gap at perigee, and rotational period. The vertical dashed line indicates the reference asteroid values. The red vertical lines indicate when $\sigma(K_{3m}) =0.01$.}
     \label{fig:scan-rho}
     \label{fig:scan-theta}
     \label{fig:scan-cadence}
     \label{fig:observation-gap}
     \label{fig:scan-observational}
-  \end{figure}
-  \end{landscape}
-}
-\afterpage{
-  \begin{landscape}
-    \begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{figs/scan-all1.pdf}
-    \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of (left to right) perigee, excess velocity, spin pole uncertainty, and period uncertainty. The vertical dashed line indicates the reference asteroid values. The red vertical lines indicate when $\sigma(K_{3m}) =0.01$.}
-    \label{fig:scan-perigee}
-    \label{fig:scan-vex}
-    \label{fig:scan-am}
-    \label{fig:scan-period}
-    \label{fig:scan-physical}
-  \end{figure}
-  \end{landscape}
-}
+\end{figure*}
 
 \begin{figure*}
   \includegraphics[width=0.3\textwidth]{figs/probe-space-theta-1-sigma.pdf}\hfill
@@ -449,7 +434,6 @@ The excess velocity and rotational period of the asteroid do not drastically aff
   \label{fig:scan-space-sigma}
 \end{figure*}
 
-
 \begin{figure*}
   \centering
   \includegraphics[width=0.8\textwidth]{figs/spin-pole.png}
@@ -458,11 +442,17 @@ The excess velocity and rotational period of the asteroid do not drastically aff
 \end{figure*}
 
 
+Table \ref{tab:threshold-summary} reveals that the most limiting physical properties of the asteroid are its perigee and its length. \jtd{Further discuss}. Figure \ref{fig:scan-physical} demonstrates that the asteroid length cut-off is particularly sharp, since the density moment uncertainty $\sigma_{K_{3m}}$ is very steep there. However, precision on the moment of inertia ratios of the asteroid $K_{2m}$ are not affected by asteroid length; these may still be collected even for small asteroids.
+
+The excess velocity and rotational period of the asteroid do not drastically affect the moment uncertainty and therefore do not impose strict thresholds, except for a dramatic increase in $\sigma(K_{2m})$ visible in figure \ref{fig:scan-physical} for rotational period $P_\omega \approx 4$ hr. The location of this threshold is likely dependent on other dynamical time scales of the system such as the cadence of observations and possibly the orbital time scales of $v_\infty / r_p$ and $\mu_\mathcal{A} / (v_\infty^2 r_p)$.
+
 Physical parameters not studied here include the possibility of an initially tumbling asteroid and the presence of a third perturbing body, such as the Moon. Both are likely to increase precision but they are not within the scope of this paper.
+
 
 The observational parameters also impose strict thresholds, most of all the uncertainty of the data set $\sigma_P / P$ and $\sigma_\rho$. Instantaneous rotational period uncertainty of less than one part in one million is required to resolve precise details of the asteroid density distribution. This could be accomplished by multiple, precise period measurements, increasing the time between observations to maximize the change in period between observations, increasing the data set to include more post-flyby tumbling data, or if necessary by increasing precision in the other observational parameters to relieve the burden on asteroid period. The instantaneous spin pole direction of the asteroid must also be known with precision on the order of degrees. However, the cadence of observations and the possibility of missing data points does not strongly affect results. Observations can be as much as 30 minutes apart and as much as 1.5 hr can be left out of the data set (equivalent to 45 missing data points for the reference 2 minute cadence), even during the high-torque perigee. The latter could be caused by the asteroid passing in front of the sun, for example. 
 
 Two other properties important that affect moment uncertainty are the asteroid shape (as parametrized by the values of $K_{2m}$ or the axis lengths of the corresponding ellipsoid) and initial spin pole direction. The asteroid shape does not strongly affect density moment uncertainty, except that this model is not well-equipped to handle rotationally-symmetric asteroids with $K_{22} = 0$. For such asteroids, the principal axes can be selected to lie anywhere in the $xy$-plane, so that $\gamma_0$ is unconstrained. This inflates the moment uncertainties, although the density uncertainties are not badly affected as seen for the symmetric density distribution shown in figure \ref{fig:uniform}. A reparametrization of $\gamma_0$ would aid in decreasing moment uncertainty.
+
 
 The initial spin pole of the asteroid also does not strongly affect the moment uncertainties, except when the initial spin pole happens to point perpendicular to the orbital plane, or in the plane and perpendicular to the major axis of the encounter. Both of these regions tend to result in less tidal torque, but even within these regions, the moment uncertainty generally is only double or triple that of other regions. 
 

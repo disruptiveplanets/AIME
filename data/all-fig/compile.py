@@ -4,15 +4,16 @@ import numpy as np
 from matplotlib.lines import Line2D
 import matplotlib as mpl
 
+AXIS_SIZE = 12
 plt.style.use("jcap")
-mpl.rcParams['ytick.labelsize'] = 12
+mpl.rcParams['ytick.labelsize'] = AXIS_SIZE
 
 param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
 
 axis_names = {
     "scan-perigee": "$r_p$ (Earth radii)",
     "probe-s-theta": "$\sigma_\\theta$",
-    "probe-s-rho": "$\sigma_\\P / P$",
+    "probe-s-rho": "$\sigma_P / P$",
     "scan-cadence": "$\Delta t$ (min)",
     "scan-period": "$P_\omega$ (hr)",
     "scan-am": "$a_\\mathcal{A}$ (m)",
@@ -84,7 +85,6 @@ index_offset = {
 
 
 scales = (1e7, 1e2)
-AXIS_SIZE = 9
 LEGEND_SIZE = 12
 
 N_DIM = 10
@@ -245,7 +245,7 @@ def show_figs(plot_name, plot_name_index, num_columns):
             ax.set_xticks([])
             
 
-fig = plt.figure(figsize=((11-1.5)*FIG_SCALE, (8.5-2) * FIG_SCALE))
+fig = plt.figure(figsize=((11-1.2)*FIG_SCALE, (8.5-1) * FIG_SCALE))
 
 figs_to_show = ["scan-perigee", "scan-vex", "scan-am", "scan-period"]
 
@@ -264,7 +264,7 @@ plt.show()
 
 
 
-fig = plt.figure(figsize=((11-1.5)*FIG_SCALE, (8.5-2) * FIG_SCALE))
+fig = plt.figure(figsize=((11-1.2)*FIG_SCALE, (8.5-1) * FIG_SCALE))
 
 figs_to_show = ["probe-s-rho", "probe-s-theta", "scan-cadence", "observation-gap"]
 
