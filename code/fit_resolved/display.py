@@ -334,6 +334,7 @@ class Display:
 
         ax2.set_ylabel("Residuals (rad/hr)")
         ax2.set_xlabel("Time to perigee (hours)")
+        ax2.set_xlim(np.min(x_display), np.max(x_display))
         plt.tight_layout()
 
         plt.savefig(self.h5_name+"-compare.png")
