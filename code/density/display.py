@@ -125,10 +125,17 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
 
 
     exponent = None
+    sub_one = False
     if np.nanmax(densities) < 0.05:
         exponent = int(np.log10(np.nanmax(densities))) - 1
         densities /= 10**exponent
         levels /= 10**exponent
+
+    if np.nanmax(densities) - 1 < 0.05 and np.nanmin(densities) -1 > -0.05:
+        exponent = int(np.log10(np.nanmax(densities) - 1)) - 1
+        densities = (densities - 1) / 10**exponent
+        levels = (levels - 1) / 10**exponent
+        sub_one = True
 
     mins = np.min(np.where(~np.isnan(densities)), axis=1)
     maxes = np.max(np.where(~np.isnan(densities)), axis=1)
@@ -177,6 +184,8 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
     tag = ""
     if exponent is not None:
         tag = f" ($\\times 10^{{{exponent}}}$)"
+    if sub_one:
+        tag = f" ($-1,\\times 10^{{{exponent}}}$)"
     c.set_label(axis_name + tag)
 
 

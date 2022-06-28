@@ -118,9 +118,14 @@ SAMPLE_NAMES = {
 asteroid = mcmc_core.MCMCAsteroid(f"{RUN_NAME}-{method_tag}", f"../../samples/{SAMPLE_NAMES[RUN_NAME]}-0-samples.npy", INDICATORS[RUN_NAME],
     TRUE_SHAPES[RUN_NAME], SURFACE_AMS[RUN_NAME], DIVISION, MAX_RADIUS, dof, BULK_AMS[RUN_NAME], TRUE_MOMENTS[RUN_NAME])
 
+if False:
+    unc_tracker_file = f"{RUN_NAME}-{method_tag}-unc-tracker.npy"
+else:
+    unc_tracker_file = None
+
 result = None
 while result is None:
-    result = asteroid.pipeline(method_class, make_map, generate=generate, n_samples=1000)
+    result = asteroid.pipeline(method_class, make_map, generate=generate, n_samples=1000, unc_tracker_file=unc_tracker_file)
     
 with open(f"{RUN_NAME}-{method_tag}-unc-tracker.npy", 'wb') as f:
     result.save(f)

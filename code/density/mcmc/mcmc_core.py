@@ -161,31 +161,34 @@ class MCMCAsteroid:
         self.n_all = dof + N_CONSTRAINED
 
         
-    def pipeline(self, method_class, make_map, generate=True, n_samples=None):
+    def pipeline(self, method_class, make_map, generate=True, n_samples=None, unc_tracker_file=None):
         if n_samples is None and make_map:
             raise Exception("Number of samples cannot be none if make_map is true")
-
-        method = method_class(self.asteroid, self.mean_density, self.n_free, self.n_all, generate)
 
         if self.data_storage.data is None:
             return None
 
-        long_samples = self.get_densities_mcmc(method, generate)
-        if long_samples is None:
-            return None
+        if unc_tracker_file is None:        
+            method = method_class(self.asteroid, self.mean_density, self.n_free, self.n_all, generate)
 
-        unc_tracker = UncertaintyTracker()
-        
-        if n_samples is not None:
-            print(f"Generating {n_samples} samples")
-            for i in range(n_samples):
-                # Pull random MCMC sample
-                sample = long_samples[np.random.randint(0, len(long_samples))]
-                # Extract the associated density distro
-                densities = method.get_map(sample, None, self.asteroid)
-                densities /= np.nansum(densities)
-                # Add it to the uncertainty tracker
-                unc_tracker.update(densities)
+            long_samples = self.get_densities_mcmc(method, generate)
+            if long_samples is None:
+                return None
+
+            unc_tracker = UncertaintyTracker()
+            if n_samples is not None:
+                print(f"Generating {n_samples} samples")
+                for i in range(n_samples):
+                    # Pull random MCMC sample
+                    sample = long_samples[np.random.randint(0, len(long_samples))]
+                    # Extract the associated density distro
+                    densities = method.get_map(sample, None, self.asteroid)
+                    densities /= np.nansum(densities)
+                    # Add it to the uncertainty tracker
+                    unc_tracker.update(densities)
+        else:
+            with open(unc_tracker_file, 'rb') as f:
+                unc_tracker = UncertaintyTracker.load(f)
 
         if make_map:
             densities, uncertainty = unc_tracker.generate()
@@ -394,9 +397,9 @@ class MCMCAsteroid:
         if true_densities is not None:
             true_densities /= np.nanmean(true_densities)
             ratios = (densities - true_densities) / (densities * uncertainty_ratios)
-            make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{FIG_DIRECTORY}{self.name}/fe-r", error, percentile=95, balance=True)
-            make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\sigma$", 'coolwarm', f"{FIG_DIRECTORY}{self.name}/fe-r.gif", duration=duration, percentile=95, balance=True)
-            difference = (true_densities - densities)
+            make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\rho / \\sigma_\\rho$", 'coolwarm', f"{FIG_DIRECTORY}{self.name}/fe-r", error, percentile=95, balance=True)
+            make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\rho / \\sigma_\\rho$", 'coolwarm', f"{FIG_DIRECTORY}{self.name}/fe-r.gif", duration=duration, percentile=95, balance=True)
+            difference = (true_densities - densities) / densities
 
         print("Plotting density")
         make_slices(densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"{FIG_DIRECTORY}{self.name}/fe-d", error)
@@ -408,8 +411,8 @@ class MCMCAsteroid:
 
         if true_densities is not None:
             print("Plotting differences")
-            make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr_r', f"{FIG_DIRECTORY}{self.name}/fe-s", error, 95, balance=True)
-            make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho$", 'PuOr_r', f"{FIG_DIRECTORY}{self.name}/fe-s.gif", duration, 95, balance=True)
+            make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho / \\rho$", 'PuOr_r', f"{FIG_DIRECTORY}{self.name}/fe-s", error, 95, balance=True)
+            make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho / \\rho$", 'PuOr_r', f"{FIG_DIRECTORY}{self.name}/fe-s.gif", duration, 95, balance=True)
 
         warnings.filterwarnings("default")
 
