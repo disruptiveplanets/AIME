@@ -11,7 +11,7 @@ import matplotlib as mpl
 mpl.rcParams["font.family"] = "serif"
 mpl.rcParams["font.monospace"] = "Roboto mono"
 mpl.rcParams["text.usetex"] = "true"
-mpl.rcParams["figure.figsize"] = (4.25, 4)
+mpl.rcParams["figure.figsize"] = (6.5, 4.00)
 mpl.rcParams["legend.framealpha"] = 0.5
 mpl.rcParams["lines.linewidth"] = 2
 mpl.rcParams["lines.markersize"] = 4
@@ -24,6 +24,7 @@ EXPAND_X=1.15 # Scale along x and y so that spheres look circular
 AXIS_LIMIT = 1000
 EPSILON = 0.00000001
 NUM_CONTOURS = 6
+SLICE_FIGSIZE = (4.25, 4)
 
 
 def latexify(number):
@@ -90,7 +91,7 @@ def make_frame(densities, pos_array, axis_name, cmap, percentile, balance, z_ind
     return fig
 
 def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percentile=99, balance=False):
-    fig = plt.figure()
+    fig = plt.figure(figsize=SLICE_FIGSIZE)
     ax = fig.gca(projection='3d')
     ax.set_axis_off()
     ax.grid(False)
@@ -99,7 +100,7 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
 
     if cmap == 'Greys_r': # Uncertainty
         want_min = np.nanmin(densities)
-        want_min = 0
+        #want_min = 0
 
     # Does the colorbar have an arrow?
     extend = 'neither'
@@ -131,8 +132,9 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
         densities /= 10**exponent
         levels /= 10**exponent
 
-    if np.nanmax(densities) - 1 < 0.05 and np.nanmin(densities) -1 > -0.05:
-        exponent = int(np.log10(np.nanmax(densities) - 1)) - 1
+    dist_beyond_one = max(abs(np.nanmax(densities) - 1), abs(np.nanmin(densities) - 1))
+    if dist_beyond_one < 0.05:
+        exponent = int(np.log10(dist_beyond_one)) - 1
         densities = (densities - 1) / 10**exponent
         levels = (levels - 1) / 10**exponent
         sub_one = True
@@ -148,7 +150,7 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
 
     ax.view_init(elev=8, azim=45)
 
-    fig2 = plt.figure()
+    fig2 = plt.figure(figsize=SLICE_FIGSIZE)
     ax2 = fig2.gca()
     contour_handle = ax2.contourf(pos_array, pos_array, densities[:,:,0], levels=levels, cmap=cmap, extend=extend)
 
@@ -194,4 +196,5 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
         fig.savefig(name+".pdf")
         fig.savefig(name+".png")
     except Exception:
+        print("Failed to save")
         pass
