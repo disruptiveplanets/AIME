@@ -12,7 +12,7 @@ param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re
 axis_names = {
     "scan-perigee": "$r_p$ (Earth radii)",
     "probe-s-theta": "$\sigma_\\theta$",
-    "probe-s-rho": "$\sigma_\\rho$",
+    "probe-s-rho": "$\sigma_\\P / P$",
     "scan-cadence": "$\Delta t$ (min)",
     "scan-period": "$P_\omega$ (hr)",
     "scan-am": "$a_\\mathcal{A}$ (m)",
@@ -247,7 +247,7 @@ def show_figs(plot_name, plot_name_index, num_columns):
 
 fig = plt.figure(figsize=((11-1.5)*FIG_SCALE, (8.5-2) * FIG_SCALE))
 
-figs_to_show = ["scan-vex", "scan-perigee", "probe-s-theta", "probe-s-rho"]
+figs_to_show = ["scan-perigee", "scan-vex", "scan-am", "scan-period"]
 
 for i, name in enumerate(figs_to_show):
     show_figs(name, i, len(figs_to_show))
@@ -266,7 +266,7 @@ plt.show()
 
 fig = plt.figure(figsize=((11-1.5)*FIG_SCALE, (8.5-2) * FIG_SCALE))
 
-figs_to_show = ["scan-am", "scan-cadence", "observation-gap", "scan-period"]
+figs_to_show = ["probe-s-rho", "probe-s-theta", "scan-cadence", "observation-gap"]
 
 for i, name in enumerate(figs_to_show):
     show_figs(name, i, len(figs_to_show))

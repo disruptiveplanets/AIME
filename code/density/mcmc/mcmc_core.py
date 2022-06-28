@@ -394,11 +394,13 @@ class MCMCAsteroid:
 
         densities /= np.nanmean(densities)
 
+        PERCENTILE = 99.5# 95
+
         if true_densities is not None:
             true_densities /= np.nanmean(true_densities)
             ratios = (densities - true_densities) / (densities * uncertainty_ratios)
-            make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\rho / \\sigma_\\rho$", 'coolwarm', f"{FIG_DIRECTORY}{self.name}/fe-r", error, percentile=95, balance=True)
-            make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\rho / \\sigma_\\rho$", 'coolwarm', f"{FIG_DIRECTORY}{self.name}/fe-r.gif", duration=duration, percentile=95, balance=True)
+            make_slices(ratios, self.asteroid.grid_line, "$\\Delta\\rho / \\sigma_\\rho$", 'coolwarm', f"{FIG_DIRECTORY}{self.name}/fe-r", error, percentile=PERCENTILE, balance=True)
+            make_gif(ratios, self.asteroid.grid_line, "$\\Delta\\rho / \\sigma_\\rho$", 'coolwarm', f"{FIG_DIRECTORY}{self.name}/fe-r.gif", duration=duration, percentile=PERCENTILE, balance=True)
             difference = (true_densities - densities) / densities
 
         print("Plotting density")
@@ -406,13 +408,13 @@ class MCMCAsteroid:
         make_gif(densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"{FIG_DIRECTORY}{self.name}/fe-d.gif", duration)
         
         print("Plotting uncertainty")
-        make_slices(uncertainty_ratios, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{FIG_DIRECTORY}{self.name}/fe-u", error, 95)
-        make_gif(uncertainty_ratios, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{FIG_DIRECTORY}{self.name}/fe-u.gif", duration, 95)
+        make_slices(uncertainty_ratios, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{FIG_DIRECTORY}{self.name}/fe-u", error, PERCENTILE)
+        make_gif(uncertainty_ratios, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{FIG_DIRECTORY}{self.name}/fe-u.gif", duration, PERCENTILE)
 
         if true_densities is not None:
             print("Plotting differences")
-            make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho / \\rho$", 'PuOr_r', f"{FIG_DIRECTORY}{self.name}/fe-s", error, 95, balance=True)
-            make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho / \\rho$", 'PuOr_r', f"{FIG_DIRECTORY}{self.name}/fe-s.gif", duration, 95, balance=True)
+            make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho / \\rho$", 'PuOr_r', f"{FIG_DIRECTORY}{self.name}/fe-s", error, PERCENTILE, balance=True)
+            make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho / \\rho$", 'PuOr_r', f"{FIG_DIRECTORY}{self.name}/fe-s.gif", duration, PERCENTILE, balance=True)
 
         warnings.filterwarnings("default")
 

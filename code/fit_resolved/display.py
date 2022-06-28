@@ -305,6 +305,7 @@ class Display:
         fig, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(9, 6), sharex=True)
 
         x_display = np.arange(len(self.true_results)) * self.cadence / 3600.0
+        x_display -= np.median(x_display)
         ax1.scatter(x_display, self.true_results[:,0] * 3600, label = 'true x', alpha=0.5, color='C0', s=1)
         ax1.scatter(x_display, self.true_results[:,1] * 3600, label = 'true y', alpha=0.5, color='C1', s=1)
         ax1.scatter(x_display, self.true_results[:,2] * 3600, label = 'true z', alpha=0.5, color='C2', s=1)
@@ -332,7 +333,7 @@ class Display:
             ax2.fill_between(x_display, uncertainties[:,2] * 3600, -uncertainties[:,2] * 3600, color="C2", alpha=0.2)
 
         ax2.set_ylabel("Residuals (rad/hr)")
-        ax2.set_xlabel("Time (hours)")
+        ax2.set_xlabel("Time to perigee (hours)")
         plt.tight_layout()
 
         plt.savefig(self.h5_name+"-compare.png")
