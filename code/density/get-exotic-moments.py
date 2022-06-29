@@ -18,10 +18,12 @@ blob_displacement = 500
 blob_rad = 300
 blob_vol = np.pi * 4 / 3 * blob_rad**3
 ellipsoid_vol = np.pi * 4 / 3 * a * b * c
-density_factor = 5
+density_factor = 2
 lump_shift = blob_displacement * (blob_vol * density_factor) / ellipsoid_vol
 print("Blob Mass fraction:", (blob_vol * density_factor) / (blob_vol * density_factor+ellipsoid_vol))
+print("Blob double mass fraction:", (blob_vol * density_factor) / (2 * blob_vol * density_factor+ellipsoid_vol) * ellipsoid_vol)
 print("Blob Lump shift:", lump_shift)
+print("Blob am", blob_rad * np.sqrt(3/5))
 
 core_displacement = 300
 core_rad = 500

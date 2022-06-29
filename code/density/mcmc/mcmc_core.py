@@ -128,13 +128,16 @@ class DataStorage:
         real_hybrid_samples[:, 6]  = complex_hybrid_samples[:, 4].real * (bulk_am / surface_am) # R K31
         real_hybrid_samples[:, 7]  = complex_hybrid_samples[:, 4].imag * (bulk_am / surface_am) # I K31
         real_hybrid_samples[:, 8]  = complex_hybrid_samples[:, 5].real * (bulk_am / surface_am) # R K30
+
         cov = np.cov(real_hybrid_samples.transpose())
+        part_cov = cov[2:,2:]
         self.data = np.mean(real_hybrid_samples, axis=0)
 
         if cov is None:
             # Sample path was empty
             return False
         self.data_inv_covs = pinvh(cov)
+        self.data_part_inv_covs = pinvh(part_cov)
 
 def log_probability(theta_short, method, data_storage):
     theta_long = method.get_theta_long(theta_short)
@@ -224,7 +227,8 @@ class MCMCAsteroid:
             ])
 
             diff_klms_part = free_real_klms[2:] - self.data_storage.data[2:]
-            error_part = diff_klms_part.transpose() @ self.data_storage.data_inv_covs[2:,2:] @ diff_klms_part / (self.n_free - 2)
+            error_part = diff_klms_part.transpose() @ self.data_storage.data_part_inv_covs @ diff_klms_part / self.n_free
+
             likelihood_full = log_like(free_real_klms, self.data_storage)
             error_full = -2 * likelihood_full / self.n_free
 
@@ -244,7 +248,6 @@ class MCMCAsteroid:
         output_name = self.name + "-" + method.short_name()
         if generate:
             theta_start = self.get_theta_start_mcmc(method)
-
             if theta_start is None:
                 print("Bailed")
                 return None

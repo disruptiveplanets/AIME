@@ -19,6 +19,7 @@ RLM_EPSILON = 1e-20
 UNCERTAINTY_RATIO = 0.25
 
 MIN_MASS = 1e-10
+SLOW_PRIOR = False
 
 # Made for spherical lumps
 
@@ -40,6 +41,8 @@ class Lumpy(MCMCMethod):
         self.shell_volume = np.sum(asteroid.indicator_map) * asteroid.division**3
         self.surface_am = asteroid.surface_am
         self.X, self.Y, self.Z = np.meshgrid(asteroid.grid_line, asteroid.grid_line, asteroid.grid_line)
+        if SLOW_PRIOR:
+            self.indicator = asteroid.indicator_map
 
         # moment_field = asteroid.moment_field(asteroid.surface_am)
         # bulk_am_sqr = np.sum(moment_field[-1] * asteroid.indicator_map) * asteroid.division**3
@@ -143,7 +146,7 @@ class Lumpy(MCMCMethod):
             intersections.append(density + shell_density)
 
         # Double lumps
-        lump_poses = [theta_long[-3:] / theta_long[-4]]
+        lump_poses = [theta_long[-3:] / theta_long[1]]
         for i in range(MODEL_N - 1):
             lump_poses.append(theta_long[(4 + i * 5):(7 + i * 5)] / theta_long[3 + 5 * i])
         for i, pos_i in enumerate(lump_poses):
@@ -155,6 +158,17 @@ class Lumpy(MCMCMethod):
                 dist_sqr = np.sum((pos_i - pos_j)**2)
                 if dist_sqr < (radius_i + radius_j)**2:
                     intersections.append(lump_densities[i] + lump_densities[j] + shell_density)
+
+        if SLOW_PRIOR:
+            overage = 0
+            for i in range(MODEL_N):
+                lump_mass = theta_long[1] if i == 0 else theta_long[-2 + 5 * i]
+                lump_pos = (theta_long[-3:] if i == 0 else theta_long[(-1 + i * 5):(2 + i * 5)]) / lump_mass
+                lump_radius_sqr = (theta_long[0] if i == 0 else theta_long[-3 + 5 * i])**2 * 5 / 3 / lump_mass**2
+                interior = (self.X - lump_pos[0])**2 + (self.Y - lump_pos[1])**2 + (self.Z - lump_pos[2])**2 <= lump_radius_sqr
+                overage += np.sum(~self.indicator & interior)
+            if overage > 0:
+                return -overage * VERY_LARGE_SLOPE
 
         return min(0, np.min(intersections) - MIN_DENSITY) * VERY_LARGE_SLOPE + \
             min(0, MAX_DENSITY - np.max(intersections)) * VERY_LARGE_SLOPE

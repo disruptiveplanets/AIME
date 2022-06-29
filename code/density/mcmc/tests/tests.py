@@ -28,6 +28,7 @@ if METHOD_NAME == "lumpy":
         DIVISION = 99
     if RUN_NAME == "double":
         lumpy.MODEL_N = 2
+        lumpy.SLOW_PRIOR = True
         dof = 7
         mcmc_core.NUM_SUCCESSES = 48
 elif METHOD_NAME == "fe":
