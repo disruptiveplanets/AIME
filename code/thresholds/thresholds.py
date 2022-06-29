@@ -2,7 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-THRESHOLDS = ()#(1, True), (0.2, False))
+THRESHOLDS = ((1e-4, False),(1e-3, False),)
 INCREASING = {
     "observation-gap": True,
     "probe-s-rho": True,
@@ -15,6 +15,7 @@ INCREASING = {
 }
 PULL = True
 DIRECTORY = "lumpy"
+USE_MEANS = True
 
 if PULL:
     for name in INCREASING.keys():
@@ -33,38 +34,41 @@ for fname in os.listdir(DIRECTORY):
             print(fname[:-4], end='\t\t')
         else:
             print(fname[:-4], end='\t')
+
+        if USE_MEANS:
+            use_uncs = uncs[:, 5] # means
+        else:
+            use_uncs = uncs[:, 2] # medians
         
         plt.figure()
         xs = np.arange(len(uncs))
-        plt.plot(xs, uncs[:,5], label=fname[:-4], color="k") # mean is 5, median is 2
+        plt.plot(xs, use_uncs, label=fname[:-4], color="k")
         plt.fill_between(xs, uncs[:,1], uncs[:,3], alpha=0.3, color="C0")
         plt.fill_between(xs, uncs[:,0], uncs[:,4], alpha=0.3, color="C0")
         plt.title(fname[:-4])
-
-        print(uncs)
 
         for threshold, wait in THRESHOLDS:
             plt.axhline(y=threshold, c='r')
 
             if INCREASING[fname[:-4]]:
-                where_more_than_one = np.where(uncs>threshold)[0]
+                where_more_than_one = np.where(use_uncs>threshold)[0]
                 if len(where_more_than_one) > 0:
                     thresh_index = where_more_than_one[0]
                 else:
                     print("None", end='\t\t\t\t')
                     continue
-                fraction = (threshold - uncs[thresh_index-1]) / (uncs[thresh_index] - uncs[thresh_index-1])
+                fraction = (threshold - use_uncs[thresh_index-1]) / (use_uncs[thresh_index] - use_uncs[thresh_index-1])
                 thresh = thresh_index - 1 + fraction
                 
                 plt.axvline(x=thresh, c='k')
                 print(f"inc.\t{thresh}", end='\t')
 
             else:
-                where_less_than_one = np.where(uncs<threshold)[0]
+                where_less_than_one = np.where(use_uncs<threshold)[0]
                 if len(where_less_than_one) > 0:
                     if wait:
                         # Cut out all the indices that happen before the "last fall": the place where the uncertainty first comes down.
-                        last_fall = np.where(uncs>threshold)[0]
+                        last_fall = np.where(use_uncs>threshold)[0]
                         if len(last_fall) > 0:
                             last_fall = last_fall[-1]
                             indices_sub = where_less_than_one - last_fall
@@ -81,7 +85,7 @@ for fname in os.listdir(DIRECTORY):
                 else:
                     print("None", end='\t\t\t\t')
                     continue
-                fraction = (threshold - uncs[thresh_index]) / (uncs[thresh_index - 1] - uncs[thresh_index])
+                fraction = (threshold - use_uncs[thresh_index]) / (use_uncs[thresh_index - 1] - use_uncs[thresh_index])
                 thresh = thresh_index - fraction
                 plt.axvline(x=thresh, c='k')
                 print(f"dec.\t{thresh}", end='\t')

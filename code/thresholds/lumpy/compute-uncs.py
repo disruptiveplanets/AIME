@@ -62,7 +62,7 @@ def scan_directory(directory, index_lengths):
             indices = get_indices(dname, index_lengths)
             max_indices = np.maximum(max_indices, indices)
     max_indices += 1
-    uncs = np.ones(np.append(max_indices, [5])) * np.nan
+    uncs = np.ones(np.append(max_indices, [6])) * np.nan
 
     for dname in os.listdir(directory):
         run_name = directory+'/'+dname
@@ -133,7 +133,7 @@ def get_unc_for_file(dname, fname):
         repeat = True
         while repeat:
             repeat = False
-            generate = not os.path.exists(f"ast-{short_name}-{run_index}-fe.npy")
+            generate = not os.path.exists(f"ast-{short_name}-{run_index}-lumpy.npy")
             print(f"Trial {run_index}. Generating: {generate}")
             with suppress_stdout():
                 asteroid = MCMCAsteroid(f"ast-{short_name}-{run_index}", fname, Indicator.ell(radius, k22, k20), TrueShape.uniform(),
