@@ -2,11 +2,11 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-THRESHOLDS = ((1, True), (0.2, False))
+THRESHOLDS = ()#(1, True), (0.2, False))
 INCREASING = {
     "observation-gap": True,
     "probe-s-rho": True,
-    #"probe-s-theta": True,
+    "probe-s-theta": True,
     "scan-am": False,
     "scan-cadence": True,
     "scan-perigee": True,
@@ -14,11 +14,11 @@ INCREASING = {
     "scan-vex": True,
 }
 PULL = True
-DIRECTORY = "fe"
+DIRECTORY = "lumpy"
 
 if PULL:
     for name in INCREASING.keys():
-        os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/thresholds/fe/{name}.npy {DIRECTORY}/")
+        os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/thresholds/{DIRECTORY}/{name}.npy {DIRECTORY}/")
 
 
 print('Thresholds\t\t'+'\t\t'.join([str(t[0]) for t in THRESHOLDS]))
@@ -36,13 +36,15 @@ for fname in os.listdir(DIRECTORY):
         
         plt.figure()
         xs = np.arange(len(uncs))
-        plt.plot(xs, uncs[:,2], label=fname[:-4], color="k")
+        plt.plot(xs, uncs[:,5], label=fname[:-4], color="k") # mean is 5, median is 2
         plt.fill_between(xs, uncs[:,1], uncs[:,3], alpha=0.3, color="C0")
         plt.fill_between(xs, uncs[:,0], uncs[:,4], alpha=0.3, color="C0")
         plt.title(fname[:-4])
 
+        print(uncs)
+
         for threshold, wait in THRESHOLDS:
-            #plt.axhline(y=threshold, c='r')
+            plt.axhline(y=threshold, c='r')
 
             if INCREASING[fname[:-4]]:
                 where_more_than_one = np.where(uncs>threshold)[0]
@@ -54,7 +56,7 @@ for fname in os.listdir(DIRECTORY):
                 fraction = (threshold - uncs[thresh_index-1]) / (uncs[thresh_index] - uncs[thresh_index-1])
                 thresh = thresh_index - 1 + fraction
                 
-                #plt.axvline(x=thresh, c='k')
+                plt.axvline(x=thresh, c='k')
                 print(f"inc.\t{thresh}", end='\t')
 
             else:
@@ -81,7 +83,7 @@ for fname in os.listdir(DIRECTORY):
                     continue
                 fraction = (threshold - uncs[thresh_index]) / (uncs[thresh_index - 1] - uncs[thresh_index])
                 thresh = thresh_index - fraction
-                #plt.axvline(x=thresh, c='k')
+                plt.axvline(x=thresh, c='k')
                 print(f"dec.\t{thresh}", end='\t')
         print()
         plt.xlabel("Index")

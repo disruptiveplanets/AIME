@@ -160,6 +160,7 @@ def get_unc_for_file(dname, fname):
         np.nanpercentile(uncertainty_ratio, 50),
         np.nanpercentile(uncertainty_ratio, (100 - 68.27) / 2),
         np.nanpercentile(uncertainty_ratio, (100 - 95.45) / 2),
+        np.nanmean(uncertainty_ratio),
     ])
 
 def scan_specific(directory, threshold):
