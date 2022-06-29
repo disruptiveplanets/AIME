@@ -62,7 +62,7 @@ def scan_directory(directory, index_lengths):
             indices = get_indices(dname, index_lengths)
             max_indices = np.maximum(max_indices, indices)
     max_indices += 1
-    uncs = np.ones(np.append(max_indices, [6])) * np.nan
+    uncs = np.ones(np.append(max_indices, [9])) * np.nan
 
     for dname in os.listdir(directory):
         run_name = directory+'/'+dname
@@ -161,6 +161,9 @@ def get_unc_for_file(dname, fname):
         np.nanpercentile(uncertainty_ratio, (100 - 68.27) / 2),
         np.nanpercentile(uncertainty_ratio, (100 - 95.45) / 2),
         np.nanmean(uncertainty_ratio),
+        np.nanstd(uncertainty_ratio),
+        np.nanmin(uncertainty_ratio),
+        np.nanmax(uncertainty_ratio),
     ])
 
 def scan_specific(directory, threshold):

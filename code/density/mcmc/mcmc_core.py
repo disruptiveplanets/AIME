@@ -340,7 +340,7 @@ class MCMCAsteroid:
             except CompletedException:
                 return
             if min_result.fun < MIN_LOG_LIKE:
-                print(f"Thread successfully completed with log like {min_result.fun}")
+                print(f"Thread successfully completed with log like {min_result.fun}, parameters {min_result.x}")
                 result.set(min_result.x, min_result.fun)
             else:
                 print(f"Attempt failed with log like {min_result.fun}")
@@ -349,7 +349,10 @@ class MCMCAsteroid:
     def minimize_func(self, theta, result, method):
         if result.is_satisfied() or result.query_exceeded_attempts(MINIMIZATION_ATTEMPTS):
             raise CompletedException
-        return -log_probability(theta, method, self.data_storage)
+        lp = -log_probability(theta, method, self.data_storage)
+        #print(lp, theta)
+        #print(-log_probability(theta / 100, method, self.data_storage))
+        return lp
 
     def mcmc_fit(self, theta_start, output_name, method, generate=True):
         if generate:

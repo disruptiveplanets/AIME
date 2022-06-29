@@ -30,7 +30,7 @@ if METHOD_NAME == "lumpy":
         lumpy.MODEL_N = 2
         lumpy.SLOW_PRIOR = True
         dof = 7
-        mcmc_core.NUM_SUCCESSES = 48
+        mcmc_core.NUM_SUCCESSES = 8
 elif METHOD_NAME == "fe":
     cut_k2m = False
     DIVISION = 49

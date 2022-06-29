@@ -42,9 +42,17 @@ for fname in os.listdir(DIRECTORY):
         
         plt.figure()
         xs = np.arange(len(uncs))
-        plt.plot(xs, use_uncs, label=fname[:-4], color="k")
-        plt.fill_between(xs, uncs[:,1], uncs[:,3], alpha=0.3, color="C0")
-        plt.fill_between(xs, uncs[:,0], uncs[:,4], alpha=0.3, color="C0")
+        plt.plot(xs,  uncs[:,5], label="mean", color="k")
+        plt.plot(xs,  uncs[:,5] + uncs[:,6], label="mean+stdev", color="k", linewidth=1, linestyle='dashed')
+        #plt.plot(xs,  uncs[:,5] - uncs[:,6], color="k", linewidth=1, linestyle='dashed')
+        plt.fill_between(xs, uncs[:,1], uncs[:,3], label="1 sigma", alpha=0.3, color="C0")
+        plt.fill_between(xs, uncs[:,0], uncs[:,4], label="2 sigma", alpha=0.3, color="C0")
+        plt.plot(xs, uncs[:,2], label="median", color="C0",)
+        plt.plot(xs, uncs[:,7], label="max/min", color="C1", linestyle='dotted')
+        plt.plot(xs, uncs[:,8], color="C1", linestyle='dotted')
+
+        plt.legend()
+        plt.yscale('log')
         plt.title(fname[:-4])
 
         for threshold, wait in THRESHOLDS:

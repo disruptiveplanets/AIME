@@ -95,20 +95,24 @@ class Lumpy(MCMCMethod):
         return np.append(theta_short, np.append([shell_mass], -pos_sum))
 
     def pick_parameters(self, local_rng):
-        mass = (local_rng.random() - 0.5) * 2 * self.shell_volume
-        params = np.array([
-            local_rng.random() * self.surface_am * mass,
-            mass
-        ])
-        for i in range(MODEL_N - 1):
-            mass = (local_rng.random() - 0.5) * 2 * self.shell_volume
-            params = np.append(params, [
-                local_rng.random() * self.surface_am * mass,
-                mass,
-                (local_rng.random() - 0.5) * 2 * self.surface_am * mass,
-                (local_rng.random() - 0.5) * 2 * self.surface_am * mass,
-                (local_rng.random() - 0.5) * 2 * self.surface_am * mass
+        success = False
+        while not success:
+            mass = (local_rng.random() - 0.5) * self.shell_volume
+            params = np.array([
+                local_rng.random() * self.surface_am / 2 * mass,
+                mass
             ])
+            for i in range(MODEL_N - 1):
+                mass = (local_rng.random() - 0.5) * self.shell_volume
+                params = np.append(params, [
+                    local_rng.random() * self.surface_am / 2 * mass,
+                    mass,
+                    (local_rng.random() - 0.5) * 2 * self.surface_am * mass,
+                    (local_rng.random() - 0.5) * 2 * self.surface_am * mass,
+                    (local_rng.random() - 0.5) * 2 * self.surface_am * mass
+                ])
+            if self.log_prior(self.get_theta_long(params)) > -1:
+                success = True
         return params
 
     def log_prior(self, theta_long):
@@ -166,7 +170,9 @@ class Lumpy(MCMCMethod):
                 lump_pos = (theta_long[-3:] if i == 0 else theta_long[(-1 + i * 5):(2 + i * 5)]) / lump_mass
                 lump_radius_sqr = (theta_long[0] if i == 0 else theta_long[-3 + 5 * i])**2 * 5 / 3 / lump_mass**2
                 interior = (self.X - lump_pos[0])**2 + (self.Y - lump_pos[1])**2 + (self.Z - lump_pos[2])**2 <= lump_radius_sqr
-                overage += np.sum(~self.indicator & interior)
+                disallowed = np.sum(~self.indicator & interior)
+                if disallowed > 0:
+                    overage += disallowed * (1 + np.sum(lump_pos * lump_pos) / self.surface_am**2 + lump_radius_sqr / self.surface_am**2)
             if overage > 0:
                 return -overage * VERY_LARGE_SLOPE
 
