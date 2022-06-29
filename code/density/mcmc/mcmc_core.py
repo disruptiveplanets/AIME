@@ -161,7 +161,7 @@ class MCMCAsteroid:
         self.n_all = dof + N_CONSTRAINED
 
         
-    def pipeline(self, method_class, make_map, generate=True, n_samples=None, unc_tracker_file=None):
+    def pipeline(self, method_class, make_map, generate=True, n_samples=None, unc_tracker_file=None, cut_k2m=False):
         if n_samples is None and make_map:
             raise Exception("Number of samples cannot be none if make_map is true")
 
@@ -223,12 +223,17 @@ class MCMCAsteroid:
                 klms[12].real, # K30
             ])
 
-            likelihood = log_like(free_real_klms, self.data_storage)
-            error = -2 * likelihood / self.n_free
+            diff_klms_part = free_real_klms[2:] - self.data_storage.data[2:]
+            error_part = diff_klms_part.transpose() @ self.data_storage.data_inv_covs[2:,2:] @ diff_klms_part / (self.n_free - 2)
+            likelihood_full = log_like(free_real_klms, self.data_storage)
+            error_full = -2 * likelihood_full / self.n_free
 
             print("Real klms:", free_real_klms)
             print("Data klms:", self.data_storage.data)
-            print("Redchi", error)
+            print("Redchi full", error_full)
+            print("Redchi K3m", error_part)
+
+            error = error_part if cut_k2m else error_full
 
             self.display(densities, true_densities, uncertainty_ratios, error)
 

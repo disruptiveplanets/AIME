@@ -8,9 +8,9 @@ from mcmc_core import MCMCAsteroid, log_like
 from display import make_gif, make_slices
 from core import TrueShape, Indicator
 
-RUN_NAME = "sym"
-PULL = False
-GENERATE = False
+RUN_NAME = sys.argv[1]
+PULL = True
+GENERATE = True
 
 NUM_DRAWS = 20
 NUM_CHOOSE = 1000

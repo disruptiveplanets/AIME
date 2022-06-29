@@ -206,3 +206,7 @@ However, the lumpy model needs really low division to get a good redchi. Changed
 Redoing all the finite element stuff because it was 9 dof.
 
 Working on reparameterizing lumpy so that uniform is nondegenerate. Test
+
+## June 29
+
+Computed new 5 dof average (done) and reworked plot so that the lumpy model skips out on the K2m fit.

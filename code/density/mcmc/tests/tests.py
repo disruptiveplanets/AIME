@@ -18,6 +18,7 @@ MAX_RADIUS = 2000
 RUN_NAME = sys.argv[1]
 METHOD_NAME = sys.argv[2]
 if METHOD_NAME == "lumpy":
+    cut_k2m = True
     method_class = lumpy.Lumpy
     method_tag = "lump"
     dof = 2
@@ -30,6 +31,7 @@ if METHOD_NAME == "lumpy":
         dof = 7
         mcmc_core.NUM_SUCCESSES = 48
 elif METHOD_NAME == "fe":
+    cut_k2m = False
     DIVISION = 49
     method_class = fe.FiniteElement
     method_tag = "fe"
@@ -125,7 +127,7 @@ asteroid = mcmc_core.MCMCAsteroid(f"{RUN_NAME}-{method_tag}", f"../../samples/{S
 
 result = None
 while result is None:
-    result = asteroid.pipeline(method_class, make_map, generate=generate, n_samples=1000, unc_tracker_file=unc_tracker_file)
+    result = asteroid.pipeline(method_class, make_map, generate=generate, n_samples=1000, unc_tracker_file=unc_tracker_file, cut_k2m=cut_k2m)
     
 with open(f"{RUN_NAME}-{method_tag}-unc-tracker.npy", 'wb') as f:
     result.save(f)
