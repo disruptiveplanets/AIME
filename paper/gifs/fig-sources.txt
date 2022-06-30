@@ -1,0 +1,49 @@
+asym-fe-d.gif code/density/figs/avg-asym/fe-d.gif
+asym-fe-r.gif code/density/figs/avg-asym/fe-r.gif
+asym-fe-s.gif code/density/figs/avg-asym/fe-s.gif
+asym-fe-u.gif code/density/figs/avg-asym/fe-u.gif
+
+asym-l-d.gif code/density/figs/asym-lump/fe-d.gif
+asym-l-r.gif code/density/figs/asym-lump/fe-r.gif
+asym-l-s.gif code/density/figs/asym-lump/fe-s.gif
+asym-l-u.gif code/density/figs/asym-lump/fe-u.gif
+
+sym-fe-d.gif code/density/figs/avg-sym/fe-d.gif
+sym-fe-r.gif code/density/figs/avg-sym/fe-r.gif
+sym-fe-s.gif code/density/figs/avg-sym/fe-s.gif
+sym-fe-u.gif code/density/figs/avg-sym/fe-u.gif
+
+sym-l-d.gif code/density/figs/sym-lump/fe-d.gif
+sym-l-r.gif code/density/figs/sym-lump/fe-r.gif
+sym-l-s.gif code/density/figs/sym-lump/fe-s.gif
+sym-l-u.gif code/density/figs/sym-lump/fe-u.gif
+
+sph-3-fe-d.gif code/density/figs/avg-sph-3/fe-d.gif
+sph-3-fe-r.gif code/density/figs/avg-sph-3/fe-r.gif
+sph-3-fe-s.gif code/density/figs/avg-sph-3/fe-s.gif
+sph-3-fe-u.gif code/density/figs/avg-sph-3/fe-u.gif
+
+sph-3-l-d.gif code/density/figs/sph-3-lump/fe-d.gif
+sph-3-l-r.gif code/density/figs/sph-3-lump/fe-r.gif
+sph-3-l-s.gif code/density/figs/sph-3-lump/fe-s.gif
+sph-3-l-u.gif code/density/figs/sph-3-lump/fe-u.gif
+
+double-fe-d.gif code/density/figs/avg-double/fe-d.gif
+double-fe-r.gif code/density/figs/avg-double/fe-r.gif
+double-fe-s.gif code/density/figs/avg-double/fe-s.gif
+double-fe-u.gif code/density/figs/avg-double/fe-u.gif
+
+double-l-d.gif code/density/figs/double-lump/fe-d.gif
+double-l-r.gif code/density/figs/double-lump/fe-r.gif
+double-l-s.gif code/density/figs/double-lump/fe-s.gif
+double-l-u.gif code/density/figs/double-lump/fe-u.gif
+
+move-fe-d.gif code/density/figs/avg-move-1.5/fe-d.gif
+move-fe-r.gif code/density/figs/avg-move-1.5/fe-r.gif
+move-fe-s.gif code/density/figs/avg-move-1.5/fe-s.gif
+move-fe-u.gif code/density/figs/avg-move-1.5/fe-u.gif
+
+move-l-d.gif code/density/figs/move-1.5-lump/fe-d.gif
+move-l-r.gif code/density/figs/move-1.5-lump/fe-r.gif
+move-l-s.gif code/density/figs/move-1.5-lump/fe-s.gif
+move-l-u.gif code/density/figs/move-1.5-lump/fe-u.gif

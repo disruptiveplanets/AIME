@@ -24,9 +24,9 @@ N_PERCENTILES = None
 PULL = True
 
 if PULL:
-    os.sysmem("scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/thresholds/lumpy/scan-spin-pole.npy .")
+    os.system("scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/thresholds/lumpy/scan-spin-pole.npy .")
 
-with open("../../code/thresholds/scan-spin-pole.npy", 'rb') as f:
+with open("scan-spin-pole.npy", 'rb') as f:
     uncs = np.load(f)
 
 def show_true_point(ax, flip=False):
@@ -104,17 +104,25 @@ for plot_index in range(N_DIM+1):
         param_data[:,name_index[f]] = percentiles[f][i]
 
     interp = LinearNDInterpolator(xyzs, data[i])
+    interp_unc = LinearNDInterpolator(xyzs, uncs)
 
     cart_array = []
+    cart_array_unc = []
     for pi, lat in enumerate(lats):
         cart_line = []
+        cart_line_unc = []
         for pj, lon in enumerate(lons):
             p = projected_vecs[pi][pj]
             cart_line.append(interp(p[0], p[1], p[2]))
+            cart_line_unc.append(interp_unc(p[0], p[1], p[2]))
         cart_array.append(cart_line)
+        cart_array_unc.append(np.array(cart_line_unc))
 
     vmax = np.percentile(cart_array, 95)
     im = axs[plot_index].pcolormesh(Lon, Lat, cart_array, vmin=np.min(cart_array), vmax=vmax, cmap='Blues_r')
+
+    axs[plot_index].contour(Lon, Lat, np.array(cart_array_unc), levels=[1e-3], colors=['r'], linewidths=[1])
+    axs[plot_index].contour(Lon, Lat, np.array(cart_array_unc), levels=[1e-4], colors=['r'], linewidths=[1], linestyles=['dotted'])
     
     cbar = fig.colorbar(im, ax=axs[plot_index], extend='max')
     if i < 3:

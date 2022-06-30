@@ -21,7 +21,7 @@
 \usepackage{bm}
 \usepackage{caption}
 \usepackage{subcaption}
-
+\usepackage{animate}
 \usetikzlibrary{arrows.meta}
 
 
@@ -48,7 +48,7 @@
 % The list of authors, and the short list which is used in the headers.
 % If you need two or more lines of authors, add an extra line using \newauthor
 \author[Jack T. Dinsmore, Julien de Wit]{
-Jack T. Dinsmore,$^{1}$\thanks{E-mail: jtdinsmo@mit.edu}
+Jack T. Dinsmore,$^{1}$\thanks{E-mail: jtd@stanford.edu}
 Julien de Wit$^{2}$
 \\
 % List of institutions
@@ -328,8 +328,8 @@ Density moments of the kind described above were extracted for the asymmetric an
   \includegraphics[width=0.24\linewidth]{figs/sym-l-u}\hfill
   \includegraphics[width=0.24\linewidth]{figs/sym-l-r}
 
-  \caption{Cross-sectional slices of the density distributions extracted via the finite element model for the asymmetric (\textit{first and thrid row}) and symmetric (\textit{second and fourth rows}) reference asteroids. The finite element model (\textit{top two rows}) and the lumpy model (\textit{bottom two rows}) are employed. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted. Extracted densities are generally within 10\% of the truth.}
-  \label{fig:uniform}
+  \caption{Cross-sectional slices of the density distributions extracted via the finite element model for the asymmetric (\textit{first and thrid row}) and symmetric (\textit{second and fourth rows}) reference asteroids. The finite element model (\textit{top two rows}) and the lumpy model (\textit{bottom two rows}) are employed. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted. These figures are available in animated form in appendix figure \ref{fig:animated-uniform}.Extracted densities are generally within 10\% of the truth.}
+  \label{fig:den-uniform}
 \end{figure*}
 
 The figure demonstrates that the finite element model successfully extracts density distributions consistent with the extracted density moments, as shown by the $\chi^2$ value per degree of freedom, $\chi^2_r$, depicted in the figure. These express the agreement of the density moments of the shown distributions with the posterior distributions for the density moments, produced by the MCMC described in section \ref{sec:fit}. $\chi^2_r = 0$ indicates that the moments of the shown distributions are exactly equal to the means of the moment posterior extracted by the MCMC. The accuracy of this model is robust for additional shapes, including non-ellipsoidal shapes.
@@ -350,8 +350,8 @@ We also explore model behaviour in non-uniform density asteroids. We employ an a
   \includegraphics[width=0.24\linewidth]{figs/sph-3-l-u}\hfill
   \includegraphics[width=0.24\linewidth]{figs/sph-3-l-r}
 
-  \caption{Cross-sectional slices of the density distributions extracted via the finite-element (\textit{top}) and lumpy (\textit{bottom}) models for an asteroid with a centred core. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted. The core is successfully extracted in all cases.}
-  \label{fig:center-core}
+  \caption{Cross-sectional slices of the density distributions extracted via the finite-element (\textit{top}) and lumpy (\textit{bottom}) models for an asteroid with a centred core. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted. These figures are available in animated form in appendix figure \ref{fig:animated-den-sph}. The core is successfully extracted in all cases.}
+  \label{fig:den-sph}
 \end{figure*}
 
 Once again, figure \ref{fig:center-core} shows that the model results are successful in that they reproduce the extracted density moments ($\chi^2_r$ is low). However, the density distributions extracted by the finite model match the true distributions less well. The deviation the true density extends to as much as 35\% in some locations, leading to a maximum significance of $0.86\sigma$. The distributions are consistent with the true distribution, but the finite element model has distributed the core into the rest of the asteroid so that the peak density is lowered.
@@ -370,9 +370,9 @@ However, the lumpy model is designed to detect discrete changes in density distr
 \label{sec:fit-uncertainty}
 
 
-The question of which encounters are most suited to this analysis is of great interest. We investigate a mix of encounter parameters, from observational parameters (e.g., the cadence of observations, gaps in data, and uncertainty in the spin pole and period of the asteroid) and physical asteroid properties (e.g., the true density moments, rotational period, perigee, excess velocity, initial spin pole direction, and length), and discuss their effect on the uncertainty of this methodology's results.
+The question of which encounters are most suited to this methodology is of great interest, as is the question of how observational campaigns can be designed to best take advantage of an asteroid to maximize the success of this methodology. We investigate a mix of encounter parameters, from observational parameters (the data uncertainty, the cadence of observations, and gaps in data coverage) and physical asteroid properties (the encounter's orbital properties, the asteroid's true shape, and its initial rotational velocity), and discuss their effect on the uncertainty of this methodology's results.
 
-Specifically, we highlight both the uncertainties on the density moments and uncertainty on density distribution. Moment uncertainty is defined as the range of $K_{\ell m}$ values that contains 68.27\% of the marginal PPD for each $\ell$ and $m$. Since there is no degeneracy between moments and the actual encounter data, this uncertainty is well-defined. However, its physical relevance is not obvious. The density distribution uncertainty is presented as a map of uncertainty over the asteroid, made by taking the standard deviation of density at each point over 5000 maps of asteroid density, each made using a different sample of the output of the density distribution MCMC described in section \ref{sec:density-distro}. The median uncertainty over this map, divided by the local density, is taken as the uncertainty in density distribution of the asteroid. This measure of uncertainty is more physically relevant than moment uncertainty, but it is affected by choices of the density distribution model, degrees of freedom, prior constraints, and other effects unrelated to the encounter properties.
+We study both the uncertainties on the density moments and uncertainty on density distribution. Moment uncertainty $\sigma (K_{\ell m})$ is defined as the range of $K_{\ell m}$ values that contains 68.27\% of the marginal PPD for each $\ell$ and $m$. Since there is no degeneracy between moments and the actual encounter data, this uncertainty is well-defined. However, its physical relevance is not obvious. The density distribution uncertainty $\sigma_\rho / \rho$ is defined as a map of uncertainty over the asteroid, made by taking the standard deviation of density at each point over 5000 maps of asteroid density, each made using a different sample of the output of the density distribution MCMC described in section \ref{sec:density-distro}. The median uncertainty over this map, divided by the local density, is taken to represent the density distribution uncertainty. This measure of uncertainty is more physically relevant than moment uncertainty, but it is strongly dependent by choices of the density distribution model, degrees of freedom, prior constraints, and other effects unrelated to the encounter properties. We therefore investigate both the moment uncertainty and the density distribution uncertainty. 
 
 \begin{table}
   \centering
@@ -388,18 +388,32 @@ Specifically, we highlight both the uncertainties on the density moments and unc
     Data gap ($T_\text{gap}$, hr) & - & - \\ 
     \hline
   \end{tabular}
-  \caption{The weak and strong thresholds on physical / observational properties (\textit{top} / \textit{bottom}) consistent with useable density distribution uncertainty. Perigee and observational uncertainty are the most constraining properties, followed by asteroid length, rotational period, and observational cadence.}
+  \caption{The weak and strong thresholds on physical / observational properties (\textit{top} / \textit{bottom}) consistent with useable density distribution uncertainty. Perigee and observational uncertainty are the most constraining properties, followed by rotational period, asteroid length, and observational cadence.}
   \label{tab:threshold-summary}
 \end{table}
 
 \begin{figure*}
   \centering
+  % \includegraphics[width=0.5\linewidth]{figs/spin-unc.pdf}
+  \caption{Median ratio of density uncertainty to density computed over the reference asteroid density distribution via the lumpy model as a function of initial spin pole direction. The benchmark uncertainty thresholds (\textit{red lines}) are shown, as is the reference spin pole direction (\textit{\jtd{What symbol?}}). \jtd{Summary}}
+  \label{fig:spin-uncertainty}
+\end{figure*}
+
+\begin{figure*}
+  \centering
   \includegraphics[width=\linewidth]{figs/unc-scan.pdf}
-  \caption{Median ratio of density uncertainty to density computed over the reference asteroid density distribution as a function of various encounter properties. Density distributions from both the lumpy and finite element models are used. The benchmark uncertainty thresholds (\textit{red lines}) are shown and the properties that exceed these thresholds are shaded. The figures illustrate the marked difference in density distributions that results from using different models.}
+  \caption{Median ratio of density uncertainty to density computed over the reference asteroid density distribution as a function of physical / observational encounter properties (\textit{top / bottom}). Density distributions from both the lumpy and finite element models are used. The benchmark uncertainty thresholds (\textit{red lines}) are shown and the properties that exceed these thresholds are shaded. Te vertical black dotted lines are the property values of the reference asteroid. The figures illustrate the marked difference in density distributions that results from using different models.}
   \label{fig:net-uncertainty}
 \end{figure*}
 
-We therefore investigate both the moment uncertainty and the density distribution uncertainty. Figure \ref{fig:scan-physical} displays the dependence of moment uncertainty on four asteroid physical parameters and and \ref{fig:scan-observational} displays dependence on observational parameters. Additionally, figures \ref{fig:scan-space-sigma} and \ref{fig:scan-spin} display dependence on asteroid shape and initial spin direction. These are useful as a sensitive and model-independent measure of the relationship between the encounter properties and the methodology uncertainty.
+Table \ref{tab:threshold-summary} displays the encounter properties which beyond which the density distribution uncertainty rises above two sample values we term the ``weak'' and ``strong'' thresholds. These values are $\sigma_\rho / \rho = 10^{-4}$ (weak) and $10^{-3}$ (strong), for density distributions extracted via the lumpy model. These thresholds are manually chosen, and adjustments to them or to the lumpy model will affect the data of table \ref{tab:threshold-summary}. Figure \ref{fig:spin-uncertainty} depicts the same $\sigma_\rho / \rho$ as a function of initial spin pole direction, while figure \ref{fig:net-uncertainty} depicts $\sigma_\rho / \rho$ as a function of the encounter properties. Both highlight the threshold values of table \ref{tab:threshold-summary} with red lines. Bands contain 68\% (light) and 95\% (dark) of the density uncertainty over the asteroid are shown for figure \ref{fig:net-uncertainty}.
+
+Table \ref{tab:threshold-summary} reveals that the most limiting physical properties of the asteroid are its perigee and period. Excess velocity does not greatly affect the uncertainty of the density distribution, and asteroid length is only effective for $a_\mathcal{A} \sim 15$ m. By contrast, the radius of asteroid 99942 Apophis is 
+$\sim 300$ m and Apophis will encounter Earth in 2029. Apophis's perigee of 5--6 Earth radii also obeys the weak and strong constraints. In addition to the period constraint shown in this table, figure \ref{fig:spin-uncertainty} also shows a threshold on spin pole direction. \jtd{Describe}.
+
+Table \ref{tab:threshold-summary} also demonstrates the strong affect of properties of the observational campaign on the final density uncertainty. Most vital are the uncertainty on the instantaneous asteroid rotational period $\sigma_P / P$ and its direction $\sigma_\theta$, which require precision on the order of tens to hundreds of milliseconds and degrees every cadence, respectively. This could be accomplished by multiple, precise angular velocity measurements from multiple telescopes, or by increasing the time between observations to maximize the change in period between observations. Increasing the data set size to include more post-flyby tumbling data would also relieve the burden on each data point for uncertainty to be so low. On the other hand, the cadence of observations $\Delta t$ and the presence of gaps in the data $T_\text{gap}$ do not affect results as strongly. Observations can be as much as 15 minutes apart to obey the weak threshold, with no constraint required to meet the strong threshold in our data set (which contains $\Delta t < 1$ hr). Likewise, there is no constraint on our data set of $T_\text{gap} < 3$ hr. This gap was simulated to occur in one contiguous unit centred on the encounter perigee, where torque is highest. If the gap occurred elsewhere in the data set or was subdivided into multiple gaps, it would likely affect density uncertainty even less. All of these thresholds are liable to change if the encounter properties are adjusted, since they are all interdependent.
+
+Figure \ref{fig:net-uncertainty} reveals that the thresholds presented in table \ref{tab:threshold-summary} are particularly sharp (a steep slope of $\sigma_\rho / \rho$) for the encounter perigee $r_p$and observational precision $\sigma_P$ and $\sigma_\theta$. These thresholds are therefore less likely to change if the asteroid properties are altered, whereas the thresholds on period $P_\omega$, length $a_\mathcal{A}$, and cadence $\Delta t$ are much more volatile. The figure also displays the stark difference between density uncertainty as computed by the lumpy model and the finite element model. This is partially due to different choices in the number of DOF (5 for the finite element model and 2 for the lumpy model). The model assumptions also affect this uncertainty; the lumpy model must place the asteroid lump at the center of the asteroid since placing it elsewhere would move the asteroid's center of mass away from its observed position. Therefore, uncertainty on the edge of the asteroid where the lump is unlikely to be located, is very low for the lumpy model. The same reasoning does not apply to the finite element model, which has no bias towards the asteroid center. This model-dependence of $\sigma_\rho / \rho$ is another reason to take the thresholds of table \ref{tab:threshold-summary} as estimates rather than strict limits on encounter properties.
 
 \begin{figure*}
   \centering
@@ -436,33 +450,13 @@ We therefore investigate both the moment uncertainty and the density distributio
   \label{fig:scan-space-sigma}
 \end{figure*}
 
-\begin{figure*}
-  \centering
-  \includegraphics[width=0.8\textwidth]{figs/spin-pole.png}
-  \caption{$1\sigma$ uncertainties for the first-order parameters (\textit{top}) and second-order (\textit{bottom}) as a function of the initial direction of spin in the inertial frame. All maps are made in the Mollweide projection. The orange star indicates the reference spin pole. The red contours enclose regions the 20\% (dotted) and 100\% (solid) $\sigma_\rho / \rho$ cut-off. Posterior uncertainty depends similarly on initial spin pole direction for all parameters}
-  \label{fig:scan-spin}
-\end{figure*}
+To address the dependence of $\sigma_\rho / \rho$ on the choice of model, we investigate moment uncertainty as well. Figures \ref{scan-physical} and \ref{scan-observational} display moment uncertainty $\sigma(K_{\ell m})$ on physical and observational encounter properties respectively. The thresholds of table \ref{tab:threshold-summary} are depicted as red lines. Also shown is moment uncertainty as a function of $K_{2m}$ in figure \ref{fig:scan-space-sigma}.
 
+Figure \ref{scan-physical} reveals that $\sigma_\rho / \rho$ is more sensitive to $\sigma (K_{2m})$ than to $K_{3m}$. For instance, $\sigma(K_{2m})$ is constant as $a_\mathcal{A}$ is varied despite a dramatic increase in $\sigma(K_{3m})$ for low $a_\mathcal{A}$. The resulting $\sigma_\rho / \rho$ is mostly constant. However, the roles are reversed for $P_\omega$, where $\sigma(K_{3m})$ (except for $m=0$) are mostly constant, and here $\sigma_\rho /\rho$ follows the trend of $\sigma(K_{2m})$ and increases for low rotational period. This fact has several consequences. First of all, if more post-flyby tumbling data is collected, this will place stronger constraints on $K_{2m}$ and not $K_{3m}$. If so much data is available that $K_{2m}$ have essentially no uncertainty, then uncertainty on $K_{3m}$ will be dominant and the most constraining parameters will change. Rotational period $P_\omega$ will cease to be a vital parameter but asteroid length $a_\mathcal{A}$ will be because $\sigma(K_{3m})$ are much more dependent on $a_\mathcal{A}$ than $P_\omega$.
 
-In table \ref{tab:threshold-summary}, we present the property ``thresholds'' required in order to obtain meaningful information about the asteroid density distribution. These are collected by evaluating the median uncertainty ratio of the asteroid density distribution extracted by the lumpy model as a function of each encounter property and identifying when it exceeds $\sigma_\rho / \rho = 10^{-4}$ (the weak threshold) and $\sigma_\rho / \rho = 10^{-3}$ (the strong threshold). These thresholds are also shown in figures \ref{fig:scan-physical} to \ref{fig:scan-observational} as vertical red lines. The values of $\sigma_\rho / \rho$ are plotted as a function of encounter properties in figure \ref{fig:net-uncertainty}, similarly to figures \ref{fig:scan-physical} and \ref{fig:scan-observational}.
+Figure \ref{fig:scan-physical} also demonstrates exponentially increasing $\sigma(K_{\ell m})$ as a function of perigee $r_p$, indicating that the constraint on $r_p$ noted in table \ref{tab:threshold-summary} is not entirely a feature of the density model. (Figure \ref{fig:net-uncertainty} also indicated this, since $\sigma_\rho / \rho$ falls for low perigee in both the lumpy and the finite element model). Dependence of moment uncertainty on data precision $\sigma_P$ and $\sigma_\theta$ is similarly exponential as shown by figure \ref{fig:scan-observational}. However, moment uncertainty on cadence $\Delta t$ and gaps in data $T_\text{gap}$ are less exponential. These tend to increase in uncertainty at some characteristic time scale of $\Delta t \sim 15 -40$ min for cadence and $1-2$ hr for $T_\text{gap}$. As long as $\Delta t$ and $T_\text{gap}$ are below these time scales, uncertainty is not strongly dependent on them.
 
-
-Table \ref{tab:threshold-summary} reveals that the most limiting physical properties of the asteroid are its perigee and its length. \jtd{Further discuss}. Figure \ref{fig:scan-physical} demonstrates that the asteroid length cut-off is particularly sharp, since the density moment uncertainty $\sigma_{K_{3m}}$ is very steep there. However, precision on the moment of inertia ratios of the asteroid $K_{2m}$ are not affected by asteroid length; these may still be collected even for small asteroids.
-
-The excess velocity and rotational period of the asteroid do not drastically affect the moment uncertainty and therefore do not impose strict thresholds, except for a dramatic increase in $\sigma(K_{2m})$ visible in figure \ref{fig:scan-physical} for rotational period $P_\omega \approx 4$ hr. The location of this threshold is likely dependent on other dynamical time scales of the system such as the cadence of observations and possibly the orbital time scales of $v_\infty / r_p$ and $\mu_\mathcal{A} / (v_\infty^2 r_p)$.
-
-Physical parameters not studied here include the possibility of an initially tumbling asteroid and the presence of a third perturbing body, such as the Moon. Both are likely to increase precision but they are not within the scope of this paper.
-
-
-The observational parameters also impose strict thresholds, most of all the uncertainty of the data set $\sigma_P / P$ and $\sigma_\rho$. Instantaneous rotational period uncertainty of less than one part in one million is required to resolve precise details of the asteroid density distribution. This could be accomplished by multiple, precise period measurements, increasing the time between observations to maximize the change in period between observations, increasing the data set to include more post-flyby tumbling data, or if necessary by increasing precision in the other observational parameters to relieve the burden on asteroid period. The instantaneous spin pole direction of the asteroid must also be known with precision on the order of degrees. However, the cadence of observations and the possibility of missing data points does not strongly affect results. Observations can be as much as 30 minutes apart and as much as 1.5 hr can be left out of the data set (equivalent to 45 missing data points for the reference 2 minute cadence), even during the high-torque perigee. The latter could be caused by the asteroid passing in front of the sun, for example. 
-
-Two other properties important that affect moment uncertainty are the asteroid shape (as parametrized by the values of $K_{2m}$ or the axis lengths of the corresponding ellipsoid) and initial spin pole direction. The asteroid shape does not strongly affect density moment uncertainty, except that this model is not well-equipped to handle rotationally-symmetric asteroids with $K_{22} = 0$. For such asteroids, the principal axes can be selected to lie anywhere in the $xy$-plane, so that $\gamma_0$ is unconstrained. This inflates the moment uncertainties, although the density uncertainties are not badly affected as seen for the symmetric density distribution shown in figure \ref{fig:uniform}. A reparametrization of $\gamma_0$ would aid in decreasing moment uncertainty.
-
-
-The initial spin pole of the asteroid also does not strongly affect the moment uncertainties, except when the initial spin pole happens to point perpendicular to the orbital plane, or in the plane and perpendicular to the major axis of the encounter. Both of these regions tend to result in less tidal torque, but even within these regions, the moment uncertainty generally is only double or triple that of other regions. 
-
-Additional analysis of the data shown in this section, descriptions of how they were collected, and some supplementary figures are given in appendix \ref{app:uncertainty-dependence}.
-                 
+Finally, figure \ref{fig:scan-space-sigma} depicts moment uncertainty $\sigma(K_{2m})$ as a function of $K_{2m}$ and $\gamma_0$. $K_{2m}$ can be interpreted as moment inertia ratios or the dimensions of the uniform-density ellipsoid with the same $K_{\ell m}$. Therefore, moment uncertainty is depicted both as a function of $K_{2m}$ and these ratios $a/c$ and $b/c$. The figure shows a dramatic increase in moment uncertainty for $K_{22} = 0$, which corresponds to $a=b$, or a rotationally symmetric ellipsoid. This uncertainty is caused by degeneracy in the model; if the asteroid is rotationally symmetric, then two principal axes can lie anywhere in the $xy$-plane, so that the definition of $\gamma_0$ becomes meaningless. $\gamma_0$ is therefore poorly constrained as $K_{22} \rightarrow 0$. Figure \ref{fig:uniform} revealed that density distributions can still be extracted for symmetric asteroids, but to reduce uncertainty, the moments must be re-parametrized to remove this degeneracy if this methodology is to be run on nearly symmetric asteroids. Beyond this dependence on $K_{2m}$, almost no moment uncertainty variation is visible, indicating that this methodology will give similar results given many asteroid shapes distinct from the reference asteroid.
 
 
 \subsection{Comparison of Jupiter and Earth encounters}
@@ -527,25 +521,52 @@ The top panel of \ref{fig:dof-scan} also demonstrates that $\sigma_\rho$ reaches
 \subsection{Comparisons between density distribution models}
 \label{sec:density-compare}
 
-In section \ref{sec:asym-density}, we displayed density distributions extracted via the lumpy model with $N=1$ lumps. When $N=1$, the model has two DOF, meaning that the density distribution can be determined only via the fit results for $K_{2m}$, rather than the relatively poorly constrained $K_{3m}$. Therefore, we also explore a density distribution with $N=2$ lumps, which has seven DOF.
+In section \ref{sec:asym-density}, we displayed uniform and non-uniform density distributions extracted via the finite element and single-lump lumpy model. Here we highlight the success of the model in two other scenarios.
 
-\jtd{Continue}
+\begin{figure*}
+  \includegraphics[width=0.24\linewidth]{figs/move-fe-d}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/move-fe-s}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/move-fe-u}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/move-fe-r}
 
-\jtd{Possibly discuss moved core}
+  \includegraphics[width=0.24\linewidth]{figs/move-l-d}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/move-l-s}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/move-l-u}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/move-l-r}
+
+  \caption{Cross-sectional slices of the density distributions extracted via the finite-element (\textit{top}) and lumpy (\textit{bottom}) models for an asteroid with an off-center core. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted. These figures are available in animated form in appendix figure \ref{fig:animated-move}. The core is successfully extracted in all cases.}
+  \label{fig:den-move}
+\end{figure*}
+
+Figure \ref{fig:den-move} shows density distributions extracted via the finite element model and the lumpy model for an off-center core. Results are similar to the centred core shown in \ref{fig:den-sph} in that the moments of the resulting density distribution are consistent with those extracted from the encounter data (i.e., $\chi^2_r$ is low). Again, the finite element model does not isolate the lump, instead spreading the excess mass over the right side of the asteroid. The ability of the lumpy model to isolate the core is rooted in the fact that the shape of the asteroid is offset from the center of mass by a fixed amount with no uncertainty attached. The position of the lump is therefore set to balance the offset of the surrounding asteroid medium; the only free parameter is the lump's mass, which determines this offset. The assumption that the asteroid's center of mass is precisely known is rooted stems from the fact that the shape of the asteroid is observed to rotate around its center of mass. If observations do not allow the center of mass to be determined in this way, then the lump's position will be more uncertain.
+
+To assess the lumpy model when the positions of the lump are not as certain as in this off-center case, we consider an asteroid with two lumps of radius 300 m and density three times the surrounding density. Each lump is located 500 meters from the center of the asteroid, so that they counterbalance and the asteroid's observed center of mass is its surface's centroid. The lumpy model with $N=2$ lumps then inherits three additional DOF corresponding to one lump's position (the other lump is fixed to counterbalance it) as well as two more from the additional lump's radius and mass. The model thus has seven DOF, in contrast to the 5 DOF of the finite element model. Both models are run on this asteroid and the resulting distributions are shown in figure \ref{fig:den-double}.
+
+\begin{figure*}
+  \includegraphics[width=0.24\linewidth]{figs/double-fe-d}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/double-fe-s}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/double-fe-u}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/double-fe-r}
+
+  \includegraphics[width=0.24\linewidth]{figs/double-l-d}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/double-l-s}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/double-l-u}\hfill
+  \includegraphics[width=0.24\linewidth]{figs/double-l-r}
+
+  \caption{Cross-sectional slices of the density distributions extracted via the finite-element (\textit{top}) and the two-lump lumpy (\textit{bottom}) models for an asteroid with two counterbalancing cores. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted. These figures are available in animated form in appendix figure \ref{fig:animated-double}. The additional lump greatly increases uncertainty, but the resulting distribution is close to accurate.}
+  \label{fig:den-double}
+\end{figure*}
+
+Figure \ref{fig:den-double} again shows that the finite element model is unable to isolate the lumps except to predict generally increased asteroid near the center. On the other hand, the lumpy model detects that the two lumps are opposite each other, and of roughly the same radius and mass. These radius and mass values are also close to the true values. The model places the lumps correctly in the $xy$-plane of the asteroid but does not perfectly align them with the $y$ axis, resulting in very high $\Delta \rho$ where the true lumps and predicted lumps do not intersect. Note that $\chi^2_r$ remains low despite the lumpy model's misplacement of the lumps. This is because the lumpy model gains its information on the placement of the lumps from the $K_{3m}$ density moments, which figures \ref{fig:scan-physical} and \ref{fig:scan-observational} suggest are not as well constrained as the $K_{2m}$ density moments. The moments estimated by the MCMC fit to encounter data are not perfectly correct, resulting in a deviation of a few hundred meters in lump location. Overall, the figures show that even the poorly constrained $K_{3m}$ moments can be used to determine features of the asteroid density, given a well-chosen model.
+
 
 \section{Conclusions}
 
-We derived a novel, arbitrary-order equation for the tidal torque experienced by an asteroid during an encounter with a planet of arbitrary shape and mass distribution. The tidal torque equation (equation \ref{eqn:tidal-torque}) revealed that the angular velocity of the asteroid over time depends strongly on $K_{\ell m}$ and the initial orientation. We then built a fast simulation for an asteroid encounter, truncating the equation at second-order, and used the simulation to extract first- and second-order density moments from synthetic spin pole data via a Markov Chain Monte Carlo fit. We observe the following general properties of the moments:
-\begin{enumerate}
-  \item The second-order moments $K_{3m}$ are roughly a factor of $~\frac{a_\mathcal{A}}{r_p}$ more uncertain than the first-order moments, where $a_\mathcal{A}$ is proportional to the asteroid radius and $r_p$ is the perigee distance. For our reference asteroid, this fraction was about $10^{-5}$.
-  \item The second-order moments that measure small-scale variations in density (i.e., $|m|$ is large) are generally less uncertain. It is often possible to measure $K_{3|m|}$ for large $m$ even when $K_{30}$ is not resolved.
-  \item Extracted density moments are generally more precise when the asteroid leaves the encounter tumbling.
-  \item The oblateness of the central body cannot be ignored without generating incorrect density moment estimates.
-\end{enumerate}
+We derived a novel, arbitrary-order equation for the tidal torque experienced by an asteroid during an encounter with a planet of arbitrary shape and mass distribution. The tidal torque (equation \ref{eqn:tidal-torque}) revealed that the angular velocity of the asteroid over time depends strongly on the asteroid's density moments and the initial orientation. We then built a fast simulation for an asteroid encounter and designed an MCMC to extract density moments from simulated data. We also created two models --- the finite element model and the lumpy model --- to translate these density moments back into density distributions. Since this problem is underdetermined, the models give different results and were contrasted. Nevertheless, we find that the models always produce results consistent with the data set. The entire pipeline was run starting from simulated encounter data and ending with density distribution predictions and was shown to be robust.
 
-We assessed the posterior uncertainty generated by the fit process by adjusting various properties of an asteroid on an Earth encounter. The precise thresholds we measure (table \ref{tab:threshold-summary}) show that the observational uncertainty and perigee of the asteroid orbit are the most difficult requirements to meet, with perigee $\lesssim 6$ Earth radii, spin pole uncertainty $\lesssim 1^\circ$, and period uncertainty $\lesssim 10$ ms. However, these thresholds depend on the model used to extract a density distribution, and useful information may be able to be extracted when they are not achieved by using a different model.
+We assessed the uncertainty of the pipeline's results by adjusting various properties of the asteroid and its Earth encounter. The precise thresholds we measure (table \ref{tab:threshold-summary}) show that the observational uncertainty and perigee of the asteroid orbit have the strongest effect on the density distribution uncertainty and they are the most important thresholds to meet in order to extract a precise distribution. We also discussed how these thresholds could be eased by changes in observational behaviour such as lengthening the data set, or by physical asteroid properties such as a closer encounter or an initially tumbling state. If the thresholds were eased enough, then the asteroid length would become an important threshold as well.
 
-Finally, we presented three fast, linear methods for extracting density distributions (together with uncertainties) from the density moments and the shape of the asteroid The extracted density distributions are largely consistent with the true distributions in all cases we tested. Slight adjustments to $K_{3m}$ dramatically change the overall distribution, so that they are not very precise. Indeed, the models sometimes predict negative density (though more complicated models could be made not to). Errors in the shape estimate of the asteroid also distort the density distribution, but the resulting distributions provide hints as to exactly where the shape is incorrect. Large-scale properties of the asteroid's true distribution, such as whether the mass is located in the middle or on the edges, are often observable. Two of the models presented (the harmonic and lumpy models) are flexible in their number of parameters, so that if only these large-scale properties are necessary, a small set of parameters can be chosen to prevent over-fitting.`'
+Finally, we highlighted that the properties of the final density distribution are strongly dependent. The uncertainties on density distribution of the two models were drastically different, and also depended on the number of degrees of freedom used in the model. For asteroids of non-uniform distributions, the distributions themselves also differed. The lumpy model, designed to look for specific types of features, was much more sensitive to these features than the generic finite element model. To efficiently use encounter data, it is therefore important to investigate multiple models and choose different models to answer different questions.
 
 \section*{Acknowledgements}
 
@@ -556,7 +577,7 @@ We warmly thank Emmanuel Jehin, Maxime Devogele, and Marin Ferrais for meeting w
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Data Availability}
 
-The asteroid simulation, fit process, and density moment extraction code are available on \href{https://github.com/jack-dinsmore/asteroid-tidal-torque}{GitHub}.
+The asteroid simulation, fit process, and density moment extraction code are available on \href{https://github.com/jack-dinsmore/asteroid-tidal-torque}{GitHub}. Please contact JTD with questions.
 
 
 

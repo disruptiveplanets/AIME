@@ -60,11 +60,11 @@ TRUES = {
     "observation-gap": 0,
 }
 COLORS = {
-    "lumpy": "C0",
-    "fe": "C2",
+    "lumpy": "darkcyan",
+    "fe": "olivedrab",
 }
 EXCLUDE = ["scan-vex"]
-PULL = True
+PULL = False
 DIRECTORIES = ["lumpy", "fe"]
 
 THRESHOLDS = ((1e-4, "gray"),(1e-3, "k"),)
@@ -78,6 +78,7 @@ print('Thresholds\t\t'+'\t\t\t'.join([str(t[0]) for t in THRESHOLDS]))
 
 fig, axs = plt.subplots(ncols=len(INCREASING)//2, nrows=2, figsize=(12,5), sharey=True)
 axs = axs.reshape(-1)
+handles = {}
 for directory in DIRECTORIES:
     for i, name in enumerate(PLOT_ORDER):
         with open(f"{directory}/{name}.npy", 'rb') as f:
@@ -95,34 +96,38 @@ for directory in DIRECTORIES:
         with open(f"../../data/all-fig/{name}-x.npy", 'rb') as f:
             xs = np.load(f)[-len(uncs):]
 
-        axs[i].plot(xs, uncs[:,2], color=COLORS[directory],)
-        axs[i].fill_between(xs, uncs[:,0], uncs[:,4], alpha=0.3, color=COLORS[directory])
-        axs[i].fill_between(xs, uncs[:,1], uncs[:,3], alpha=0.3, color=COLORS[directory])
-
-        for threshold, color in THRESHOLDS:
-            axs[i].axhline(y=threshold, c='r', linewidth=1)
-            if name in EXCLUDE:
-                continue
-
-            locs = np.where(use_uncs > threshold)[0]
-            if len(locs) == 0:
-                continue
-            if INCREASING[name]:
-                index = np.min(locs)
-            else:
-                index = np.max(locs)
-            fraction = (threshold - use_uncs[index]) / (use_uncs[index - 1] - use_uncs[index])
-            thresh_x = xs[index] - fraction * (xs[index] - xs[index - 1])
-
-            if INCREASING[name]:
-                axs[i].axvspan(xmin=thresh_x, xmax=xs[-1], alpha=0.2, color='k')
-            else:
-                axs[i].axvspan(xmin=xs[0], xmax=thresh_x, alpha=0.2, color='k')
-            print(f"\t{thresh_x}", end="")
-        print()
+        handles[directory] = (
+            axs[i].plot(xs, uncs[:,2], color=COLORS[directory])[0],
+            axs[i].fill_between(xs, uncs[:,0], uncs[:,4], alpha=0.3, color=COLORS[directory])
+        )
+        axs[i].fill_between(xs, uncs[:,1], uncs[:,3], alpha=0.3, color=COLORS[directory], label='foo')
 
         if directory == "lumpy":
+            for threshold, color in THRESHOLDS:
+                axs[i].axhline(y=threshold, c='r', linewidth=1)
+                if name in EXCLUDE:
+                    continue
+
+                locs = np.where(use_uncs > threshold)[0]
+                if len(locs) == 0:
+                    continue
+                if INCREASING[name]:
+                    index = np.min(locs)
+                else:
+                    index = np.max(locs)
+                fraction = (threshold - use_uncs[index]) / (use_uncs[index - 1] - use_uncs[index])
+                thresh_x = xs[index] - fraction * (xs[index] - xs[index - 1])
+
+                if INCREASING[name]:
+                    axs[i].axvspan(xmin=thresh_x, xmax=xs[-1], alpha=0.2, color='k')
+                else:
+                    axs[i].axvspan(xmin=xs[0], xmax=thresh_x, alpha=0.2, color='k')
+                print(f"\t{thresh_x}", end="")
+            print()
+
             axs[i].set_yscale('log')
+            if LOGS[name]:
+                axs[i].set_xscale('log')
             axs[i].axvline(x=TRUES[name], linewidth=1, c='k', linestyle='dotted')
             axs[i].set_xlabel(LABELS[name])
             axs[i].set_xlim(np.min(xs), np.max(xs))
@@ -133,12 +138,8 @@ for directory in DIRECTORIES:
             if i % 4 == 0:
                 axs[i].set_ylabel("$\sigma_\\rho / \\rho$")
 
-            if i == 0:
-                axs[0].plot([], [], color="C0", label="Lumpy")
-                axs[0].plot([], [], color="C1", label="Finite Element")
-
-fig.legend()
+fig.legend([handles["lumpy"], handles["fe"]], ["Lumpy", "Finite element"], loc="lower left")
 fig.tight_layout()
-fig.savefig(f"all.png")
-fig.savefig(f"all.pdf")
+fig.savefig("all.png")
+fig.savefig("all.pdf")
 plt.show()
