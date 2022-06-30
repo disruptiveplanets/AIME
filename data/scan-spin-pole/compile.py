@@ -5,6 +5,7 @@ from matplotlib.lines import Line2D
 from matplotlib.colors import LinearSegmentedColormap, to_rgba
 from scipy.interpolate import LinearNDInterpolator
 from scipy.linalg import norm
+import os
 
 plt.style.use("jcap")
 
@@ -20,6 +21,10 @@ LEGEND_SIZE = 12
 
 N_DIM = None
 N_PERCENTILES = None
+PULL = True
+
+if PULL:
+    os.sysmem("scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/thresholds/lumpy/scan-spin-pole.npy .")
 
 with open("../../code/thresholds/scan-spin-pole.npy", 'rb') as f:
     uncs = np.load(f)

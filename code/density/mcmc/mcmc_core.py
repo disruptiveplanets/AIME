@@ -22,7 +22,6 @@ MIN_LOG_LIKE = 1000
 MINIMIZATION_ATTEMPTS = 500
 EPSILON = 1e-10
 MINIMUM_LIKELIHOOD = -1000
-
 NUM_SUCCESSES = 1
 
 class MCMCMethod:
@@ -363,7 +362,11 @@ class MCMCAsteroid:
 
             with Pool() as pool:
                 sampler = emcee.EnsembleSampler(N_WALKERS, self.n_free, log_probability, args=(method, self.data_storage), backend=backend, pool=pool)
-                pos = method.scatter_walkers(theta_start, N_WALKERS)
+            
+                pos = method.scatter_walkers(theta_start, N_WALKERS, data_storage=self.data_storage)
+                
+                for p in pos:
+                    print(log_probability(p, method, self.data_storage))
 
                 for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
                     if sampler.iteration % 500 == 0:

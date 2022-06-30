@@ -372,33 +372,36 @@ However, the lumpy model is designed to detect discrete changes in density distr
 
 The question of which encounters are most suited to this analysis is of great interest. We investigate a mix of encounter parameters, from observational parameters (e.g., the cadence of observations, gaps in data, and uncertainty in the spin pole and period of the asteroid) and physical asteroid properties (e.g., the true density moments, rotational period, perigee, excess velocity, initial spin pole direction, and length), and discuss their effect on the uncertainty of this methodology's results.
 
-Specifically, we highlight both the uncertainties on the density moments and uncertainty on density distribution. Moment uncertainty is defined as the range of $K_{\ell m}$ values that contains 68.27\% of the marginal PPD for each $\ell$ and $m$. Since there is no degeneracy between moments and the actual encounter data, this uncertainty is well-defined. However, its physical relevance is not obvious. The density distribution uncertainty is presented as a map of uncertainty over the asteroid, made by taking the standard deviation of density at each point over 5000 maps of asteroid density, each made using a different sample of the output of the density distribution MCMC described in section \ref{sec:density-distro}. The average uncertainty over this map, divided by the local density, is taken as the uncertainty in density distribution of the asteroid. This measure of uncertainty is more physically relevant than moment uncertainty, but it is affected by choices of the density distribution model, degrees of freedom, prior constraints, and other effects unrelated to the encounter properties.
-
-We therefore investigate both the moment uncertainty and the density distribution uncertainty. Figure \ref{fig:scan-physical} displays the dependence of moment uncertainty on four asteroid physical parameters and and \ref{fig:scan-observational} displays dependence on observational parameters. Additionally, figures \ref{fig:scan-space-sigma} and \ref{fig:scan-spin} display dependence on asteroid shape and initial spin direction. These are useful as a sensitive and model-independent measure of the relationship between the encounter properties and the methodology uncertainty.
-
+Specifically, we highlight both the uncertainties on the density moments and uncertainty on density distribution. Moment uncertainty is defined as the range of $K_{\ell m}$ values that contains 68.27\% of the marginal PPD for each $\ell$ and $m$. Since there is no degeneracy between moments and the actual encounter data, this uncertainty is well-defined. However, its physical relevance is not obvious. The density distribution uncertainty is presented as a map of uncertainty over the asteroid, made by taking the standard deviation of density at each point over 5000 maps of asteroid density, each made using a different sample of the output of the density distribution MCMC described in section \ref{sec:density-distro}. The median uncertainty over this map, divided by the local density, is taken as the uncertainty in density distribution of the asteroid. This measure of uncertainty is more physically relevant than moment uncertainty, but it is affected by choices of the density distribution model, degrees of freedom, prior constraints, and other effects unrelated to the encounter properties.
 
 \begin{table}
   \centering
   \begin{tabular}{lll} \hline
-    Encounter property & $\sigma_\rho / \rho = 100\%$ & $20\%$ \\ \hline
-    Perigee ($r_p$, Earth radii) & $<$7.9 & $<$4.7 \\
+    Encounter property & Weak &Strong \\ \hline
+    Perigee ($r_p$, Earth radii) & $<$6.0 & $<$18\\
     Excess velocity ($v_\infty$) & - & - \\
-    Asteroid length ($a_\mathcal{A}$, m) & $>$180 & $>$1100 \\
-    Period ($P_\omega$, hr) & $>$4.3 & $>$9.5\\ \hline
-    Spin period uncertainty ($P_\omega \sigma_\rho$, ms) & $<$15 & $<$3.1\\
-    Spin pole uncertainty ($\sigma_\theta$, $^\circ$) & $<$2.8 & $<$0.5 \\
-    Cadence ($\Delta t$, min) & $<$38 & $<$2 \\
-    Data gap ($T_\text{gap}$, hr) & $<$1.8 & $<$0 \\ 
+    Asteroid length ($a_\mathcal{A}$, m) & $>$15 & - \\
+    Period ($P_\omega$, hr) & $>$7.6 & - \\ \hline
+    Spin period uncertainty ($\sigma_P$, ms) & $<$12 & $<$270\\
+    Spin pole uncertainty ($\sigma_\theta$, $^\circ$) & $<$1.9 & $<$35 \\
+    Cadence ($\Delta t$, min) & $<$15 & - \\
+    Data gap ($T_\text{gap}$, hr) & - & - \\ 
     \hline
   \end{tabular}
-  \caption{The physical / observational encounter property thresholds (\textit{top} / \textit{bottom} consistent with useable density distribution uncertainty. \jtd{Summarizing sentence}.}
+  \caption{The weak and strong thresholds on physical / observational properties (\textit{top} / \textit{bottom}) consistent with useable density distribution uncertainty. Perigee and observational uncertainty are the most constraining properties, followed by asteroid length, rotational period, and observational cadence.}
   \label{tab:threshold-summary}
 \end{table}
 
-In table \ref{tab:threshold-summary}, we present the property ``thresholds'' required in order to obtain meaningful information about the asteroid density distribution. These are collected by \jtd{Explain}. Their values are also shown in figures \ref{fig:scan-physical} to \ref{fig:scan-observational} as vertical red lines. These thresholds are more physically relevant, but they should be understood as moveable, since making different model choices can drastically change their locations.
+\begin{figure*}
+  \centering
+  \includegraphics[width=\linewidth]{figs/unc-scan.pdf}
+  \caption{Median ratio of density uncertainty to density computed over the reference asteroid density distribution as a function of various encounter properties. Density distributions from both the lumpy and finite element models are used. The benchmark uncertainty thresholds (\textit{red lines}) are shown and the properties that exceed these thresholds are shaded. The figures illustrate the marked difference in density distributions that results from using different models.}
+  \label{fig:net-uncertainty}
+\end{figure*}
+
+We therefore investigate both the moment uncertainty and the density distribution uncertainty. Figure \ref{fig:scan-physical} displays the dependence of moment uncertainty on four asteroid physical parameters and and \ref{fig:scan-observational} displays dependence on observational parameters. Additionally, figures \ref{fig:scan-space-sigma} and \ref{fig:scan-spin} display dependence on asteroid shape and initial spin direction. These are useful as a sensitive and model-independent measure of the relationship between the encounter properties and the methodology uncertainty.
 
 \begin{figure*}
-  \newpage
   \centering
   \includegraphics[angle=90, origin=c, width=\linewidth]{figs/scan-all1.pdf}
   \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of (left to right) perigee, excess velocity, spin pole uncertainty, and period uncertainty. The vertical dashed line indicates the reference asteroid values. The red vertical lines indicate when $\sigma(K_{3m}) =0.01$.}
@@ -410,7 +413,6 @@ In table \ref{tab:threshold-summary}, we present the property ``thresholds'' req
 \end{figure*}
 
 \begin{figure*}
-  \newpage
   \centering
   \includegraphics[angle=90, origin=c, width=\linewidth]{figs/scan-all2.pdf}
   \caption{1 and 2$\sigma$ confidence intervals for the first-order parameter PPDs (\textit{top}) and second-order parameters (\textit{bottom}) as a function of (left to right) asteroid length, observational cadence, data gap at perigee, and rotational period. The vertical dashed line indicates the reference asteroid values. The red vertical lines indicate when $\sigma(K_{3m}) =0.01$.}
@@ -440,6 +442,9 @@ In table \ref{tab:threshold-summary}, we present the property ``thresholds'' req
   \caption{$1\sigma$ uncertainties for the first-order parameters (\textit{top}) and second-order (\textit{bottom}) as a function of the initial direction of spin in the inertial frame. All maps are made in the Mollweide projection. The orange star indicates the reference spin pole. The red contours enclose regions the 20\% (dotted) and 100\% (solid) $\sigma_\rho / \rho$ cut-off. Posterior uncertainty depends similarly on initial spin pole direction for all parameters}
   \label{fig:scan-spin}
 \end{figure*}
+
+
+In table \ref{tab:threshold-summary}, we present the property ``thresholds'' required in order to obtain meaningful information about the asteroid density distribution. These are collected by evaluating the median uncertainty ratio of the asteroid density distribution extracted by the lumpy model as a function of each encounter property and identifying when it exceeds $\sigma_\rho / \rho = 10^{-4}$ (the weak threshold) and $\sigma_\rho / \rho = 10^{-3}$ (the strong threshold). These thresholds are also shown in figures \ref{fig:scan-physical} to \ref{fig:scan-observational} as vertical red lines. The values of $\sigma_\rho / \rho$ are plotted as a function of encounter properties in figure \ref{fig:net-uncertainty}, similarly to figures \ref{fig:scan-physical} and \ref{fig:scan-observational}.
 
 
 Table \ref{tab:threshold-summary} reveals that the most limiting physical properties of the asteroid are its perigee and its length. \jtd{Further discuss}. Figure \ref{fig:scan-physical} demonstrates that the asteroid length cut-off is particularly sharp, since the density moment uncertainty $\sigma_{K_{3m}}$ is very steep there. However, precision on the moment of inertia ratios of the asteroid $K_{2m}$ are not affected by asteroid length; these may still be collected even for small asteroids.

@@ -1,6 +1,8 @@
-from mcmc_core import MCMCMethod, MIN_DENSITY, MAX_DENSITY
+from mcmc_core import MCMCMethod, MIN_DENSITY, MAX_DENSITY, N_FITTED_MOMENTS
 import numpy as np
 from scipy.special import lpmv, factorial
+from scipy.linalg import pinvh
+from numdifftools import Hessian
 
 VERY_LARGE_SLOPE = 1e30
 LMS = [
@@ -213,8 +215,28 @@ class Lumpy(MCMCMethod):
         else:
             return densities, np.ones_like(densities)
 
-    def scatter_walkers(self, theta_start, n_walkers):
-        pos = np.zeros((n_walkers, self.n_free))
-        for i in range(self.n_free):
-            pos[:,i] = np.random.randn(n_walkers) * UNCERTAINTY_RATIO * theta_start[i] + theta_start[i]
-        return pos
+    def scatter_walkers(self, theta_start, n_walkers, data_storage):
+        if MODEL_N == 1:
+            pos = np.zeros((n_walkers, self.n_free))
+            for i in range(self.n_free):
+                pos[:,i] = np.random.randn(n_walkers) * UNCERTAINTY_RATIO * theta_start[i] + theta_start[i]
+            return pos
+
+        else:
+            inv_hess = pinvh(Hessian(lambda theta: -self.hess_like(theta, data_storage))(theta_start))
+            evals, evecs = np.linalg.eigh(inv_hess)
+            print(evals)
+            sigmas = np.sqrt(np.maximum(1e5, evals))
+
+            poses = []
+            for _ in range(n_walkers):
+                direction = np.random.randn(7)
+                direction /= np.sqrt(np.sum(direction**2))
+                poses.append(theta_start + 2 * sigmas * direction @ evecs.transpose())
+            return np.array(poses)
+
+    def hess_like(self, theta_short, data_storage):
+        theta_long = self.get_theta_long(theta_short)
+        free_klms = self.get_klms(theta_long)[:N_FITTED_MOMENTS]
+        diff_klms = free_klms - data_storage.data # Only need the unconstrained ones
+        return -0.5 * diff_klms.transpose() @ data_storage.data_inv_covs @ diff_klms

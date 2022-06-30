@@ -59,28 +59,15 @@ specialized_y_labels = {
     "observation-gap": (None, None, None, None, None, None, None, None, None, None),
 }
 
-threshold_indices = {
-    "scan-perigee":	(5.793018052362309, 2.652343364089338),
-    "probe-s-theta": (34.74078711858516, 28.012080848975405),
-    "scan-cadence":	(29.149635220536055, None),
-    "scan-period": (12.290439858160184, 28.096153533032613),
-    "scan-am": (26.839080626938763, 43.821350285158374),
-    "scan-vex": (None, 21.388856936153143),
-    "observation-gap": (17.24093403832585, None),
-    "probe-s-rho": (25.164129906200923, 18.68745083854685),
-}
-NUM_THRESHOLDS = 2
-
-# Index of the first data point for each scan
-index_offset = {
-    "scan-perigee": 0,
-    "probe-s-theta": 4,
-    "scan-cadence": 0,
-    "scan-period": 0,
-    "scan-am": 0,
-    "scan-vex": 0,
-    "observation-gap": 0,
-    "probe-s-rho": 7,
+thresholds = {
+    "scan-perigee":	(6.041275818201059, 18.20618262898073),
+    "probe-s-theta": (0.032726900377081515, 0.6113839751941476),
+    "scan-cadence":	(15.424913260494899, None),
+    "scan-period": (7.591137362332508, None),
+    "scan-am": (14.814169963587675, None),
+    "scan-vex": (None, None),
+    "observation-gap": (None, None),
+    "probe-s-rho": (3.6172957141874776e-07, 8.228524489683316e-06),
 }
 
 
@@ -157,6 +144,8 @@ def show_figs(plot_name, plot_name_index, num_columns):
             raise Exception(f"Plot name {plot_name} not defined")
 
     xs = np.array(xs)
+    with open(f"{plot_name}-x.npy", 'wb') as f:
+        np.save(f, xs)
 
     for plot_index in range(N_DIM):
         offset = 1 if plot_index > 2 else 0
@@ -182,39 +171,14 @@ def show_figs(plot_name, plot_name_index, num_columns):
         if not logs[plot_name][1]:
             ax.plot(xs, (param_data[3]-param_data[0]) * scale, color=colors[plot_index], linewidth=1, linestyle='dashed')
 
-
-
-        # Draw threshold
-
-        # Old method of 0.01
-        # thresh = xs[(np.abs(param_data[2]-param_data[0]) > 0.01) | np.abs((param_data[-2]-param_data[0]) > 0.01)]
-        # if len(thresh) > 0 and thresh[0] == xs[0]:
-        #         thresh = xs[(np.abs(param_data[2]-param_data[0]) < 0.01) & np.abs((param_data[-2]-param_data[0]) < 0.01)]
-        # if len(thresh) > 0 and plot_index > 2:
-        #     ax.axvline(x=thresh[0], color='r', linewidth=1)
-
-        # New method based on indices
-        for thresh_index in range(NUM_THRESHOLDS):
-            decimal_index = threshold_indices[plot_name][thresh_index]
-            if decimal_index == None:
-                if plot_index == 0:
-                    print(plot_name, '\t', None)
+        for thresh_index in range(len(thresholds[plot_name])):
+            thresh = thresholds[plot_name][thresh_index]
+            if thresh is None:
                 continue
-            decimal_index -= index_offset[plot_name]
-            low = xs[int(np.floor(decimal_index))]
-            high = xs[int(np.ceil(decimal_index))]
-            fraction = decimal_index - np.floor(decimal_index)
-            if logs[plot_name][0]:
-                thresh = low * (high / low)**fraction
-            else:
-                thresh = low + fraction * (high - low)
-            if plot_index == 0:
-                print(plot_name, '\t', thresh)
-
             if thresh_index == 0:
-                ax.axvline(x=thresh, color='r', linewidth=1, linestyle='solid')
-            if thresh_index == 1:
                 ax.axvline(x=thresh, color='r', linewidth=1, linestyle='dashed')
+            if thresh_index == 1:
+                ax.axvline(x=thresh, color='r', linewidth=1, linestyle='solid')
 
 
         if plot_name_index == 0:
