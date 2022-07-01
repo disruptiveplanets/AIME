@@ -5,18 +5,19 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 #plt.style.use("jcap")
 
-FONT_SIZE = 16
+FIG_SCALE = 2
+FONT_SIZE = 16 * FIG_SCALE
 
 import matplotlib as mpl
 mpl.rcParams["font.family"] = "serif"
 mpl.rcParams["font.monospace"] = "Roboto mono"
 mpl.rcParams["text.usetex"] = "true"
-mpl.rcParams["figure.figsize"] = (6.5, 4.00)
+mpl.rcParams["figure.figsize"] = (6.5 * FIG_SCALE, 4.00 * FIG_SCALE)
 mpl.rcParams["legend.framealpha"] = 0.5
 mpl.rcParams["lines.linewidth"] = 2
 mpl.rcParams["lines.markersize"] = 4
 mpl.rcParams["font.size"] = FONT_SIZE
-mpl.rcParams["legend.fontsize"] = 10
+mpl.rcParams["legend.fontsize"] = 10 * FIG_SCALE
 
 VERY_SMALL = 1
 NUM_SLICES = 6
@@ -24,7 +25,7 @@ EXPAND_X=1.15 # Scale along x and y so that spheres look circular
 AXIS_LIMIT = 1000
 EPSILON = 0.00000001
 NUM_CONTOURS = 6
-SLICE_FIGSIZE = (4.25, 4)
+SLICE_FIGSIZE = (4.25 * FIG_SCALE, 4 * FIG_SCALE)
 
 
 def latexify(number):
