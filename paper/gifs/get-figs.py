@@ -15,8 +15,8 @@ for line in f.readlines():
     if not os.path.isfile(ROOT + path):
         print("Could not find " + path)
         continue
-    if path[-4:] not in [".eps", ".pdf"]:
-        print("WARNING: .eps or .pdf file formats are preferred")
+    if path[-4:] not in [".gif"]:
+        print("WARNING: .gif file formats are preferred")
     shutil.copyfile(ROOT+path, ROOT + "paper/gifs/"+name)
 
 f.close()

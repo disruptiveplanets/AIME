@@ -9,13 +9,13 @@ plt.style.use("jcap")
 xyzs = []
 theta_phis = []
 
-PULL = True
+PULL = False
 
 if PULL:
     os.system("scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/thresholds/lumpy/scan-spin-pole.npy .")
 
 with open("scan-spin-pole.npy", 'rb') as f:
-    uncs = np.load(f)
+    uncs = np.load(f)[:,2] # Use medians
 
 def show_true_point(ax, flip=False):
     spin = [0.00006464182, 0.00012928364, -0.00012928364]
@@ -25,7 +25,7 @@ def show_true_point(ax, flip=False):
     ax.scatter(phi, theta, color='tab:orange', marker='*', s=32)
 
 for i in range(len(uncs)):
-    dir_name = f"pole-{i}"
+    dir_name = "pole-{:02}".format(i)
     with open(f"{dir_name}/{dir_name}.txt", 'r') as f:
         max_j, max_l = f.readline().split(", ")
         max_j, max_l = (int(max_j), int(max_l))
@@ -45,8 +45,8 @@ for i in range(len(uncs)):
     xyzs.append(np.array(spin) / norm(spin))
 
 theta_phis = np.array(theta_phis)
-lons = np.linspace(-np.pi, np.pi, 180)
-lats = np.linspace(-np.pi/2, np.pi/2, 90)
+lons = np.linspace(-np.pi, np.pi, 60)
+lats = np.linspace(-np.pi/2, np.pi/2, 30)
 Lon, Lat = np.meshgrid(lons, lats)
 
 fig, ax = plt.subplots(subplot_kw=dict(projection="mollweide"))
@@ -62,14 +62,15 @@ for pi, lat in enumerate(lats):
         p = projected_vecs[pi][pj]
         cart_line_unc.append(interp_unc(p[0], p[1], p[2]))
     cart_array_unc.append(np.array(cart_line_unc))
+cart_array_unc = np.array(cart_array_unc) * 10**4
 
-im = ax.pcolormesh(Lon, Lat, cart_array_unc, vmin=np.min(cart_array_unc), cmap='Blues_r')
+levels = np.linspace(0, 1.2, 13)
+im = ax.contourf(Lon, Lat, cart_array_unc, cmap='Blues_r', levels=levels)
 
-ax.contour(Lon, Lat, np.array(cart_array_unc), levels=[1e-3], colors=['r'], linewidths=[1])
-ax.contour(Lon, Lat, np.array(cart_array_unc), levels=[1e-4], colors=['r'], linewidths=[1], linestyles=['dotted'])
+ax.contour(Lon, Lat, cart_array_unc, levels=[1], colors=['r'], linewidths=[1], linestyles=['dashed'])
     
 cbar = fig.colorbar(im)
-cbar.set_label("$\sigma_\\rho / \\rho$")
+cbar.set_label("$\sigma_\\rho / \\rho$ ($\\times 10^{-4}$)")
 
 show_true_point(ax)
 ax.set_xticks([-3 * np.pi / 4, -np.pi / 2, -np.pi / 4, 0, np.pi / 4, np.pi / 2, 3 * np.pi / 4])

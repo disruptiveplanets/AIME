@@ -31,7 +31,7 @@ INCREASING = {
 LABELS = {
     "scan-perigee": "$r_p$ (Earth radii)",
     "probe-s-theta": "$\sigma_\\theta$",
-    "probe-s-rho": "$\sigma_P / P$",
+    "probe-s-rho": "$\sigma_P / P_\omega$",
     "scan-cadence": "$\Delta t$ (min)",
     "scan-period": "$P_\omega$ (hr)",
     "scan-am": "$a_\\mathcal{A}$ (m)",
@@ -67,7 +67,7 @@ EXCLUDE = ["scan-vex"]
 PULL = False
 DIRECTORIES = ["lumpy", "fe"]
 
-THRESHOLDS = ((1e-4, "gray"),(1e-3, "k"),)
+THRESHOLDS = ((1e-4, "dashed"),(1e-3, "solid"),)
 
 if PULL:
     for directory in DIRECTORIES:
@@ -103,8 +103,8 @@ for directory in DIRECTORIES:
         axs[i].fill_between(xs, uncs[:,1], uncs[:,3], alpha=0.3, color=COLORS[directory], label='foo')
 
         if directory == "lumpy":
-            for threshold, color in THRESHOLDS:
-                axs[i].axhline(y=threshold, c='r', linewidth=1)
+            for threshold, style in THRESHOLDS:
+                axs[i].axhline(y=threshold, c='r', linewidth=1, linestyle=style)
                 if name in EXCLUDE:
                     continue
 

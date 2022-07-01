@@ -54,8 +54,8 @@ for bare in file_names:
 pf.close()
 
 
-lons = np.linspace(-np.pi, np.pi, 180)
-lats = np.linspace(-np.pi/2, np.pi/2, 90)
+lons = np.linspace(-np.pi, np.pi, 60)
+lats = np.linspace(-np.pi/2, np.pi/2, 30)
 xyzs = []
 
 for dir_name in file_names:

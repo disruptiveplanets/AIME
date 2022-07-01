@@ -9,8 +9,8 @@ from display import make_gif, make_slices
 from core import TrueShape, Indicator
 
 RUN_NAME = sys.argv[1]
-PULL = True
-GENERATE = True
+PULL = False
+GENERATE = False
 
 NUM_DRAWS = 20
 NUM_CHOOSE = 1000
@@ -211,21 +211,23 @@ uncertainty_ratios = unc_grid / mean_grid
 num_elements = np.sum(~np.isnan(mean_grid))
 error = np.nansum(ratios**2) / num_elements # Reduced chi squared
 
+PERCENTILE = 99.5# 95
+
 print("Plotting density")
 make_slices(mean_grid, grid_line, "$\\rho$", 'plasma', f"../../figs/{ASTEROID_NAME}/fe-d", error)
 make_gif(mean_grid, grid_line, "$\\rho$", 'plasma', f"../../figs/{ASTEROID_NAME}/fe-d.gif", DURATION)
 
 print("Plotting ratios")
-make_slices(ratios, grid_line, "$\\Delta \\rho / \\sigma_\\rho$", 'coolwarm', f"../../figs/{ASTEROID_NAME}/fe-r", error, percentile=95, balance=True)
-make_gif(ratios, grid_line, "$\\Delta \\rho / \\sigma_\\rho$", 'coolwarm', f"../../figs/{ASTEROID_NAME}/fe-r.gif", duration=DURATION, percentile=95, balance=True)
+make_slices(ratios, grid_line, "$\\Delta \\rho / \\sigma_\\rho$", 'coolwarm', f"../../figs/{ASTEROID_NAME}/fe-r", error, percentile=PERCENTILE, balance=True)
+make_gif(ratios, grid_line, "$\\Delta \\rho / \\sigma_\\rho$", 'coolwarm', f"../../figs/{ASTEROID_NAME}/fe-r.gif", duration=DURATION, percentile=PERCENTILE, balance=True)
 
 print("Plotting uncertainty")
-make_slices(uncertainty_ratios, grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"../../figs/{ASTEROID_NAME}/fe-u", error, 95)
-make_gif(uncertainty_ratios, grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"../../figs/{ASTEROID_NAME}/fe-u.gif", DURATION, 95)
+make_slices(uncertainty_ratios, grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"../../figs/{ASTEROID_NAME}/fe-u", error, PERCENTILE)
+make_gif(uncertainty_ratios, grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"../../figs/{ASTEROID_NAME}/fe-u.gif", DURATION, PERCENTILE)
 
 if true_densities is not None:
     print("Plotting differences")
-    make_slices(difference, grid_line, "$\\Delta\\rho$", 'PuOr_r', f"../../figs/{ASTEROID_NAME}/fe-s", error, 95, balance=True)
-    make_gif(difference, grid_line, "$\\Delta\\rho$", 'PuOr_r', f"../../figs/{ASTEROID_NAME}/fe-s.gif", DURATION, 95, balance=True)
+    make_slices(difference, grid_line, "$\\Delta\\rho$", 'PuOr_r', f"../../figs/{ASTEROID_NAME}/fe-s", error, PERCENTILE, balance=True)
+    make_gif(difference, grid_line, "$\\Delta\\rho$", 'PuOr_r', f"../../figs/{ASTEROID_NAME}/fe-s.gif", DURATION, PERCENTILE, balance=True)
 
 warnings.filterwarnings("default")
