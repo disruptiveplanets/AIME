@@ -19,4 +19,9 @@ for line in f.readlines():
         print("WARNING: .gif file formats are preferred")
     shutil.copyfile(ROOT+path, ROOT + "paper/gifs/"+name)
 
+    bare = ROOT + "paper/gifs/"+name[:-4]
+    print(bare)
+    os.system(f"ffmpeg -f gif -i \"{bare}.gif\" \"{bare}.mp4\"")
+    os.remove(f"{bare}.gif")
+
 f.close()
