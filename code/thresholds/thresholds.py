@@ -110,6 +110,7 @@ for directory in DIRECTORIES:
 
                 locs = np.where(use_uncs > threshold)[0]
                 if len(locs) == 0:
+                    print(f"\t-\t\t", end="")
                     continue
                 if INCREASING[name]:
                     index = np.min(locs)

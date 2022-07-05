@@ -164,6 +164,7 @@ def covariance():
     plt.ylim(1, 6.7)
     plt.tight_layout()
     plt.savefig("compile-figs/corrab.pdf")
+    plt.savefig("compile-figs/corrab.png")
 
     corr01_max = max(np.nanmax(corr01_data), -np.nanmin(corr01_data))
     plt.figure(figsize=FIG_SIZE)
@@ -177,6 +178,7 @@ def covariance():
     plt.ylim(1, 6.7)
     plt.tight_layout()
     plt.savefig("compile-figs/corr1a.pdf")
+    plt.savefig("compile-figs/corr1a.png")
 
     corr02_max = max(np.nanmax(corr02_data), -np.nanmin(corr02_data))
     plt.figure(figsize=FIG_SIZE)
@@ -190,6 +192,7 @@ def covariance():
     plt.ylim(1, 6.7)
     plt.tight_layout()
     plt.savefig("compile-figs/corr1b.pdf")
+    plt.savefig("compile-figs/corr1b.png")
 
     plt.figure(figsize=FIG_SIZE)
     flat_sig_0 = np.array(sigma0_data).reshape(-1) * 1e6
@@ -203,6 +206,7 @@ def covariance():
     plt.ylim(1, 6.7)
     plt.tight_layout()
     plt.savefig("compile-figs/theta-1-ab-sigma.pdf")
+    plt.savefig("compile-figs/theta-1-ab-sigma.png")
 
     plt.figure(figsize=FIG_SIZE)
     c = plt.contourf(X, Y, np.array(sigma1_data) * 10**6, levels=20, cmap="Purples_r")
@@ -215,6 +219,7 @@ def covariance():
     plt.ylim(1, 6.7)
     plt.tight_layout()
     plt.savefig("compile-figs/theta-a-sigma.pdf")
+    plt.savefig("compile-figs/theta-a-sigma.png")
 
     plt.figure(figsize=FIG_SIZE)
     c = plt.contourf(X, Y, np.array(sigma2_data) * 10**6, levels=20, cmap="Purples_r")
@@ -227,6 +232,7 @@ def covariance():
     plt.ylim(1, 6.7)
     plt.tight_layout()
     plt.savefig("compile-figs/theta-b-sigma.pdf")
+    plt.savefig("compile-figs/theta-b-sigma.png")
 
 
 if __name__ == "__main__":

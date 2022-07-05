@@ -103,6 +103,7 @@ def plot_pdf(index):
         #    ax.set_xticklabels([])
 
     fig.savefig("theta-{}-hists.pdf".format(index))
+    fig.savefig("theta-{}-hists.png".format(index))
 
 def covariance():
     side_length = int(-0.5 + np.sqrt(1 + 8 * len(names)) / 2)
@@ -208,6 +209,7 @@ def covariance():
     plt.ylabel("$K_{20}$")
     plt.tight_layout()
     plt.savefig("compile-figs/corr23.pdf")
+    plt.savefig("compile-figs/corr23.png")
 
     corr01_max = max(np.nanmax(corr01_data), -np.nanmin(corr01_data))
     plt.figure(figsize=FIG_SIZE)
@@ -221,6 +223,7 @@ def covariance():
     plt.ylabel("$K_{20}$")
     plt.tight_layout()
     plt.savefig("compile-figs/corr12.pdf")
+    plt.savefig("compile-figs/corr12.png")
 
     corr02_max = max(np.nanmax(corr02_data), -np.nanmin(corr02_data))
     plt.figure(figsize=FIG_SIZE)
@@ -234,6 +237,7 @@ def covariance():
     plt.ylabel("$K_{20}$")
     plt.tight_layout()
     plt.savefig("compile-figs/corr13.pdf")
+    plt.savefig("compile-figs/corr13.png")
 
     plt.figure(figsize=FIG_SIZE)
     flat_sig_0 = np.array(sigma0_data).reshape(-1) * 1e6
@@ -247,6 +251,7 @@ def covariance():
     plt.ylabel("$K_{20}$")
     plt.tight_layout()
     plt.savefig("compile-figs/theta-1-sigma.pdf")
+    plt.savefig("compile-figs/theta-1-sigma.png")
 
     plt.figure(figsize=FIG_SIZE)
     c = plt.contourf(X, Y, np.array(sigma1_data) * 1e6, levels=np.linspace(0, np.nanmax(sigma1_data) * 1e6, NUM_LEVELS), cmap='Purples_r')
@@ -259,6 +264,7 @@ def covariance():
     plt.ylabel("$K_{20}$")
     plt.tight_layout()
     plt.savefig("compile-figs/theta-2-sigma.pdf")
+    plt.savefig("compile-figs/theta-2-sigma.png")
 
     plt.figure(figsize=FIG_SIZE)
     c = plt.contourf(X, Y, np.array(sigma2_data) * 1e6, levels=np.linspace(0, np.nanmax(sigma2_data) * 1e6, NUM_LEVELS), cmap='Purples_r')
@@ -271,6 +277,7 @@ def covariance():
     plt.ylabel("$K_{20}$")
     plt.tight_layout()
     plt.savefig("compile-figs/theta-3-sigma.pdf")
+    plt.savefig("compile-figs/theta-3-sigma.png")
 
 
 if __name__ == "__main__":
