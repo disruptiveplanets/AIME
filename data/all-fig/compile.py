@@ -4,7 +4,7 @@ import numpy as np
 from matplotlib.lines import Line2D
 import matplotlib as mpl
 
-AXIS_SIZE = 12
+AXIS_SIZE = 11
 plt.style.use("jcap")
 mpl.rcParams['ytick.labelsize'] = AXIS_SIZE
 
@@ -183,9 +183,9 @@ def show_figs(plot_name, plot_name_index, num_columns):
 
         if plot_name_index == 0:
             if plot_index < 3:
-                ax.set_ylabel(f"$\sigma({param_names[plot_index]}) (\\times 10^{{-7}})$", size=AXIS_SIZE)
+                ax.set_ylabel(f"$\sigma({param_names[plot_index]}) (\\times 10^{{-7}})$", size=AXIS_SIZE, rotation=270, labelpad=16)
             else:
-                ax.set_ylabel(f"$\sigma({param_names[plot_index]}) (\\times 10^{{-2}})$", size=AXIS_SIZE)
+                ax.set_ylabel(f"$\sigma({param_names[plot_index]}) (\\times 10^{{-2}})$", size=AXIS_SIZE, rotation=270, labelpad=16)
 
         if logs[plot_name][0]:
             ax.set_xscale('log')

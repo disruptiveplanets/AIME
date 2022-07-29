@@ -1,6 +1,6 @@
 import os, shutil
 
-ROOT = "/home/jtdinsmo/Dropbox (MIT)/12.420 project/"
+ROOT = "/Users/jtd/Documents/research/12.420 project/"
 
 f = open(ROOT + "paper/gifs/fig-sources.txt", 'r')
 for line in f.readlines():
