@@ -20,7 +20,7 @@ def get_text(vex):
     cos_true_anomaly = (semi_latus_rectum / (10 * perigee) - 1) / eccentricity
     eccentric_anomaly = np.arccosh((eccentricity + cos_true_anomaly) / (1 + eccentricity * cos_true_anomaly))
     time_to_perigee = np.sqrt(semi_major_ax**3 / MU) * (eccentricity * np.sinh(eccentric_anomaly) - eccentric_anomaly)
-    print(vex, '\t', time_to_perigee / 3600)
+    print(vex, '\t', eccentricity, '\t', time_to_perigee / 3600)
     radians = 2 * np.pi / (9 * 3600) * time_to_perigee
     gamma_0 = (PERIGEE_GAMMA - radians) % (2 * np.pi)
     quartile = int((gamma_0 + np.pi / 4) / (np.pi / 2))
