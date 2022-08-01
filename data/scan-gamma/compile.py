@@ -10,7 +10,7 @@ param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re
 percentiles = {}
 name_index = {}
 true_sigma = None
-v_excess = []
+gamma = []
 
 AXIS_SIZE = 12
 LEGEND_SIZE = 12
@@ -54,9 +54,9 @@ for name in percentiles.keys():
     name_index[name] = index
     index += 1
     true_sigma = sigma[0]
-    v_excess.append(theta_true[0])
+    gamma.append(theta_true[0])
 
-v_excess = np.array(v_excess)
+gamma = np.array(gamma)
 
 #fig, axs = plt.subplots(figsize=(6, 19), ncols=1, nrows=10,  sharex=True)
 #axs = axs.reshape(-1)
@@ -65,28 +65,28 @@ fig = plt.figure(figsize=(6.6, 19))
 for plot_index in range(N_DIM):
     offset = 1 if plot_index > 2 else 0
     ax = plt.subplot2grid((31, 1), (plot_index * 3 + offset, 0), rowspan=3)
-    param_data = np.zeros(len(v_excess) * N_PERCENTILES).reshape(N_PERCENTILES, len(v_excess))
+    param_data = np.zeros(len(gamma) * N_PERCENTILES).reshape(N_PERCENTILES, len(gamma))
     for f in percentiles.keys():
         param_data[:,name_index[f]] = percentiles[f][plot_index]
     scale = 1e7 if plot_index < 3 else 1e2
 
-    ax.plot(v_excess, (param_data[1]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
-    ax.plot(v_excess, (param_data[-1]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
-    ax.fill_between(v_excess, (param_data[1]-param_data[0]) * scale, 
+    ax.plot(gamma, (param_data[1]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+    ax.plot(gamma, (param_data[-1]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+    ax.fill_between(gamma, (param_data[1]-param_data[0]) * scale, 
         (param_data[-1]-param_data[0]) * scale,  color=f"C{plot_index}", alpha=0.3)
 
-    ax.plot(v_excess, (param_data[2]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
-    ax.plot(v_excess, (param_data[-2]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
-    ax.fill_between(v_excess, (param_data[2]-param_data[0]) * scale,
+    ax.plot(gamma, (param_data[2]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+    ax.plot(gamma, (param_data[-2]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1)
+    ax.fill_between(gamma, (param_data[2]-param_data[0]) * scale,
         (param_data[-2]-param_data[0]) * scale, color=f"C{plot_index}", alpha=0.3)
 
-    ax.plot(v_excess, (param_data[3]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1, linestyle='dashed')
+    ax.plot(gamma, (param_data[3]-param_data[0]) * scale, color=f"C{plot_index}", linewidth=1, linestyle='dashed')
 
     y_min_norm = np.min((param_data[-1]-param_data[0]) * scale)
     y_max_norm = np.max((param_data[1]-param_data[0]) * scale)
     ax.set_ylim(y_min_norm * SCALE_Y, y_max_norm * SCALE_Y)
 
-    thresh = v_excess[(np.abs(param_data[2]-param_data[0]) > 0.01) | np.abs((param_data[-2]-param_data[0]) > 0.01)]
+    thresh = gamma[(np.abs(param_data[2]-param_data[0]) > 0.01) | np.abs((param_data[-2]-param_data[0]) > 0.01)]
     if len(thresh) > 0:
         ax.axvline(x=thresh[0], color='r', linewidth=1)
 
@@ -99,7 +99,7 @@ for plot_index in range(N_DIM):
     #axs[plot_index].set_xscale('log')
     #axs[plot_index].set_yscale('log')
 
-    ax.set_xlim(np.min(v_excess), np.max(v_excess))
+    ax.set_xlim(np.min(gamma), np.max(gamma))
     ax.axvline(x=3.14159265 / 8, color='k', linewidth=1, linestyle='dashed')
 
     if plot_index == 9:
@@ -112,7 +112,7 @@ custom_lines = [Line2D([0], [0], color='k', lw=4, alpha=0.3),
                 Line2D([0], [0], color='k', lw=1, linestyle='dashed')]
 fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='upper center', prop={'size': LEGEND_SIZE}, bbox_to_anchor=(0.5,0.91))
 
-plt.savefig("vex.pdf", bbox_inches="tight")
-plt.savefig("vex.png", bbox_inches="tight")
+plt.savefig("gamma.pdf", bbox_inches="tight")
+plt.savefig("gamma.png", bbox_inches="tight")
 
 plt.show()
