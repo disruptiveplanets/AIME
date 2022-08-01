@@ -37,7 +37,7 @@ with open("percentiles.dat", 'r') as f:
 # Get true sigmas
 index = 0
 for name in percentiles.keys():
-    dir_name = name[:6]
+    dir_name = name[:11]
     with open(f"{dir_name}/{dir_name}.txt", 'r') as f:
         max_j, max_l = f.readline().split(", ")
         max_j, max_l = (int(max_j), int(max_l))

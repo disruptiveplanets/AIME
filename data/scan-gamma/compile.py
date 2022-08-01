@@ -37,7 +37,7 @@ with open("percentiles.dat", 'r') as f:
 # Get true sigmas
 index = 0
 for name in percentiles.keys():
-    dir_name = name[:6]
+    dir_name = name[:8]
     with open(f"{dir_name}/{dir_name}.txt", 'r') as f:
         max_j, max_l = f.readline().split(", ")
         max_j, max_l = (int(max_j), int(max_l))
@@ -54,7 +54,7 @@ for name in percentiles.keys():
     name_index[name] = index
     index += 1
     true_sigma = sigma[0]
-    v_excess.append(speed / 1000)
+    v_excess.append(theta_true[0])
 
 v_excess = np.array(v_excess)
 
@@ -100,10 +100,10 @@ for plot_index in range(N_DIM):
     #axs[plot_index].set_yscale('log')
 
     ax.set_xlim(np.min(v_excess), np.max(v_excess))
-    ax.axvline(x=6, color='k', linewidth=1, linestyle='dashed')
+    ax.axvline(x=3.14159265 / 8, color='k', linewidth=1, linestyle='dashed')
 
     if plot_index == 9:
-        ax.set_xlabel(f"$v_\infty$ (km/s)")
+        ax.set_xlabel(f"$\gamma_0$")
     else:
         ax.set_xticks([])
         

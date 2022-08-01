@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "shape-data"
+PATH = "scan-gamma"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1
