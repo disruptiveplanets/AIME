@@ -2,4 +2,4 @@ g++ -DASTEROIDS_MAX_J=0 -DASTEROIDS_MAX_K=2 -Wall -std=c++17 ../sim/*.cpp main.c
 
 ./bin/generate 2-params.dat
 
-python3 display.py
+#python3 display.py
