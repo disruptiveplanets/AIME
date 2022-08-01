@@ -100,6 +100,8 @@ We address this community need by developing a methodology to translate (1) time
 \section{Methods}
 \label{sec:methods}
 
+In the following mathematical model for the influence of tidal torque on asteroid encounters, we assume for simplicity that (1) that the central body is much more massive than the asteroid, (2) that both are rigid, (3) that there are no distant perturbing objects and (4) that the asteroid is in a short-axis, non-tumbling rotational state before the encounter. All of these assumptions except 2 can be relaxed without drastic changes to the model.
+
 The only properties of an asteroid's density moments that affect tidal torque interactions are its ``density moments,'' defined here as
 \begin{equation}
   K_{\ell m} = \frac{a_\mathcal{A}^{2-\ell}}{I_\mathcal{A}} \int_\mathcal{A} d^3 r \rho_\mathcal{A}(\bm r) R_{\ell m}(\bm r).
@@ -120,7 +122,7 @@ where $V_\mathcal{A}$ is the asteroid volume. We call these MOI and length scale
 The tidal torque experienced by an asteroid is 
 \begin{equation}
   \begin{split}
-  \bm \tau = & G\frac{I_\mathcal{A}I_\mathcal{B}}{2 a_\mathcal{A}^2a_\mathcal{B}^2}\left[\sum_{\ell m} a_\mathcal{B}^\ell J_{\ell m} \sum_{\ell' m'}a_\mathcal{A}^{\ell'}S^*_{\ell+\ell', m + m'} (\bm D) (-1)^{\ell'}\right.\\
+  \bm \tau = & G\frac{I_\mathcal{A}I_\mathcal{B}}{2 a_\mathcal{A}^2a_\mathcal{B}^2}\left[\sum_{\ell m} a_\mathcal{B}^\ell J_{\ell m} \sum_{\ell' m'}a_\mathcal{A}^{\ell'}S_{\ell+\ell', m + m'} (\bm D)^* (-1)^{\ell'}\right.\\
   \times & \left.\sum_{m''=-\ell'}^{\ell'} \sqrt{\frac{(\ell'-m'')!(\ell'+m'')!}{(\ell'-m')!(\ell'+m')!}}  \mathcal{D}^{\ell'}_{m'm''}(\alpha, \beta, \gamma)^* \right. \\
   \times & \Big((i\unit x - \unit y)(\ell'-m''+1)K_{\ell',m''-1} \\
   & +(i\unit x+\unit y)(\ell'+m''+1)K_{\ell',m''+1}+2im''\unit z K_{\ell'm''}\Big) \Bigg],
@@ -145,9 +147,7 @@ Throughout the paper, we refer to the ``inertial frame'' (the frame in which the
 \subsection{Simulation design}
 \label{sec:sim}
 
-We built a publicly accessible, custom simulation in C++ to produce time series of angular velocity data during a close encounter with a central body. This simulation requires as initial data (1) the orbital parameters of the asteroid $r_p$ (perigee distance) and $v_\infty$ (hyperbolic excess velocity); (2) the cadence of angular velocity observation $\Delta t$; (3) the central body moments $J_{\ell m}$, mass $\mu_\mathcal{B}$, and radius $a_\mathcal{B}$; (4) the initial asteroid angular velocity in the inertial frame $\bm \Omega_0$; (5) the asteroid length $a_\mathcal{A}$ and (6) the asteroid's density moments $K_{\ell m}$ and initial Euler angle $\gamma_0$. All parameters except (6) are assumed to be known to high accuracy. For example, $\bm \Omega_0$ could be extracted from pre-encounter light-curve data and $a_\mathcal{A}$ from a model for the asteroid's surface using radar.
-
-We assume for simplicity that the asteroid is initially not tumbling, though this assumption can be relaxed. We assume a short-axis rotation mode such that energy of the asteroid's rotation is minimized. This sets two of the Euler angles equal to zero initially, so that only $\gamma_0$ is necessary to provide initial data for the simulation.
+We built a publicly accessible, custom simulation in C++ to produce time series of angular velocity data during a close encounter with a central body. This simulation requires as initial data (1) the orbital parameters of the asteroid $r_p$ (perigee distance) and $v_\infty$ (hyperbolic excess velocity); (2) the cadence of angular velocity observation $\Delta t$; (3) the central body moments $J_{\ell m}$, mass $\mu_\mathcal{B}$, and radius $a_\mathcal{B}$; (4) the initial asteroid angular velocity in the inertial frame $\bm \Omega_0$; (5) the asteroid length $a_\mathcal{A}$ and (6) the asteroid's density moments $K_{\ell m}$ and initial Euler angle $\gamma_0$. All parameters except (6) are assumed to be known to high accuracy. For example, $\bm \Omega_0$ could be extracted from pre-encounter light-curve data and $a_\mathcal{A}$ from a model for the asteroid's surface using radar. The other two initial Euler angles $\alpha_0$ and $\beta_0$ are required to be zero by the assumption of no initial tumbling.
 
 We begin our simulation at $D = 10 r_p$. Since the leading order of the equations of motion is $\ell' = 2, \ell = 0$, this corresponds roughly to a torque of $10^{-3}$ times the maximum torque at perigee. Unless otherwise indicated, the simulation is terminated at $D=10 r_p$ as well.
 
@@ -277,7 +277,7 @@ Additional constraints can be imposed on $K_{\ell m}^{(i)}$ if desired. For exam
 To demonstrate our interior-probing methodology, we provide a full density distribution retrieval applied to synthetic data for two ``reference asteroids,'' which correspond to the following encounter parameter choices.
 
 \begin{enumerate}
-  \item An orbit around a spherical, Moonless Earth with $6$ km s$^{-1}$ excess velocity and perigee at 5 Earth radii. This orbit was chosen to roughly match that of Apophis. These orbital parameters correspond to an eccentricity of 3.88. 
+  \item An orbit around a spherical, non-rotating, Moonless Earth with $6$ km s$^{-1}$ excess velocity and perigee at 5 Earth radii. This orbit was chosen to roughly match that of Apophis and corresponds to an eccentricity of 3.88. 
   \item An initial roll of $\gamma_0=\pi/8$.
   \item A cadence of 2 minutes and observational uncertainty of $\sigma_\theta = 10^{-2}$ and $\sigma_P / P = 10^{-7}$.
   \item A rotational period of 9 hours, with the angular velocity vector distributed between the $\unit X$, $\unit Y$, and $\unit Z$ axes in a $1:2:-2$ ratio.
@@ -340,7 +340,7 @@ Figure \ref{fig:den-uniform} displays density distributions extracted by both th
 
 Furthermore, the finite element density distributions are consistent with uniform, which is the true density distribution of the asteroid. For the reference asteroid observational set-up, the uncertainty on observations is such that the density distribution is generally within 10\% of the true density (second column) while the density uncertainty is generally less than 40-50\% of the density value at any point in the asteroid (third column). The dependence of this constraint on the observational set-up is discussed in section \ref{sec:fit-uncertainty}. In no place is the significance of these deviations from the true distribution greater than $1 \sigma$ (last column).
 
-The lumpy model also yields distributions which are consistent with the extracted moments and consistent with uniform. These distributions have much lower uncertainty than the finite element distributions (maximum uncertainty on the order of 1\% of the local density or less) due to its few degrees of freedom. With only one lump and with asteroids where the surface's centroid is the asteroid's center of mass (such as these uniform asteroids), the lump must lie at the centroid with mass close to zero and unconstrained radius. Hence, the uncertainty of regions far from the asteroid is typically very small, while regions close to the center are more likely to be contained inside a lump and hence have more density uncertainty.
+The lumpy model also yields distributions which are consistent with the extracted moments and consistent with uniform. These distributions have much lower uncertainty than the finite element distributions (maximum uncertainty on the order of 1\% of the local density or less) due to its few degrees of freedom. With the one-lump-model and with asteroids whose surface's centroid is the asteroid's center of mass (such as these uniform asteroids), the single lump must lie at the centroid with mass close to zero and unconstrained radius. The uncertainty of regions far from the asteroid center, where the lump is unlikely to extend, is typically very small, while regions close to the center are more likely to be contained inside a lump and hence have greater density uncertainty.
 
 We also explore model behaviour in non-uniform density asteroids. We employ an asteroid of the same shape as the asymmetric asteroid, and in the same flyby scenario, but we place a solid core of radius $\SI{300}{\meter}$ and density 50\% greater than the surrounding density, 500 m away from the center of the asteroid. This changes the asteroid density moments. New density moments are extracted via the process described in section \ref{sec:fit} and the finite-element and lumpy models are used to extract density distributions shown in figure \ref{fig:den-move}.
 
