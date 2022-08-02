@@ -25,7 +25,8 @@ def get_indices_from_name(name):
     return int(name[7:9]), int(name[10:12])
 
 with open("../../code/thresholds/cad-speed-contour.npy", 'rb') as f:
-    uncs = np.load(f)
+   uncs = np.load(f)[:,:,2] # Use median
+print(uncs)
 
 # Adjust uncs so that everything after the first large unc is large
 def adjust(a):
@@ -39,7 +40,7 @@ def adjust(a):
             new_line[wheres[0]+1:] = 2
             res.append(new_line)
     return np.array(res)
-uncs = adjust(uncs)
+#uncs = adjust(uncs)
 
 
 # Get percentiles
@@ -101,7 +102,7 @@ for plot_index in range(N_DIM):
     #p = ax.pcolormesh(cadences, time_ratios, param_data.transpose() * scale, vmin=0, cmap="Oranges_r")
     levels = np.linspace(0, np.percentile(param_data * scale, 90), 12)
     p = ax.contourf(cadences, time_ratios, param_data.transpose() * scale, cmap="PuBu_r", levels=levels, extend='max')
-    ax.contour(cadences, time_ratios, uncs, colors='r', levels=[0.2, 1], linestyles=["dashed", "solid"])
+    ax.contour(cadences, time_ratios, uncs, colors='r', levels=[1e-4, 1e-3], linestyles=["dashed", "solid"])
 
     cbar = fig.colorbar(p, ax=ax)
     if plot_index < 3:
