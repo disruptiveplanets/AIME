@@ -81,14 +81,9 @@ theta_low = np.asarray([float(x) for x in f.readline().split(',')])
 sigma = [float(d) for d in f.readline().split(", ")]# theta, ratio
 last_line = f.readline()
 VELOCITY_MUL = 1 if last_line == '' else float(last_line)
-
 while output_name[-1] == '\n':
     output_name = output_name[:-1]
 f.close()
-assert(len(theta_true) == len(theta_high) == len(theta_low))
-assert(len(theta_true) == (ASTEROIDS_MAX_K + 1)**2 - 6)
-assert(len(jlms) == (ASTEROIDS_MAX_J + 1)**2)
-assert(np.all(theta_high > theta_low))
 
 SIGMA_FACTOR = (sigma[0] / 0.01)**2#theta
 
@@ -100,19 +95,7 @@ else:
     raise Exception("Have not implemented max k >= 4")
 MIN_SPACING = MIN_SPACING[:cut_index]
 MAX_SPACING = MAX_SPACING[:cut_index]
-
-logging.info("Cadence {}, perigee {}, speed {}".format(cadence, perigee, speed))
-logging.info("Spin {}".format(spin))
-logging.info("Jlms {}".format(jlms))
-logging.info("Radius {}".format(radius))
-logging.info("Theta true {}".format(theta_true))
-logging.info("Theta high {}".format(theta_high))
-logging.info("Theta low {}".format(theta_low))
-logging.info("Sigma {}".format(sigma))
-logging.info("Name {}".format(output_name))
-logging.info("Velocity multiplier {}".format(VELOCITY_MUL))
 N_DIM = len(theta_true)
-
 reload = False
 if len(sys.argv) == 3 and sys.argv[2] == "reload":
     reload = True
@@ -146,14 +129,14 @@ def fit_function(theta, target_length=None):
             resolved_data.append(resolved_data[-3])
     return np.asarray(resolved_data).reshape(-1, 3)
 
-def log_likelihood(theta, y, y_inv_covs):
+def log_likelihood(theta, y, sigma):
     # Normal likelihood
     try:
         model = fit_function(theta, len(y))
     except RuntimeError:
         return -np.inf # Zero likelihood
    
-    return random_vector.log_likelihood(UNCERTAINTY_MODEL, y, model, len(y), UNCERTAINTY_ARGUMENT)
+    return random_vector.log_likelihood(UNCERTAINTY_MODEL, y, model, len(y), sigma)
 
 def log_prior(theta):
     for i, param in enumerate(theta):
@@ -161,29 +144,12 @@ def log_prior(theta):
             return -np.inf
     return 0.0
 
-def log_probability(theta, y, y_inv_covs):
+def log_probability(theta, y, sigma):
     prior = log_prior(theta)
-    like = log_likelihood(theta, y, y_inv_covs)
+    like = log_likelihood(theta, y, sigma)
     if not np.isfinite(prior) or not np.isfinite(like):
         return -np.inf
     return prior + like
-
-####################################################################
-# Generate synthetic data
-####################################################################
-start = time.time()
-y = fit_function(theta_true)
-logging.info("Data generation took {} s".format(time.time() - start))
-y, y_inv_covs = random_vector.randomize(UNCERTAINTY_MODEL, y, sigma)
-if UNCERTAINTY_MODEL == random_vector.TILT_UNIFORM_TRUE:
-    UNCERTAINTY_ARGUMENT = sigma
-else:
-    UNCERTAINTY_ARGUMENT = y_inv_covs
-
-np.save(f"{output_name}-data.npy", y)
-np.save(f"{output_name}-unc.npy", y_inv_covs)
-
-logging.info(f"DOF: {len(y)}")
 
 def get_data_cut(drc):
     enforce_drc = False if drc is None else True
@@ -203,29 +169,6 @@ def get_data_cut(drc):
     raise Exception("Cannot handle this J.")
 
 data_cuts = [[get_data_cut(drc) for drc in tier] for tier in DISTANCE_RATIO_CUTS]
-
-plt.figure(figsize=(12, 4))
-x_display = np.arange(len(y))
-uncs = np.array([2 * np.sqrt(np.diagonal(pinvh(a))) for a in y_inv_covs])
-plt.fill_between(x_display, y[:,0]+uncs[:,0], y[:,0]-uncs[:,0], alpha=0.5, color="C0")
-plt.fill_between(x_display, y[:,1]+uncs[:,1], y[:,1]-uncs[:,1],alpha=0.5, color="C1")
-plt.fill_between(x_display, y[:,2]+uncs[:,2], y[:,2]-uncs[:,2],  alpha=0.5, color="C2")
-plt.scatter(x_display, y[:,0], label='x', s=1, color="C0")
-plt.scatter(x_display, y[:,1], label='y', s=1, color="C1")
-plt.scatter(x_display, y[:,2], label='z', s=1, color="C2")
-plt.xlabel("Time (Cadences)")
-plt.ylabel("Spin (rad/s)")
-for tier in data_cuts:
-    for drc in tier:
-        plt.axvline(x=drc, color='k')
-plt.legend()
-plt.show()
-
-
-
-####################################################################
-# Minimize likelihood
-####################################################################
 
 def minimize_function(theta, simulate_func, l_index, cut_index):
     drc = DISTANCE_RATIO_CUTS[l_index][cut_index]
@@ -248,7 +191,7 @@ def minimize_function(theta, simulate_func, l_index, cut_index):
 
     return np.asarray(resolved_data).reshape(-1, 3)
 
-def minimize_log_prob(float_theta, fix_theta, simulate_func, l_index, cut_index):
+def minimize_log_prob(y, float_theta, fix_theta, simulate_func, l_index, cut_index):
     # Normal likelihood
     theta = list(fix_theta) + list(float_theta)
     try:
@@ -264,31 +207,10 @@ def minimize_log_prob(float_theta, fix_theta, simulate_func, l_index, cut_index)
     # Return chisq
     chisq = 0
     want_length = data_cuts[l_index][cut_index]
-    return -random_vector.log_likelihood(UNCERTAINTY_MODEL, y, model, want_length, UNCERTAINTY_ARGUMENT)
-
-
-if ASTEROIDS_MAX_K == 3:
-    if ASTEROIDS_MAX_J == 0:
-        real_sim_func = asteroids_0_3.simulate
-    elif ASTEROIDS_MAX_J == 2:
-        real_sim_func = asteroids_2_3.simulate
-    elif ASTEROIDS_MAX_J == 3:
-        real_sim_func = asteroids_3_3.simulate
-elif ASTEROIDS_MAX_K == 2:
-    if ASTEROIDS_MAX_J == 0:
-        real_sim_func = asteroids_0_2.simulate
-    elif ASTEROIDS_MAX_J == 2:
-        real_sim_func = asteroids_2_2.simulate
-    elif ASTEROIDS_MAX_J == 3:
-        real_sim_func = asteroids_3_2.simulate
-
-
-true_redchi = 2 * minimize_log_prob(theta_true, [], real_sim_func, 0, -1) / len(y) / 3
-logging.info("TRUE REDCHI: {}".format(true_redchi))
-
+    return -random_vector.log_likelihood(UNCERTAINTY_MODEL, y, model, want_length, sigma)
 
 def get_minimum(arg):
-    point, fix_theta, l, bounds = arg
+    y, point, fix_theta, l, bounds = arg
 
     redchi_record = []
 
@@ -310,7 +232,7 @@ def get_minimum(arg):
     # Do an initial fit with cut data
     for cut_index in range(len(DISTANCE_RATIO_CUTS)):
         def minimize_log_prob_cut(x):
-            return minimize_log_prob(x, fix_theta, simulate_func, l - 2, cut_index)
+            return minimize_log_prob(y, x, fix_theta, simulate_func, l - 2, cut_index)
 
         start_redchi = 2 *  minimize_log_prob_cut(point) / data_cuts[l-2][cut_index] / 3
 
@@ -349,7 +271,7 @@ def get_minimum(arg):
     # Now do fit on full data
 
     def minimize_log_prob_uncut(x):
-        return minimize_log_prob(x, fix_theta, simulate_func, l-2, -1)
+        return minimize_log_prob(y, x, fix_theta, simulate_func, l-2, -1)
 
     result = bfgs_min.x
     
@@ -415,7 +337,7 @@ def get_minimum(arg):
     return 2 * minimizing_likelihood / len(y) / 3, result, new_evals, new_evecs
 
 
-def minimize(l, fix_theta):
+def minimize(y, l, fix_theta):
     assert l <= ASTEROIDS_MAX_K
     assert len(fix_theta) == max((l)**2 - 6, 0)
 
@@ -450,7 +372,7 @@ def minimize(l, fix_theta):
             model = minimize_function(point, simulate, 0, 0) # Terminate the run early with drc=2 because I just want the runtime error
         except RuntimeError:
             continue
-        parameter_points.append([point, fix_theta, l, bounds])
+        parameter_points.append([y, point, fix_theta, l, bounds])
 
     #parameter_points[0][0] = np.array(theta_true) + np.random.randn(3)*0.001
 
@@ -490,51 +412,6 @@ def minimize(l, fix_theta):
             distinct_results.append((theta, evals, evecs, redchi))
     return distinct_results
 
-# Stepped minimization
-queue = [([], [], [], 0)]
-for i in range(2, ASTEROIDS_MAX_K + 1):
-    new_queue = []
-    for fix_theta, evals, evecs, _ in queue:
-        tier_results = minimize(i, fix_theta)
-        for result_theta, result_evals, result_evecs, result_redchi in tier_results:
-            logging.info("Deg {} redchi: {}. Theta: {}".format(i, result_redchi, result_theta))
-            new_queue.append((fix_theta + list(result_theta), evals + list(result_evals),
-                evecs + list(result_evecs), result_redchi))
-    queue = new_queue
-
-# Stitch together the hessians
-kernel = []
-for theta, evals, evecs, redchi in queue:
-    resized_evecs = []
-    max_len = (1 + ASTEROIDS_MAX_K)**2 - 6
-    for e in evecs:
-        l_value = (len(e) - 1) // 2
-        start_index = l_value**2 - 6
-        if l_value < 2:
-            l_value = 2
-            start_index = 0
-        evec = [0] * start_index + list(e) + [0] * (max_len - start_index - len(e))
-        resized_evecs.append(np.array(evec))
-    if redchi / true_redchi > THRESHOLD_LIKE_RAT:
-        logging.warning(f"The point with theta {theta} and redchi {redchi} was excluded from the kernel")
-        continue
-    logging.info("The kernel includes a point with theta {}, redchi {}".format(theta, redchi))
-    kernel.append((theta, evals, np.array(resized_evecs)))
-
-logging.info("There are {} MCMC starting points".format(len(kernel)))
-
-if len(kernel) == 0:
-    f = open("errors.dat", 'a')
-    f.write(output_name+": kernel is empty\n")
-    f.close()
-    logging.critical("Kernel is empty")
-    sys.exit()
-
-####################################################################
-# Run MCMC
-####################################################################
-
-
 def populate(evals, diagonalizer, count, start):
     spacing = 1 / np.sqrt(evals)
     if np.any(spacing < MIN_SPACING):
@@ -554,7 +431,7 @@ def populate(evals, diagonalizer, count, start):
 
     for i, point in enumerate(global_points):
         while True:
-            logprob = log_probability(point, y, y_inv_covs)
+            logprob = log_probability(point, y, sigma)
             if np.isfinite(logprob):
                 break
             point = np.matmul(diagonalizer.transpose(), spacing * np.random.randn(N_DIM)) + start
@@ -589,7 +466,7 @@ def mcmc_fit(theta_start, evals, evecs, index):
     old_tau = np.inf
     with Pool() as pool:
         sampler = emcee.EnsembleSampler(N_WALKERS, N_DIM, log_probability,
-            args=(y, y_inv_covs), backend=backend, pool=pool)
+            args=(y, sigma), backend=backend, pool=pool)
 
         if reload:
             pos = sampler._previous_state
@@ -626,5 +503,125 @@ def mcmc_fit(theta_start, evals, evecs, index):
     else:
         logging.info("Done")
 
-for i, (theta, evals, evecs) in enumerate(kernel):
-    mcmc_fit(theta, evals, evecs, i)
+if __name__ == "__main__":
+    assert(len(theta_true) == len(theta_high) == len(theta_low))
+    assert(len(theta_true) == (ASTEROIDS_MAX_K + 1)**2 - 6)
+    assert(len(jlms) == (ASTEROIDS_MAX_J + 1)**2)
+    assert(np.all(theta_high > theta_low))
+
+    logging.info("Cadence {}, perigee {}, speed {}".format(cadence, perigee, speed))
+    logging.info("Spin {}".format(spin))
+    logging.info("Jlms {}".format(jlms))
+    logging.info("Radius {}".format(radius))
+    logging.info("Theta true {}".format(theta_true))
+    logging.info("Theta high {}".format(theta_high))
+    logging.info("Theta low {}".format(theta_low))
+    logging.info("Sigma {}".format(sigma))
+    logging.info("Name {}".format(output_name))
+    logging.info("Velocity multiplier {}".format(VELOCITY_MUL))
+    ####################################################################
+    # Generate synthetic data
+    ####################################################################
+    start = time.time()
+    y = fit_function(theta_true)
+    logging.info("Data generation took {} s".format(time.time() - start))
+    y, y_inv_covs = random_vector.randomize(UNCERTAINTY_MODEL, y, sigma)
+    if UNCERTAINTY_MODEL == random_vector.TILT_UNIFORM_TRUE:
+        UNCERTAINTY_ARGUMENT = sigma
+    else:
+        UNCERTAINTY_ARGUMENT = y_inv_covs
+
+    np.save(f"{output_name}-data.npy", y)
+    np.save(f"{output_name}-unc.npy", y_inv_covs)
+
+    logging.info(f"DOF: {len(y)}")
+
+    plt.figure(figsize=(12, 4))
+    x_display = np.arange(len(y))
+    uncs = np.array([2 * np.sqrt(np.diagonal(pinvh(a))) for a in y_inv_covs])
+    plt.fill_between(x_display, y[:,0]+uncs[:,0], y[:,0]-uncs[:,0], alpha=0.5, color="C0")
+    plt.fill_between(x_display, y[:,1]+uncs[:,1], y[:,1]-uncs[:,1],alpha=0.5, color="C1")
+    plt.fill_between(x_display, y[:,2]+uncs[:,2], y[:,2]-uncs[:,2],  alpha=0.5, color="C2")
+    plt.scatter(x_display, y[:,0], label='x', s=1, color="C0")
+    plt.scatter(x_display, y[:,1], label='y', s=1, color="C1")
+    plt.scatter(x_display, y[:,2], label='z', s=1, color="C2")
+    plt.xlabel("Time (Cadences)")
+    plt.ylabel("Spin (rad/s)")
+    for tier in data_cuts:
+        for drc in tier:
+            plt.axvline(x=drc, color='k')
+    plt.legend()
+    # plt.show()
+
+
+
+    ####################################################################
+    # Minimize likelihood
+    ####################################################################
+
+    if ASTEROIDS_MAX_K == 3:
+        if ASTEROIDS_MAX_J == 0:
+            real_sim_func = asteroids_0_3.simulate
+        elif ASTEROIDS_MAX_J == 2:
+            real_sim_func = asteroids_2_3.simulate
+        elif ASTEROIDS_MAX_J == 3:
+            real_sim_func = asteroids_3_3.simulate
+    elif ASTEROIDS_MAX_K == 2:
+        if ASTEROIDS_MAX_J == 0:
+            real_sim_func = asteroids_0_2.simulate
+        elif ASTEROIDS_MAX_J == 2:
+            real_sim_func = asteroids_2_2.simulate
+        elif ASTEROIDS_MAX_J == 3:
+            real_sim_func = asteroids_3_2.simulate
+
+
+    true_redchi = 2 * minimize_log_prob(y, theta_true, [], real_sim_func, 0, -1) / len(y) / 3
+    logging.info("TRUE REDCHI: {}".format(true_redchi))
+
+    # Stepped minimization
+    queue = [([], [], [], 0)]
+    for i in range(2, ASTEROIDS_MAX_K + 1):
+        new_queue = []
+        for fix_theta, evals, evecs, _ in queue:
+            tier_results = minimize(y, i, fix_theta)
+            for result_theta, result_evals, result_evecs, result_redchi in tier_results:
+                logging.info("Deg {} redchi: {}. Theta: {}".format(i, result_redchi, result_theta))
+                new_queue.append((fix_theta + list(result_theta), evals + list(result_evals),
+                    evecs + list(result_evecs), result_redchi))
+        queue = new_queue
+
+    # Stitch together the hessians
+    kernel = []
+    for theta, evals, evecs, redchi in queue:
+        resized_evecs = []
+        max_len = (1 + ASTEROIDS_MAX_K)**2 - 6
+        for e in evecs:
+            l_value = (len(e) - 1) // 2
+            start_index = l_value**2 - 6
+            if l_value < 2:
+                l_value = 2
+                start_index = 0
+            evec = [0] * start_index + list(e) + [0] * (max_len - start_index - len(e))
+            resized_evecs.append(np.array(evec))
+        if redchi / true_redchi > THRESHOLD_LIKE_RAT:
+            logging.warning(f"The point with theta {theta} and redchi {redchi} was excluded from the kernel")
+            continue
+        logging.info("The kernel includes a point with theta {}, redchi {}".format(theta, redchi))
+        kernel.append((theta, evals, np.array(resized_evecs)))
+
+    logging.info("There are {} MCMC starting points".format(len(kernel)))
+
+    if len(kernel) == 0:
+        f = open("errors.dat", 'a')
+        f.write(output_name+": kernel is empty\n")
+        f.close()
+        logging.critical("Kernel is empty")
+        sys.exit()
+
+    ####################################################################
+    # Run MCMC
+    ####################################################################
+
+
+    for i, (theta, evals, evecs) in enumerate(kernel):
+        mcmc_fit(theta, evals, evecs, i)

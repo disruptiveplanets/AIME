@@ -6,7 +6,7 @@ EARTH_RADIUS = 6_370_000
 x = np.linspace(0, 12 * np.pi, DATA_WIDTH)
 
 def simulate(cadence, jlms, theta, radius, spinx, spiny, spinz, impact_parameter,
-    speed, mu, central_radius, drc=-1, enforce_drc=False):
+    speed, mu, central_radius, drc=-1, enforce_drc=False, vel_mul=1):
 
     consider_x = x[:int(DATA_WIDTH / 2 * (1 + drc / 10)) - 1] if enforce_drc else x
 

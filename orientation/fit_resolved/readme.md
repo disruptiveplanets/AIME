@@ -1,0 +1,3 @@
+# Aug 2
+
+I created this directory today to make an orientation to angular velocity data set comparison. I confirmed that the likelihood obeys the right properties, that the true data set was not too far from the new one, that the whole `fit.py` code runs start to finish with the test data, and I also ran the code up to the MCMC with the true data. Then I ran a moment extraction with an orientation data set.

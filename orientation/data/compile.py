@@ -27,4 +27,6 @@ vel_moments = vel_resids / ratio + np.mean(vel_moments, axis=0)
 
 fig = corner.corner(vel_moments)
 corner.corner(o_resids, fig=fig)
+plt.savefig("corner-compare.png")
+plt.savefig("corner-compare.pdf")
 plt.show()

@@ -10,6 +10,7 @@ My goal is to be able to determine asteroid shape and density distribution based
 - **paper/** contains the paper associated with this work.
 - **code/** contains both the C++ asteroid simulation and the fitting software.
 - **data/** contains all the data, processing code, and figures computed on a supercomputer. Many of the large files are not on GitHub.
+- **orientation/** contains a copy of the `code` directory, but specialized for a data set of asteroid orientation.
 - **apophis/** contains some code copied from this directory specifically dedicated to the 2029 encounter of Apophis.
 - **math/** contains Mathematica files used to do some of the analysis.
 - **summaries/** contains progress reports and summaries of mathematical calculations.
