@@ -366,3 +366,34 @@ This appendix contains animations to better display the density distributions sh
   \caption{Density distributions extracted via the finite-element (\textit{top}) and the two-lump lumpy (\textit{bottom}) models for an asteroid with two counterbalancing cores. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted. Animated form of figure \ref{fig:den-double}.}
   \label{fig:animated-double}
 \end{figure*}
+
+
+\section{Comparing orientation and angular velocity data}
+
+To extract the density distribution of an asteroid, the main text assumes that the angular velocity data of the asteroid is observable. It is possible that the orientation of the asteroid may be better constrained by observations than angular velocity. In this appendix, we generate an orientation data set for the reference asteroid flyby, extract a density distribution from it, and compare the results to distributions extracted from angular velocity data.
+
+\subsection{Uncertainty model}
+We will use the same tools to extract data from the orientation data set as we did in the main text for the angular velocity data set. The only item that requires redefinition is the likelihood used by the MCMC (equation \ref{eqn:log-likelihood}), which depends on a model for the uncertainty of orientation observations.
+
+For the sake of this appendix, we will assume that all observations of orientation $O$ differ from the true orientation $O^*$ by a rotation by some angle $\phi$ around an axis drawn from a uniform distribution on the unit sphere, where $\phi$ is drawn from a normal distribution with mean zero and standard deviation $\sigma_\phi$. Expressing orientation as a quaternion $\quat q = q_r + q_i \bm i + q_j \bm j + q_k \bm k$, $\phi$ can be extracted and the likelihood written as 
+\begin{equation}
+  \ln \mathcal{L} = -\frac{2}{\sigma_\phi^2}\sum_{i=0}\parens{\cos^{-1}\brackets{(\quat q_i (\quat q_i^*)^{-1})_r}}^2
+  \label{eqn:orientation-like}
+\end{equation}
+where $\quat q_i$ is the $i$th quaternion in the data set measured in the inertial frame, and $\quat q_i^*$ is the true quaternion. It is assumed that both quaternions have norm one.
+
+\subsection{Moment uncertainty comparison}
+With the likelihood defined, density moments can be extracted from the orientation data via the fit process described in the main text and compared to those extracted from the angular velocity data. We generate data of both types for the reference asteroid configuration and extract $K_{\ell m}$ means and uncertainties for both data sets.
+
+Due to the different uncertainty models used for the orientation and angular velocity data sets, this set-up does not allow direct comparison between the sizes of moment uncertainty for both data sets. One could not tell if one data set yields more precise moments because the observational precision of that data set is better or because that data type affords better estimation of density moments. However, the relative uncertainty of moments can be compared between the two data sets. 
+
+We generate moment uncertainty for the orientation data using a test value of $\sigma_\phi = 0.1$ and compute the mean uncertainty. We then scale the moment uncertainties attained from the angular velocity data set with the reference observational uncertainty parameters so that the mean uncertainty of all the moments is equal to that of the orientation data set. This is equivalent to simply choosing observational uncertainties for the angular velocity data set which yield density moments to the same precision as the observational data set, because figure \ref{fig:scan-observational} shows that density moment uncertainty $\sigma(K_{\ell m})$ is proportional to observational uncertainty. We then compute the ratio between $\sigma(K_{\ell m})$ for the observational data set and the angular velocity data set and show the result as a function of $\ell$ and $m$ in figure \ref{fig:observational-moment-uncertainty}.
+\begin{figure}
+  \centering
+  % \includegraphics{figs/observational-moment-uncertainty}
+  \caption{\jtd{Write}}
+  \label{fig:observational-moment-uncertainty}
+\end{figure}
+
+\subsection{Density uncertainty comparison}
+
