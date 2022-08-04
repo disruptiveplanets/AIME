@@ -1,11 +1,3 @@
-## Jan 21
+## Aug 4
 
-Staged today
-
-## Feb 9
-
-Pulled up to 25 today and ran a fit to extract the way the uncertainty grows. Kind of interesting behavior ensues: one of the parameters is much more sensitive than the rest, and only a few vary with period.
-
-## Feb 11
-
-I pulled the rest from the supercomputer today. I also started the density scan for high order parameters.
+Created this scan today and staged it, but did not run it yet because the SC has too much going on. I'm going to wait until tomorrow, when gamma should be finished and much of vex and period will also be done.
