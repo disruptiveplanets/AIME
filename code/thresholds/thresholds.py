@@ -67,7 +67,7 @@ EXCLUDE = ["scan-vex"]
 PULL = False
 DIRECTORIES = ["lumpy", "fe"]
 
-THRESHOLDS = ((1e-4, "dashed"),(1e-3, "solid"),)
+THRESHOLDS = ((1e-4, "dashed", "weak"),(1e-3, "solid", "strong"),)
 
 if PULL:
     for directory in DIRECTORIES:
@@ -103,8 +103,8 @@ for directory in DIRECTORIES:
         axs[i].fill_between(xs, uncs[:,1], uncs[:,3], alpha=0.3, color=COLORS[directory], label='foo')
 
         if directory == "lumpy":
-            for threshold, style in THRESHOLDS:
-                axs[i].axhline(y=threshold, c='r', linewidth=1, linestyle=style)
+            for threshold, style, thresh_name in THRESHOLDS:
+                handles[thresh_name] = axs[i].axhline(y=threshold, c='r', linewidth=1, linestyle=style)
                 if name in EXCLUDE:
                     continue
 
@@ -139,8 +139,7 @@ for directory in DIRECTORIES:
             if i % 4 == 0:
                 axs[i].set_ylabel("$\sigma_\\rho / \\rho$")
 
-fig.legend([handles["lumpy"], handles["fe"]], ["Lumpy", "Finite element"], loc="lower left")
-fig.tight_layout()
-fig.savefig("all.png")
-fig.savefig("all.pdf")
+fig.legend([handles["lumpy"], handles["fe"], handles["weak"], handles["strong"]], ["Lumpy", "Finite element", "Weak cut-off", "Strong cut-off"], loc="upper center", ncol=2)
+fig.savefig("all.png", bbox_inches='tight')
+fig.savefig("all.pdf", bbox_inches='tight')
 plt.show()

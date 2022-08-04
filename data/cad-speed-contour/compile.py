@@ -110,7 +110,7 @@ for plot_index in range(N_DIM):
     else:
         cbar.set_label(f"$\sigma({param_names[plot_index]})\ (\\times 10^{{2}})$")
 
-    ax.set_ylabel(f"$t_\\mathrm{{spin}}/t_\\mathrm{{orbit}}$")
+    ax.set_ylabel(f"$v_\\mathrm{{orbit}} / v_\\mathrm{{physical}}$")
 
 
     #axs[plot_index].set_xscale('log')

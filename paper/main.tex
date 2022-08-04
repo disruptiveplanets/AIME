@@ -381,7 +381,7 @@ We study both the uncertainties on the density moments and uncertainty on densit
 \begin{table}
   \centering
   \begin{tabular}{lll} \hline
-    Encounter property & Strong & Weak \\ \hline
+    Encounter property & Weak & Strong \\ \hline
     Perigee ($r_p$, Earth radii) & $<$6.0 & $<$18\\
     Excess velocity ($v_\infty$) & - & - \\
     Asteroid length ($a_\mathcal{A}$, m) & $>$15 & - \\
@@ -399,7 +399,7 @@ We study both the uncertainties on the density moments and uncertainty on densit
 \begin{figure}
   \centering
   \includegraphics[width=0.9\linewidth]{figs/spin-unc.pdf}
-  \caption{Median ratio of density uncertainty to density computed over the reference asteroid density distribution via the lumpy model as a function of initial spin pole direction. The strong uncertainty thresholds (\textit{red line}) is shown, as is the reference spin pole direction (\textit{orange star}). Initial angular velocities perpendicular to the orbital plane lead to greatest uncertainty.}
+  \caption{Median ratio of density uncertainty to density computed over the reference asteroid density distribution via the lumpy model as a function of initial spin pole direction. The weak uncertainty cut-off (\textit{red line}) is shown, as is the reference spin pole direction (\textit{orange star}). The strong cut-off is never exceeded and thus does not appear. Initial angular velocities perpendicular to the orbital plane lead to greatest uncertainty.}
   \label{fig:spin-uncertainty}
 \end{figure}
 
@@ -410,7 +410,7 @@ We study both the uncertainties on the density moments and uncertainty on densit
   \label{fig:net-uncertainty}
 \end{figure*}
 
-Table \ref{tab:threshold-summary} displays the encounter properties corresponding to density distribution uncertainty equal to two sample values we term the ``weak'' and ``strong'' thresholds. These values are $\sigma_\rho / \rho = 10^{-3}$ (weak) and $10^{-4}$ (strong), for density distributions extracted via the lumpy model. They are manually chosen, and adjustments to them or to the lumpy model will affect the data of table \ref{tab:threshold-summary}. Figure \ref{fig:spin-uncertainty} depicts the same $\sigma_\rho / \rho$ as a function of initial spin pole direction, while figure \ref{fig:net-uncertainty} depicts $\sigma_\rho / \rho$ as a function of the encounter properties. Both highlight the threshold values of table \ref{tab:threshold-summary} with red lines. Bands containing 68\% (light) and 95\% (dark) of the density uncertainty over the asteroid are shown for figure \ref{fig:net-uncertainty}.
+Table \ref{tab:threshold-summary} displays the encounter properties corresponding to density distribution uncertainty equal to two sample values we term the ``weak'' and ``strong'' thresholds. These values are $\sigma_\rho / \rho = 10^{-4}$ (weak) and $10^{-3}$ (strong), for density distributions extracted via the lumpy model. They are manually chosen, and adjustments to them or to the lumpy model will affect the data of table \ref{tab:threshold-summary}. Figure \ref{fig:spin-uncertainty} depicts the same $\sigma_\rho / \rho$ as a function of initial spin pole direction, while figure \ref{fig:net-uncertainty} depicts $\sigma_\rho / \rho$ as a function of the encounter properties. Both highlight the threshold values of table \ref{tab:threshold-summary} with red lines. Bands containing 68\% (light) and 95\% (dark) of the density uncertainty over the asteroid are shown for figure \ref{fig:net-uncertainty}.
 
 Table \ref{tab:threshold-summary} reveals that the most limiting physical properties of the asteroid are its perigee and period. Excess velocity does not greatly affect the uncertainty of the density distribution, and asteroid length is only effective for $a_\mathcal{A} \sim 15$ m. By contrast, the radius of Apophis is 
 $\sim 300$ m and its perigee and rotational period also obey the strong constraints \cite{giorgini2008predicting}. The comparison to Apophis is complicated by the fact that Apophis is smaller than our $a_\mathcal{A}$ value, is tumbling \cite{PRAVEC201448}, and may change slightly in physical properties due to tidal interaction during the encounter \cite{yu2014numerical,hirabayashi2021finite}. Further work must therefore be done to apply this analysis to Apophis.
@@ -500,12 +500,9 @@ Let $\delta = |\bm{\delta}_\omega| / |\bm \omega|$ and $\delta \ll 1$. Then if $
 \subsubsection{Cadence}
 \label{sec:scan-cadence}
 
-The time between observations of asteroid angular velocity, (cadence, $\Delta t$), may vary depending on the observational schedule of the observing telescopes and the path of the asteroid through the sky.  We measure how the posterior uncertainty $\sigma(K_{\ell m})$ varies with cadence ranging from two minutes to one hour in figure \ref{fig:scan-cadence}.
+The time between observations of asteroid angular velocity, (cadence, $\Delta t$), may vary depending on the observational schedule of the observing telescopes and the path of the asteroid through the sky.  We measure how the moment uncertainty $\sigma(K_{\ell m})$ varies with cadence ranging from two minutes to one hour in figure \ref{fig:scan-cadence}.
 
-Figure \ref{fig:scan-cadence} displays little dependence of uncertainty on cadence $\Delta t$ for $\Delta t \lesssim 40$ min. We also see flaring of uncertainty for very large cadence, largely driven by the paucity of data points. However, uncertainty dramatically increases for many parameters at about $\Delta t = 30-40$ min, a time scale which is likely characteristic of the asteroid system.  This increase is generally where the $\sigma(K_{3m})$ threshold is crossed for all second-order moments except $K_{30}$, which exceeds the uncertainty threshold at $\Delta t \approx 5$ min.
-
-We expect this threshold value of $\Delta t$ to be a function of two dynamical time scales of the system: the rotational period of the asteroid $P_\omega$ and the dynamical time scale of the orbit (the latter can be estimated in multiple ways, since both $r_p / v_\infty$ and $v_\infty r_p^2 / \mu_\mathcal{B}$ have units of time). 
-\jtd{How these time scales affect the $\Delta t$ threshold is discussed in appendix \ref{app:cadence-tests}.}
+Figure \ref{fig:scan-cadence} displays little dependence of uncertainty on cadence $\Delta t$ for $\Delta t \lesssim 40$ min. We also see flaring of uncertainty for very large cadence, largely driven by the paucity of data points. However, uncertainty dramatically increases for many parameters at about $\Delta t = 30-40$ min, a time scale which depends both on the asteroid rotational period $P_\omega$ and the time scales of its orbit.
 
 Figure \ref{fig:scan-cadence} shows that as long as $\Delta t$ is less than this threshold, the influence of cadence on $\sigma$ is small, but shorter cadence leads to lower uncertainties.
 

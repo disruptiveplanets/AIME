@@ -259,14 +259,46 @@ These integrals can be pre-computed given a known asteroid shape $\mathcal{A}$, 
 Imposing constraints on these moments is also necessary. The choice of mass is enforced via equation \ref{eqn:harmonic-mass}. We impose bounds on $\rho(\bm r)$ by acknowledging that harmonic functions such as $\rho(\bm r)$ in a region such as $\mathcal{A}$ attain their maxima on the boundary of the region, so that it is only necessary to ensure that $\rho$ lies within the allowed range on the asteroid boundary rather than within the entire asteroid. This can be done by parametrizing the asteroid surface as a function of two variables (e.g., latitude and longitude) and minimizing and maximizing $\rho$ with respect to those variables, ensuring these minima and maxima are within the allowed range.
 
 
-% \section{The cadence cut-off}
+
+
+\section{Comparing orientation and angular velocity data}
+
+To extract the density distribution of an asteroid, the main text assumes that the angular velocity data of the asteroid is observable. It is possible that the orientation of the asteroid may be better constrained by observations than angular velocity. In this appendix, we generate an orientation data set for the reference asteroid flyby, extract a density distribution from it, and compare the results to distributions extracted from angular velocity data.
+
+We may expect some differences in the resolving power of orientation and angular velocity data, but not a large difference, due to the following argument. If the initial orientation of the asteroid is known, then the orientation of the next data point can be determined by knowledge of the asteroid's angular velocity at that moment. Thus, an orientation data set can be produced from an angular velocity data set and vice versa given an initial asteroid position. The initial position is defined up to $\gamma_0$ by the assumption of no initial tumbling, and figures \ref{fig:scan-physical} and \ref{fig:scan-observational} reveal that $\gamma_0$ is typically also constrained to high precision even by angular velocity data. Thus, we expect the only differences between moment uncertainty as obtained from angular velocity data or from orientation data to be due to the uncertainty of the data itself.
+
+\subsection{Uncertainty model}
+The likelihood used by the MCMC (equation \ref{eqn:log-likelihood}) requires redefinition in order to extract density moments from orientation data. This requires a new model for the uncertainty of orientation observations.
+
+For the sake of this appendix, we will assume that all observations of orientation $O$ differ from the true orientation $O^*$ by a rotation by some angle $\phi$ around an axis drawn from a uniform distribution on the unit sphere, where $\phi$ is drawn from a normal distribution with mean zero and standard deviation $\sigma_\phi$. Expressing orientation as a quaternion $\quat q = q_r + q_i \bm i + q_j \bm j + q_k \bm k$, $\phi$ can be extracted and the likelihood written as 
+\begin{equation}
+  \ln \mathcal{L} = -\frac{2}{\sigma_\phi^2}\sum_{i=0}\parens{\cos^{-1}\brackets{(\quat q_i (\quat q_i^*)^{-1})_r}}^2
+  \label{eqn:orientation-like}
+\end{equation}
+where $\quat q_i$ is the $i$th quaternion in the data set measured in the inertial frame, and $\quat q_i^*$ is the true quaternion. It is assumed that both quaternions have norm one.
+
+\subsection{Moment uncertainty comparison}
+With the likelihood defined, density moments can be extracted from the orientation data via the fit process described in the main text and compared to those extracted from the angular velocity data. We generate data of both types for the reference asteroid configuration and extract $K_{\ell m}$ means and uncertainties for both data sets.
+
+Due to the different uncertainty models used for the orientation and angular velocity data sets, this set-up does not allow direct comparison between the sizes of moment uncertainty for both data sets. One could not tell if one data set yields more precise moments because the observational precision of that data set is better or because that data type affords better estimation of density moments. However, the relative uncertainty of moments can be compared between the two data sets. 
+
+We generate moment uncertainty for the orientation data using a test value of $\sigma_\phi = 0.1$ and compute the mean uncertainty. We then scale the moment uncertainties attained from the angular velocity data set with the reference observational uncertainty parameters so that the mean uncertainty of all the moments is equal to that of the orientation data set. This is equivalent to simply choosing observational uncertainties for the angular velocity data set which yield density moments to the same precision as the observational data set, because figure \ref{fig:scan-observational} shows that density moment uncertainty $\sigma(K_{\ell m})$ is proportional to observational uncertainty. We then compute the ratio between $\sigma(K_{\ell m})$ for the observational data set and the angular velocity data set and show the result as a function of $\ell$ and $m$ in figure \ref{fig:observational-moment-uncertainty}.
+\begin{figure}
+  \centering
+  % \includegraphics{figs/observational-moment-uncertainty}
+  \caption{\jtd{Write}}
+  \label{fig:observational-moment-uncertainty}
+\end{figure}
+
+\subsection{Density uncertainty comparison}
+
+
+% \section{Dependence of the cadence cut-off on time scales}
 % \label{app:cadence-tests}
 
-% \jtd{Remove this section or included it in the following section.}
+% In section \ref{sec:scan-cadence}, we noted that moment uncertainty as a function of observation cadence $\Delta t$ increases suddenly near $\Delta t_\text{cut-off} \approx 30-40$ min. By dimensional analysis, $\Delta t_\text{cut-off}$ depends both on the asteroid period $P_\omega$ and the orbital time scales. In this appendix, we assess the relationship between $\Delta t_\text{cut-off}$ and these time scales by measuring moment uncertainty as a function of cadence at different values of these time scales. However, changing the time scales also affects the moment uncertainty directly, obscuring the cadence dependence of the moment uncertainty. Figure \ref{fig:scan-period} indicates that $P_\omega$ only slightly affects moment uncertainty as long as $P_\omega$ is not too small, so we neglect this obscuring effect in the case of $P_\omega$. To assess the dependence of $\Delta t$ on the orbital time scales, we fix the orbit shape and simulate the asteroid as following the orbit at different speeds. This process is unphysical, but it has the advantage of keeping all encounter parameters fixed except for the time the asteroid spends in the orbit, thereby isolating the orbital time scale. We parametrize this change $v_\text{orbit} / v_\text{physical}$, which is large for an artificially fast encounter, low for an artificially slow encounter, and 1 for a physical encounter.
 
-% In section \ref{sec:scan-cadence}, we noted that posterior uncertainty as a function of observation cadence $\Delta t$ appears to increase suddenly near $\Delta t \sim T_\text{cad}=30-40$ min. In this appendix, we discuss the location of this cadence cut-off as a function of the physical parameters of the asteroid.
-
-% In figure \ref{fig:cad-contour}, we display contour plots of posterior uncertainty $\sigma(K_{\ell m})$ of the fit parameters as a function of both cadence $\Delta t$ and $P_\omega$ (left panel) or the relative orbit speed $t_\text{spin} / t_\text{orbit}$ (right panel). Both panels show the same sudden increase in posterior uncertainty we named $T_\text{cad}$, located around the region where $\sigma_\rho / \rho = 100\%$ and now visible as a function of frequency and relative orbit speed. In all cases, the value of $\gamma_0$ was set so that all data points achieve the same value of $\gamma$ at perigee.
+% In figure \ref{fig:cad-contour}, we display contour plots of moment uncertainty $\sigma(K_{\ell m})$ of the fit parameters as a function of both cadence $\Delta t$ and $P_\omega$ and the relative orbit speed $v_\text{orbit} / v_\text{physical}$. Superimposed is the weak Both panels show the same sudden increase in posterior uncertainty we named $T_\text{cad}$, located around the region where $\sigma_\rho / \rho = 100\%$ and now visible as a function of frequency and relative orbit speed. In all cases, the value of $\gamma_0$ was set so that all data points achieve the same value of $\gamma$ at perigee.
 
 % \begin{figure*}
 %   \centering
@@ -366,36 +398,3 @@ This appendix contains animations to better display the density distributions sh
   \caption{Density distributions extracted via the finite-element (\textit{top}) and the two-lump lumpy (\textit{bottom}) models for an asteroid with two counterbalancing cores. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted. Animated form of figure \ref{fig:den-double}.}
   \label{fig:animated-double}
 \end{figure*}
-
-
-\section{Comparing orientation and angular velocity data}
-
-To extract the density distribution of an asteroid, the main text assumes that the angular velocity data of the asteroid is observable. It is possible that the orientation of the asteroid may be better constrained by observations than angular velocity. In this appendix, we generate an orientation data set for the reference asteroid flyby, extract a density distribution from it, and compare the results to distributions extracted from angular velocity data.
-
-We may expect some differences in the resolving power of orientation and angular velocity data, but not a large difference, due to the following argument. If the initial orientation of the asteroid is known, then the orientation of the next data point can be determined by knowledge of the asteroid's angular velocity at that moment. Thus, an orientation data set can be produced from an angular velocity data set and vice versa given an initial asteroid position. The initial position is defined up to $\gamma_0$ by the assumption of no initial tumbling, and figures \ref{fig:scan-physical} and \ref{fig:scan-observational} reveal that $\gamma_0$ is typically also constrained to high precision even by angular velocity data. Thus, we expect the only differences between moment uncertainty as obtained from angular velocity data or from orientation data to be due to the uncertainty of the data itself.
-
-\subsection{Uncertainty model}
-The likelihood used by the MCMC (equation \ref{eqn:log-likelihood}) requires redefinition in order to extract density moments from orientation data. This requires a new model for the uncertainty of orientation observations.
-
-For the sake of this appendix, we will assume that all observations of orientation $O$ differ from the true orientation $O^*$ by a rotation by some angle $\phi$ around an axis drawn from a uniform distribution on the unit sphere, where $\phi$ is drawn from a normal distribution with mean zero and standard deviation $\sigma_\phi$. Expressing orientation as a quaternion $\quat q = q_r + q_i \bm i + q_j \bm j + q_k \bm k$, $\phi$ can be extracted and the likelihood written as 
-\begin{equation}
-  \ln \mathcal{L} = -\frac{2}{\sigma_\phi^2}\sum_{i=0}\parens{\cos^{-1}\brackets{(\quat q_i (\quat q_i^*)^{-1})_r}}^2
-  \label{eqn:orientation-like}
-\end{equation}
-where $\quat q_i$ is the $i$th quaternion in the data set measured in the inertial frame, and $\quat q_i^*$ is the true quaternion. It is assumed that both quaternions have norm one.
-
-\subsection{Moment uncertainty comparison}
-With the likelihood defined, density moments can be extracted from the orientation data via the fit process described in the main text and compared to those extracted from the angular velocity data. We generate data of both types for the reference asteroid configuration and extract $K_{\ell m}$ means and uncertainties for both data sets.
-
-Due to the different uncertainty models used for the orientation and angular velocity data sets, this set-up does not allow direct comparison between the sizes of moment uncertainty for both data sets. One could not tell if one data set yields more precise moments because the observational precision of that data set is better or because that data type affords better estimation of density moments. However, the relative uncertainty of moments can be compared between the two data sets. 
-
-We generate moment uncertainty for the orientation data using a test value of $\sigma_\phi = 0.1$ and compute the mean uncertainty. We then scale the moment uncertainties attained from the angular velocity data set with the reference observational uncertainty parameters so that the mean uncertainty of all the moments is equal to that of the orientation data set. This is equivalent to simply choosing observational uncertainties for the angular velocity data set which yield density moments to the same precision as the observational data set, because figure \ref{fig:scan-observational} shows that density moment uncertainty $\sigma(K_{\ell m})$ is proportional to observational uncertainty. We then compute the ratio between $\sigma(K_{\ell m})$ for the observational data set and the angular velocity data set and show the result as a function of $\ell$ and $m$ in figure \ref{fig:observational-moment-uncertainty}.
-\begin{figure}
-  \centering
-  % \includegraphics{figs/observational-moment-uncertainty}
-  \caption{\jtd{Write}}
-  \label{fig:observational-moment-uncertainty}
-\end{figure}
-
-\subsection{Density uncertainty comparison}
-

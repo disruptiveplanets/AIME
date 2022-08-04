@@ -8,10 +8,10 @@ mpl.rcParams["font.size"] = 14
 
 percentiles = {}
 cadences = []
-time_ratios = []
+periods = []
 
 def get_indices_from_name(name):
-    return int(name[7:9]), int(name[10:12])
+    return int(name[8:10]), int(name[11:13])
 
 with open("cad-period-sync-contour.npy", 'rb') as f:
    uncs = np.load(f)[:,:,2] # Use median
@@ -29,7 +29,7 @@ with open("../../data/cad-period-sync-contour/percentiles.dat", 'r') as f:
         percentiles[name] = perc_array
 
 for name in percentiles.keys():
-    dir_name = name[:12]
+    dir_name = name[:13]
     with open(f"../../data/cad-period-sync-contour/{dir_name}/{dir_name}.txt", 'r') as f:
         max_j, max_l = f.readline().split(", ")
         max_j, max_l = (int(max_j), int(max_l))
@@ -43,20 +43,22 @@ for name in percentiles.keys():
         theta_high = [float(x) for x in f.readline().split(',')]
         theta_low = [float(x) for x in f.readline().split(',')]
         sigma = [float(d) for d in f.readline().split(',')]
-        time_ratio = float(f.readline())
     cadence_index, period_index = get_indices_from_name(name)
     if period_index == 1:
         cadences.append(cadence / 60)
     if cadence_index == 1:
-        time_ratios.append(time_ratio)
+        period = 2 * np.pi / np.linalg.norm(spin) / 3600.0
+        periods.append(period)
 
 cadences = np.sort(cadences)
-time_ratios = np.sort(time_ratios)
+periods = np.sort(periods)
+print(cadences),
+print(periods)
 
 fig = plt.figure(figsize=(6.6, 4))
-p = plt.contourf(cadences, time_ratios, uncs, levels=10)
+p = plt.contourf(cadences, periods, uncs, levels=10)
 cbar = plt.colorbar(p)
-plt.ylabel(f"$t_\\mathrm{{spin}}/t_\\mathrm{{orbit}}$")
+plt.ylabel(f"$P_\omega$ (hr)")
 plt.xlabel(f"$\Delta t$ (min)")
 plt.savefig("cad-period-contour-net.pdf", bbox_inches="tight")
 plt.savefig("cad-period-contour-net.png", bbox_inches="tight")

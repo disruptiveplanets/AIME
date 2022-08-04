@@ -14,3 +14,7 @@ I realized that this would suffer from the same problems as period so I redid th
 ## April 28
 
 Pulled the samples today, except for 06-00. But it doesn't seem to matter. High tspin/torbit corresponds to high uncertainty in cadence.
+
+## Aug 4
+
+Today I finished with this directory and opted only to summarize the results in the paper. The figure is complete, though.

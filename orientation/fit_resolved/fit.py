@@ -426,7 +426,7 @@ def populate(evals, diagonalizer, count, start):
             if np.isfinite(logprob):
                 break
             point = np.matmul(diagonalizer.transpose(), spacing * np.random.randn(N_DIM)) + start
-            #print(f"Redrew point {point}")
+            print(f"Redrew point {point}")
             global_points[i] = point
         logging.info("{}, {}".format(point, logprob / len(y)))
 
@@ -487,7 +487,7 @@ def mcmc_fit(theta_start, evals, evecs, index):
 
             if sampler.iteration % (MAX_N_STEPS//10) == 0:
                 redchis = -2 * sample.log_prob / len(y)
-                logging.info(f"Minimum redchi at {sampler.iteration/MAX_N_STEPS * 100}\%: {np.min(redchis)}")
+                logging.info(f"Minimum redchi at {sampler.iteration/MAX_N_STEPS * 100}\%: {np.min(redchis)}, theta: {np.mean(sample.coords, axis=0)}")
         sampler._previous_state = sample
 
     if reload:
