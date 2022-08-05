@@ -526,9 +526,9 @@ if __name__ == "__main__":
     logging.info("Data generation took {} s".format(time.time() - start))
     y = random_vector.randomize(UNCERTAINTY_MODEL, y, sigma)
 
-    np.save(f"{output_name}-data.npy", y)
+    np.save(f"{output_name}-data.npy", quaternion.as_float_array(y))
 
-    logging.info(f"DOF: {len(y)}")
+    logging.info(f"DOF: {y.shape}")
 
 
 

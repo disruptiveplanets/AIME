@@ -1,4 +1,4 @@
-SAVE_PDFS = False
+SAVE_PDFS = True
 
 import corner, emcee
 import asteroids_0_3, asteroids_0_2, asteroids_2_3, asteroids_2_2, asteroids_3_3, asteroids_3_2
@@ -57,7 +57,7 @@ class Display:
     def get_true_results(self):
         if self.true_results is not None:
             return
-        self.true_results = np.load(f"{self.bare_name}-data.npy")
+        self.true_results = quaternion.as_quat_array(np.load(f"{self.bare_name}-data.npy"))
         #self.true_uncs = np.load(f"{self.bare_name}-unc.npy")
 
     def get_samples(self):
@@ -102,7 +102,7 @@ class Display:
 
         f = open(self.h5_name + '-redchis.txt', 'w')
         for i in range(self.log_prob_samples.shape[1]):
-            redchi_list = -self.log_prob_samples[:,i] / len(self.true_results) / 3 * 2
+            redchi_list = -self.log_prob_samples[:,i] / len(self.true_results) * 2
             redchi = np.nanmin(redchi_list)
             f.write(str(redchi) + "\n")
             if redchi < REDCHI_THRESHOLD:
@@ -290,40 +290,45 @@ class Display:
         while len(mean_res) < len(self.true_results):
             mean_res.append(mean_res[-1])
 
-        mean_res = np.array(mean_res)
+        mean_res = quaternion.as_float_array(np.array(mean_res))
         #uncertainties = np.array([2 * np.sqrt(np.diagonal(pinvh(a))) for a in self.true_uncs])
 
         fig, (ax1, ax2) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(9, 6), sharex=True)
 
-        x_display = np.arange(len(self.true_results)) * self.cadence / 3600.0
+        float_results = quaternion.as_float_array(self.true_results)
+        x_display = np.arange(float_results.shape[0]) * self.cadence / 3600.0
         x_display -= np.median(x_display)
-        ax1.scatter(x_display, self.true_results[:,0] * 3600, label = 'true x', alpha=0.5, color='C0', s=1)
-        ax1.scatter(x_display, self.true_results[:,1] * 3600, label = 'true y', alpha=0.5, color='C1', s=1)
-        ax1.scatter(x_display, self.true_results[:,2] * 3600, label = 'true z', alpha=0.5, color='C2', s=1)
 
-        # ax1.fill_between(x_display, self.true_results[:,0] * 3600 + uncertainties[:,0] * 3600,
-        #         self.true_results[:,0] * 3600 - uncertainties[:,0] * 3600, color="C0", alpha=0.2)
-        # ax1.fill_between(x_display, self.true_results[:,1] * 3600 + uncertainties[:,1] * 3600,
-        #         self.true_results[:,1] * 3600 - uncertainties[:,1], color="C1", alpha=0.2)
-        # ax1.fill_between(x_display, self.true_results[:,2] * 3600 + uncertainties[:,2] * 3600,
-        #         self.true_results[:,2] * 3600 - uncertainties[:,2] * 3600, color="C2", alpha=0.2)
+        ax1.scatter(x_display, float_results[:,0], label = 'r', alpha=0.5, color='C0', s=1)
+        ax1.scatter(x_display, float_results[:,1], label = 'i', alpha=0.5, color='C1', s=1)
+        ax1.scatter(x_display, float_results[:,2], label = 'j', alpha=0.5, color='C2', s=1)
+        ax1.scatter(x_display, float_results[:,3], label = 'k', alpha=0.5, color='C3', s=1)
+
+        # ax1.fill_between(x_display, float_results[:,0] * 3600 + uncertainties[:,0] * 3600,
+        #         float_results[:,0] * 3600 - uncertainties[:,0] * 3600, color="C0", alpha=0.2)
+        # ax1.fill_between(x_display, float_results[:,1] * 3600 + uncertainties[:,1] * 3600,
+        #         float_results[:,1] * 3600 - uncertainties[:,1], color="C1", alpha=0.2)
+        # ax1.fill_between(x_display, float_results[:,2] * 3600 + uncertainties[:,2] * 3600,
+        #         float_results[:,2] * 3600 - uncertainties[:,2] * 3600, color="C2", alpha=0.2)
 
         if mean_res is not None:
-            ax1.plot(x_display, mean_res[:,0] * 3600, label = 'mean x', color='C0')
-            ax1.plot(x_display, mean_res[:,1] * 3600, label = 'mean y', color='C1')
-            ax1.plot(x_display, mean_res[:,2] * 3600, label = 'mean z', color='C2')
-        ax1.set_ylabel("Spin (rad/hr)")
+            ax1.plot(x_display, mean_res[:,0], label = 'mean r', color='C0')
+            ax1.plot(x_display, mean_res[:,1], label = 'mean i', color='C1')
+            ax1.plot(x_display, mean_res[:,2], label = 'mean j', color='C2')
+            ax1.plot(x_display, mean_res[:,3], label = 'mean k', color='C3')
+        ax1.set_ylabel("Orientation")
         ax1.legend()
 
         if mean_res is not None:
-            ax2.scatter(x_display, mean_res[:,0] * 3600 - self.true_results[:,0] * 3600, color='C0', s=1)
-            ax2.scatter(x_display, mean_res[:,1] * 3600 - self.true_results[:,1] * 3600, color='C1', s=1)
-            ax2.scatter(x_display, mean_res[:,2] * 3600 - self.true_results[:,2] * 3600, color='C2', s=1)
+            ax2.scatter(x_display, mean_res[:,0] - float_results[:,0], color='C0', s=1)
+            ax2.scatter(x_display, mean_res[:,1] - float_results[:,1], color='C1', s=1)
+            ax2.scatter(x_display, mean_res[:,2] - float_results[:,2], color='C2', s=1)
+            ax2.scatter(x_display, mean_res[:,3] - float_results[:,3], color='C3', s=1)
             # ax2.fill_between(x_display, uncertainties[:,0] * 3600, -uncertainties[:,0] * 3600, color="C0", alpha=0.2)
             # ax2.fill_between(x_display, uncertainties[:,1] * 3600, -uncertainties[:,1] * 3600, color="C1", alpha=0.2)
             # ax2.fill_between(x_display, uncertainties[:,2] * 3600, -uncertainties[:,2] * 3600, color="C2", alpha=0.2)
 
-        ax2.set_ylabel("Residuals (rad/hr)")
+        ax2.set_ylabel("Residuals")
         ax2.set_xlabel("Time to perigee (hours)")
         ax2.set_xlim(np.min(x_display), np.max(x_display))
         plt.tight_layout()
