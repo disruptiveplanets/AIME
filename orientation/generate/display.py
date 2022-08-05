@@ -82,8 +82,10 @@ if os.path.exists(f"{file_name}-resolved-perfect.dat"):
     perfect_quats = quaternion.as_quat_array(np.array([perfect_rs, perfect_xs, perfect_ys, perfect_zs]).transpose().reshape(-1))
     angles = []
     for (q, q_star) in zip(quats, perfect_quats):
-        print(2 * np.arccos(min(1, abs((q * q_star.conj()).real))))
-        angles.append(2 * np.arccos(min(1, abs((q * q_star.conj()).real)))**2)
+        angle = 2 * np.arccos(min(1, abs((q * q_star.conj()).real)))
+        print(angle)
+        angles.append(angle)
+    print(angles)
     plt.figure()
     plt.title(f"Residuals: {file_name}")
     plt.plot(time, np.array(rs) - np.array(perfect_rs), label="r")
