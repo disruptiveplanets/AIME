@@ -28,7 +28,7 @@ def like_uniform_angle(y, true, length, sigma):
     # Assume y and true have dtype quaternion.
     s = 0
     for (q, q_star) in zip(y[:length], true[:length]):
-        s += np.arccos((q * q_star.conj()).real)**2
+        s += np.arccos(min(1, abs((q * q_star.conj()).real)))**2
     return -2 / (sigma*sigma) * s
 
 if __name__ == "__main__":
