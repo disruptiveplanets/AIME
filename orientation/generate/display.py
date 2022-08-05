@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import quaternion
 import sys, os
 
 plt.style.use("jcap")
@@ -64,10 +65,10 @@ if os.path.exists(f"{file_name}-resolved-perfect.dat"):
 
 time = np.arange(-len(zs)/2, len(zs)/2, 1) * 120/3600
 
-plt.plot(time, np.array(rs)*3600, label=f'$r$')
-plt.plot(time, np.array(xs)*3600, label=f'$x$')
-plt.plot(time, np.array(ys)*3600, label=f'$y$')
-plt.plot(time, np.array(zs)*3600, label=f'$z$')
+plt.plot(time, np.array(rs), label=f'$r$')
+plt.plot(time, np.array(xs), label=f'$x$')
+plt.plot(time, np.array(ys), label=f'$y$')
+plt.plot(time, np.array(zs), label=f'$z$')
 
 plt.xlabel("Time after perigee (hr)")
 plt.ylabel("Orientaton")
@@ -77,12 +78,19 @@ plt.legend()
 plt.tight_layout()
 
 if os.path.exists(f"{file_name}-resolved-perfect.dat"):
+    quats = quaternion.as_quat_array(np.array([rs, xs, ys, zs]).transpose().reshape(-1))
+    perfect_quats = quaternion.as_quat_array(np.array([perfect_rs, perfect_xs, perfect_ys, perfect_zs]).transpose().reshape(-1))
+    angles = []
+    for (q, q_star) in zip(quats, perfect_quats):
+        print(2 * np.arccos(min(1, abs((q * q_star.conj()).real))))
+        angles.append(2 * np.arccos(min(1, abs((q * q_star.conj()).real)))**2)
     plt.figure()
     plt.title(f"Residuals: {file_name}")
     plt.plot(time, np.array(rs) - np.array(perfect_rs), label="r")
     plt.plot(time, np.array(xs) - np.array(perfect_xs), label="x")
     plt.plot(time, np.array(ys) - np.array(perfect_ys),  label="y")
     plt.plot(time, np.array(zs) - np.array(perfect_zs), label="z")
+    plt.plot(time, angles, label="angle", c='k')
     plt.legend()
     plt.tight_layout()
 
