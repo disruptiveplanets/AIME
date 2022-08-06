@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "scan-gamma"
+PATH = "scan-period-sync"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1
