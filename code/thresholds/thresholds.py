@@ -8,10 +8,10 @@ plt.style.use('jcap')
 mpl.rcParams["font.size"] = 12
 
 PLOT_ORDER = [
-    "scan-perigee",
-    "scan-vex",
+    "scan-perigee-sync",
+    "scan-vex-sync",
     "scan-am",
-    "scan-period",
+    "scan-period-sync",
     "probe-s-rho",
     "probe-s-theta",
     "scan-cadence",
@@ -24,46 +24,46 @@ INCREASING = {
     "probe-s-theta": True,
     "scan-am": False,
     "scan-cadence": True,
-    "scan-perigee": True,
-    "scan-period": False,
-    "scan-vex": True,
+    "scan-perigee-sync": True,
+    "scan-period-sync": False,
+    "scan-vex-sync": True,
 }
 LABELS = {
-    "scan-perigee": "$r_p$ (Earth radii)",
+    "scan-perigee-sync": "$r_p$ (Earth radii)",
     "probe-s-theta": "$\sigma_\\theta$",
     "probe-s-rho": "$\sigma_P / P_\omega$",
     "scan-cadence": "$\Delta t$ (min)",
-    "scan-period": "$P_\omega$ (hr)",
+    "scan-period-sync": "$P_\omega$ (hr)",
     "scan-am": "$a_\\mathcal{A}$ (m)",
-    "scan-vex": "$v_\infty$ (km s$^{-1}$)",
+    "scan-vex-sync": "$v_\infty$ (km s$^{-1}$)",
     "observation-gap": "$T_\mathrm{gap}$ (hr)",
 }
 
 LOGS = {
-    "scan-perigee": False,
+    "scan-perigee-sync": False,
     "probe-s-theta": True,
     "probe-s-rho": True,
     "scan-cadence": False,
-    "scan-period": False,
+    "scan-period-sync": False,
     "scan-am": True,
-    "scan-vex": False,
+    "scan-vex-sync": False,
     "observation-gap": False,
 }
 TRUES = {
-    "scan-perigee": 5,
+    "scan-perigee-sync": 5,
     "probe-s-theta": 1e-2,
     "probe-s-rho": 1e-7,
     "scan-cadence": 2,
-    "scan-period": 9,
+    "scan-period-sync": 9,
     "scan-am": 1000,
-    "scan-vex": 6,
+    "scan-vex-sync": 6,
     "observation-gap": 0,
 }
 COLORS = {
     "lumpy": "darkcyan",
     "fe": "olivedrab",
 }
-EXCLUDE = ["scan-vex"]
+EXCLUDE = []#"scan-vex"]
 PULL = False
 DIRECTORIES = ["lumpy", "fe"]
 
