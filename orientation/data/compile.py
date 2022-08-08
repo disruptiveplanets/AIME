@@ -36,10 +36,19 @@ vel_moments = vel_resids + np.mean(vel_moments, axis=0)
 
 ## Save new moments
 
-walker_moments = vel_moments.reshape(-1, 32, 10)
-print(np.mean(walker_moments, axis=(0, 1)))
-print(np.mean(vel_moments, axis=0))
-np.save("scale-vel-0-samples.npy", walker_moments)
+for name, moments in zip(["scale-vel", "scale-ori"], [vel_moments, o_moments]):
+    new_moments = np.zeros_like(moments)
+    # Rotate so that K22 -> -K22 
+    new_moments[:,0] = moments[:,0] # gamma_0
+    new_moments[:,1] = -moments[:,1] # K22
+    new_moments[:,2] = moments[:,2] # K20
+    (new_moments[:,3], new_moments[:,4]) = (moments[:,4], -moments[:,3]) # K33
+    (new_moments[:,5], new_moments[:,6]) = (-moments[:,5], -moments[:,6]) # K32
+    (new_moments[:,7], new_moments[:,8]) = (-moments[:,8], moments[:,7]) # K31
+    new_moments[:,9] = moments[:,9] # K30
+    print(np.mean(new_moments, axis=0))
+
+    np.save(f"{name}-0-samples.npy", new_moments.reshape(-1, 32, 10))
 
 def make_corner():
     param_ranges = []
@@ -101,4 +110,4 @@ def make_unc():
 
 if __name__ == "__main__":
     make_unc()
-    plt.show()
+    # plt.show()

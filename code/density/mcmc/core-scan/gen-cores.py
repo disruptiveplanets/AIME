@@ -80,7 +80,7 @@ INDICATORS = {
 SAMPLE_NAME = {
     "sym": "den-sym",
     "asym": "den-asym",
-    "ori": "ori-e-5",
+    "ori": "scale-ori",
     "vel": "scale-vel",
     "sph-3": "den-core-sph-3",
     "sph-1.5": "den-core-sph-1.5",
