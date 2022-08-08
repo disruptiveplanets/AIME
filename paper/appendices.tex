@@ -257,8 +257,6 @@ Imposing constraints on these moments is also necessary. The choice of mass is e
 
 To extract the density distribution of an asteroid, the main text assumes that the angular velocity data of the asteroid is observable. It is possible that the orientation of the asteroid may be better constrained by observations than angular velocity. In this appendix, we generate an orientation data set for the reference asteroid flyby, extract a density distribution from it, and compare the results to distributions extracted from angular velocity data.
 
-We may expect some differences in the resolving power of orientation and angular velocity data, but not a large difference, due to the following argument. If the initial orientation of the asteroid is known, then the orientation of the next data point can be determined by knowledge of the asteroid's angular velocity at that moment. Thus, an orientation data set can be produced from an angular velocity data set and vice versa given an initial asteroid position. The initial position is defined up to $\gamma_0$ by the assumption of no initial tumbling, and figures \ref{fig:scan-physical} and \ref{fig:scan-observational} reveal that $\gamma_0$ is typically also constrained to high precision even by angular velocity data. Thus, we expect the only differences between moment uncertainty as obtained from angular velocity data or from orientation data to be due to the uncertainty of the data itself.
-
 \subsection{Uncertainty model}
 The likelihood used by the MCMC (equation \ref{eqn:log-likelihood}) requires redefinition in order to extract density moments from orientation data. This requires a new model for the uncertainty of orientation observations.
 
@@ -270,19 +268,24 @@ For the sake of this appendix, we will assume that all observations of orientati
 where $\quat q_i$ is the $i$th quaternion in the data set measured in the inertial frame, and $\quat q_i^*$ is the true quaternion. It is assumed that both quaternions have norm one.
 
 \subsection{Moment uncertainty comparison}
-With the likelihood defined, density moments can be extracted from the orientation data via the fit process described in the main text and compared to those extracted from the angular velocity data. We generate data of both types for the reference asteroid configuration and extract $K_{\ell m}$ means and uncertainties for both data sets.
+With the likelihood defined, we generate both angular velocity and orientation data for the asymmetric reference asteroid configuration and extract $K_{\ell m}$ means and uncertainties for both data sets via the fit method defined in the main text. Due to the different uncertainty models used for the orientation and angular velocity data sets, this set-up does not allow direct comparison between the sizes of moment uncertainty for both data sets. If one data set yields more precise moments than the other, one could not determine whether the effect is due to increased observational precision in the data set or the use of a data type that better constrains density moments. However, the relative uncertainty of moments can be compared between the two data sets.
 
-Due to the different uncertainty models used for the orientation and angular velocity data sets, this set-up does not allow direct comparison between the sizes of moment uncertainty for both data sets. One could not tell if one data set yields more precise moments because the observational precision of that data set is better or because that data type affords better estimation of density moments. However, the relative uncertainty of moments can be compared between the two data sets. 
+To make this comparison, we compute moment uncertainties $\sigma(K_{\ell m})$ for both data sets and also compute the mean value of $\sigma(K_{\ell m})$ over all fit parameters. We then scale the moment uncertainties attained from the angular velocity data set so that the mean uncertainty of its parameters is equal to that of the orientation data set. This is equivalent to simply choosing observational uncertainties for the angular velocity data set which yield density moments to the same precision as the observational data set, because figure \ref{fig:scan-observational} shows that density moment uncertainty $\sigma(K_{\ell m})$ is proportional to observational uncertainty. The resulting PPDs for the density moments of both data sets are displayed in figure \ref{fig:orientation-unc}, as well as their mean values relative to the true values.
 
-We generate moment uncertainty for the orientation data using a test value of $\sigma_\phi = 0.1$ and compute the mean uncertainty. We then scale the moment uncertainties attained from the angular velocity data set with the reference observational uncertainty parameters so that the mean uncertainty of all the moments is equal to that of the orientation data set. This is equivalent to simply choosing observational uncertainties for the angular velocity data set which yield density moments to the same precision as the observational data set, because figure \ref{fig:scan-observational} shows that density moment uncertainty $\sigma(K_{\ell m})$ is proportional to observational uncertainty. We then compute the ratio between $\sigma(K_{\ell m})$ for the observational data set and the angular velocity data set and show the result as a function of $\ell$ and $m$ in figure \ref{fig:observational-moment-uncertainty}.
-\begin{figure}
+\begin{figure*}
   \centering
-  % \includegraphics{figs/observational-moment-uncertainty}
-  \caption{\jtd{Write}}
-  \label{fig:observational-moment-uncertainty}
-\end{figure}
+  \includegraphics[width=0.75\linewidth]{figs/orientation-unc}
+  \caption{PPDs for each parameter as extracted from angular velocity (blue) and orientation (orange) data. First order parameters are shown in the left panel and second-order parameters in the right. Mean values are also shown as horizontal lines. Both data produce similar constraints on parameters, except in the case of $\gamma_0$.}
+  \label{fig:orientation-unc}
+\end{figure*}
+
+The figure demonstrates that using orientation data rather than angular velocity data does not greatly affect the relative uncertainties of density moments, except in the case of $\gamma_0$. This is expected due to the following argument. If the initial orientation of the asteroid is known, then the orientation of the next data point can be determined by knowledge of the asteroid's angular velocity at that moment. Thus, an orientation data set can be produced from an angular velocity data set and vice versa given an initial asteroid orientation. This initial orientation is defined up to $\gamma_0$ by the assumption of no initial tumbling, so that the orientation data set will affect $\sigma(\gamma_0)$ most strongly. A smaller effect observed in figure \ref{fig:orientation-unc} is that the orientation data set yields similar uncertainties for all density moments of fixed $\ell$, whereas the angular velocity data set tends to yield larger uncertainties for small $|m|$.
 
 \subsection{Density uncertainty comparison}
+
+
+
+
 
 
 % \section{Dependence of the cadence cut-off on time scales}

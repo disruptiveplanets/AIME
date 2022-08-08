@@ -210,3 +210,7 @@ Working on reparameterizing lumpy so that uniform is nondegenerate. Test
 ## June 29
 
 Computed new 5 dof average (done) and reworked plot so that the lumpy model skips out on the K2m fit.
+
+## Aug 8
+
+Running new core scan for vel and ori with finite element method and new run for lumpy.

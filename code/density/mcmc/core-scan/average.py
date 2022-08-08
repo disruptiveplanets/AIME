@@ -30,12 +30,16 @@ SURFACE_AMS = {
     "move-1.5": 1000.1281468600504,
     "sym": 1000,
     "asym": 1000,
+    "ori": 1000,
+    "vel": 1000,
     "double": 1000,
 }
 
 BULK_AMS = {
     "sym": 1000,
     "asym": 1000,
+    "ori": 1000,
+    "vel": 1000,
     "sph-3": 922.9234884822591,
     "sph-1.5": 978.4541044108308,
     "move-3": 933.1648422811957,
@@ -62,6 +66,8 @@ core_two = np.array([0, -500, 0])
 TRUE_SHAPES = {
     "sym": TrueShape.uniform(),
     "asym": TrueShape.uniform(),
+    "ori": TrueShape.uniform(),
+    "vel": TrueShape.uniform(),
     "sph-3": TrueShape.core_sph(3, 500),
     "sph-1.5": TrueShape.core_sph(1.5, 500),
     "move-3": TrueShape.core_shift(3, 500, core_displacement),
@@ -72,6 +78,8 @@ TRUE_SHAPES = {
 INDICATORS = {
     "sym": Indicator.ell(ELLIPSOID_AM, k22s, k20s),
     "asym": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
+    "ori": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
+    "vel": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
     "sph-3": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
     "sph-1.5": Indicator.ell(ELLIPSOID_AM, k22a, k20a),
     "move-3": Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high),
@@ -81,6 +89,8 @@ INDICATORS = {
 SAMPLE_NAME = {
     "sym": "den-sym",
     "asym": "den-asym",
+    "ori": "den-ori",
+    "vel": "den-vel",
     "sph-3": "den-core-sph-3",
     "sph-1.5": "den-core-sph-1.5",
     "move-3": "den-core-move-3",
