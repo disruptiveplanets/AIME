@@ -9,8 +9,8 @@ from display import make_gif, make_slices
 from core import TrueShape, Indicator
 
 RUN_NAME = sys.argv[1]
-PULL = False
-GENERATE = False
+PULL = True
+GENERATE = True
 
 NUM_DRAWS = 20
 NUM_CHOOSE = 1000
@@ -89,8 +89,8 @@ INDICATORS = {
 SAMPLE_NAME = {
     "sym": "den-sym",
     "asym": "den-asym",
-    "ori": "den-ori",
-    "vel": "den-vel",
+    "ori": "scale-ori",
+    "vel": "scale-vel",
     "sph-3": "den-core-sph-3",
     "sph-1.5": "den-core-sph-1.5",
     "move-3": "den-core-move-3",
@@ -148,8 +148,8 @@ def check_moments(densities):
 
 
 if PULL:
-    os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/mcmc/core-scan/den-core-{RUN_NAME}*.npy {RUN_NAME}/den-core-{RUN_NAME}*.npy")
-    os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/mcmc/core-scan/den-core-{RUN_NAME}*.png {RUN_NAME}/den-core-{RUN_NAME}*.png")
+    os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/mcmc/core-scan/den-core-{RUN_NAME}*.npy {RUN_NAME}/")
+    os.system(f"scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/density/mcmc/core-scan/den-core-{RUN_NAME}*.png {RUN_NAME}/")
 
 if GENERATE:
     density_grid_sum = 0

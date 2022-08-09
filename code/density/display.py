@@ -49,8 +49,13 @@ def make_gif(densities, pos_array, axis_name, cmap, fname, duration, percentile=
     for i in range(0, num_frames, skip_between):
         fig = make_frame(densities, pos_array, axis_name, cmap, percentile, balance, i + mins[2])
         fig.canvas.draw()
+        w, h = fig.canvas.get_width_height()
+
+        # This line of code should be adjusted based on DPI.
+        w *= 2; h *= 2
+
         imgs.append(Image.frombytes('RGB',
-            fig.canvas.get_width_height(),fig.canvas.tostring_rgb()))
+            (w, h), fig.canvas.tostring_rgb()))
         plt.close()
     imgs[0].save(fp=fname, format='GIF', append_images=imgs,
                 save_all=True, duration= int(duration * 1000 / num_frames), loop=0)

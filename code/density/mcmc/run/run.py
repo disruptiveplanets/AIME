@@ -132,6 +132,7 @@ SAMPLE_NAMES = {
 
 if RELOAD_UNC_TRACKER:
     unc_tracker_file = f"{RUN_NAME}-{method_tag}-unc-tracker.npy"
+    print("Reloading uncertainty tracker")
 else:
     unc_tracker_file = None
 
