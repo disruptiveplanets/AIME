@@ -1,7 +1,7 @@
 import os, sys
 from shutil import copyfile
 
-PATH = "scan-vex-sync"
+PATH = "scan-perigee-sync"
 FORBIDDEN_NAMES = []
 
 I_LIMIT = -1

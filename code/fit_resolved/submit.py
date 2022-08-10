@@ -4,7 +4,7 @@ tf = open("template-submit", 'r')
 template_text = tf.read()[:-1].split('\n')
 tf.close()
 
-RELOAD = True
+RELOAD = False
 
 if os.path.exists("errors.dat"):
     os.remove("errors.dat")
