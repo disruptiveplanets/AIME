@@ -470,12 +470,13 @@ def mcmc_fit(theta_start, evals, evecs, index):
         if reload:
             pos = sampler._previous_state
 
-        if not emcee.walkers_independent(pos):
-            f = open("errors.dat", 'a')
-            f.write(output_name + f": walkers weren't independent (eigenvalues {evals})\n")
-            f.close()
-            logging.warning(f"Walkers weren't independent. Eigenvalues {evals}")
-            sys.exit()
+        else:
+            if not emcee.walkers_independent(pos):
+                f = open("errors.dat", 'a')
+                f.write(output_name + f": walkers weren't independent (eigenvalues {evals})\n")
+                f.close()
+                logging.warning(f"Walkers weren't independent. Eigenvalues {evals}")
+                sys.exit()
 
         for sample in sampler.sample(pos, iterations=MAX_N_STEPS, progress=True):
             if sampler.iteration % 100 == 0:
