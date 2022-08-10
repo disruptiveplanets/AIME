@@ -99,7 +99,6 @@ N_DIM = len(theta_true)
 reload = False
 if len(sys.argv) == 3 and sys.argv[2] == "reload":
     reload = True
-    REGENERATE_DATA = False
 
 def fit_function(theta, target_length=None):
     if ASTEROIDS_MAX_K == 3:
@@ -519,39 +518,45 @@ if __name__ == "__main__":
     logging.info("Sigma {}".format(sigma))
     logging.info("Name {}".format(output_name))
     logging.info("Velocity multiplier {}".format(VELOCITY_MUL))
+
     ####################################################################
     # Generate synthetic data
     ####################################################################
-    start = time.time()
-    y = fit_function(theta_true)
-    logging.info("Data generation took {} s".format(time.time() - start))
-    y, y_inv_covs = random_vector.randomize(UNCERTAINTY_MODEL, y, sigma)
-    if UNCERTAINTY_MODEL == random_vector.TILT_UNIFORM_TRUE:
-        UNCERTAINTY_ARGUMENT = sigma
+    if not reload:
+        start = time.time()
+        y = fit_function(theta_true)
+        logging.info("Data generation took {} s".format(time.time() - start))
+        y, y_inv_covs = random_vector.randomize(UNCERTAINTY_MODEL, y, sigma)
+        if UNCERTAINTY_MODEL == random_vector.TILT_UNIFORM_TRUE:
+            UNCERTAINTY_ARGUMENT = sigma
+        else:
+            UNCERTAINTY_ARGUMENT = y_inv_covs
+
+        np.save(f"{output_name}-data.npy", y)
+        np.save(f"{output_name}-unc.npy", y_inv_covs)
+
+        logging.info(f"DOF: {len(y)}")
+
+        plt.figure(figsize=(12, 4))
+        x_display = np.arange(len(y))
+        uncs = np.array([2 * np.sqrt(np.diagonal(pinvh(a))) for a in y_inv_covs])
+        plt.fill_between(x_display, y[:,0]+uncs[:,0], y[:,0]-uncs[:,0], alpha=0.5, color="C0")
+        plt.fill_between(x_display, y[:,1]+uncs[:,1], y[:,1]-uncs[:,1],alpha=0.5, color="C1")
+        plt.fill_between(x_display, y[:,2]+uncs[:,2], y[:,2]-uncs[:,2],  alpha=0.5, color="C2")
+        plt.scatter(x_display, y[:,0], label='x', s=1, color="C0")
+        plt.scatter(x_display, y[:,1], label='y', s=1, color="C1")
+        plt.scatter(x_display, y[:,2], label='z', s=1, color="C2")
+        plt.xlabel("Time (Cadences)")
+        plt.ylabel("Spin (rad/s)")
+        for tier in data_cuts:
+            for drc in tier:
+                plt.axvline(x=drc, color='k')
+        plt.legend()
+        # plt.show()
+
     else:
-        UNCERTAINTY_ARGUMENT = y_inv_covs
-
-    np.save(f"{output_name}-data.npy", y)
-    np.save(f"{output_name}-unc.npy", y_inv_covs)
-
-    logging.info(f"DOF: {len(y)}")
-
-    plt.figure(figsize=(12, 4))
-    x_display = np.arange(len(y))
-    uncs = np.array([2 * np.sqrt(np.diagonal(pinvh(a))) for a in y_inv_covs])
-    plt.fill_between(x_display, y[:,0]+uncs[:,0], y[:,0]-uncs[:,0], alpha=0.5, color="C0")
-    plt.fill_between(x_display, y[:,1]+uncs[:,1], y[:,1]-uncs[:,1],alpha=0.5, color="C1")
-    plt.fill_between(x_display, y[:,2]+uncs[:,2], y[:,2]-uncs[:,2],  alpha=0.5, color="C2")
-    plt.scatter(x_display, y[:,0], label='x', s=1, color="C0")
-    plt.scatter(x_display, y[:,1], label='y', s=1, color="C1")
-    plt.scatter(x_display, y[:,2], label='z', s=1, color="C2")
-    plt.xlabel("Time (Cadences)")
-    plt.ylabel("Spin (rad/s)")
-    for tier in data_cuts:
-        for drc in tier:
-            plt.axvline(x=drc, color='k')
-    plt.legend()
-    # plt.show()
+        y = np.load(f"{output_name}-data.npy")
+        y_inv_covs = np.load(f"{output_name}-unc.npy")
 
 
 
@@ -574,49 +579,52 @@ if __name__ == "__main__":
         elif ASTEROIDS_MAX_J == 3:
             real_sim_func = asteroids_3_2.simulate
 
+    if not reload:
+        true_redchi = 2 * minimize_log_prob(y, theta_true, [], real_sim_func, 0, -1) / len(y) / 3
+        logging.info("TRUE REDCHI: {}".format(true_redchi))
 
-    true_redchi = 2 * minimize_log_prob(y, theta_true, [], real_sim_func, 0, -1) / len(y) / 3
-    logging.info("TRUE REDCHI: {}".format(true_redchi))
+        # Stepped minimization
+        queue = [([], [], [], 0)]
+        for i in range(2, ASTEROIDS_MAX_K + 1):
+            new_queue = []
+            for fix_theta, evals, evecs, _ in queue:
+                tier_results = minimize(y, i, fix_theta)
+                for result_theta, result_evals, result_evecs, result_redchi in tier_results:
+                    logging.info("Deg {} redchi: {}. Theta: {}".format(i, result_redchi, result_theta))
+                    new_queue.append((fix_theta + list(result_theta), evals + list(result_evals),
+                        evecs + list(result_evecs), result_redchi))
+            queue = new_queue
 
-    # Stepped minimization
-    queue = [([], [], [], 0)]
-    for i in range(2, ASTEROIDS_MAX_K + 1):
-        new_queue = []
-        for fix_theta, evals, evecs, _ in queue:
-            tier_results = minimize(y, i, fix_theta)
-            for result_theta, result_evals, result_evecs, result_redchi in tier_results:
-                logging.info("Deg {} redchi: {}. Theta: {}".format(i, result_redchi, result_theta))
-                new_queue.append((fix_theta + list(result_theta), evals + list(result_evals),
-                    evecs + list(result_evecs), result_redchi))
-        queue = new_queue
+        # Stitch together the hessians
+        kernel = []
+        for theta, evals, evecs, redchi in queue:
+            resized_evecs = []
+            max_len = (1 + ASTEROIDS_MAX_K)**2 - 6
+            for e in evecs:
+                l_value = (len(e) - 1) // 2
+                start_index = l_value**2 - 6
+                if l_value < 2:
+                    l_value = 2
+                    start_index = 0
+                evec = [0] * start_index + list(e) + [0] * (max_len - start_index - len(e))
+                resized_evecs.append(np.array(evec))
+            if redchi / true_redchi > THRESHOLD_LIKE_RAT:
+                logging.warning(f"The point with theta {theta} and redchi {redchi} was excluded from the kernel")
+                continue
+            logging.info("The kernel includes a point with theta {}, redchi {}".format(theta, redchi))
+            kernel.append((theta, evals, np.array(resized_evecs)))
 
-    # Stitch together the hessians
-    kernel = []
-    for theta, evals, evecs, redchi in queue:
-        resized_evecs = []
-        max_len = (1 + ASTEROIDS_MAX_K)**2 - 6
-        for e in evecs:
-            l_value = (len(e) - 1) // 2
-            start_index = l_value**2 - 6
-            if l_value < 2:
-                l_value = 2
-                start_index = 0
-            evec = [0] * start_index + list(e) + [0] * (max_len - start_index - len(e))
-            resized_evecs.append(np.array(evec))
-        if redchi / true_redchi > THRESHOLD_LIKE_RAT:
-            logging.warning(f"The point with theta {theta} and redchi {redchi} was excluded from the kernel")
-            continue
-        logging.info("The kernel includes a point with theta {}, redchi {}".format(theta, redchi))
-        kernel.append((theta, evals, np.array(resized_evecs)))
+        logging.info("There are {} MCMC starting points".format(len(kernel)))
 
-    logging.info("There are {} MCMC starting points".format(len(kernel)))
+        if len(kernel) == 0:
+            f = open("errors.dat", 'a')
+            f.write(output_name+": kernel is empty\n")
+            f.close()
+            logging.critical("Kernel is empty")
+            sys.exit()
 
-    if len(kernel) == 0:
-        f = open("errors.dat", 'a')
-        f.write(output_name+": kernel is empty\n")
-        f.close()
-        logging.critical("Kernel is empty")
-        sys.exit()
+    else:
+        kernel = [(None, None, None)]
 
     ####################################################################
     # Run MCMC

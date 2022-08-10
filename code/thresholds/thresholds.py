@@ -139,7 +139,9 @@ for directory in DIRECTORIES:
             if i % 4 == 0:
                 axs[i].set_ylabel("$\sigma_\\rho / \\rho$")
 
-fig.legend([handles["lumpy"], handles["fe"], handles["weak"], handles["strong"]], ["Lumpy", "Finite element", "Weak cut-off", "Strong cut-off"], loc="upper center", ncol=2)
+fig.legend([handles["lumpy"], handles["fe"], handles["weak"], handles["strong"]], ["Lumpy", "Finite element", "Weak cut-off", "Strong cut-off"], loc="upper center", ncol=2, bbox_to_anchor=(0.5,1.1))
+
+fig.tight_layout()
 fig.savefig("all.png", bbox_inches='tight')
 fig.savefig("all.pdf", bbox_inches='tight')
 plt.show()

@@ -4,10 +4,10 @@ tf = open("template-submit", 'r')
 template_text = tf.read()[:-1].split('\n')
 tf.close()
 
+RELOAD = True
+
 if os.path.exists("errors.dat"):
     os.remove("errors.dat")
-
-reload = ''
 
 def submit(fname):
     if os.path.exists(fname+"-*.h5") and not RELOAD:
@@ -17,8 +17,9 @@ def submit(fname):
         if res == 'n':
             return
     f = open("{}.sh".format(fname), 'w')
+    reload_text = ' reload' if RELOAD else ''
     write_text = '\n'.join(template_text[:3])+ '\n' + template_text[3] + \
-        fname + '.log\n' + '\n'.join(template_text[4:]) + ' ' + fname + reload
+        fname + '.log\n' + '\n'.join(template_text[4:]) + ' ' + fname + reload_text
 
     f.write(write_text)
     f.close()
@@ -33,9 +34,5 @@ if __name__ == "__main__":
     elif len(sys.argv) >= 2:
         for fname in sys.argv[1:]:
             submit(fname)
-        #if sys.argv[1] == "reload":
-        #    reload = ' reaload'
-        #else:
-        #    raise Exception("You passed an invalid second argument.")
     else:
         raise Exception("You must pass 0 or 1 arguments.")
