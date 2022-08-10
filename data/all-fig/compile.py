@@ -11,13 +11,13 @@ mpl.rcParams['ytick.labelsize'] = AXIS_SIZE
 param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
 
 axis_names = {
-    "scan-perigee": "$r_p$ (Earth radii)",
+    "scan-perigee-sync": "$r_p$ (Earth radii)",
     "probe-s-theta": "$\sigma_\\theta$",
     "probe-s-rho": "$\sigma_P / P_\omega$",
     "scan-cadence": "$\Delta t$ (min)",
-    "scan-period": "$P_\omega$ (hr)",
+    "scan-period-sync": "$P_\omega$ (hr)",
     "scan-am": "$a_\\mathcal{A}$ (m)",
-    "scan-vex": "$v_\infty$ (km s$^{-1}$)",
+    "scan-vex-sync": "$v_\infty$ (km s$^{-1}$)",
     "observation-gap": "$T_\mathrm{gap}$ (hr)",
 }
 colors = [
@@ -28,44 +28,44 @@ colors = [
     '#000ac9'
 ]
 trues = {
-    "scan-perigee": 5,
+    "scan-perigee-sync": 5,
     "probe-s-theta": 1e-2,
     "probe-s-rho": 1e-7,
     "scan-cadence": 2,
-    "scan-period": 9,
+    "scan-period-sync": 9,
     "scan-am": 1000,
-    "scan-vex": 6,
+    "scan-vex-sync": 6,
     "observation-gap": 0,
 }
 logs = {
-    "scan-perigee": (False, False),
+    "scan-perigee-sync": (False, False),
     "probe-s-theta": (True, True),
     "probe-s-rho": (True, True),
     "scan-cadence": (False, False),
-    "scan-period": (False, False),
+    "scan-period-sync": (False, False),
     "scan-am": (False, True),
-    "scan-vex": (False, False),
+    "scan-vex-sync": (False, False),
     "observation-gap": (False, False),
 }
 
 specialized_y_labels = {
-    "scan-perigee": (None, None, None, None, None, None, None, None, None, None),
+    "scan-perigee-sync": (None, None, None, None, None, None, None, None, None, None),
     "probe-s-theta": ([1e2, 1e0, 1e-2], [1e1, 1e-1, 1e-3], [1e2, 1e0, 1e-2], [1e0, 1e-2, 1e-4], [1e-1, 1e-3, 1e-5], [1e0, 1e-2, 1e-4], [1e0, 1e-2, 1e-4], [1e1, 1e-1, 1e-3], [1e0, 1e-2, 1e-4], [1e1, 1e-1, 1e-3]),
     "probe-s-rho": (None, None, None, None, None, None, None, None, None, None),
     "scan-cadence": ([100, 0, -100], [10, 0, -10], None, None, None, None, None, None, None, None),
-    "scan-period": (None, None, None, None, None, None, None, None, None, None),
+    "scan-period-sync": (None, None, None, None, None, None, None, None, None, None),
     "scan-am": ([10, 6], [1, 0.6], [2, 1], None, None, None, None, None, None, None),
-    "scan-vex": (None, None, None, None, None, None, None, None, None, None),
+    "scan-vex-sync": (None, None, None, None, None, None, None, None, None, None),
     "observation-gap": (None, None, None, None, None, None, None, None, None, None),
 }
 
 thresholds = {
-    "scan-perigee":	(6.041275818201059, 18.20618262898073),
+    "scan-perigee-sync":	(6.041275818201059, 18.20618262898073),
     "probe-s-theta": (0.032726900377081515, 0.6113839751941476),
     "scan-cadence":	(15.424913260494899, None),
-    "scan-period": (7.591137362332508, None),
+    "scan-period-sync": (7.591137362332508, None),
     "scan-am": (14.814169963587675, None),
-    "scan-vex": (None, None),
+    "scan-vex-sync": (None, None),
     "observation-gap": (None, None),
     "probe-s-rho": (3.6172957141874776e-07, 8.228524489683316e-06),
 }
@@ -124,7 +124,7 @@ def show_figs(plot_name, plot_name_index, num_columns):
         name_index[name] = index
         index += 1
         true_sigma = sigma[0]
-        if plot_name == "scan-perigee":
+        if plot_name == "scan-perigee-sync":
             xs.append(perigee)
         elif plot_name == "probe-s-theta":
             xs.append(sigma[0])
@@ -134,9 +134,9 @@ def show_figs(plot_name, plot_name_index, num_columns):
             xs.append(cadence / 60)
         elif plot_name == "scan-am":
             xs.append(radius)
-        elif plot_name == "scan-period":
+        elif plot_name == "scan-period-sync":
             xs.append(2 * np.pi / np.sqrt(np.dot(spin, spin)) / 3600)
-        elif plot_name == "scan-vex":
+        elif plot_name == "scan-vex-sync":
             xs.append(speed / 1000)
         elif plot_name == "observation-gap":
             xs.append(float(extra_line))
@@ -211,7 +211,7 @@ def show_figs(plot_name, plot_name_index, num_columns):
 
 fig = plt.figure(figsize=((11-1.2)*FIG_SCALE, (8.5-1) * FIG_SCALE))
 
-figs_to_show = ["scan-perigee", "scan-vex", "scan-am", "scan-period"]
+figs_to_show = ["scan-perigee-sync", "scan-vex-sync", "scan-am", "scan-period-sync"]
 
 for i, name in enumerate(figs_to_show):
     show_figs(name, i, len(figs_to_show))
