@@ -3,8 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-plt.style.use('jcap')
+PULL = True
 
+plt.style.use('jcap')
 mpl.rcParams["font.size"] = 12
 
 PLOT_ORDER = [
@@ -63,8 +64,6 @@ COLORS = {
     "lumpy": "darkcyan",
     "fe": "olivedrab",
 }
-EXCLUDE = []#"scan-vex"]
-PULL = False
 DIRECTORIES = ["lumpy", "fe"]
 
 THRESHOLDS = ((1e-4, "dashed", "weak"),(1e-3, "solid", "strong"),)
@@ -105,8 +104,6 @@ for directory in DIRECTORIES:
         if directory == "lumpy":
             for threshold, style, thresh_name in THRESHOLDS:
                 handles[thresh_name] = axs[i].axhline(y=threshold, c='r', linewidth=1, linestyle=style)
-                if name in EXCLUDE:
-                    continue
 
                 locs = np.where(use_uncs > threshold)[0]
                 if len(locs) == 0:

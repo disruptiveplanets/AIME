@@ -17,3 +17,7 @@ I think I messed up the data handling, so I regenerated the data today.
 ## Aug 7
 
 Data was pulled today, so I started the threshold scan.
+
+## Aug 11
+
+Threshold scan done

@@ -11,7 +11,7 @@ mpl.rcParams['ytick.labelsize'] = AXIS_SIZE
 param_names = ["\\gamma_0", "K_{22}", "K_{20}", "\Re K_{33}", "\Im K_{33}", "\Re K_{32}", "\Im K_{32}", "\Re K_{31}", "\Im K_{31}", "K_{30}"]
 
 axis_names = {
-    "scan-perigee-sync": "$r_p$ (Earth radii)",
+    #"scan-perigee-sync": "$r_p$ (Earth radii)",
     "probe-s-theta": "$\sigma_\\theta$",
     "probe-s-rho": "$\sigma_P / P_\omega$",
     "scan-cadence": "$\Delta t$ (min)",
