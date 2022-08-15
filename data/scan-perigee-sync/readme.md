@@ -144,3 +144,38 @@ peri-45.sh (fine)
 I re-terminated them and pulled their data to confirm that they were acceptable. But in so doing, I accidentally killed all the other processes and had to reload them. However, this did not induce any errors. The number of iterations already completed for all processes were between 7,000 and 30,000. I will manually kill them at 100,000.
 
 To check the completed files, I deleted the directories which are still running and extracted plots. They look good, but I had to change 33 to adjust the burnin manually and saved it as peri-33-1.
+
+## Aug 15
+
+Today, only 37 and 46 are running. I pull the rest and check them. It looks pretty good, but 44 has the wrong gamma_0 estimate. Weirdly, the very last walker was wrong. (A write issue to the file? Indeed the log file indicated this) So I took it off and reran the extraction. The problem was solved. No other files hit errors.
+
+The following perigee threshold extractions were deleted (copied from aug 11) and rerun
+
+peri-10.sh
+peri-11.sh
+peri-12.sh
+peri-20.sh
+peri-21.sh
+peri-22.sh
+peri-23.sh
+peri-25.sh
+peri-27.sh
+peri-28.sh
+peri-29.sh
+peri-30.sh
+peri-31.sh
+peri-32.sh
+peri-34.sh
+peri-35.sh
+peri-36.sh
+peri-38.sh
+peri-39.sh
+peri-40.sh
+peri-41.sh
+peri-42.sh
+peri-43.sh
+peri-44.sh
+peri-45.sh
+peri-47.sh
+
+We still need to rerun 37 and 46 after they finish. I deleted all the staged files both on the SC and locally, because everything except 37 and 46 is done.
