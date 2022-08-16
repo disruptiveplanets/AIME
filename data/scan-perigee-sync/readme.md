@@ -179,3 +179,7 @@ peri-45.sh
 peri-47.sh
 
 We still need to rerun 37 and 46 after they finish. I deleted all the staged files both on the SC and locally, because everything except 37 and 46 is done.
+
+## Aug 16
+
+46 is done. I pulled the data, checked that it's good, pushed it to the SC, and deleted the records of the old asteroid solutions. The next time I run scan-perigee, it will compute 46. But I won't run it until 37 is done.
