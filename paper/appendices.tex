@@ -1,14 +1,9 @@
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%% APPENDICES %%%%%%%%%%%%%%%%%%%%%
-
 \appendix
 
 \section{Tidal torque \& Equations of motion}
 \label{app:eom}
 
-In this appendix, we derive the equations of motion used to simulate the asteroid angular velocity during the encounter. In particular, we describe our coordinates (section \ref{sec:coordinates}) for an encountering asteroid's position and orientation, and we parametrize its density distribution via its density moments (section \ref{sec:moments}). Then we derive an arbitrary-order equation for tidal torque (section \ref{sec:tidal-torque}) and write the equations of motion for the system (section \ref{sec:eom}).
+In this appendix, we derive the equations of motion used to simulate the asteroid encounter. In particular, we describe our coordinates (section \ref{sec:coordinates}) for an encountering asteroid's position and orientation, and we parametrize its density distribution via its density moments (section \ref{sec:moments}). Then we derive an arbitrary-order equation for tidal torque (section \ref{sec:tidal-torque}) and write the equations of motion for the system (section \ref{sec:eom}).
 
 \subsection{Coordinates}
 \label{sec:coordinates}
@@ -22,7 +17,7 @@ The difference between the origins of the body-fixed and inertial frames is the 
 M = R_z(\alpha) R_y(\beta) R_z(\gamma).
 \label{eqn:euler-angles}
 \end{equation}
-Here, $R_i(\theta)$ is a rotation around the unit vector $i$ by $\theta$ (figure \ref{fig:euler-angles}).
+Here, $R_i(\theta)$ is a rotation around the unit vector $i$ by angle $\theta$ (figure \ref{fig:euler-angles}).
 
 \begin{figure}
     \centering
@@ -40,9 +35,6 @@ Here, $R_i(\theta)$ is a rotation around the unit vector $i$ by $\theta$ (figure
     \draw (-0.3, 1.3) node[anchor=center] {$\beta$};
     \draw[->] (0.97, -0.52) arc (330:368:1.3);
     \draw (1.4, -0.25) node[anchor=center] {$\gamma$};
-    %\draw[-{Latex[length=3mm]}] (0, 0) -- (0, 4) node[anchor=south] {$\unit Z$};
-    %\draw[-{Latex[length=3mm]}] (0, 0) -- (4, 0) node[anchor=west] {$\unit Y$};
-    %\draw[-{Latex[length=3mm]}] (0, 0) -- (-2, -2) node[anchor=east] {$\unit X$};
     \end{tikzpicture}
     \caption{$z-y-z$ Euler angles used in this work to express the orientation of the asteroid. Orientation is expressed as a rotation from the body-fixed axes (lowercase) to the inertial axes (bold lines and uppercase). The origins are co-located for demonstration purposes.}
     \label{fig:euler-angles}
@@ -68,7 +60,7 @@ These spherical harmonics obey many useful identities summarized in Ref.~\cite{G
 \end{equation}
 By contrast, $J_{\ell m}$ should be computed in the inertial frame. The length scale $a_\mathcal{B}$ and MOI scale $I_\mathcal{B}$ can be defined similarly to $a_\mathcal{A}$ and $a_\mathcal{B}$ in equations \ref{eqn:aa} and \ref{eqn:ia}, but they could also be set to any other scales of the same units, e.g. $a_\mathcal{B}$ equal to the central body radius and $I_\mathcal{B} = \mu_\mathcal{B}a_\mathcal{B}^2$, where $\mu_\mathcal{B}$ is the central body mass.
 
-Note that both $J_{\ell m}$ and $K_{\ell m}$ are unitless. We call them ``moments'' because the $R_{\ell m}(\bm r)$ contains an $r^\ell$ dependence so that $K_{\ell m}$ is the $\ell$th density moment of the asteroid.
+Note that both $J_{\ell m}$ and $K_{\ell m}$ are unitless. We call them ``moments'' because $R_{\ell m}(\bm r)$ contains an $r^\ell$ dependence so that $K_{\ell m}$ is the $\ell$th density moment of the asteroid.
 
 These moments share several key properties which we discuss before continuing. Firstly, for real mass density, properties of the spherical harmonics imply that $K_{\ell m} = (-1)^m K_{\ell, -m}^*$. Therefore, the set of $K_{\ell m}$ for $\ell < \ell_\text{max}$ contains $\ell_\text{max}^2$ degrees of freedom. However, some of these degrees of freedom are redundant with the choice of coordinates: $K_{1m} = 0$ since the body-fixed frame is centred on the asteroid centre of mass. Further calculation reveals that the alignment of the body-fixed frame with the asteroid principal axes also forces $K_{21}= 0$ and $\Im K_{22}=0$. The only physical density moments for $\ell \leq 2$ are therefore $K_{22}$, $K_{20}$, and $K_{00}$. The first two are related to the MOI around each principal axis by equation \ref{eqn:moi}, while $K_{00} = \mu_\mathcal{A} a_\mathcal{A}^2 / I_\mathcal{A}$ will not be relevant to this study as it does not appear in equation \ref{eqn:tidal-torque}. 
 
@@ -99,10 +91,10 @@ The higher-order moments $K_{3m}$ can be thought of loosely as measuring the lar
 
 Finally, the requirement that $\rho_\mathcal{A}(\bm r) \geq 0$ everywhere restricts $K_{\ell m}$. In the case of $K_{2m}$, this fact and the constraint that $I_z$ is larger than $I_x$ or $I_y$ requires $K_{20}$ and $K_{22}$ to fall in the triangle
 \begin{equation}
-  -\frac{1}{4} \leq K_{20} \leq 0, \qquad |K_{22}| \leq -\frac{K_{20}}{2}.
+  -\frac{1}{4} \leq K_{20} \leq 0, \qquad |K_{22}| \leq \frac{|K_{20}|}{2}.
   \label{eqn:parameter-bounds}
 \end{equation}
-An analytical constraint on $K_{3m}$ based on this property is more difficult to derive, but in practice, we also observe that $|K_{3m}| < 0.01$.
+An analytical constraint on $K_{3m}$ based on this property is more difficult to derive, but in practice, we observe that $|K_{3m}| < 0.01$.
 
 
 
@@ -116,7 +108,7 @@ Here, we present a new derivation of the tidal torque to arbitrary orders in ter
 
 The gravitational potential energy of the central body is, in its most general form,
 \begin{equation}
-V(\bm R') = -G\int_\mathcal{B} d^3 R \rho_\mathcal{B}(\bm R) \frac{1}{|\bm{R}-\bm{R'}|}.
+V(\bm R') = -G\int_\mathcal{B} d^3 R \frac{\rho_\mathcal{B}(\bm R)}{|\bm{R}-\bm{R'}|}.
 \label{eqn:first-pe}
 \end{equation}
 where $\rho_\mathcal{B}$ is the density distribution of the central body and $\mathcal{B}$ indicates the central body's volume. All vectors here are written in the inertial frame. Given $|\bm{R}| < |\bm{R'}|$, Ref.~\cite{Gelderen1998TheSO} gives the identity
@@ -182,7 +174,7 @@ for angular velocity $\bm \omega$ given in the body-fixed frame. The equations o
   \end{split}
   \label{eqn:omega-eom}
 \end{equation}
-Equations \ref{eqn:tidal-torque}, \ref{eqn:moi}, and \ref{eqn:pos-eom} to \ref{eqn:omega-eom} form a set of non-linear, first-order coupled differential equations in which can be numerically integrated. They are expressed in terms of the physical parameters $I_\mathcal{A/B}$, $a_\mathcal{A/B}$, $J_{\ell m}$, and $K_{\ell m}$ which are constant if the asteroid is rigid and the central body does not rotate.
+Equations \ref{eqn:tidal-torque}, \ref{eqn:moi}, \ref{eqn:pos-eom}, and \ref{eqn:omega-eom} form a set of non-linear, first-order coupled differential equations in which can be numerically integrated. They are expressed in terms of the physical parameters $I_\mathcal{A/B}$, $a_\mathcal{A/B}$, $J_{\ell m}$, and $K_{\ell m}$ which are constant if the asteroid is rigid and the central body does not rotate.
 
 
 
@@ -190,6 +182,7 @@ Equations \ref{eqn:tidal-torque}, \ref{eqn:moi}, and \ref{eqn:pos-eom} to \ref{e
 
 
 \section{Comparing orientation and angular velocity data}
+\label{app:orientation}
 
 To extract the density distribution of an asteroid, the main text assumes that the angular velocity data of the asteroid is observable. It is possible that the orientation of the asteroid may be more readily available as a data set. In this appendix, we generate an orientation data set for the reference asteroid flyby, extract density moments from it, and compare the results to moments extracted from angular velocity data.
 
@@ -204,20 +197,20 @@ For the sake of this appendix, we will assume that all observations of orientati
 where a subscript $i$ denotes the $i$th element of the data set. It is assumed that both quaternions have norm one.
 
 \subsection{Moment uncertainty comparison}
-With the likelihood defined, we generate both angular velocity and orientation data for the asymmetric reference asteroid configuration and extract density moment PPDs for both data sets via the fit method defined in the main text. Due to the different uncertainty models used for the orientation and angular velocity data sets, this set-up does not allow direct comparison between the amount of moment uncertainty for both data sets. If one data set yields more precise moments than the other, one could not determine whether the effect is due to increased observational precision in the data set or the use of a data type that better constrains density moments. However, the relative uncertainty of moments can be compared between the two data sets.
+With the likelihood defined, we generate both angular velocity and orientation data for the asymmetric reference asteroid configuration and extract density moment PPDs for both data sets via the fit method defined in the main text. Due to the different uncertainty models used for the orientation and angular velocity data sets, this set-up does not allow direct comparison between the amount of moment uncertainty for both data sets. (If one data set yields more precise moments than the other, one could not determine whether the effect is due to increased observational precision in the data set or the use of a data type that better constrains density moments.) However, the relative uncertainty of moments can be compared.
 
-To make this comparison, we compute moment uncertainties $\sigma(K_{\ell m})$ for both data sets. We then scale the moment uncertainties attained from the angular velocity data set so that the mean uncertainty of its parameters is equal to that of the orientation data set. This is equivalent to choosing observational uncertainties for the angular velocity data set which yield density moments to the same average precision as the observational data set, because figure \ref{fig:scan-observational} shows that density moment uncertainty $\sigma(K_{\ell m})$ is proportional to observational uncertainty. The resulting PPDs for the density moments of both data sets are displayed in figure \ref{fig:orientation-unc}, as well as their mean values relative to the true values.
+To make this comparison, we compute moment uncertainties $\sigma(K_{\ell m})$ for both data sets. We then scale the moment uncertainties attained from the angular velocity data set so that the mean uncertainty of its parameters is equal to that of the orientation data set. This is equivalent to choosing observational uncertainties for the angular velocity data set which yield density moments to the same average precision as the observational data set. The resulting PPDs for the density moments of both data sets are displayed in figure \ref{fig:orientation-unc} relative to the true values.
 
 \begin{figure}
   \centering
   \includegraphics[width=0.7\linewidth]{figs/orientation-unc}
-  \caption{PPDs for each parameter as extracted from angular velocity (blue) and orientation (orange) data. First order parameters are shown in the top panel and second-order parameters in the bottom. Mean values are also shown as vertical lines. Both data produce similar constraints on parameters, except in the case of $\gamma_0$.}
+  \caption{PPDs for each parameter as extracted from angular velocity (blue) and orientation (orange) data. First order parameters are shown in the top panel and second-order parameters in the bottom. Mean values are also shown as vertical lines. Both data sets produce similar constraints on parameters, except in the case of $\gamma_0$.}
   \label{fig:orientation-unc}
 \end{figure}
 
 The figure demonstrates that using orientation data rather than angular velocity data does not greatly affect the relative uncertainties of density moments, except in the case of $\gamma_0$, which is much more precisely constrained by orientation data than by angular velocity data. This result is expected due to the following argument. If the initial orientation of the asteroid is known, then the orientation of the next data point can be determined by knowledge of the asteroid's angular velocity at that moment. Thus, an orientation data set can be produced from an angular velocity data set and vice versa given an initial asteroid orientation. That initial orientation is defined up to $\gamma_0$ by the assumption of no initial tumbling, so we expect the angular velocity data set to yield increased uncertainties in $\gamma_0$ only, relative to the observational data, to a first approximation.
 
-A smaller effect observed in figure \ref{fig:orientation-unc} is that the orientation data set yields similar uncertainties for all density moments of fixed $\ell$, whereas the angular velocity data set tends to yield larger uncertainties for small $|m|$. However, this has little effect on the density distributions extracted by the finite element model; the average density uncertainty $\sigma_\rho / \rho$ are essentially equivalent between the two data sets, as is the extracted distribution of density and density uncertainty.
+A smaller effect observed in figure \ref{fig:orientation-unc} is that the orientation data set yields similar uncertainties for all density moments of fixed $\ell$, whereas the angular velocity data set tends to yield larger uncertainties for small $|m|$. However, this has little effect on the density distributions extracted by the finite element model (not shown); the average density uncertainty $\sigma_\rho / \rho$ are essentially equivalent between the two data sets, as is the extracted distribution of density and density uncertainty.
 
 
 
@@ -282,34 +275,6 @@ A harmonic density distribution can be expanded in terms of the spherical harmon
 Since the integrals are independent of the parameters, they can be computed before solving for $C_{\ell m}$. Furthermore, their values when $\mathcal{A}$ is spherical gives us insight into the influence of $K_{\ell m}$ on density distributions. In this case, $I_\mathcal{A} \propto C_{00}$ and the integral of equation \ref{eqn:harmonic-klm} is non-zero only when $\ell' = \ell$ and $m'=m$. Therefore, $C_{\ell m}$ is proportional to $K_{\ell m}$. The density distribution can be immediately visualized given the density moments as a sum of the solid spherical harmonics $R_{\ell m}$ weighted by $K_{\ell m}$. When the asteroid is non-spherical, the shape itself contributes to $K_{\ell m}$ so as to alter this picture.
 
 $C_{\ell m}$ can be treated as parameters for a fitting method (such as an MCMC) that enforces our bounds on $\rho(\bm r)$. With the integrals pre-computed, obtaining $K_{\ell m}$ from $C_{\ell m}$ is fast. We impose these bounds by acknowledging that harmonic functions such as $\rho(\bm r)$ in a region such as $\mathcal{A}$ attain their maxima on the boundary of the region, so that it is only necessary to ensure that $\rho$ lies within the allowed range on the asteroid boundary rather than within the entire asteroid. This can be done by parametrizing the asteroid surface as a function of two variables (e.g., latitude and longitude) and minimizing and maximizing $\rho$ with respect to those variables, ensuring these minima and maxima are within the allowed range.
-
-
-
-
-
-
-
-% \section{Dependence of the cadence cut-off on time scales}
-% \label{app:cadence-tests}
-
-% In section \ref{sec:scan-cadence}, we noted that moment uncertainty as a function of observation cadence $\Delta t$ increases suddenly near $\Delta t_\text{cut-off} \approx 30-40$ min. By dimensional analysis, $\Delta t_\text{cut-off}$ depends both on the asteroid period $P_\omega$ and the orbital time scales. In this appendix, we assess the relationship between $\Delta t_\text{cut-off}$ and these time scales by measuring moment uncertainty as a function of cadence at different values of these time scales. However, changing the time scales also affects the moment uncertainty directly, obscuring the cadence dependence of the moment uncertainty. Figure \ref{fig:scan-period} indicates that $P_\omega$ only slightly affects moment uncertainty as long as $P_\omega$ is not too small, so we neglect this obscuring effect in the case of $P_\omega$. To assess the dependence of $\Delta t$ on the orbital time scales, we fix the orbit shape and simulate the asteroid as following the orbit at different speeds. This process is unphysical, but it has the advantage of keeping all encounter parameters fixed except for the time the asteroid spends in the orbit, thereby isolating the orbital time scale. We parametrize this change $v_\text{orbit} / v_\text{physical}$, which is large for an artificially fast encounter, low for an artificially slow encounter, and 1 for a physical encounter.
-
-% In figure \ref{fig:cad-contour}, we display contour plots of moment uncertainty $\sigma(K_{\ell m})$ of the fit parameters as a function of both cadence $\Delta t$ and $P_\omega$ and the relative orbit speed $v_\text{orbit} / v_\text{physical}$. Superimposed is the weak Both panels show the same sudden increase in posterior uncertainty we named $T_\text{cad}$, located around the region where $\sigma_\rho / \rho = 100\%$ and now visible as a function of frequency and relative orbit speed. In all cases, the value of $\gamma_0$ was set so that all data points achieve the same value of $\gamma$ at perigee.
-
-% \begin{figure*}
-%   \centering
-%   \includegraphics[width=0.48\textwidth]{figs/cad-period.pdf}\hfill
-%   \includegraphics[width=0.48\textwidth]{figs/cad-speed.pdf}
-%   \caption{Contour plots showing posterior uncertainties as a function of cadence $\Delta t$ and dynamical time scales for the encounter: rotational period $P_\omega$ (\textit{left}) and the relative speed of the orbit (\textit{right}; see text for a definition). The reference values of $P_\omega=9$ hr and $t_\text{spin}/t_\text{orbit}=1$ are shown as dotted lines. The solid (dotted) red line represents the $\sigma_\rho / \rho = 100\%$ (20\%) threshold. Cadence cut-off depends strongly on both $P_\text{omega}$ and $t_\text{spin}/t_\text{orbit}=1$.}
-%   \label{fig:cad-contour}
-% \end{figure*}
-
-% Figure \ref{fig:cad-contour} demonstrates that large rotational period produces high $T_\text{cad}$. The dependence on $P_\omega$ agrees with the fact that large rotational periods for fixed cadence lead to better posterior uncertainty, discussed in section \ref{sec:scan-period}. The figure also demonstrates that for large $P_\omega$, $T_\text{cad}$ depends less strongly on $P_\text{omega}$ and may even reverse its dependence such that increasing $P_\text{omega}$ decreases $T_\text{omega}$. In all cases except $\Re K_{33}$, at least constant-$\sigma(K_{\ell m})$ contour is seen to curve back such that $\Delta t$ decreases as a function of $P_\text{omega}$ for large $P_\text{omega}$. In these regions the cadence cut-off also dulls, as shown by the spreading of the constant-$\sigma(K_{\ell m})$ contours in this region.
-
-%  The relative orbit speed $t_\text{spin} / t_\text{orbit}$ was defined by un-physically increasing or decreasing the time at which the asteroid moved through the orbit determined by the equations of motion (but leaving the orbit shape unchanged). The equations of motion affecting the orientation and spin of the asteroid however were unaffected. $t_\text{spin} / t_\text{orbit} > 1$ corresponds to a faster orbit, and $t_\text{spin} / t_\text{orbit} < 1$ corresponds to a slower orbit. With this unphysical process, we isolate the effect of the amount of time spent near perigee on posterior uncertainty, without inheriting additional affects that would have been caused by the orbit changing shape.
-
-% The right panel of figure \ref{fig:cad-contour} shows a stronger and more monotonic dependence of $T_\text{cad}$ on $t_\text{spin} / t_\text{orbit}$. It appears that even slightly slower orbits sharply increases $T_\text{cad}$. This effect is both due to the asteroid spending greater time in the high-torque, near-perigee region, and the larger data set that can be collected for slow orbits. However, if the orbit speed is changed by adjusting its parameters ($v_\infty$, $r_p$) or the central body mass $\mu_\mathcal{B}$, then the orbit shape will also change. This induces other effects studied in the main text and will complicate the trend observed here. Unlike the $P_\omega$ case, the cadence cut-off does not visibly broaden as a function of $t_\text{spin} / t_\text{orbit}$. It appears that the increased orbit speed merely shifts $T_\text{cad}$ rather than changing its sharpness.
-
 
 
 
