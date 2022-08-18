@@ -183,3 +183,7 @@ We still need to rerun 37 and 46 after they finish. I deleted all the staged fil
 ## Aug 16
 
 46 is done. I pulled the data, checked that it's good, pushed it to the SC, and deleted the records of the old asteroid solutions. The next time I run scan-perigee, it will compute 46. But I won't run it until 37 is done.
+
+## Aug 18
+
+37 is done. TX-E1 is down for maintenance, but I will soon push the data to the SC and start the extractions for 37 and 46.
