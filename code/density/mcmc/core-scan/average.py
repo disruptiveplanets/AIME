@@ -222,6 +222,7 @@ num_elements = np.sum(~np.isnan(mean_grid))
 error = np.nansum(ratios**2) / num_elements # Reduced chi squared
 
 PERCENTILE = 99.5# 95
+UNC_PERCENTILE = 95
 
 print("Plotting density")
 make_slices(mean_grid, grid_line, "$\\rho$", 'plasma', f"../../figs/{ASTEROID_NAME}/fe-d", error)
@@ -232,8 +233,8 @@ make_slices(ratios, grid_line, "$\\Delta \\rho / \\sigma_\\rho$", 'coolwarm', f"
 make_gif(ratios, grid_line, "$\\Delta \\rho / \\sigma_\\rho$", 'coolwarm', f"../../figs/{ASTEROID_NAME}/fe-r.gif", duration=DURATION, percentile=PERCENTILE, balance=True)
 
 print("Plotting uncertainty")
-make_slices(uncertainty_ratios, grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"../../figs/{ASTEROID_NAME}/fe-u", error, PERCENTILE)
-make_gif(uncertainty_ratios, grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"../../figs/{ASTEROID_NAME}/fe-u.gif", DURATION, PERCENTILE)
+make_slices(uncertainty_ratios, grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"../../figs/{ASTEROID_NAME}/fe-u", error, UNC_PERCENTILE)
+make_gif(uncertainty_ratios, grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"../../figs/{ASTEROID_NAME}/fe-u.gif", DURATION, UNC_PERCENTILE)
 
 if true_densities is not None:
     print("Plotting differences")

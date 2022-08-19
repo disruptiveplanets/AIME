@@ -7,7 +7,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 FIG_SCALE = 2
 FONT_SIZE = 16 * FIG_SCALE
-RUNNING_IN_SC = True
+RUNNING_IN_SC = False
 
 import matplotlib as mpl
 mpl.rcParams["font.family"] = "serif"
@@ -53,11 +53,11 @@ def make_gif(densities, pos_array, axis_name, cmap, fname, duration, percentile=
         w, h = fig.canvas.get_width_height()
 
         # This line of code should be adjusted based on DPI.
-        if not RUNNING_IN_SC:
-            w *= 2; h *= 2
+        if RUNNING_IN_SC:
+            imgs.append(Image.frombytes('RGB', (w, h), fig.canvas.tostring_rgb()))
+        else:
+            imgs.append(Image.frombytes('RGB', (w * 2, h * 2), fig.canvas.tostring_rgb()).resize((w, h)))
 
-        imgs.append(Image.frombytes('RGB',
-            (w, h), fig.canvas.tostring_rgb()))
         plt.close()
     imgs[0].save(fp=fname, format='GIF', append_images=imgs,
                 save_all=True, duration= int(duration * 1000 / num_frames), loop=0)
@@ -187,7 +187,7 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
     if exponent is not None:
         tag = f" ($\\times 10^{{{exponent}}}$)"
     if sub_one:
-        tag = f" ($-1,\\times 10^{{{exponent}}}$)"
+        tag = f" -- 1 ($\\times 10^{{{exponent}}}$)"
     c.set_label(axis_name + tag)
 
 
