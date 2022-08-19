@@ -9,8 +9,8 @@ from display import make_gif, make_slices
 from core import TrueShape, Indicator
 
 RUN_NAME = sys.argv[1]
-PULL = True
-GENERATE = True
+PULL = False
+GENERATE = False
 
 NUM_DRAWS = 20
 NUM_CHOOSE = 1000

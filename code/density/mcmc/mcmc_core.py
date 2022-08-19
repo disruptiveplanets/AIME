@@ -409,6 +409,7 @@ class MCMCAsteroid:
         densities /= np.nanmean(densities)
 
         PERCENTILE = 99.5# 95
+        UNC_PERCENTILE=95
 
         if true_densities is not None:
             true_densities /= np.nanmean(true_densities)
@@ -422,8 +423,8 @@ class MCMCAsteroid:
         make_gif(densities, self.asteroid.grid_line, "$\\rho$", 'plasma', f"{FIG_DIRECTORY}{self.name}/fe-d.gif", duration)
         
         print("Plotting uncertainty")
-        make_slices(uncertainty_ratios, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{FIG_DIRECTORY}{self.name}/fe-u", error, PERCENTILE)
-        make_gif(uncertainty_ratios, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{FIG_DIRECTORY}{self.name}/fe-u.gif", duration, PERCENTILE)
+        make_slices(uncertainty_ratios, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{FIG_DIRECTORY}{self.name}/fe-u", error, UNC_PERCENTILE)
+        make_gif(uncertainty_ratios, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho$", 'Greys_r', f"{FIG_DIRECTORY}{self.name}/fe-u.gif", duration, UNC_PERCENTILE)
 
         if true_densities is not None:
             print("Plotting differences")

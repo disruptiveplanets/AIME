@@ -184,7 +184,7 @@ Equations \ref{eqn:tidal-torque}, \ref{eqn:moi}, \ref{eqn:pos-eom}, and \ref{eqn
 \section{Comparing orientation and angular velocity data}
 \label{app:orientation}
 
-To extract the density distribution of an asteroid, the main text assumes that the angular velocity data of the asteroid is observable. It is possible that the orientation of the asteroid may be more readily available as a data set. In this appendix, we generate an orientation data set for the reference asteroid flyby, extract density moments from it, and compare the results to moments extracted from angular velocity data.
+To extract the density distribution of an asteroid, the main text assumes that the angular velocity data of the asteroid is observable. It is possible that the orientation of the asteroid may be more readily available as a data set, notably if a large collection of radar antenna fail to follow the encounter sufficiently. In this appendix, we generate an orientation data set for the reference asteroid flyby, extract density moments from it, and compare the results to moments extracted from angular velocity data.
 
 \subsection{Uncertainty model}
 To use an asteroid orientation data set rather than angular velocity, we must create an uncertainty model for orientation observations and produce a likelihood to be used by the MCMC (replacing equation \ref{eqn:log-likelihood}).
@@ -282,14 +282,109 @@ $C_{\ell m}$ can be treated as parameters for a fitting method (such as an MCMC)
 
 This appendix contains animations to better display the density distributions shown in the main text. Each frame represents a cross section perpendicular to the $\unit z$-axis, starting with negative $z$ and ending with positive $z$. All densities are divided by the mean asteroid density.
 
+% \begin{figure*}
+%   \textbf{Please see the published version of the paper for these animations, or find them online at the following links.}
+  
+%   Asymmetric reference asteroid
+  
+%   \rotatebox[origin=c]{90}{Finite element model}
+%   asym-fe-d.mp4\hfill
+%   asym-fe-s.mp4\hfill
+%   asym-fe-u.mp4\hfill
+%   asym-fe-r.mp4
+  
+%   \rotatebox[origin=c]{90}{Lumpy model}
+%   asym-l-d.mp4\hfill
+%   asym-l-s.mp4\hfill
+%   asym-l-u.mp4\hfill
+%   asym-l-r.mp4
+
+%   \vspace{2em}
+%   Symmetric reference asteroid
+
+%   \rotatebox[origin=c]{90}{Finite element model}
+%   sym-fe-d.mp4\hfill
+%   sym-fe-s.mp4\hfill
+%   sym-fe-u.mp4\hfill
+%   sym-fe-r.mp4
+
+%   \rotatebox[origin=c]{90}{Lumpy model}
+%   sym-l-d.mp4\hfill
+%   sym-l-s.mp4\hfill
+%   sym-l-u.mp4\hfill
+%   sym-l-r.mp4
+
+%   \caption{Density distributions extracted via the finite element model for the asymmetric (\textit{top two rows}) and symmetric (\textit{bottom two rows}) reference asteroids. The finite element model (\textit{first and third rows}) and the lumpy model (\textit{second and fourth rows}) are employed. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted. Animated form of figure \ref{fig:den-uniform}.}
+%   \label{fig:animated-uniform}
+% \end{figure*}
+
+% \begin{figure*}
+%   \textbf{Please see the published version of the paper for these animations, or find them online at the following links.}
+
+%   \rotatebox[origin=c]{90}{Finite element model}
+%   move-fe-d.mp4\hfill
+%   move-fe-s.mp4\hfill
+%   move-fe-u.mp4\hfill
+%   move-fe-r.mp4
+
+%   \rotatebox[origin=c]{90}{Lumpy model}
+%   move-l-d.mp4\hfill
+%   move-l-s.mp4\hfill
+%   move-l-u.mp4\hfill
+%   move-l-r.mp4
+
+%   \caption{Density distributions extracted via the finite-element (\textit{top}) and lumpy (\textit{bottom}) models for an asteroid with an off-center core. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted. Animated form of figure \ref{fig:den-move}.}
+%   \label{fig:animated-move}
+% \end{figure*}
+
+% \begin{figure*}
+%   \textbf{Please see the published version of the paper for these animations, or find them online at the following links.}
+
+%   \rotatebox[origin=c]{90}{Finite element model}
+%   sph-3-fe-d.mp4\hfill
+%   sph-3-fe-s.mp4\hfill
+%   sph-3-fe-u.mp4\hfill
+%   sph-3-fe-r.mp4
+
+%   \rotatebox[origin=c]{90}{Lumpy model}
+%   sph-3-l-d.mp4\hfill
+%   sph-3-l-s.mp4\hfill
+%   sph-3-l-u.mp4\hfill
+%   sph-3-l-r.mp4
+
+%   \caption{Density distributions extracted via the finite-element (\textit{top}) and lumpy (\textit{bottom}) models for an asteroid with a centred core. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted. Animated form of figure \ref{fig:den-sph}.}
+%   \label{fig:animated-sph}
+% \end{figure*}
+
+% \begin{figure*}
+%   \textbf{Please see the published version of the paper for these animations, or find them online at the following links.}
+
+%   \rotatebox[origin=c]{90}{Finite element model}
+%   double-fe-d.mp4\hfill
+%   double-fe-s.mp4\hfill
+%   double-fe-u.mp4\hfill
+%   double-fe-r.mp4
+
+%   \rotatebox[origin=c]{90}{Lumpy model}
+%   double-l-d.mp4\hfill
+%   double-l-s.mp4\hfill
+%   double-l-u.mp4\hfill
+%   double-l-r.mp4
+
+%   \caption{Density distributions extracted via the finite-element (\textit{top}) and the two-lump lumpy (\textit{bottom}) models for an asteroid with two counterbalancing cores. From left to right, the densities, deviations from the true density, uncertainties, and significance of the deviations are plotted. Animated form of figure \ref{fig:den-double}.}
+%   \label{fig:animated-double}
+% \end{figure*}
+
+
+
 \begin{figure*}
   \textbf{Please see the published version of the paper for these animations, or find them online at the following links.}
-
+  
   \href{https://github.com/jack-dinsmore/asteroid-tidal-torque/tree/main/paper/gifs/asym-fe-d.mp4}{FE asymmetric density} \hfill
   \href{https://github.com/jack-dinsmore/asteroid-tidal-torque/tree/main/paper/gifs/asym-fe-s.mp4}{FE asymmetric deviation} \hfill
   \href{https://github.com/jack-dinsmore/asteroid-tidal-torque/tree/main/paper/gifs/asym-fe-u.mp4}{FE asymmetric uncertainty} \hfill
   \href{https://github.com/jack-dinsmore/asteroid-tidal-torque/tree/main/paper/gifs/asym-fe-r.mp4}{FE asymmetric significance}
-
+  
   \href{https://github.com/jack-dinsmore/asteroid-tidal-torque/tree/main/paper/gifs/asym-l-d.mp4}{Lumpy asymmetric density} \hfill
   \href{https://github.com/jack-dinsmore/asteroid-tidal-torque/tree/main/paper/gifs/asym-l-s.mp4}{Lumpy asymmetric deviation} \hfill
   \href{https://github.com/jack-dinsmore/asteroid-tidal-torque/tree/main/paper/gifs/asym-l-u.mp4}{Lumpy asymmetric uncertainty} \hfill

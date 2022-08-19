@@ -7,6 +7,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 FIG_SCALE = 2
 FONT_SIZE = 16 * FIG_SCALE
+RUNNING_IN_SC = True
 
 import matplotlib as mpl
 mpl.rcParams["font.family"] = "serif"
@@ -22,7 +23,7 @@ mpl.rcParams["legend.fontsize"] = 10 * FIG_SCALE
 VERY_SMALL = 1
 NUM_SLICES = 6
 EXPAND_X=1.15 # Scale along x and y so that spheres look circular
-AXIS_LIMIT = 1000
+AXIS_LIMIT = 900
 EPSILON = 0.00000001
 NUM_CONTOURS = 6
 SLICE_FIGSIZE = (4.25 * FIG_SCALE, 4 * FIG_SCALE)
@@ -52,7 +53,8 @@ def make_gif(densities, pos_array, axis_name, cmap, fname, duration, percentile=
         w, h = fig.canvas.get_width_height()
 
         # This line of code should be adjusted based on DPI.
-        w *= 2; h *= 2
+        if not RUNNING_IN_SC:
+            w *= 2; h *= 2
 
         imgs.append(Image.frombytes('RGB',
             (w, h), fig.canvas.tostring_rgb()))
@@ -160,10 +162,6 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
     ax2 = fig2.gca()
     contour_handle = ax2.contourf(pos_array, pos_array, densities[:,:,0], levels=levels, cmap=cmap, extend=extend)
 
-    '''max_radius = max([max(abs(pos_array[mins[i]]), abs(pos_array[maxes[i]])) for i in range(len(densities.shape))])
-    ax.set_xlim3d(-max_radius * EXPAND_X / 2, max_radius * EXPAND_X / 2)
-    ax.set_ylim3d(-max_radius * EXPAND_X / 2, max_radius * EXPAND_X / 2)
-    ax.set_zlim3d(-max_radius / 2, max_radius / 2)'''
     ax.set_xlim3d(-AXIS_LIMIT * EXPAND_X, AXIS_LIMIT * EXPAND_X)
     ax.set_ylim3d(-AXIS_LIMIT * EXPAND_X, AXIS_LIMIT * EXPAND_X)
     ax.set_zlim3d(-AXIS_LIMIT, AXIS_LIMIT)
@@ -172,22 +170,18 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
     ax.set_yticks([])
     ax.set_zticks([])
 
-    ax.set_xlabel("$x$")
-    ax.set_ylabel("$y$")
-    ax.set_zlabel("$z$")
-
     # ax.set_title(f"$\\chi^2_r={str(klm_error)[:4]}$", y=0.9, fontdict={'fontsize': FONT_SIZE})
 
     axins = inset_axes(ax,
                     width="100%",  
-                    height="5%",
+                    height="4%",
                     loc='lower center',
-                    borderpad=-6
+                    borderpad=2
                     )
 
     from matplotlib.ticker import FuncFormatter
     fmt = lambda x, pos: round(x, 2)
-    c = fig.colorbar(contour_handle, ax=axins, extend=extend, orientation="horizontal", format=FuncFormatter(fmt))
+    c = fig.colorbar(contour_handle, cax=axins, extend=extend, orientation="horizontal", format=FuncFormatter(fmt))
     
     tag = ""
     if exponent is not None:
@@ -199,8 +193,8 @@ def make_slices(densities, pos_array, axis_name, cmap, name, klm_error, percenti
 
     fig.tight_layout()
     try:
-        fig.savefig(name+".pdf")
-        fig.savefig(name+".png")
+        fig.savefig(name+".pdf", bbox_inches='tight')
+        fig.savefig(name+".png", bbox_inches='tight')
     except Exception:
         print("Failed to save")
         pass
