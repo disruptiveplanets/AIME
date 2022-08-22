@@ -24,6 +24,8 @@ EPSILON = 1e-10
 MINIMUM_LIKELIHOOD = -1000
 NUM_SUCCESSES = 1
 
+TRIFECTA = True
+
 class MCMCMethod:
     def __init__(self, asteroid, mean_density, n_free, n_all, generate):
         self.mean_density = mean_density
@@ -238,7 +240,10 @@ class MCMCAsteroid:
 
             error = error_part if cut_k2m else error_full
 
-            self.display(densities, true_densities, uncertainty_ratios, error)
+            if not TRIFECTA:
+                self.display(densities, true_densities, uncertainty_ratios, error)
+            else:
+                self.display(densities, true_densities, uncertainty_ratios)
 
         return unc_tracker
 
@@ -430,6 +435,35 @@ class MCMCAsteroid:
             print("Plotting differences")
             make_slices(difference, self.asteroid.grid_line, "$\\Delta\\rho / \\rho$", 'PuOr_r', f"{FIG_DIRECTORY}{self.name}/fe-s", error, PERCENTILE, balance=True)
             make_gif(difference, self.asteroid.grid_line, "$\\Delta\\rho / \\rho$", 'PuOr_r', f"{FIG_DIRECTORY}{self.name}/fe-s.gif", duration, PERCENTILE, balance=True)
+
+        warnings.filterwarnings("default")
+
+    def display_trifecta(self, densities, true_densities, uncertainty_ratios, duration=5):
+
+        FIG_DIRECTORY = "../../figs/"
+        PERCENTILE = 99.5# 95
+        UNC_PERCENTILE=95
+
+        if not os.path.isdir(f"{FIG_DIRECTORY}trifecta"):
+            os.mkdir(f"{FIG_DIRECTORY}trifecta")
+        warnings.filterwarnings("ignore")
+
+        densities /= np.nanmean(densities)
+        assert true_densities is not None
+
+        true_densities /= np.nanmean(true_densities)
+
+        print("Plotting density")
+        make_slices(densities, self.asteroid.grid_line, "$\\rho_\mathrm{fit}$", 'plasma', f"{FIG_DIRECTORY}trifecta/fe-d", None)
+        make_gif(densities, self.asteroid.grid_line, "$\\rho_\mathrm{fit}$", 'plasma', f"{FIG_DIRECTORY}trifecta/fe-d.gif", duration)
+        
+        print("Plotting uncertainty")
+        make_slices(uncertainty_ratios, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho_\mathrm{fit}$", 'Greys_r', f"{FIG_DIRECTORY}trifecta/fe-u", "", UNC_PERCENTILE)
+        make_gif(uncertainty_ratios, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho_\mathrm{fit}$", 'Greys_r', f"{FIG_DIRECTORY}trifecta/fe-u.gif", duration, UNC_PERCENTILE)
+
+        print("Plotting true")
+        make_slices(true_densities, self.asteroid.grid_line, "$\\rho_\mathrm{true}$", 'plasma', f"{FIG_DIRECTORY}trifecta/fe-t", "", PERCENTILE, balance=True)
+        make_gif(true_densities, self.asteroid.grid_line, "$\\rho_\mathrm{true}$", 'plasma', f"{FIG_DIRECTORY}trifecta/fe-t.gif", duration, PERCENTILE, balance=True)
 
         warnings.filterwarnings("default")
 

@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-PULL = True
+PULL = False
 
 plt.style.use('jcap')
 mpl.rcParams["font.size"] = 12
@@ -137,8 +137,14 @@ for directory in DIRECTORIES:
                 axs[i].set_ylabel("$\sigma_\\rho / \\rho$")
 
 fig.legend([handles["lumpy"], handles["fe"], handles["weak"], handles["strong"]], ["Lumpy", "Finite element", "Weak cut-off", "Strong cut-off"], loc="upper center", ncol=2, bbox_to_anchor=(0.5,1.1))
+axs[7].annotate('', xy=(0.9, 0.9), xycoords='axes fraction', xytext=(0.9, 0.4), 
+    arrowprops=dict(arrowstyle="<->", color='k'))
+axs[7].annotate('Model-driven difference', xy=(0.9, 0.65), xycoords='axes fraction', xytext=(1.1, 0), 
+    arrowprops=dict(arrowstyle="-", color='k'), rotation=90)
 
 fig.tight_layout()
 fig.savefig("all.png", bbox_inches='tight')
 fig.savefig("all.pdf", bbox_inches='tight')
+
+
 plt.show()
