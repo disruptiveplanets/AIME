@@ -163,7 +163,7 @@ class TrueShape:
 
     def smooth_y(am, k22, k20, com):
         b = np.sqrt(5/3) * am * np.sqrt(1 - 2 * k20 - 12 * k22)
-        g = 20 / 3 * com / b**2
+        g = 5 * com / b**2
         return lambda x, y, z: 1 + g * y
 
     def blob(am, k22, k20):

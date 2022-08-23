@@ -49,7 +49,8 @@ asteroids = [
     #("moved-high", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high), TrueShape.uniform(), True),
     # ("two-lump", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.two_core(3, blob_rad, [0, 500, 0], 3, blob_rad, [0, -500, 0]), False),
 
-    #("core-move-1.5", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.core_shift(1.5, core_rad, core_displacement), True),
+    ("core-move-1.5", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.core_shift(1.5, core_rad, core_displacement), True),
+
     ("smooth", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.smooth_y(ELLIPSOID_AM, k22a, k20a, core_shift_low), True),
 ]
 

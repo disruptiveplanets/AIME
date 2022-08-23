@@ -2,4 +2,24 @@
 
 This readme is specifically for `delta-chisq.py`. Today, I invented the "smooth" distribution, which is uniform except it sweeps any center of mass offset into a linear trend in density. Moments need to be calculated for it. For move-1.5, the difference in density distribution between the low and high-density ends of the asteroid is 10%.
 
-The moments
+The smoothed moments are:
+
+(1+0j)
+(-3.277148820965217e-06-0.0026451170464454003j)
+(-2.3353615046650198e-05+0j)
+(3.277148820965217e-06-0.0026451170464454003j)
+(-0.05197515378457811+4.0625813766330754e-07j)
+(-2.4908765862468645e-06-2.861719055489412e-07j)
+(-0.202180022773344+0j)
+(2.4908765862468645e-06-2.861719055489412e-07j)
+(-0.05197515378457811-4.0625813766330754e-07j)
+(-3.790791213924793e-07-1.9011869962463665e-05j)
+(-3.118311276528886e-07+3.848701179856361e-07j)
+(6.30179216276858e-07-9.415721317775602e-05j)
+(-1.522058302276185e-06+0j)
+(-6.30179216276858e-07-9.415721317775602e-05j)
+(-3.118311276528886e-07-3.848701179856361e-07j)
+(3.790791213924793e-07-1.9011869962463665e-05j)
+(999.7934566494076+0j)
+
+I used the code to calculate disagreement between these moments and the true moments.
