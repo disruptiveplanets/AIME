@@ -8,7 +8,7 @@ import moviepy.editor as mp
 
 FIG_DIRECTORY = "/Users/jtd/Documents/research/12.420 project/code/density/figs"
 IMAGE_LAYOUTS = {
-    "figure-4-animated": [
+    "figure-5-animated": [
         ("Asymmetric reference asteroid",),
         ("Finite element model", "avg-asym"),
         ("Lumpy model", "asym-lump"),
@@ -16,15 +16,15 @@ IMAGE_LAYOUTS = {
         ("Finite element model", "avg-sym"),
         ("Lumpy model", "sym-lump"),
     ],
-    "figure-5-animated": [
+    "figure-6-animated": [
         ("Finite element model", "avg-move-1.5"),
         ("Lumpy model", "move-1.5-lump"),
     ],
-    "figure-6-animated": [
+    "figure-7-animated": [
         ("Finite element model", "avg-sph-3"),
         ("Lumpy model", "sph-3-lump"),
     ],
-    "figure-7-animated": [
+    "figure-8-animated": [
         ("Finite element model", "avg-double"),
         ("Lumpy model", "double-lump"),
     ],
@@ -190,13 +190,13 @@ def make_trifecta():
     
     # Save as gif
     print("Saving gif")
-    frames[0].save(fp=f"figure-x-animated.gif", format='GIF', append_images=frames,
+    frames[0].save(fp=f"figure-4-animated.gif", format='GIF', append_images=frames,
             save_all=True, duration=duration, loop=0)
 
     # gif to mp4
     print("Converting to mp4")
-    clip = mp.VideoFileClip(f"figure-x-animated.gif")
-    clip.write_videofile(f"figure-x-animated.mp4")
+    clip = mp.VideoFileClip(f"figure-4-animated.gif")
+    clip.write_videofile(f"figure-4-animated.mp4")
 
 if __name__ == "__main__":
     make_gifs()

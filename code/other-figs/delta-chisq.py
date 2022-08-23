@@ -107,6 +107,6 @@ def calc_dsq(name):
     print(f"Delta chisq\t {unif_chisq - true_chisq} ({(unif_chisq - true_chisq) / N_MOMENTS})")
 
 if __name__ == "__main__":
-    # calc_dsq("sph-3")
+    calc_dsq("sph-3")
     calc_dsq("double")
-    # calc_dsq("move-1.5")
+    calc_dsq("move-1.5")
