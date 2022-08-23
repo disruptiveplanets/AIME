@@ -21,7 +21,7 @@ RLM_EPSILON = 1e-20
 UNCERTAINTY_RATIO = 0.25
 
 MIN_MASS = 1e-10
-SLOW_PRIOR = False
+SLOW_PRIOR = True
 
 # Made for spherical lumps
 

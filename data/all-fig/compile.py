@@ -60,14 +60,14 @@ specialized_y_labels = {
 }
 
 thresholds = {
-    "scan-perigee-sync":	(6.041275818201059, 18.20618262898073),
-    "probe-s-theta": (0.032726900377081515, 0.6113839751941476),
-    "scan-cadence":	(15.424913260494899, None),
-    "scan-period-sync": (7.591137362332508, None),
-    "scan-am": (14.814169963587675, None),
-    "scan-vex-sync": (None, None),
-    "observation-gap": (None, None),
-    "probe-s-rho": (3.6172957141874776e-07, 8.228524489683316e-06),
+    "scan-perigee-sync": (10.05645830142579,),
+    "probe-s-theta": (0.15813979997110503,),
+    "scan-cadence":	(None,),
+    "scan-period-sync": (3.342475232084257,),
+    "scan-am": (None,),
+    "scan-vex-sync": (None,),
+    "observation-gap": (None,),
+    "probe-s-rho": (1.708724170502394e-06,),
 }
 
 
@@ -176,7 +176,7 @@ def show_figs(plot_name, plot_name_index, num_columns):
             if thresh is None:
                 continue
             if thresh_index == 0:
-                ax.axvline(x=thresh, color='r', linewidth=1, linestyle='dashed')
+                ax.axvline(x=thresh, color='r', linewidth=1, linestyle='solid')
             if thresh_index == 1:
                 ax.axvline(x=thresh, color='r', linewidth=1, linestyle='solid')
 
@@ -223,7 +223,7 @@ fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='upper center', p
 
 plt.savefig("all1.pdf", bbox_inches="tight")
 plt.savefig("all1.png", bbox_inches="tight")
-plt.show()
+# plt.show()
 
 
 
@@ -242,4 +242,4 @@ fig.legend(custom_lines, ['95\%', '68\%', '50\%'], ncol=3, loc='upper center', p
 
 plt.savefig("all2.pdf", bbox_inches="tight")
 plt.savefig("all2.png", bbox_inches="tight")
-plt.show()
+# plt.show()

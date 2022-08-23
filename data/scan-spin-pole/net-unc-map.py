@@ -10,6 +10,7 @@ xyzs = []
 theta_phis = []
 
 PULL = False
+THRESHOLD = 0.0005369031978644279
 
 if PULL:
     os.system("scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/thresholds/lumpy/scan-spin-pole.npy .")
@@ -67,7 +68,7 @@ cart_array_unc = np.array(cart_array_unc) * 10**4
 levels = np.linspace(0, 1.2, 13)
 im = ax.contourf(Lon, Lat, cart_array_unc, cmap='Blues_r', levels=levels)
 
-ax.contour(Lon, Lat, cart_array_unc, levels=[1], colors=['r'], linewidths=[1], linestyles=['dashed'])
+ax.contour(Lon, Lat, cart_array_unc, levels=[THRESHOLD * 1e4], colors=['r'], linewidths=[1], linestyles=['dashed'])
     
 cbar = fig.colorbar(im)
 cbar.set_label("$\sigma_\\rho / \\rho$ ($\\times 10^{-4}$)")

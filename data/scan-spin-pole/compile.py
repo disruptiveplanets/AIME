@@ -22,6 +22,8 @@ N_PERCENTILES = None
 PULL = False
 DRAW_AVG_PLOTS = False
 
+THRESHOLD = 0.0005369031978644279
+
 if PULL:
     os.system("scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/thresholds/lumpy/scan-spin-pole.npy .")
 
@@ -125,8 +127,8 @@ for plot_index in range(N_DIM+1):
 
     im = axs[plot_index].pcolormesh(Lon, Lat, cart_array, cmap='Blues_r', shading="gouraud")
 
-    axs[plot_index].contour(Lon, Lat, cart_array_unc, levels=[1e-3], colors=['r'], linewidths=[1])
-    axs[plot_index].contour(Lon, Lat, cart_array_unc, levels=[1e-4], colors=['r'], linewidths=[1], linestyles=['dashed'])
+    axs[plot_index].contour(Lon, Lat, cart_array_unc, levels=[THRESHOLD], colors=['r'], linewidths=[1])
+    # axs[plot_index].contour(Lon, Lat, cart_array_unc, levels=[1e-4], colors=['r'], linewidths=[1], linestyles=['dashed'])
     
     cbar = fig.colorbar(im, ax=axs[plot_index], extend='max')
     if i < 3:

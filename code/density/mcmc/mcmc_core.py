@@ -24,6 +24,8 @@ EPSILON = 1e-10
 MINIMUM_LIKELIHOOD = -1000
 NUM_SUCCESSES = 1
 
+TRUE_PARAMETERS = None # np.array([48173067527.840256, 207282614.49373367, 48173067527.840256, 207282614.49373367, 0, 103689705301.15648, 0]) # For double model
+
 TRIFECTA = True
 
 class MCMCMethod:
@@ -174,6 +176,58 @@ class MCMCAsteroid:
 
         if unc_tracker_file is None:        
             method = method_class(self.asteroid, self.mean_density, self.n_free, self.n_all, generate)
+
+
+
+
+
+
+            # # Test true distro
+
+            # blob_mass = 207282614.489154
+            # blob_radius = 300 * np.sqrt(3/5)
+            # TRUE_THETA = [
+            #     blob_radius * blob_mass,
+            #     blob_mass,
+            #     blob_radius * blob_mass,
+            #     blob_mass,
+            #     0,
+            #     500 * blob_mass,
+            #     0,
+            # ]
+            # print("Initial log prob", log_probability(TRUE_THETA, method, self.data_storage))
+
+            # def opposite(x):
+            #     _blob_radius, _blob_mass, pos = x
+            #     theta = [
+            #         _blob_radius * _blob_mass,
+            #         _blob_mass,
+            #         _blob_radius * _blob_mass,
+            #         _blob_mass,
+            #         0,
+            #         pos * _blob_mass,
+            #         0,
+            #     ]
+            #     return -log_probability(theta, method, self.data_storage)
+
+            # result = minimize(opposite, x0=(blob_radius, blob_mass, 500))
+            # print("New log prob", result.fun)
+            # print("Shift was were", result.x - np.array((blob_radius, blob_mass, 500)))
+            # _blob_radius, _blob_mass, pos = result.x
+            # print("Full theta short was", [
+            #     _blob_radius * _blob_mass,
+            #     _blob_mass,
+            #     _blob_radius * _blob_mass,
+            #     _blob_mass,
+            #     0,
+            #     pos * _blob_mass,
+            #     0,
+            # ])
+
+            # 2.5142861513618944
+
+
+
 
             long_samples = self.get_densities_mcmc(method, generate)
             if long_samples is None:
@@ -367,10 +421,15 @@ class MCMCAsteroid:
             except CompletedException:
                 return
             if min_result.fun < MIN_LOG_LIKE:
-                print(f"Thread successfully completed with log like {min_result.fun}, parameters {min_result.x}")
+                if TRUE_PARAMETERS is None:
+                    print(f"Thread successfully completed with log like {min_result.fun}, parameters {min_result.x}")
+                else:
+                    
+                    print(f"Thread successfully completed with log like {min_result.fun}, parameters {min_result.x}, delta {min_result.x - TRUE_PARAMETERS}")
+
                 result.set(min_result.x, min_result.fun)
             else:
-                print(f"Attempt failed with log like {min_result.fun}")
+                # print(f"Attempt failed with log like {min_result.fun}")
                 result.increment()
 
     def minimize_func(self, theta, result, method):

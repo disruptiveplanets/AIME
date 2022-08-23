@@ -2,6 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+from scipy.optimize import minimize
 
 PULL = False
 
@@ -64,9 +65,12 @@ COLORS = {
     "lumpy": "darkcyan",
     "fe": "olivedrab",
 }
-DIRECTORIES = ["lumpy", "fe"]
+DIRECTORIES = [
+    "fe",
+    "lumpy",
+]
 
-THRESHOLDS = ((1e-4, "dashed", "weak"),(1e-3, "solid", "strong"),)
+THRESHOLDS = ((0.0005369031978644279, "solid", "threshold"),)
 
 if PULL:
     for directory in DIRECTORIES:
@@ -85,11 +89,6 @@ for directory in DIRECTORIES:
 
         uncs = uncs[~np.any(np.isnan(uncs), axis=1),:]
 
-        if len(name) < 8:
-            print(name, end='\t\t')
-        else:
-            print(name, end='\t')
-
         use_uncs = uncs[:, 2] # means
 
         with open(f"../../data/all-fig/{name}-x.npy", 'rb') as f:
@@ -100,6 +99,54 @@ for directory in DIRECTORIES:
             axs[i].fill_between(xs, uncs[:,0], uncs[:,4], alpha=0.3, color=COLORS[directory])
         )
         axs[i].fill_between(xs, uncs[:,1], uncs[:,3], alpha=0.3, color=COLORS[directory], label='foo')
+
+
+
+
+
+        if i == 0:
+            if directory == "fe":
+                # Fit a curve to the perigee case to see if I can get a threshold from the lumpy model
+                def fit_func(param):
+                    c, b, p = param
+                    return -c / xs ** p + b
+
+                def invert_fit_func(param, y):
+                    c, b, p = param
+                    return (-c / (y - b))**(1/p)
+
+                def error(param):
+                    model = fit_func(param)
+                    data = uncs[:,2]
+                    error1 = (uncs[:,1] - uncs[:,3]) / 2
+                    error2 = (uncs[:,0] - uncs[:,4]) / 4
+                    error = (error1 + error2) / 2
+                    return np.sum(((model - data) / error)**2)
+
+                result = minimize(error, (1, 0.35, 1), bounds=((-5, 5), (0.1, 10), (1, 5)))
+                print(result)
+                print(invert_fit_func(result.x, 0.20))
+                print(invert_fit_func(result.x, 0.25))
+                print(invert_fit_func(result.x, 0.30))
+
+                THRESHOLD_PERIGEE = invert_fit_func(result.x, 0.30)
+
+                # axs[i].plot(xs, fit_func(result.x), c='k')
+
+            if directory == "lumpy":
+                threshold = np.interp(THRESHOLD_PERIGEE, xs, uncs[:,2])
+                print()
+                print("THRESHOLD", threshold)
+
+
+
+        if len(name) < 8:
+            print(name, end='\t\t')
+        else:
+            print(name, end='\t')
+
+
+
 
         if directory == "lumpy":
             for threshold, style, thresh_name in THRESHOLDS:
@@ -123,20 +170,21 @@ for directory in DIRECTORIES:
                 print(f"\t{thresh_x}", end="")
             print()
 
-            axs[i].set_yscale('log')
-            if LOGS[name]:
-                axs[i].set_xscale('log')
-            axs[i].axvline(x=TRUES[name], linewidth=1, c='k', linestyle='dotted')
-            axs[i].set_xlabel(LABELS[name])
-            axs[i].set_xlim(np.min(xs), np.max(xs))
-            if name == "scan-perigee":
-                perigee_tick_poses = [5, 15, 30, 45]
-                axs[i].set_xticks(perigee_tick_poses)
-                axs[i].set_xticklabels([str(p) for p in perigee_tick_poses])
-            if i % 4 == 0:
-                axs[i].set_ylabel("$\sigma_\\rho / \\rho$")
+        axs[i].set_yscale('log')
+        if LOGS[name]:
+            axs[i].set_xscale('log')
+        axs[i].axvline(x=TRUES[name], linewidth=1, c='k', linestyle='dotted')
+        axs[i].set_xlabel(LABELS[name])
+        axs[i].set_xlim(np.min(xs), np.max(xs))
 
-fig.legend([handles["lumpy"], handles["fe"], handles["weak"], handles["strong"]], ["Lumpy", "Finite element", "Weak cut-off", "Strong cut-off"], loc="upper center", ncol=2, bbox_to_anchor=(0.5,1.1))
+        if name == "scan-perigee":
+            perigee_tick_poses = [5, 15, 30, 45]
+            axs[i].set_xticks(perigee_tick_poses)
+            axs[i].set_xticklabels([str(p) for p in perigee_tick_poses])
+        if i % 4 == 0:
+            axs[i].set_ylabel("$\sigma_\\rho / \\rho$")
+
+fig.legend([handles["lumpy"], handles["fe"], handles["threshold"]], ["Lumpy", "Finite element", "Threshold"], loc="upper center", ncol=3, bbox_to_anchor=(0.5,1.1))
 axs[7].annotate('', xy=(0.9, 0.9), xycoords='axes fraction', xytext=(0.9, 0.4), 
     arrowprops=dict(arrowstyle="<->", color='k'))
 axs[7].annotate('Model-driven difference', xy=(0.9, 0.65), xycoords='axes fraction', xytext=(1.1, 0), 
@@ -147,4 +195,4 @@ fig.savefig("all.png", bbox_inches='tight')
 fig.savefig("all.pdf", bbox_inches='tight')
 
 
-plt.show()
+# plt.show()

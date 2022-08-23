@@ -224,6 +224,25 @@ error = np.nansum(ratios**2) / num_elements # Reduced chi squared
 PERCENTILE = 99.5# 95
 UNC_PERCENTILE = 95
 
+# Display density chisq
+print()
+mask = ~np.isnan(mean_grid.reshape(-1))
+flat_densities = mean_grid.reshape(-1)[mask]
+flat_true = true_densities.reshape(-1)[mask]
+flat_unc = uncertainty_ratios.reshape(-1)[mask]
+density_chisq_array = ((1 - flat_true / flat_densities) / flat_unc)**2
+uniform_chisq_array = ((1 - 1 / flat_densities) / flat_unc)**2
+
+density_chisq = np.nansum(density_chisq_array)
+uniform_chisq = np.nansum(uniform_chisq_array)
+delta = uniform_chisq - density_chisq
+n = np.sum(~np.isnan(true_densities))
+print("Number of elements", n)
+print(f"Density chi squared: {density_chisq} ({density_chisq / n})")
+print(f"Uniform chi squared: {uniform_chisq} ({uniform_chisq / n})")
+print(f"Delta chi squared: {delta} ({delta / n})")
+print()
+
 print("Plotting density")
 make_slices(mean_grid, grid_line, "$\\rho$", 'plasma', f"../../figs/{ASTEROID_NAME}/fe-d", error)
 make_gif(mean_grid, grid_line, "$\\rho$", 'plasma', f"../../figs/{ASTEROID_NAME}/fe-d.gif", DURATION)

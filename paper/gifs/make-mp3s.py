@@ -142,5 +142,62 @@ def make_gifs():
         clip.write_videofile(f"{save_name}.mp4")
         # os.system(f"ffmpeg -f gif -i \"{save_name}.gif\" \"{save_name}.mp4\"")
 
+def make_trifecta():
+    images = [
+        Image.open(f'{FIG_DIRECTORY}/trifecta/fe-d.gif'),
+        Image.open(f'{FIG_DIRECTORY}/trifecta/fe-t.gif'),
+        Image.open(f'{FIG_DIRECTORY}/trifecta/fe-u.gif'),
+    ]
+    
+    num_frames = None
+    single_size = None
+    duration = None
+    for im in images:
+        if num_frames is None:
+            num_frames = im.n_frames
+            single_size = im.size
+            duration = im.info['duration']
+        if im.n_frames != num_frames:
+            num_frames = min(num_frames, im.n_frames)
+        if im.size != single_size:
+            raise Exception(f"Got image with {im.size} size, but expected {single_size}")
+        if im.info['duration'] != duration:
+            duration = max(duration, im.info['duration'])
+
+    # Make the images
+    single_size = (int(single_size[0] * RESIZE_FRAC), int(single_size[1] * RESIZE_FRAC))
+    frame_size = [
+        single_size[0] * 2,
+        single_size[1] * 2]
+    frames = []
+    for frame_index in range(num_frames):
+        frame = Image.new('RGB', frame_size, color=(255, 255, 255))
+
+        # Images first
+        for i in range(len(images)):
+            gif_frame = int(frame_index / num_frames * images[i].n_frames)
+            images[i].seek(gif_frame)
+            if i == 0:
+                frame.paste(images[i].resize(single_size),
+                    (0, 0))
+            if i == 1:
+                frame.paste(images[i].resize(single_size),
+                    (single_size[0], 0))
+            if i == 2:
+                frame.paste(images[i].resize(single_size),
+                    (single_size[0] // 2, single_size[1]))
+        frames.append(frame)
+    
+    # Save as gif
+    print("Saving gif")
+    frames[0].save(fp=f"figure-x-animated.gif", format='GIF', append_images=frames,
+            save_all=True, duration=duration, loop=0)
+
+    # gif to mp4
+    print("Converting to mp4")
+    clip = mp.VideoFileClip(f"figure-x-animated.gif")
+    clip.write_videofile(f"figure-x-animated.mp4")
+
 if __name__ == "__main__":
     make_gifs()
+    make_trifecta()
