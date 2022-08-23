@@ -1,7 +1,7 @@
 import numpy as np
 from core import Asteroid, Indicator, TrueShape
 from multiprocessing import Pool
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 division = 9
 max_radius = 2000
@@ -12,18 +12,13 @@ b = np.sqrt(5/3) * ELLIPSOID_AM * np.sqrt(1 - 2 * k20a - 12 * k22a)
 a = np.sqrt(5/3) * ELLIPSOID_AM * np.sqrt(1 - 2 * k20a + 12 * k22a)
 c = np.sqrt(5/3) * ELLIPSOID_AM * np.sqrt(1 + 4 * k20a)
 
-
-
 blob_displacement = 500
 blob_rad = 300
 blob_vol = np.pi * 4 / 3 * blob_rad**3
 ellipsoid_vol = np.pi * 4 / 3 * a * b * c
 density_factor = 2
 lump_shift = blob_displacement * (blob_vol * density_factor) / ellipsoid_vol
-print("Blob Mass fraction:", (blob_vol * density_factor) / (blob_vol * density_factor+ellipsoid_vol))
-print("Blob double mass fraction:", (blob_vol * density_factor) / (2 * blob_vol * density_factor+ellipsoid_vol) * ellipsoid_vol)
-print("Blob Lump shift:", lump_shift)
-print("Blob am", blob_rad * np.sqrt(3/5))
+
 
 core_displacement = 300
 core_rad = 500
@@ -32,9 +27,6 @@ density_factor_low = 0.5
 density_factor_high = 2
 core_shift_low = core_displacement * (core_vol * density_factor_low) / ellipsoid_vol
 core_shift_high = core_displacement * (core_vol * density_factor_high) / ellipsoid_vol
-print("Core mass fraction:", (core_vol * density_factor) / (core_vol * density_factor+ellipsoid_vol))
-print(f"Core shift low: {core_shift_low}\tCore shift high: {core_shift_high}")
-
 
 
 asteroids = [
@@ -55,9 +47,10 @@ asteroids = [
     #("core-move-3", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high), TrueShape.core_shift(3, core_rad, core_displacement), True),
     #("moved-low", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.uniform(), True),
     #("moved-high", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high), TrueShape.uniform(), True),
-    ("two-lump", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.two_core(3, blob_rad, [0, 500, 0], 3, blob_rad, [0, -500, 0]), False),
+    # ("two-lump", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.two_core(3, blob_rad, [0, 500, 0], 3, blob_rad, [0, -500, 0]), False),
 
     #("core-move-1.5", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.core_shift(1.5, core_rad, core_displacement), True),
+    ("smooth", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.smooth_y(ELLIPSOID_AM, k22a, k20a, core_shift_low), True),
 ]
 
 def get_klms(index):
@@ -105,12 +98,21 @@ def get_klms(index):
 
     return name, np.append(klms, bulk_am)
 
-with Pool() as pool:
-   results = pool.map(get_klms, range(len(asteroids)))
 
-for name, klms in results:
-    print(name)
-    for k in klms:
-        print(k)
-    print()
-    
+if __name__ == '__main__':
+    print("Blob Mass fraction:", (blob_vol * density_factor) / (blob_vol * density_factor+ellipsoid_vol))
+    print("Blob double mass fraction:", (blob_vol * density_factor) / (2 * blob_vol * density_factor+ellipsoid_vol) * ellipsoid_vol)
+    print("Blob Lump shift:", lump_shift)
+    print("Blob am", blob_rad * np.sqrt(3/5))
+    print("Core mass fraction:", (core_vol * density_factor) / (core_vol * density_factor+ellipsoid_vol))
+    print(f"Core shift low: {core_shift_low}\tCore shift high: {core_shift_high}")
+
+    with Pool() as pool:
+        results = pool.map(get_klms, range(len(asteroids)))
+
+    for name, klms in results:
+        print(name)
+        for k in klms:
+            print(k)
+        print()
+        

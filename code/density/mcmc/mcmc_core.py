@@ -240,10 +240,33 @@ class MCMCAsteroid:
 
             error = error_part if cut_k2m else error_full
 
+            true_densities /= np.nanmean(true_densities)
+            densities /= np.nanmean(densities)
+
+            mask = ~np.isnan(densities.reshape(-1))
+            flat_densities = densities.reshape(-1)[mask]
+            flat_true = true_densities.reshape(-1)[mask]
+            flat_unc = uncertainty_ratios.reshape(-1)[mask]
+            density_chisq_array = ((1 - flat_true / flat_densities) / flat_unc)**2
+            uniform_chisq_array = ((1 - 1 / flat_densities) / flat_unc)**2
+
+            for i in range(1, 99, 8):
+                print(i, np.nanpercentile(density_chisq_array, i))
+                print(i, np.nanpercentile(uniform_chisq_array, i))
+
+            density_chisq = np.nansum(density_chisq_array)
+            uniform_chisq = np.nansum(uniform_chisq_array)
+            delta = uniform_chisq - density_chisq
+            n = np.sum(~np.isnan(true_densities))
+            print("Number of elements", n)
+            print(f"Density chi squared: {density_chisq} ({density_chisq / n})")
+            print(f"Uniform chi squared: {uniform_chisq} ({uniform_chisq / n})")
+            print(f"Delta chi squared: {delta} ({delta / n})")
+
             if not TRIFECTA:
                 self.display(densities, true_densities, uncertainty_ratios, error)
             else:
-                self.display(densities, true_densities, uncertainty_ratios)
+                self.display_trifecta(densities, true_densities, uncertainty_ratios)
 
         return unc_tracker
 
@@ -462,8 +485,8 @@ class MCMCAsteroid:
         make_gif(uncertainty_ratios, self.asteroid.grid_line, "$\\sigma_\\rho / \\rho_\mathrm{fit}$", 'Greys_r', f"{FIG_DIRECTORY}trifecta/fe-u.gif", duration, UNC_PERCENTILE)
 
         print("Plotting true")
-        make_slices(true_densities, self.asteroid.grid_line, "$\\rho_\mathrm{true}$", 'plasma', f"{FIG_DIRECTORY}trifecta/fe-t", "", PERCENTILE, balance=True)
-        make_gif(true_densities, self.asteroid.grid_line, "$\\rho_\mathrm{true}$", 'plasma', f"{FIG_DIRECTORY}trifecta/fe-t.gif", duration, PERCENTILE, balance=True)
+        make_slices(true_densities, self.asteroid.grid_line, "$\\rho_\mathrm{true}$", 'plasma', f"{FIG_DIRECTORY}trifecta/fe-t", "", PERCENTILE, balance=False)
+        make_gif(true_densities, self.asteroid.grid_line, "$\\rho_\mathrm{true}$", 'plasma', f"{FIG_DIRECTORY}trifecta/fe-t.gif", duration, PERCENTILE, balance=False)
 
         warnings.filterwarnings("default")
 
@@ -498,3 +521,5 @@ if __name__ == "__main__":
     # asteroid = MCMCAsteroid(f"den-core-sph", "../samples/den-core-sph-0-samples.npy", Indicator.ell(surface_am, k22, k20), surface_am, DIVISION, MAX_RADIUS, True, used_bulk_am=978.4541044108308)
 
     print(asteroid.pipeline(fe.FiniteElement, True, generate=False))
+
+    
