@@ -9,11 +9,9 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
-% \usepackage{xcolor}
 \usepackage{tikz}
 \usepackage{bm}
 \usepackage{caption}
-% \usepackage{subcaption}
 \usepackage{graphbox}
 \usetikzlibrary{arrows.meta}
 
@@ -42,7 +40,7 @@ $^{2}$Department of Earth, Atmospheric, and Planetary Science, Massachusetts Ins
 \maketitle
 
 \begin{abstract}
-  Knowledge of the interior density distribution of an asteroid can reveal its composition and constrain its evolutionary history. However, most asteroid observational techniques are not sensitive to interior properties. We investigate the interior constraints accessible through monitoring variations in angular velocity during a close encounter. We derive the equations of motion for a rigid asteroid's orientation and angular velocity to arbitrary order and use them to generate synthetic angular velocity data for a representative asteroid on a close Earth encounter. Using Markov Chain Monte Carlo fits, we perform injection-retrieval tests on these synthetic data to gain insights into the extent to which interior properties can be constrained. We also perform a sensitivity analysis of such an inversion technique to asteroid parameters (e.g., asteroid shape and orbital elements), observational set-up (e.g., measurement precision and cadence), and mapping models to convert constraints on the density moments to density distributions. We find that high precision in rotational period estimates ($\lesssim 50$ milliseconds) are necessary for each cadence, and that low perigees ($\lesssim 10$ Earth radii) are necessary to resolve density distributions.
+  Knowledge of the interior density distribution of an asteroid can reveal its composition and constrain its evolutionary history. However, most asteroid observational techniques are not sensitive to interior properties. We investigate the interior constraints accessible through monitoring variations in angular velocity during a close encounter. We derive the equations of motion for a rigid asteroid's orientation and angular velocity to arbitrary order and use them to generate synthetic angular velocity data for a representative asteroid on a close Earth encounter. We develop a toolkit AIME (Asteroid Interior Mapping from Encounters) which reconstructs asteroid density distribution from these data, and we perform injection-retrieval tests on these synthetic data to assess AIME's accuracy and precision. We also perform a sensitivity analysis to asteroid parameters (e.g., asteroid shape and orbital elements), observational set-up (e.g., measurement precision and cadence), and the mapping models used. We find that high precision in rotational period estimates ($\lesssim 50$ milliseconds) are necessary for each cadence, and that low perigees ($\lesssim 10$ Earth radii) are necessary to resolve density distributions.
 \end{abstract}
 
 \begin{keywords}
@@ -114,7 +112,7 @@ Throughout the paper, we refer to the ``inertial frame'' (the frame in which the
 \subsection{Simulation design}
 \label{sec:sim}
 
-We built a publicly accessible, custom simulation in C++ of an asteroid's rotational state during a close encounter with a central body. This simulation requires as initial data (1) the orbital parameters of the asteroid $r_p$ (perigee distance) and $v_\infty$ (hyperbolic excess velocity); (2) the cadence of angular velocity observation $\Delta t$; (3) the central body moments $J_{\ell m}$, mass $\mu_\mathcal{B}$, and radius $a_\mathcal{B}$; (4) the initial asteroid angular velocity in the inertial frame $\bm \Omega_0$; (5) the asteroid length $a_\mathcal{A}$ and (6) the asteroid's density moments $K_{\ell m}$ and initial Euler angle $\gamma_0$. All parameters except (6) are assumed to be known to high accuracy. For example, $\bm \Omega_0$ could be extracted from pre-encounter light-curve data and $a_\mathcal{A}$ from a model for the asteroid's surface using radar. The other two initial Euler angles $\alpha_0$ and $\beta_0$ are required to be zero by the assumption of no initial tumbling.
+We built a simulation of an asteroid's rotational state during a close encounter with a central body. This simulation requires as initial data (1) the orbital parameters of the asteroid $r_p$ (perigee distance) and $v_\infty$ (hyperbolic excess velocity); (2) the cadence of angular velocity observation $\Delta t$; (3) the central body moments $J_{\ell m}$, mass $\mu_\mathcal{B}$, and radius $a_\mathcal{B}$; (4) the initial asteroid angular velocity in the inertial frame $\bm \Omega_0$; (5) the asteroid length $a_\mathcal{A}$ and (6) the asteroid's density moments $K_{\ell m}$ and initial Euler angle $\gamma_0$. All parameters except (6) are assumed to be known to high accuracy. For example, $\bm \Omega_0$ could be extracted from pre-encounter light-curve data and $a_\mathcal{A}$ from a model for the asteroid's surface using radar. The other two initial Euler angles $\alpha_0$ and $\beta_0$ are required to be zero by the assumption of no initial tumbling.
 
 We begin our simulation at $D = 10 r_p$. Since the leading order of equation \ref{eqn:tidal-torque} yields $\tau \propto D^{-3}$, this corresponds roughly to a torque of $10^{-3}$ times the maximum torque at perigee. Unless otherwise indicated, the simulation is terminated at $D=10 r_p$ as well. With the simulation inputs specified, the equations of motion are integrated via the Runge-Kutta fourth order method, with a variable time step, manually chosen to limit integration error to only $\sim 100$ times the floating point numerical error.
 
@@ -240,7 +238,7 @@ Once the parameters of the density distribution models have been extracted, each
 \section{Results}
 \label{sec:results}
 
-To demonstrate our interior-probing methodology, we provide a full density distribution retrieval applied to synthetic data for two ``reference asteroids,'' which correspond to the following encounter parameter choices.
+The techniques described above were implemented in a publicly available toolset called AIME (Asteroid Interior Mapping from Encounters). To demonstrate, we provide a full density distribution retrieval applied to synthetic data for two ``reference asteroids,'' which correspond to the following encounter parameter choices.
 
 \begin{enumerate}
   \item An orbit around a spherical, non-rotating, Moonless Earth with $6$ km s$^{-1}$ excess velocity and perigee at 5 Earth radii. This orbit was chosen to roughly match that of Apophis and corresponds to an eccentricity of 3.88. 
@@ -278,7 +276,7 @@ Figure \ref{fig:example-corner} shows a corner plot of the PPDs of the ten param
 \subsection{Density distribution retrieval}
 \label{sec:results-distro}
 
-To provide an example of a density distribution extraction, we consider an asteroid with a core and ask whether our methodology can resolve the location, mass, and size of the core. Specifically, we use a spherical core of radius 300 m, placed 500 m from the center and with density 50\% greater than that of the surrounding asteroid. We use the lumpy model to extract a distribution in this section because it is designed to look for cores.
+To provide an example of a density distribution extraction, we consider an asteroid with a core and ask whether AIME can resolve the location, mass, and size of the core. Specifically, we use a spherical core of radius 300 m, placed 500 m from the center and with density 50\% greater than that of the surrounding asteroid. We use the lumpy model to extract a distribution in this section because it is designed to look for cores.
 
 Synthetic data was generated for the new asteroid and moments were extracted via the process described above. These moments were again consistent with the true moments, with a $\chi^2$ per DOF of $\chi^2_r = 1.1$, and inconsistent with the moments of a nearly-uniform asteroid of the same shape ($\chi^2_r = 2.7 \times 10^8$). The inconsistency comes almost entirely from the MOI-constraining $K_{2m}$ moments, which are sensitive to large mass distribution changes such as the presence of a core.
 
@@ -300,7 +298,7 @@ A density distribution was then extracted, shown in figure \ref{fig:den-side-by-
 \label{sec:discussion}
 In section \ref{sec:density-compare} below, we discuss the differences between the two density distribution models for many asteroids and find that the distributions and uncertainties they generate are strongly model-dependent.
 
-Given this understanding of our density extraction models, we answer the important questions of which encounters can be successfully studied by this methodology, and how observational campaigns can be designed to best take advantage of an encounter. To quantify the methodology's success, we use the median of a density uncertainty distribution $\langle \sigma_\rho / \rho \rangle$ in section \ref{sec:density-uncertainty}. But since this median is so model-dependent, we also analyze the success of the method via the density moment uncertainty $\sigma (K_{\ell m})$ (which is not moment dependent) in section \ref{sec:moment-uncertainty}. In section \ref{sec:central-body}, we study the methodology's dependence on the properties of the central body.
+Given this understanding of our density extraction models, we answer the important questions of which encounters can be successfully studied using AIME, and how observational campaigns can be designed to best take advantage of an encounter. To quantify AIME's success, we use the median of a density uncertainty distribution $\langle \sigma_\rho / \rho \rangle$ in section \ref{sec:density-uncertainty}. But since this median is so model-dependent, we also analyze the success of the method via the density moment uncertainty $\sigma (K_{\ell m})$ (which is not moment dependent) in section \ref{sec:moment-uncertainty}. In section \ref{sec:central-body}, we study AIME's dependence on the properties of the central body.
 
 \subsection{Density distribution model caveats}
 \label{sec:density-compare}
@@ -542,7 +540,7 @@ Figure \ref{fig:scan-cadence} shows that as long as $\Delta t$ is less than this
 
 In certain circumstances, spin data might not be able to be captured for a close encounter at perigee. The asteroid might dip below the horizon, or it might pass too close to the sun to be observed. The resulting gap in data is intended to be captured by the $T_\text{gap}$ parameter of figure \ref{fig:scan-observational}, which deserves to be more fully defined.
 
-We mask the perigee of the counter by removing a duration $T_\text{gap}$ of data centred on the perigee, where $T_\text{gap}$ ranges from 0 to 3 hours. To prevent lack of precision induced by lower amounts of data when $T_\text{gap}$ is large, we always cut 3 hr$-T_\text{gap}$ from the data set, half from the beginning and half from the end, so that each data set produced for all $T_\text{gap}$ has the same size. We cut around the perigee because tidal torque is the greatest at perigee, and we expect that part of the data set to be most valuable. Indeed, figure \ref{fig:scan-observational} shows that $K_{3m}$ especially are more uncertain for $T_\text{gap} \gtrsim 1.5$ hr. However, figure \ref{fig:net-uncertainty} shows that $T_\text{gap}$ never increases density uncertainty above the threshold, indicating that large amounts of data can be cut without compromising the methodology. As with the threshold for cadence discussed above, this 1.5 hr cut-off may depend on the asteroid rotational period or the orbital time scales. It likely also depends on the observational cadence used.
+We mask the perigee of the counter by removing a duration $T_\text{gap}$ of data centred on the perigee, where $T_\text{gap}$ ranges from 0 to 3 hours. To prevent lack of precision induced by lower amounts of data when $T_\text{gap}$ is large, we always cut 3 hr$-T_\text{gap}$ from the data set, half from the beginning and half from the end, so that each data set produced for all $T_\text{gap}$ has the same size. We cut around the perigee because tidal torque is the greatest at perigee, and we expect that part of the data set to be most valuable. Indeed, figure \ref{fig:scan-observational} shows that $K_{3m}$ especially are more uncertain for $T_\text{gap} \gtrsim 1.5$ hr. However, figure \ref{fig:net-uncertainty} shows that $T_\text{gap}$ never increases density uncertainty above the threshold, indicating that large amounts of data can be cut without compromising AIME. As with the threshold for cadence discussed above, this 1.5 hr cut-off may depend on the asteroid rotational period or the orbital time scales. It likely also depends on the observational cadence used.
 
 \subsubsection{Other parameters}
 
@@ -576,7 +574,7 @@ $J_{20}$ has a slightly more general definition than oblateness. If the planet h
 
 This analysis suggests that large moons such as ours can improve fit quality, but further study of this effect (e.g., investigating an encounter that approaches both the Earth and the Moon closely) is beyond the scope of this paper.
 
-Aside from oblateness, central body mass may also affect the success of this methodology. To address this possibility, we run our reference asteroid through a Jupiter encounter to analyze the differences in moment uncertainty $\sigma(K_{\ell m})$ compared to an Earth encounter. The physical parameters of the asteroid body are kept the same as the Earth encounter case, as are the observational uncertainty and cadence. The orbit is adjusted for the Jupiter case by setting a perijove distance of $r_p=5$ Jupiter radii (compared to perigee radius $r_p=5$ Earth radii for the Earth encounter). The excess velocity does not strongly affect $\sigma(K_{\ell m})$ as shown in figure \ref{fig:scan-physical}, so we keep it at the reference value.
+Aside from oblateness, central body mass may also affect the success of AIME. To address this possibility, we run our reference asteroid through a Jupiter encounter to analyze the differences in moment uncertainty $\sigma(K_{\ell m})$ compared to an Earth encounter. The physical parameters of the asteroid body are kept the same as the Earth encounter case, as are the observational uncertainty and cadence. The orbit is adjusted for the Jupiter case by setting a perijove distance of $r_p=5$ Jupiter radii (compared to perigee radius $r_p=5$ Earth radii for the Earth encounter). The excess velocity does not strongly affect $\sigma(K_{\ell m})$ as shown in figure \ref{fig:scan-physical}, so we keep it at the reference value.
 \begin{table}
   \centering
   \begin{tabular}{c|cc}
@@ -612,11 +610,11 @@ It is true that $\sigma(K_{\ell m})$ decreases with central body radius, but $A$
 
 \section{Conclusions}
 
-We develop and demonstrate a pipeline which constrains density fluctuations in an asteroid from angular velocity changes occurring during a close encounter. We find that this inversion process is most sensitive to asteroid perigee and period, specifically requiring that the encounter perigee be $\lesssim 10$ Earth radii and the period be $\gtrsim 3.3$ hours (though these thresholds depend on a number of properties of the asteroid and the observational campaign used). Asteroids that tumble strongly after the encounter are also better constrained by our methodology. Highly precise data, especially in the instantaneous rotational asteroid period, is also required in order to extract precise constraints. Due to the sensitivity of the system, we find that it is also necessary to correctly model effects that influence the system very little, such as the oblateness of the central body, in order for accurate density distributions to be extracted.
+We develop and demonstrate a methodology, AIME, which constrains density fluctuations in an asteroid from angular velocity changes occurring during a close encounter. We find that this inversion process is most sensitive to asteroid perigee and period, specifically requiring that the encounter perigee be $\lesssim 10$ Earth radii and the period be $\gtrsim 3.3$ hours (though these thresholds depend on a number of properties of the asteroid and the observational campaign used). Asteroids that tumble strongly after the encounter are also better constrained by AIME. Highly precise data, especially in the instantaneous rotational asteroid period, is also required in order to extract precise constraints. Due to the sensitivity of the system, we find that it is also necessary to correctly model effects that influence the system very little, such as the oblateness of the central body, in order for accurate density distributions to be extracted.
 
 We also find that the exact density distributions inferred are model-dependent, and their uncertainties can be dominated by model uncertainties when the degrees of freedom available to the model exceeds the number of density moments that can be precisely extracted from the data. Models which are specialized to fit for certain features (such as the lumpy model) produce less uncertain results than generalized models (such as the finite element model). To efficiently use encounter data, it is therefore important to investigate multiple models and compare results.
 
-In order to further take advantage of close asteroid encounters, improvements to our pipeline may lead to increased precision of the output. Specifically, the angular velocity data set may be lengthened to include more post-encounter data, correlations between observational uncertainties could be incorporated into the uncertainty model, and previous knowledge of some of the asteroid properties (such as moment of inertia) could be used to adjust priors on the density moments. The presence of Earth's moon or pre-encounter tumbling of the asteroid may also increase the precision of our pipeline's density distribution estimates.
+In order to further take advantage of close asteroid encounters, improvements to AIME may lead to increased precision of the output. Specifically, the angular velocity data set may be lengthened to include more post-encounter data, correlations between observational uncertainties could be incorporated into the uncertainty model, and previous knowledge of some of the asteroid properties (such as moment of inertia) could be used to adjust priors on the density moments. The presence of Earth's moon or pre-encounter tumbling of the asteroid may also increase the precision of AIME's density distribution estimates.
 
 
 \section*{Acknowledgements}
@@ -624,10 +622,9 @@ In order to further take advantage of close asteroid encounters, improvements to
 We warmly thank Emmanuel Jehin, Maxime Devogele, and Marin Ferrais for meeting with the authors to discuss this work and pointing out possible future initiatives. We also thank the anonymous reviewer for their careful reading of our paper and their comments. JTD thanks the MIT UROP office for funding his work. This paper made substantial use of MIT Supercloud's facilities.
 
 
-
 \section*{Data Availability}
 
-The asteroid simulation, fit process, and density moment extraction code are available on GitHub\footnote{\url{https://github.com/disruptiveplanets/asteroid-interior-constraints}}. Please contact JTD with questions.
+All the code used in this paper --- namely, AIME --- are available on GitHub\footnote{\url{https://github.com/disruptiveplanets/aime}}. The data showcased here was generated from that code. Please contact JTD with questions.
 
 
 

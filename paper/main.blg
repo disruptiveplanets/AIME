@@ -11,45 +11,45 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Warning--empty booktitle in Lee2022Apophis
 Warning--empty booktitle in Makarov2022ChaosOO
-You've used 37 entries,
+You've used 38 entries,
             2881 wiz_defined-function locations,
-            977 strings with 16201 characters,
-and the built_in function-call counts, 17757 in all, are:
-= -- 1414
-> -- 1327
-< -- 81
-+ -- 582
-- -- 202
-* -- 2056
-:= -- 2813
+            983 strings with 16316 characters,
+and the built_in function-call counts, 18164 in all, are:
+= -- 1452
+> -- 1350
+< -- 85
++ -- 593
+- -- 204
+* -- 2098
+:= -- 2879
 add.period$ -- 0
-call.type$ -- 37
-change.case$ -- 75
-chr.to.int$ -- 37
-cite$ -- 39
-duplicate$ -- 888
-empty$ -- 915
-format.name$ -- 314
-if$ -- 3106
+call.type$ -- 38
+change.case$ -- 77
+chr.to.int$ -- 38
+cite$ -- 40
+duplicate$ -- 909
+empty$ -- 937
+format.name$ -- 318
+if$ -- 3178
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 38
-newline$ -- 125
-num.names$ -- 256
-pop$ -- 225
+missing$ -- 39
+newline$ -- 128
+num.names$ -- 262
+pop$ -- 229
 preamble$ -- 1
-purify$ -- 148
+purify$ -- 152
 quote$ -- 0
-skip$ -- 530
+skip$ -- 544
 stack$ -- 0
-substring$ -- 984
-swap$ -- 429
-text.length$ -- 151
+substring$ -- 1012
+swap$ -- 435
+text.length$ -- 155
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 330
+type$ -- 339
 warning$ -- 2
-while$ -- 274
+while$ -- 282
 width$ -- 0
-write$ -- 377
+write$ -- 387
 (There were 4 warnings)
