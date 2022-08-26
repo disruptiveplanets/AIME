@@ -4,7 +4,9 @@
 
 This repo was created by Jack Dinsmore in June of 2021 to hold code, data, and progress reports for his research project on the effect of tidal torque on asteroids. The project was done with Professor Julien de Wit of MIT. All data referred to in the paper is either contained in this repo or can be generated via the scripts in this repo.
 
-My goal is to be able to determine asteroid shape and density distribution based on observations of a close flyby to a planet. We will assume that light curve data has revealed the rotational velocity of the asteroid as a function of time. We also usually assume that light curve analysis constrains the shape of the asteroid, although much can be learned about the asteroid without the latter assumption.
+My goal is to be able to determine asteroid shape and density distribution based on observations of a close flyby to a planet. We will assume that light curve data has revealed the rotational velocity of the asteroid as a function of time.
+
+The corresponding paper, _Constraining the Interiors of Asteroids Through Close Encounters_, was submitted to MNRAS in late July.
 
 ## File description
 - **paper/** contains the paper associated with this work.
