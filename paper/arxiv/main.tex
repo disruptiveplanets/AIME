@@ -72,7 +72,7 @@ The only properties of an asteroid's density moments that affect tidal torque in
   K_{\ell m} = \frac{a_\mathcal{A}^{2-\ell}}{I_\mathcal{A}} \int_\mathcal{A} d^3 r \rho_\mathcal{A}(\bm r) R_{\ell m}(\bm r).
   \label{eqn:klm}
 \end{equation}
-These are complex, unitless quantities. $\rho_\mathcal{A}(\bm r)$ is the asteroid density distribution and $R_{\ell m}$ are the regular solid spherical harmonics (see Supplementary Material A.4 for details). The integral is computed over the entire asteroid mass, denoted $\mathcal{A}$, and $d^3 r$ indicates the three-dimensional volume element throughout the paper. $I_\mathcal{A}$ denotes a MOI scale defined as 
+These are complex, unitless quantities. $\rho_\mathcal{A}(\bm r)$ is the asteroid density distribution and $R_{\ell m}$ are the regular solid spherical harmonics (see appendix \ref{app:eom} for details). The integral is computed over the entire asteroid mass, denoted $\mathcal{A}$, and $d^3 r$ indicates the three-dimensional volume element throughout the paper. $I_\mathcal{A}$ denotes a MOI scale defined as 
 \begin{equation}
   I_\mathcal{A} = \int_\mathcal{A} d^3 r \rho_\mathcal{A}(\bm r) r^2
   \label{eqn:ia}
@@ -94,7 +94,7 @@ The tidal torque experienced by an asteroid is
   \end{split}
   \label{eqn:tidal-torque}
 \end{equation}
-where $\bm D$ is the position of the asteroid; $\alpha$, $\beta$, and $\gamma$ are $z-y-z$ Euler angles expressing the orientation of the asteroid; $S_{\ell m}$ are the irregular solid spherical harmonics; and $\mu_\mathcal{B}$ and $a_\mathcal{B}$ are the mass and radius of the central body while $J_{\ell m}$ are the density moments of the central body. Equation \ref{eqn:tidal-torque} is derived in Supplementary Material A.4 via a novel derivation and is accurate to arbitrary order in $D$.
+where $\bm D$ is the position of the asteroid; $\alpha$, $\beta$, and $\gamma$ are $z-y-z$ Euler angles expressing the orientation of the asteroid; $S_{\ell m}$ are the irregular solid spherical harmonics; and $\mu_\mathcal{B}$ and $a_\mathcal{B}$ are the mass and radius of the central body while $J_{\ell m}$ are the density moments of the central body. Equation \ref{eqn:tidal-torque} is derived in appendix \ref{app:eom} via a novel derivation and is accurate to arbitrary order in $D$.
 
 Since it is the angular acceleration of the asteroid that is observable, rather than the torque applied, we also compute the MOI of the asteroid around the principal axes: 
 \begin{equation}
@@ -105,9 +105,9 @@ Since it is the angular acceleration of the asteroid that is observable, rather 
   \end{split}
   \label{eqn:moi}
 \end{equation}
-Note that all moments of inertia are proportional to $I_\mathcal{A}$. Equation \ref{eqn:tidal-torque} indicated that tidal torque was also proportional to $I_\mathcal{A}$. The Euler equations, giving angular acceleration in terms of moment of inertia and torque (Supplementary Material equation A.14), show that the angular acceleration of the asteroid is therefore independent $I_\mathcal{A}$. Thus, the observables do not depend explicitly on $I_\mathcal{A}$.
+Note that all moments of inertia are proportional to $I_\mathcal{A}$. Equation \ref{eqn:tidal-torque} indicated that tidal torque was also proportional to $I_\mathcal{A}$. The Euler equations, giving angular acceleration in terms of moment of inertia and torque (equation \ref{eqn:omega-eom}), show that the angular acceleration of the asteroid is therefore independent $I_\mathcal{A}$. Thus, the observables do not depend explicitly on $I_\mathcal{A}$.
 
-Throughout the paper, we refer to the ``inertial frame'' (the frame in which the orbit is fixed) and the ``body-fixed frame'' (the frame in which the asteroid is fixed and in which $K_{\ell m}$, $I_\mathcal{A}$, and $a_\mathcal{A}$ are computed), which are also defined in Supplementary Material A.4.
+Throughout the paper, we refer to the ``inertial frame'' (the frame in which the orbit is fixed) and the ``body-fixed frame'' (the frame in which the asteroid is fixed and in which $K_{\ell m}$, $I_\mathcal{A}$, and $a_\mathcal{A}$ are computed), which are also defined in appendix \ref{app:eom}.
 
 \subsection{Simulation design}
 \label{sec:sim}
@@ -116,7 +116,7 @@ We built a simulation of an asteroid's rotational state during a close encounter
 
 We begin our simulation at $D = 10 r_p$. Since the leading order of equation \ref{eqn:tidal-torque} yields $\tau \propto D^{-3}$, this corresponds roughly to a torque of $10^{-3}$ times the maximum torque at perigee. Unless otherwise indicated, the simulation is terminated at $D=10 r_p$ as well. With the simulation inputs specified, the equations of motion are integrated via the Runge-Kutta fourth order method, with a variable time step, manually chosen to limit integration error to only $\sim 100$ times the floating point numerical error.
 
-We extract angular velocity from this simulation assuming that angular velocity is observable. If orientation data is more readily available instead, the same simulation may be used to generate orientation data. Supplementary Material C describes the consequences of this change, which are relatively small.
+We extract angular velocity from this simulation assuming that angular velocity is observable. If orientation data is more readily available instead, the same simulation may be used to generate orientation data. Appendix \ref{app:orientation} describes the consequences of this change, which are relatively small.
 
 
 
@@ -168,7 +168,7 @@ This model was chosen because it separates spin pole and period uncertainty. The
 
 \subsection{Extracting density moments from spin data}
 \label{sec:fit}
-Given synthetic data, an Affine Invariant MCMC Ensemble sampler was used to generate Posterior Probability Distributions (PPDs) from flat priors. We use the Python implementation \texttt{emcee} \citep{foreman2013emcee}. Our parameters were $\gamma_0$, $K_{20}$, $K_{22}$, and $K_{3m}$ (10 in total), bounded by $|\gamma_0| < \pi/4$, and the $K_{2 m}$ bounds given in Supplementary Material equation A.5. Computing $K_{3m}$ for many positive density distributions revealed a $|K_{3m}| \lesssim 0.01$ typically, so we use more conservative bounds on $K_{3 m}$ of $|K_{3 m}| < 1$. In general, spin data is most sensitive to $\gamma_0$ and $K_{2m}$, which we call the ``first-order parameters.'' We call $K_{3m}$ the ``second-order parameters.''
+Given synthetic data, an Affine Invariant MCMC Ensemble sampler was used to generate Posterior Probability Distributions (PPDs) from flat priors. We use the Python implementation \texttt{emcee} \citep{foreman2013emcee}. Our parameters were $\gamma_0$, $K_{20}$, $K_{22}$, and $K_{3m}$ (10 in total), bounded by $|\gamma_0| < \pi/4$, and the $K_{2 m}$ bounds given in equation \ref{eqn:parameter-bounds}. Computing $K_{3m}$ for many positive density distributions revealed a $|K_{3m}| \lesssim 0.01$ typically, so we use more conservative bounds on $K_{3 m}$ of $|K_{3 m}| < 1$. In general, spin data is most sensitive to $\gamma_0$ and $K_{2m}$, which we call the ``first-order parameters.'' We call $K_{3m}$ the ``second-order parameters.''
 
 The MCMC was determined to converge when the fractional change in autocorrelation time (computed every 100 iterations) was one percent, and the number of iterations already computed was more than 100 times the autocorrelation time. The MCMC fit also was set to terminate if more than $10^5$ iterations were run, but this only occurred for fits computed for asteroid encounters in which degeneracies were present, for example when the asteroid has rotational symmetry. About $10^4$ iterations was often sufficient.
 
@@ -180,7 +180,7 @@ To further ensure convergence, we first minimized with respect to data truncated
 \subsection{Density distribution constraints}
 \label{sec:density-distro}
 
-The asteroid density distribution $\rho_\mathcal{A}(\bm r)$ is not uniquely determined via the density moments. For example, the mass of the asteroid is unconstrained so $\rho_\mathcal{A}(\bm r)$ cannot be determined on an absolute scale. However, by making sufficient assumptions about the density distribution, we can nevertheless measure fluctuations in $\rho_\mathcal{A}(\bm r)$ across the asteroid from $K_{\ell m}$. To best understand the density distribution of an asteroid, an ensemble of models with differing assumptions is desired, so that common traits across the models can be identified. To this end, we outline two possible models here and discuss two more in Supplementary Material C.
+The asteroid density distribution $\rho_\mathcal{A}(\bm r)$ is not uniquely determined via the density moments. For example, the mass of the asteroid is unconstrained so $\rho_\mathcal{A}(\bm r)$ cannot be determined on an absolute scale. However, by making sufficient assumptions about the density distribution, we can nevertheless measure fluctuations in $\rho_\mathcal{A}(\bm r)$ across the asteroid from $K_{\ell m}$. To best understand the density distribution of an asteroid, an ensemble of models with differing assumptions is desired, so that common traits across the models can be identified. To this end, we outline two possible models here and discuss two more in appendix \ref{app:more-models}.
 
 We assume that the asteroid's surface is known in the inertial frame from radar data. Since the asteroid tumbles during the encounter, we also assume that the center of mass of the asteroid is known in the inertial frame. The density moments are extracted from flyby data, but these are known instead in the body-fixed frame.
 
@@ -189,7 +189,7 @@ To compare the asteroid surface and extracted density moments in the same coordi
   K_{\ell m}^\mathrm{hybrid} = e^{-im\gamma_0}K_{\ell m}^\mathrm{body-fixed}.
   \label{eqn:body-fixed-to-hybrid}
 \end{equation}
-Thus, values and  uncertainties on $K_{\ell m}^\mathrm{body-fixed}$ and $\gamma_0$ (obtained from the encounter data) can be translated into values and uncertainties on $K_{\ell m}^\mathrm{hybrid}$. The surface model can be rotated from the inertial frame to the hybrid frame so that both the surface and $K_{\ell m}$ are now in the same frame and are comparable. Henceforth, we will operate only in the hybrid frame and suppress the label.
+by equation \ref{eqn:ylm-rotation}. Thus, values and  uncertainties on $K_{\ell m}^\mathrm{body-fixed}$ and $\gamma_0$ (obtained from the encounter data) can be translated into values and uncertainties on $K_{\ell m}^\mathrm{hybrid}$. The surface model can be rotated from the inertial frame to the hybrid frame so that both the surface and $K_{\ell m}$ are now in the same frame and are comparable. Henceforth, we will operate only in the hybrid frame and suppress the label.
 
 When $K_{3m}$ are extracted, 12 moments are constrained (excluding the trivial $K_{00}$ and $K_{1m}$, which govern the center of mass). In cases where $\gamma_0$ is known very accurately such that the uncertainty increase imposed by equation \ref{eqn:body-fixed-to-hybrid} is very small, it is numerically favourable to treat $\Im K_{22}$ and $K_{21}$ as fixed, just as $\Im K_{22}^\text{body-fixed}$ and $K_{21}^\text{body-fixed}$ are fixed. In this case, there are nine constrained moments. Since $\gamma_0$ is precisely known for all cases studied in this paper, we will always study this case.
 
@@ -245,7 +245,7 @@ The techniques described above were implemented in a publicly available toolset 
   \item An initial roll of $\gamma_0=\pi/8$.
   \item A cadence of 2 minutes and observational uncertainty of $\sigma_\theta = 10^{-2}$ and $\sigma_P / P = 10^{-7}$.
   \item A rotational period of 9 hours, with the initial angular velocity vector distributed between the $\unit X$, $\unit Y$, and $\unit Z$ axes in a $1:2:-2$ ratio.
-  \item An asteroid with radius $a_\mathcal{A} = 1$ km and $K_{3m}=0$. For $K_{22}$ and $K_{20}$, we use two standard values: one with $(K_{22}, K_{20}) = (0, -0.097)$ and one with $(0.052, -0.202)$. Including the third point obtained by reflection $K_{22}\rightarrow -K_{22}$ (a 90$^\circ$ rotation), these are the three points that minimize the mean distance between an arbitrary point in the allowed parameter space (Supplementary Material equation A.5) and these reference values. The first point is called the symmetric case because the corresponding uniform-density-ellipsoid model is rotationally symmetric around $\unit z$. The second case is called the asymmetric case. The asymmetric case has $a=1140$ m, $b=1839$ m, and $c=565$ m, while the symmetric case has $a=b=1411$ m and $c=1008$ m.
+  \item An asteroid with radius $a_\mathcal{A} = 1$ km and $K_{3m}=0$. For $K_{22}$ and $K_{20}$, we use two standard values: one with $(K_{22}, K_{20}) = (0, -0.097)$ and one with $(0.052, -0.202)$. Including the third point obtained by reflection $K_{22}\rightarrow -K_{22}$ (a 90$^\circ$ rotation), these are the three points that minimize the mean distance between an arbitrary point in the allowed parameter space (equation \ref{eqn:parameter-bounds}) and these reference values. The first point is called the symmetric case because the corresponding uniform-density-ellipsoid model is rotationally symmetric around $\unit z$. The second case is called the asymmetric case. The asymmetric case has $a=1140$ m, $b=1839$ m, and $c=565$ m, while the symmetric case has $a=b=1411$ m and $c=1008$ m.
 \end{enumerate}
 
 In the following sections, we first introduce the retrieval capabilities regarding density moments, then we turn to an example of a retrieval of the density distribution from the moments. For both stages of information retrieval, we find that the results are consistent with the synthetic data and the true asteroid interior.
@@ -504,7 +504,7 @@ In figure \ref{fig:scan-period}, we show $\sigma(K_{\ell m})$ as a function of i
 
 We expect that fast rotators would not tumble post-encounter for the following reason, For small $P_\omega$, all the dynamical variables vary much more slowly than the orientation $\gamma$. Approximating each variable as constant over one full rotation of $\gamma$, the integral of the first-order contribution of $\bm \tau$ over $\gamma \in (0, 2\pi)$ gives no secular first-order torque to force the asteroid to tumble. However, this effect does not apply to the second-order parameters, since the integral over the second-order term of $\bm \tau$ does not vanish, as seen in the figure. An asteroid with large $K_{3m}$ moments might therefore be yield better uncertainties at these low rotational periods (e.g., a non-uniform or non-elliptical asteroid).
 
-The tidal torque experienced by the asteroid is also affected by the initial direction of asteroid spin $\bm \Omega_0$ both because spin sets the initial asteroid orientation up to $\gamma_0$ and because of the spin-dependence of the rotational equations of motion (Supplementary Material equation A.14).
+The tidal torque experienced by the asteroid is also affected by the initial direction of asteroid spin $\bm \Omega_0$ both because spin sets the initial asteroid orientation up to $\gamma_0$ and because of the spin-dependence of the rotational equations of motion (equation \ref{eqn:omega-eom}).
 
 \begin{figure*}
   \centering
@@ -553,7 +553,7 @@ Moment uncertainty is also affected by $\gamma_0$. We measured the moment uncert
 
 In all the above studies, we assumed a spherical planet ($J_{\ell m} = 0$ for $\ell \geq 1$). $J_{1m} = 0$ is enforced by the coordinate definitions, so the effect of central body non-sphericity is limited to the $J_{2m}$ terms and damped by a factor of $(a_\mathcal{B} / D)^2$. We expect these parameters to have small effect on the asteroid behaviour.
 
-Here, we define oblateness as $\epsilon = (I_z - I_x)/(\mu_\mathcal{B} R_\mathcal{B}^2)$, where $I_{x,y,z}$ are the central body moments of inertia along the principal axes, and $I_x = I_y$. $R_\mathcal{B}$ is the true radius of the body (not $a_\mathcal{B}$ from equation \ref{eqn:aa}). For an equatorial orbit, $\epsilon$ and the central body density moments (Supplementary Material equation A.3) are related by $J_{\ell m}$ as $\epsilon = -10J_{20}/3$ and $J_{22} = 0$. Since an oblate ellipsoid is mirror-symmetric around all three axes, $J_{3m}$ are all zero. The next order of tidal torque is therefore $J_{4m}$, damped by an additional $(a_\mathcal{B}/D)^2$ factor, and non-ellipsoid corrections to the central body shape. We do not consider these extra terms.
+Here, we define oblateness as $\epsilon = (I_z - I_x)/(\mu_\mathcal{B} R_\mathcal{B}^2)$, where $I_{x,y,z}$ are the central body moments of inertia along the principal axes, and $I_x = I_y$. $R_\mathcal{B}$ is the true radius of the body (not $a_\mathcal{B}$ from equation \ref{eqn:aa}). For an equatorial orbit, $\epsilon$ and the central body density moments (equation \ref{eqn:jlm}) are related by $J_{\ell m}$ as $\epsilon = -10J_{20}/3$ and $J_{22} = 0$. Since an oblate ellipsoid is mirror-symmetric around all three axes, $J_{3m}$ are all zero. The next order of tidal torque is therefore $J_{4m}$, damped by an additional $(a_\mathcal{B}/D)^2$ factor, and non-ellipsoid corrections to the central body shape. We do not consider these extra terms.
 
 \begin{figure}
   \centering
@@ -628,6 +628,9 @@ All the code used in this paper --- namely, AIME --- are available on GitHub\foo
 
 \bibliographystyle{mnras}
 \bibliography{asteroids.bib}
+
+
+% \input{appendices}
 
 
 \bsp

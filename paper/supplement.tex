@@ -21,17 +21,24 @@
 \newcommand{\parens}[1]{\left( #1 \right)}
 \newcommand{\brackets}[1]{\left[ #1 \right]}
 \newcommand{\quat}[1]{\widetilde{\bm{#1}}}
-\setlength{\columnsep}{2em}
+\setlength{\columnsep}{2.3em}
 \renewcommand\floatpagefraction{.55}
 
-\titleformat{\section}
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+\renewcommand{\thesection}{\Alph{section}}
+\numberwithin{equation}{section}
+
+
+\titleformat{\section}[block]
   {\normalsize\bfseries}
-  {\thesection}
+  {APPENDIX \thesection:}
   {.5em}
   {\MakeUppercase}
+  
 \titleformat*{\subsection}{\normalsize\bfseries}
 
-\title{Constraining the Interiors of Asteroids Through Close Encounters: Appendices}
+\title{\Huge Constraining the Interiors of Asteroids Through Close Encounters: Appendices}
 
 \author[1]{Jack T. Dinsmore}
 \author[2]{Julien de Wit}
@@ -95,20 +102,20 @@ The un-normalized spherical harmonics are defined as $Y_{\ell m}(\theta, \phi) =
     R_{\ell m} (\bm r) &= (-1)^m \frac{r^\ell}{(\ell + m)!} Y_{\ell m}(\unit r).
   \end{split}
 \end{equation}
-These spherical harmonics obey many useful identities summarized in \cite{Gelderen1998TheSO}, which are also useful for quantum mechanics. They were used to define the density moments in equation \ref{eqn:klm}, which can be extended to the central body:
+These spherical harmonics obey many useful identities summarized in \cite{Gelderen1998TheSO}, which are also useful for quantum mechanics. They were used to define the density moments in equation 1, which can be extended to the central body:
 \begin{equation}
   \begin{split}
     &J_{\ell m} = \frac{a_\mathcal{B}^{2-\ell}}{I_\mathcal{B}} \int_\mathcal{B} d^3 r \rho_\mathcal{B}(\bm r) R_{\ell m}(\bm r)\\
   \end{split}
   \label{eqn:jlm}
 \end{equation}
-By contrast, $J_{\ell m}$ should be computed in the inertial frame. The length scale $a_\mathcal{B}$ and MOI scale $I_\mathcal{B}$ can be defined similarly to $a_\mathcal{A}$ and $a_\mathcal{B}$ in equations \ref{eqn:aa} and \ref{eqn:ia}, but they could also be set to any other scales of the same units, e.g. $a_\mathcal{B}$ equal to the central body radius and $I_\mathcal{B} = \mu_\mathcal{B}a_\mathcal{B}^2$, where $\mu_\mathcal{B}$ is the central body mass.
+By contrast, $J_{\ell m}$ should be computed in the inertial frame. The length scale $a_\mathcal{B}$ and MOI scale $I_\mathcal{B}$ can be defined similarly to $a_\mathcal{A}$ and $a_\mathcal{B}$ in equations 3 and 2, but they could also be set to any other scales of the same units, e.g. $a_\mathcal{B}$ equal to the central body radius and $I_\mathcal{B} = \mu_\mathcal{B}a_\mathcal{B}^2$, where $\mu_\mathcal{B}$ is the central body mass.
 
 Note that both $J_{\ell m}$ and $K_{\ell m}$ are unitless. We call them ``moments'' because $R_{\ell m}(\bm r)$ contains an $r^\ell$ dependence so that $K_{\ell m}$ is the $\ell$th density moment of the asteroid.
 
-These moments share several key properties which we discuss before continuing. Firstly, for real mass density, properties of the spherical harmonics imply that $K_{\ell m} = (-1)^m K_{\ell, -m}^*$. Therefore, the set of $K_{\ell m}$ for $\ell < \ell_\text{max}$ contains $\ell_\text{max}^2$ degrees of freedom. However, some of these degrees of freedom are redundant with the choice of coordinates: $K_{1m} = 0$ since the body-fixed frame is centred on the asteroid centre of mass. Further calculation reveals that the alignment of the body-fixed frame with the asteroid principal axes also forces $K_{21}= 0$ and $\Im K_{22}=0$. The only physical density moments for $\ell \leq 2$ are therefore $K_{22}$, $K_{20}$, and $K_{00}$. The first two are related to the MOI around each principal axis by equation \ref{eqn:moi}, while $K_{00} = \mu_\mathcal{A} a_\mathcal{A}^2 / I_\mathcal{A}$ will not be relevant to this study as it does not appear in equation \ref{eqn:tidal-torque}. 
+These moments share several key properties which we discuss before continuing. Firstly, for real mass density, properties of the spherical harmonics imply that $K_{\ell m} = (-1)^m K_{\ell, -m}^*$. Therefore, the set of $K_{\ell m}$ for $\ell < \ell_\text{max}$ contains $\ell_\text{max}^2$ degrees of freedom. However, some of these degrees of freedom are redundant with the choice of coordinates: $K_{1m} = 0$ since the body-fixed frame is centred on the asteroid centre of mass. Further calculation reveals that the alignment of the body-fixed frame with the asteroid principal axes also forces $K_{21}= 0$ and $\Im K_{22}=0$. The only physical density moments for $\ell \leq 2$ are therefore $K_{22}$, $K_{20}$, and $K_{00}$. The first two are related to the MOI around each principal axis by equation 5, while $K_{00} = \mu_\mathcal{A} a_\mathcal{A}^2 / I_\mathcal{A}$ will not be relevant to this study as it does not appear in equation 4. 
 
-The physical meaning of $K_{22}$ and $K_{20}$ can also be interpreted via a special case: if the asteroid is a uniform-density triaxial ellipsoid, the moments of inertia are simple to compute in terms of the semi-axis lengths and can be compared to those found in equation \ref{eqn:moi}. This yields semi-axis lengths of 
+The physical meaning of $K_{22}$ and $K_{20}$ can also be interpreted via a special case: if the asteroid is a uniform-density triaxial ellipsoid, the moments of inertia are simple to compute in terms of the semi-axis lengths and can be compared to those found in equation 5. This yields semi-axis lengths of 
 \begin{equation}
   \begin{split}
   a &= \sqrt{\frac{5}{3}}a_\mathcal{A}\sqrt{1-2K_{20}+12K_{22}}\\
@@ -147,7 +154,7 @@ An analytical constraint on $K_{3m}$ based on this property is more difficult to
 \subsection{Tidal torque}
 \label{sec:tidal-torque}
 
-Derivations for the tidal torque experienced by a rigid body in the gravitational field of a larger mass have been computed by several previous studies \cite{paul88,HouMar2017,BOUE2009750, ashenberg07}, often in terms of the MOI of the rigid body (or higher order moments of inertia), and to varying degrees of precision. A simple, first-order derivation is also easily computable in terms of the asteroid MOI in the inertial frame.
+Derivations for the tidal torque experienced by a rigid body in the gravitational field of a larger mass have been computed by several previous studies (\cite{paul88,HouMar2017,BOUE2009750, ashenberg07}), often in terms of the MOI of the rigid body (or higher order moments of inertia), and to varying degrees of precision. A simple, first-order derivation is also easily computable in terms of the asteroid MOI in the inertial frame.
 
 Here, we present a new derivation of the tidal torque to arbitrary orders in terms of the density moments of an asteroid defined in section \ref{sec:moments}. These density moments can be pre-computed and do not have to be re-evaluated every time-step.
 
@@ -163,7 +170,7 @@ where $\rho_\mathcal{B}$ is the density distribution of the central body and $\m
 \end{equation}
 where the sum is shorthand for $\sum_{\ell, m} = \sum_{\ell = 0}^\infty \sum_{m=-\ell}^\ell$.
 
-Incidentally, it is the $|\bm R| < |\bm R'|$ assumption that inspires the assumption that there are ``no \textit{distant} perturbing objects'' (section \ref{sec:methods}). If a perturbing object such as a moon is not distant (i.e., it is closer to the system center of mass than the asteroid perigee so that $|\bm R| < |\bm R'|$ always), then it can be absorbed into $J_{\ell m}$ by equation \ref{eqn:jlm} and the assumptions of this derivation are not violated.
+Incidentally, it is the $|\bm R| < |\bm R'|$ assumption that inspires the assumption that there are ``no \textit{distant} perturbing objects'' (section 2). If a perturbing object such as a moon is not distant (i.e., it is closer to the system center of mass than the asteroid perigee so that $|\bm R| < |\bm R'|$ always), then it can be absorbed into $J_{\ell m}$ by equation \ref{eqn:jlm} and the assumptions of this derivation are not violated.
 
 We are interested in translating the potential energy of equation \ref{eqn:first-pe} to the body-fixed frame. To do this, we let $\bm{R'} = \bm D + \bm U$, where $\bm D$ is the location of the asteroid in the inertial frame. We further define $\bm U = M\bm u$, where $\bm u$ is in the body-fixed frame and $M$ is the rotation matrix given by the Euler angles $\alpha$, $\beta$, and $\gamma$ (see section \ref{sec:coordinates}). The translation from $\bm {R'}$ to $\bm U$ is then attained by the identity 
 \begin{equation}
@@ -194,7 +201,7 @@ where $\rho_\mathcal{A}$ is the density distribution of the asteroid and $\mathc
   & +2im\unit z R_{\ell m}(\bm u)\Big],
   \end{split}
 \end{equation}
-tidal torque can now be expressed as a function only of the constants $J_{\ell m}$, $K_{\ell m}$, $a_\mathcal{A/B}$, $I_\mathcal{A/B}$, and the asteroid orientation and position (equation \ref{eqn:tidal-torque}). Some $K_{\ell m}$ terms are written in this equation with $|m|>\ell$; these should all be taken to be zero.
+tidal torque can now be expressed as a function only of the constants $J_{\ell m}$, $K_{\ell m}$, $a_\mathcal{A/B}$, $I_\mathcal{A/B}$, and the asteroid orientation and position (equation 4). Some $K_{\ell m}$ terms are written in this equation with $|m|>\ell$; these should all be taken to be zero.
 
 \subsection{Equations of motion}
 \label{sec:eom}
@@ -219,20 +226,20 @@ for angular velocity $\bm \omega$ given in the body-fixed frame. The equations o
   \end{split}
   \label{eqn:omega-eom}
 \end{equation}
-Equations \ref{eqn:tidal-torque}, \ref{eqn:moi}, \ref{eqn:pos-eom}, and \ref{eqn:omega-eom} form a set of non-linear, first-order coupled differential equations in which can be numerically integrated. They are expressed in terms of the physical parameters $I_\mathcal{A/B}$, $a_\mathcal{A/B}$, $J_{\ell m}$, and $K_{\ell m}$ which are constant if the asteroid is rigid and the central body does not rotate.
+Equations 4, 5, \ref{eqn:pos-eom}, and \ref{eqn:omega-eom} form a set of non-linear, first-order coupled differential equations in which can be numerically integrated. They are expressed in terms of the physical parameters $I_\mathcal{A/B}$, $a_\mathcal{A/B}$, $J_{\ell m}$, and $K_{\ell m}$ which are constant if the asteroid is rigid and the central body does not rotate.
 
 
 
 
 
 
-\section{Comparing orientation and angular velocity data}
+\section{Comparing orientation \& angular velocity data}
 \label{app:orientation}
 
 To extract the density distribution of an asteroid, the main text assumes that the angular velocity data of the asteroid is observable. It is possible that the orientation of the asteroid may be more readily available as a data set, notably if a large collection of radar antenna fail to follow the encounter sufficiently. In this appendix, we generate an orientation data set for the reference asteroid flyby, extract density moments from it, and compare the results to moments extracted from angular velocity data.
 
 \subsection{Uncertainty model}
-To use an asteroid orientation data set rather than angular velocity, we must create an uncertainty model for orientation observations and produce a likelihood to be used by the MCMC (replacing equation \ref{eqn:log-likelihood}).
+To use an asteroid orientation data set rather than angular velocity, we must create an uncertainty model for orientation observations and produce a likelihood to be used by the MCMC (replacing equation 7).
 
 For the sake of this appendix, we will assume that all observations of orientation $\quat q$ differ from the true orientation $\quat q^*$ by a rotation by some angle $\phi$ around an axis drawn from a uniform distribution on the unit sphere, where $\phi$ is drawn from a normal distribution with mean zero and standard deviation $\sigma_\phi$. As in the rest of the paper, orientation is expressed as a quaternion $\quat q = q_r + q_i \bm i + q_j \bm j + q_k \bm k$. The angle $\phi$ can be extracted from these quaternion components to yield a likelihood of
 \begin{equation}
@@ -263,7 +270,7 @@ A smaller effect observed in figure \ref{fig:orientation-unc} is that the orient
 \section{Additional density distribution models}
 \label{app:more-models}
 
-Two models were discussed in section \ref{sec:density-distro} to translate density moment constraints into density distribution constraints. Here we outline two additional models which are less conventional but still useable for extracting density distribution properties. Unlike the finite element and lumpy models discussed in the main text, these models will yield smooth distributions with no discrete transitions.
+Two models were discussed in section 2.4 to translate density moment constraints into density distribution constraints. Here we outline two additional models which are less conventional but still useable for extracting density distribution properties. Unlike the finite element and lumpy models discussed in the main text, these models will yield smooth distributions with no discrete transitions.
 
 \subsection{Nearly-uniform model}
 In this ``nearly-uniform'' model, we pick one density distribution from the many distributions consistent with the data by maximizing a prior distribution $f[\rho(\bm r)]$. Any prior distribution can be chosen, but the following prior is both interesting and numerically efficient.
@@ -298,7 +305,7 @@ where the components of constant matrix $M$ and constant vector $\bm C$ are know
 \end{equation}
 where $M^\dagger$ is the hermitian conjugate of $M$.
 
-The prior distribution on $\rho(\bm r)$ discussed in section \ref{sec:fit} can be implemented by individually checking the components $\bm \delta$ computed by equation \ref{eqn:nu-delta} and confirming that $1 + \delta_i$ lies within the acceptable range of densities.
+The prior distribution on $\rho(\bm r)$ discussed in section 2.3 can be implemented by individually checking the components $\bm \delta$ computed by equation \ref{eqn:nu-delta} and confirming that $1 + \delta_i$ lies within the acceptable range of densities.
 
 
 \subsection{Harmonic model}
@@ -321,6 +328,6 @@ Since the integrals are independent of the parameters, they can be computed befo
 
 $C_{\ell m}$ can be treated as parameters for a fitting method (such as an MCMC) that enforces our bounds on $\rho(\bm r)$. With the integrals pre-computed, obtaining $K_{\ell m}$ from $C_{\ell m}$ is fast. We impose these bounds by acknowledging that harmonic functions such as $\rho(\bm r)$ in a region such as $\mathcal{A}$ attain their maxima on the boundary of the region, so that it is only necessary to ensure that $\rho$ lies within the allowed range on the asteroid boundary rather than within the entire asteroid. This can be done by parametrizing the asteroid surface as a function of two variables (e.g., latitude and longitude) and minimizing and maximizing $\rho$ with respect to those variables, ensuring these minima and maxima are within the allowed range.
 
-\printbibliography
+% \printbibliography
 
 \end{document}
