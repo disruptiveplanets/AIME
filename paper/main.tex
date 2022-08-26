@@ -9,18 +9,15 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{xcolor}
+% \usepackage{xcolor}
 \usepackage{tikz}
-\usepackage{colortbl}
-\usepackage{dsfont}
-\usepackage{siunitx}
 \usepackage{bm}
 \usepackage{caption}
-\usepackage{subcaption}
+% \usepackage{subcaption}
 \usepackage{graphbox}
 \usetikzlibrary{arrows.meta}
 
-\renewcommand{\unit}[1]{\bm{\hat{#1}}}
+\newcommand{\unit}[1]{\bm{\hat{#1}}}
 \newcommand{\parens}[1]{\left( #1 \right)}
 \newcommand{\brackets}[1]{\left[ #1 \right]}
 \newcommand{\quat}[1]{\widetilde{\bm{#1}}}
@@ -340,7 +337,7 @@ To study the output of the density distribution models, we begin by executing th
   \includegraphics[align=c, width=0.24\linewidth]{figs/sym-l-u}\hfill
   \includegraphics[align=c, width=0.24\linewidth]{figs/sym-l-r}
 
-  \caption{Cross-sectional slices of the density distributions extracted via the finite element model for the asymmetric (\textit{top two rows}) and symmetric (\textit{bottom two rows}) uniform-density reference asteroids. The finite element model (\textit{first and third rows}) and the lumpy model (\textit{second and fourth rows}) are employed. From left to right, the densities (divided by the average density), deviations from the true density, uncertainties, and significance of the deviations are plotted. These figures are available in animated form in the Supplemental Data. Extracted densities are generally within 10\% of the truth.}
+  \caption{Cross-sectional slices of the density distributions extracted via the finite element model for the asymmetric (\textit{top two rows}) and symmetric (\textit{bottom two rows}) uniform-density reference asteroids. The finite element model (\textit{first and third rows}) and the lumpy model (\textit{second and fourth rows}) are employed. From left to right, the densities (divided by the average density), deviations from the true density, uncertainties, and significance of the deviations are plotted. These figures are available in animated form in the Supplementary Material. Extracted densities are generally within 10\% of the truth.}
   \label{fig:den-uniform}
 \end{figure*}
 
@@ -630,7 +627,7 @@ We warmly thank Emmanuel Jehin, Maxime Devogele, and Marin Ferrais for meeting w
 
 \section*{Data Availability}
 
-The asteroid simulation, fit process, and density moment extraction code are available on \href{https://github.com/jack-dinsmore/asteroid-tidal-torque}{GitHub}. Please contact JTD with questions.
+The asteroid simulation, fit process, and density moment extraction code are available on GitHub\footnote{\url{https://github.com/disruptiveplanets/asteroid-interior-constraints}}. Please contact JTD with questions.
 
 
 

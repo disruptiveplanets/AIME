@@ -1,0 +1,262 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+  \entry{ashenberg07}{article}{}
+    \name{author}{1}{}{%
+      {{hash=AJ}{%
+         family={Ashenberg},
+         familyi={A\bibinitperiod},
+         given={Joshua},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{AJ1}
+    \strng{fullhash}{AJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2007}
+    \field{labeldatesource}{}
+    \field{sortinit}{A}
+    \field{sortinithash}{A}
+    \verb{doi}
+    \verb 10.1007/s10569-007-9092-7
+    \endverb
+    \field{pages}{149\bibrangedash 159}
+    \field{title}{Mutual gravitational potential and torque of solid bodies via
+  inertia integrals}
+    \field{volume}{99}
+    \field{journaltitle}{Celestial Mechanics and Dynamical Astronomy}
+    \field{month}{10}
+    \field{year}{2007}
+  \endentry
+
+  \entry{BOUE2009750}{article}{}
+    \name{author}{2}{}{%
+      {{hash=BG}{%
+         family={Boué},
+         familyi={B\bibinitperiod},
+         given={Gwenaël},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=LJ}{%
+         family={Laskar},
+         familyi={L\bibinitperiod},
+         given={Jacques},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \keyw{Celestial mechanics, Asteroids, Asteroids, Rotational dynamics,
+  Satellites of asteroids}
+    \strng{namehash}{BGLJ1}
+    \strng{fullhash}{BGLJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2009}
+    \field{labeldatesource}{}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{abstract}{%
+    We consider the solid–solid interactions in the two body problem. The
+  relative equilibria have been previously studied analytically and general
+  motions were numerically analyzed using some expansion of the gravitational
+  potential up to the second order, but only when there are no direct
+  interactions between the orientation of the bodies. Here we expand the
+  potential up to the fourth order and we show that the secular problem
+  obtained after averaging over fast angles, as for the precession model of
+  Boué and Laskar [Boué, G., Laskar, J., 2006. Icarus 185, 312–330], is
+  integrable, but not trivially. We describe the general features of the
+  motions and we provide explicit analytical approximations for the solutions.
+  We demonstrate that the general solution of the secular system can be
+  decomposed as a uniform precession around the total angular momentum and a
+  periodic symmetric orbit in the precessing frame. More generally, we show
+  that for a general n-body system of rigid bodies in gravitational
+  interaction, the regular quasiperiodic solutions can be decomposed into a
+  uniform precession around the total angular momentum, and a quasiperiodic
+  motion with one frequency less in the precessing frame.%
+    }
+    \verb{doi}
+    \verb https://doi.org/10.1016/j.icarus.2009.02.001
+    \endverb
+    \field{issn}{0019-1035}
+    \field{number}{2}
+    \field{pages}{750\bibrangedash 767}
+    \field{title}{Spin axis evolution of two interacting bodies}
+    \verb{url}
+    \verb https://www.sciencedirect.com/science/article/pii/S0019103509000384
+    \endverb
+    \field{volume}{201}
+    \field{journaltitle}{Icarus}
+    \field{year}{2009}
+  \endentry
+
+  \entry{Gelderen1998TheSO}{inproceedings}{}
+    \name{author}{1}{}{%
+      {{hash=vGM}{%
+         prefix={van},
+         prefixi={v\bibinitperiod},
+         family={Gelderen},
+         familyi={G\bibinitperiod},
+         given={Martin},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{GMv1}
+    \strng{fullhash}{GMv1}
+    \field{labelnamesource}{author}
+    \field{labelyear}{1998}
+    \field{labeldatesource}{}
+    \field{sortinit}{G}
+    \field{sortinithash}{G}
+    \field{booktitle}{The shift operators and translations of spherical
+  harmonics}
+    \field{year}{1998}
+  \endentry
+
+  \entry{HouMar2017}{article}{}
+    \name{author}{3}{}{%
+      {{hash=HX}{%
+         family={Hou},
+         familyi={H\bibinitperiod},
+         given={Xiyun},
+         giveni={X\bibinitperiod},
+      }}%
+      {{hash=SDJ}{%
+         family={Scheeres},
+         familyi={S\bibinitperiod},
+         given={Daniel\bibnamedelima J.},
+         giveni={D\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=XX}{%
+         family={Xin},
+         familyi={X\bibinitperiod},
+         given={Xiaosheng},
+         giveni={X\bibinitperiod},
+      }}%
+    }
+    \list{language}{1}{%
+      {English}%
+    }
+    \list{publisher}{1}{%
+      {Springer Nature B.V.}%
+    }
+    \keyw{Astronomy; Full two rigid body problem; Binary systems; Spin-orbit
+  coupling; Numerical simulations; Stability; Astrophysics; Orbits; Algorithms;
+  Numerical analysis}
+    \strng{namehash}{HXSDJXX1}
+    \strng{fullhash}{HXSDJXX1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{Mar 2017}
+    \field{labeldatesource}{}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \field{abstract}{%
+    Formulae to compute the mutual potential, force, and torque between two
+  rigid bodies are given. These formulae are expressed in Cartesian coordinates
+  using inertia integrals. They are valid for rigid bodies with arbitrary
+  shapes and mass distributions. By using recursive relations, these formulae
+  can be easily implemented on computers. Comparisons with previous studies
+  show their superiority in computation speed. Using the algorithm as a tool,
+  the planar problem of two ellipsoids is studied. Generally, potential
+  truncated at the second order is good enough for a qualitative description of
+  the mutual dynamics. However, for ellipsoids with very large non-spherical
+  terms, higher order terms of the potential should be considered, at the cost
+  of a higher computational cost. Explicit formulae of the potential truncated
+  to the fourth order are given.%
+    }
+    \field{issn}{0923-2958}
+    \field{note}{Copyright - Celestial Mechanics and Dynamical Astronomy is a
+  copyright of Springer, 2017.}
+    \field{number}{3}
+    \field{pages}{369\bibrangedash 395}
+    \field{title}{Mutual potential between two rigid bodies with arbitrary
+  shapes and mass distributions}
+    \verb{url}
+    \verb https://www.proquest.com/scholarly-journals/mutual-potential-between-
+    \verb two-rigid-bodies-with/docview/1867560429/se-2?accountid=12492
+    \endverb
+    \field{volume}{127}
+    \list{location}{1}{%
+      {Dordrecht}%
+    }
+    \field{journaltitle}{Celestial Mechanics and Dynamical Astronomy}
+    \field{year}{Mar 2017}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
+  \entry{kaasalainen2001interpretation}{article}{}
+    \name{author}{1}{}{%
+      {{hash=KM}{%
+         family={Kaasalainen},
+         familyi={K\bibinitperiod},
+         given={Mikko},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {EDP Sciences}%
+    }
+    \strng{namehash}{KM1}
+    \strng{fullhash}{KM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2001}
+    \field{labeldatesource}{}
+    \field{sortinit}{K}
+    \field{sortinithash}{K}
+    \field{number}{1}
+    \field{pages}{302\bibrangedash 309}
+    \field{title}{Interpretation of lightcurves of precessing asteroids}
+    \field{volume}{376}
+    \field{journaltitle}{Astronomy \& Astrophysics}
+    \field{year}{2001}
+  \endentry
+
+  \entry{paul88}{article}{}
+    \name{author}{1}{}{%
+      {{hash=PMK}{%
+         family={Paul},
+         familyi={P\bibinitperiod},
+         given={M.\bibnamedelima K.},
+         giveni={M\bibinitperiod\bibinitdelim K\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{PMK1}
+    \strng{fullhash}{PMK1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1988}
+    \field{labeldatesource}{}
+    \field{sortinit}{P}
+    \field{sortinithash}{P}
+    \verb{doi}
+    \verb 10.1007/BF01230706
+    \endverb
+    \field{issn}{1572-9478}
+    \field{number}{1}
+    \field{pages}{49\bibrangedash 59}
+    \field{title}{An expansion in power series of mutual potential for
+  gravitating bodies with finite sizes}
+    \field{volume}{44}
+    \field{journaltitle}{Celestial mechanics}
+    \field{year}{1988}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+\enddatalist
+\endinput
