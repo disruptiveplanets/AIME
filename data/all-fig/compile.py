@@ -60,14 +60,14 @@ specialized_y_labels = {
 }
 
 thresholds = {
-    "scan-perigee-sync": (10.05645830142579,),
-    "probe-s-theta": (0.15813979997110503,),
+    "scan-perigee-sync": (17.64784118356001,),
+    "probe-s-theta": (0.6113839751941476,),
     "scan-cadence":	(None,),
-    "scan-period-sync": (3.342475232084257,),
+    "scan-period-sync": (None),
     "scan-am": (None,),
     "scan-vex-sync": (None,),
     "observation-gap": (None,),
-    "probe-s-rho": (1.708724170502394e-06,),
+    "probe-s-rho": (8.228524489683316e-06,),
 }
 
 

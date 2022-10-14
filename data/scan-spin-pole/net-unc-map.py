@@ -10,7 +10,7 @@ xyzs = []
 theta_phis = []
 
 PULL = False
-THRESHOLD = 0.0005369031978644279
+THRESHOLD = 0.001#05369031978644279
 
 if PULL:
     os.system("scp jdinsmore@txe1-login.mit.edu:asteroid-tidal-torque/code/thresholds/lumpy/scan-spin-pole.npy .")

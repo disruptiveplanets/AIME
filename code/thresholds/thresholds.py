@@ -70,7 +70,7 @@ DIRECTORIES = [
     "lumpy",
 ]
 
-THRESHOLDS = ((0.0005369031978644279, "solid", "threshold"),)
+THRESHOLDS = ((0.001, "solid", "threshold"),)
 
 if PULL:
     for directory in DIRECTORIES:
@@ -182,7 +182,7 @@ for directory in DIRECTORIES:
             axs[i].set_xticks(perigee_tick_poses)
             axs[i].set_xticklabels([str(p) for p in perigee_tick_poses])
         if i % 4 == 0:
-            axs[i].set_ylabel("$\sigma_\\rho / \\rho$")
+            axs[i].set_ylabel("$\\langle \sigma_\\rho / \\rho \\rangle$")
 
 fig.legend([handles["lumpy"], handles["fe"], handles["threshold"]], ["Lumpy", "Finite element", "Threshold"], loc="upper center", ncol=3, bbox_to_anchor=(0.5,1.1))
 axs[7].annotate('', xy=(0.9, 0.9), xycoords='axes fraction', xytext=(0.9, 0.4), 
