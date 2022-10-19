@@ -1,0 +1,198 @@
+\begin{thebibliography}{}
+\makeatletter
+\relax
+\def\mn@urlcharsother{\let\do\@makeother \do\$\do\&\do\#\do\^\do\_\do\%\do\~}
+\def\mn@doi{\begingroup\mn@urlcharsother \@ifnextchar [ {\mn@doi@}
+  {\mn@doi@[]}}
+\def\mn@doi@[#1]#2{\def\@tempa{#1}\ifx\@tempa\@empty \href
+  {http://dx.doi.org/#2} {doi:#2}\else \href {http://dx.doi.org/#2} {#1}\fi
+  \endgroup}
+\def\mn@eprint#1#2{\mn@eprint@#1:#2::\@nil}
+\def\mn@eprint@arXiv#1{\href {http://arxiv.org/abs/#1} {{\tt arXiv:#1}}}
+\def\mn@eprint@dblp#1{\href {http://dblp.uni-trier.de/rec/bibtex/#1.xml}
+  {dblp:#1}}
+\def\mn@eprint@#1:#2:#3:#4\@nil{\def\@tempa {#1}\def\@tempb {#2}\def\@tempc
+  {#3}\ifx \@tempc \@empty \let \@tempc \@tempb \let \@tempb \@tempa \fi \ifx
+  \@tempb \@empty \def\@tempb {arXiv}\fi \@ifundefined
+  {mn@eprint@\@tempb}{\@tempb:\@tempc}{\expandafter \expandafter \csname
+  mn@eprint@\@tempb\endcsname \expandafter{\@tempc}}}
+
+\bibitem[\protect\citeauthoryear{Ashenberg}{Ashenberg}{2007}]{ashenberg07}
+Ashenberg J.,  2007, \mn@doi [Celestial Mechanics and Dynamical Astronomy]
+  {10.1007/s10569-007-9092-7}, 99, 149
+
+\bibitem[\protect\citeauthoryear{Benson, Scheeres  \& Moskovitz}{Benson
+  et~al.}{2020}]{benson2020spin}
+Benson C.~J.,  Scheeres D.~J.,   Moskovitz N.~A.,  2020, Icarus, 340, 113518
+
+\bibitem[\protect\citeauthoryear{Berthier et~al.,}{Berthier
+  et~al.}{2020}]{BERTHIER2020113990}
+Berthier J.,  et~al., 2020, \mn@doi [Icarus]
+  {https://doi.org/10.1016/j.icarus.2020.113990}, 352, 113990
+
+\bibitem[\protect\citeauthoryear{Boué \& Laskar}{Boué \&
+  Laskar}{2009}]{BOUE2009750}
+Boué G.,  Laskar J.,  2009, \mn@doi [Icarus]
+  {https://doi.org/10.1016/j.icarus.2009.02.001}, 201, 750
+
+\bibitem[\protect\citeauthoryear{Brown et~al.,}{Brown
+  et~al.}{2013}]{brown2013cumbres}
+Brown T.,  et~al., 2013, Publications of the Astronomical Society of the
+  Pacific, 125, 1031
+
+\bibitem[\protect\citeauthoryear{Carroll \& Faber}{Carroll \&
+  Faber}{2018}]{carroll2018tidal}
+Carroll K.,  Faber D.,  2018, in Proceedings of the 69th International
+  Astronautical Congress.
+
+\bibitem[\protect\citeauthoryear{Descamps et~al.,}{Descamps
+  et~al.}{2020}]{DESCAMPS2020113726}
+Descamps P.,  et~al., 2020, \mn@doi [Icarus]
+  {https://doi.org/10.1016/j.icarus.2020.113726}, 345, 113726
+
+\bibitem[\protect\citeauthoryear{Devogèle et~al.,}{Devogèle
+  et~al.}{2021}]{10.1093/mnras/stab1252}
+Devogèle M.,  et~al., 2021, \mn@doi [Monthly Notices of the Royal Astronomical
+  Society] {10.1093/mnras/stab1252}, 505, 245
+
+\bibitem[\protect\citeauthoryear{Foreman-Mackey, Hogg, Lang  \&
+  Goodman}{Foreman-Mackey et~al.}{2013}]{foreman2013emcee}
+Foreman-Mackey D.,  Hogg D.~W.,  Lang D.,   Goodman J.,  2013, Publications of
+  the Astronomical Society of the Pacific, 125, 306
+
+\bibitem[\protect\citeauthoryear{Gao \& Han}{Gao \& Han}{2012}]{Gao2012}
+Gao F.,  Han L.,  2012, \mn@doi [Computational Optimization and Applications]
+  {10.1007/s10589-010-9329-3}, 51, 259
+
+\bibitem[\protect\citeauthoryear{Giorgini, Benner, Nolan  \& Ostro}{Giorgini
+  et~al.}{2005}]{giorgini2005recent}
+Giorgini J.,  Benner L.,  Nolan M.,   Ostro S.,  2005, in AAS/Division of
+  Dynamical Astronomy Meeting\# 36. pp 02--01
+
+\bibitem[\protect\citeauthoryear{Giorgini, Benner, Ostro, Nolan  \&
+  Busch}{Giorgini et~al.}{2008}]{giorgini2008predicting}
+Giorgini J.~D.,  Benner L.~A.,  Ostro S.~J.,  Nolan M.~C.,   Busch M.~W.,
+  2008, Icarus, 193, 1
+
+\bibitem[\protect\citeauthoryear{Hirabayashi, Kim  \& Brozovi{\'c}}{Hirabayashi
+  et~al.}{2021}]{hirabayashi2021finite}
+Hirabayashi M.,  Kim Y.,   Brozovi{\'c} M.,  2021, Icarus, 365, 114493
+
+\bibitem[\protect\citeauthoryear{Hou, Scheeres  \& Xin}{Hou
+  et~al.}{2017}]{HouMar2017}
+Hou X.,  Scheeres D.~J.,   Xin X.,  Mar 2017, Celestial Mechanics and Dynamical
+  Astronomy, 127, 369
+
+\bibitem[\protect\citeauthoryear{Kaasalainen}{Kaasalainen}{2001}]{kaasalainen2001interpretation}
+Kaasalainen M.,  2001, Astronomy \& Astrophysics, 376, 302
+
+\bibitem[\protect\citeauthoryear{Kaiser et~al.,}{Kaiser
+  et~al.}{2002}]{kaiser2002pan}
+Kaiser N.,  et~al., 2002, in Survey and Other Telescope Technologies and
+  Discoveries. pp 154--164
+
+\bibitem[\protect\citeauthoryear{Larson, Brownlee, Hergenrother  \&
+  Spahr}{Larson et~al.}{1998}]{larson1998catalina}
+Larson S.,  Brownlee J.,  Hergenrother C.,   Spahr T.,  1998, in Bulletin of
+  the American Astronomical Society. p.~1037
+
+\bibitem[\protect\citeauthoryear{Lee et~al.,}{Lee
+  et~al.}{2022}]{Lee2022Apophis}
+Lee H.-J.,  et~al., 2022, Astronomy \& Astrophysics, 661, L3
+
+\bibitem[\protect\citeauthoryear{Makarov, Goldin, Tkachenko, Veras  \&
+  Noyelles}{Makarov et~al.}{2022}]{Makarov2022ChaosOO}
+Makarov V.~V.,  Goldin A.,  Tkachenko A.~V.,  Veras D.,   Noyelles B.,  2022,
+  Monthly Notices of the Royal Astronomical Society, 513, 2076
+
+\bibitem[\protect\citeauthoryear{Moskovitz et~al.,}{Moskovitz
+  et~al.}{2020}]{MOSKOVITZ2020113519}
+Moskovitz N.~A.,  et~al., 2020, \mn@doi [Icarus]
+  {https://doi.org/10.1016/j.icarus.2019.113519}, 340, 113519
+
+\bibitem[\protect\citeauthoryear{Naidu \& Margot}{Naidu \&
+  Margot}{2015}]{Naidu_2015}
+Naidu S.~P.,  Margot J.-L.,  2015, \mn@doi [The Astronomical Journal]
+  {10.1088/0004-6256/149/2/80}, 149, 80
+
+\bibitem[\protect\citeauthoryear{Pater \& Lissauer}{Pater \&
+  Lissauer}{2015}]{paterLissauer2015}
+Pater D.~I.,  Lissauer J.~J.,  2015, Planetary sciences, 2 edn.
+Cambridge University Press
+
+\bibitem[\protect\citeauthoryear{Paul}{Paul}{1988}]{paul88}
+Paul M.~K.,  1988, \mn@doi [Celestial mechanics] {10.1007/BF01230706}, 44, 49
+
+\bibitem[\protect\citeauthoryear{Pravec et~al.,}{Pravec
+  et~al.}{2014}]{PRAVEC201448}
+Pravec P.,  et~al., 2014, \mn@doi [Icarus]
+  {https://doi.org/10.1016/j.icarus.2014.01.026}, 233, 48
+
+\bibitem[\protect\citeauthoryear{Richardson, Bottke  \& Love}{Richardson
+  et~al.}{1998}]{RICHARDSON199847}
+Richardson D.~C.,  Bottke W.~F.,   Love S.~G.,  1998, \mn@doi [Icarus]
+  {https://doi.org/10.1006/icar.1998.5954}, 134, 47
+
+\bibitem[\protect\citeauthoryear{Richardson, Melosh, Greenberg  \&
+  O'Brien}{Richardson et~al.}{2005}]{RICHARDSON2005325}
+Richardson J.~E.,  Melosh H.~J.,  Greenberg R.~J.,   O'Brien D.~P.,  2005,
+  \mn@doi [Icarus] {https://doi.org/10.1016/j.icarus.2005.07.005}, 179, 325
+
+\bibitem[\protect\citeauthoryear{Scheeres, Ostro, Werner, Asphaug  \&
+  Hudson}{Scheeres et~al.}{2000}]{SCHEERES2000106}
+Scheeres D.,  Ostro S.,  Werner R.,  Asphaug E.,   Hudson R.,  2000, \mn@doi
+  [Icarus] {https://doi.org/10.1006/icar.2000.6443}, 147, 106
+
+\bibitem[\protect\citeauthoryear{Scheeres, Marzari  \& Rossi}{Scheeres
+  et~al.}{2004}]{scheeres2004evolution}
+Scheeres D.~J.,  Marzari F.,   Rossi A.,  2004, Icarus, 170, 312
+
+\bibitem[\protect\citeauthoryear{Smalley, Garradd, Benner, Nolan, Giorgini,
+  Chesley, Ostro  \& Scheeres}{Smalley et~al.}{2005}]{smalley20052004}
+Smalley K.,  Garradd G.,  Benner L.,  Nolan M.,  Giorgini J.,  Chesley S.,
+  Ostro S.,   Scheeres D.,  2005, International Astronomical Union Circular,
+  8477, 1
+
+\bibitem[\protect\citeauthoryear{Souchay, Souami, Lhotka, Puente  \&
+  Folgueira}{Souchay et~al.}{2014}]{souchay2014rotational}
+Souchay J.,  Souami D.,  Lhotka C.,  Puente V.,   Folgueira M.,  2014,
+  Astronomy \& Astrophysics, 563, A24
+
+\bibitem[\protect\citeauthoryear{Souchay, Lhotka, Heron, Herve, Puente  \&
+  Lopez}{Souchay et~al.}{2018}]{souchay2018changes}
+Souchay J.,  Lhotka C.,  Heron G.,  Herve Y.,  Puente V.,   Lopez M.~F.,  2018,
+  Astronomy \& Astrophysics, 617, A74
+
+\bibitem[\protect\citeauthoryear{Stokes, Evans, Viggh, Shelly  \&
+  Pearce}{Stokes et~al.}{2000}]{stokes2000lincoln}
+Stokes G.~H.,  Evans J.~B.,  Viggh H.~E.,  Shelly F.~C.,   Pearce E.~C.,  2000,
+  Icarus, 148, 21
+
+\bibitem[\protect\citeauthoryear{Tyson}{Tyson}{2002}]{tyson2002large}
+Tyson J.~A.,  2002, Survey and Other Telescope Technologies and Discoveries,
+  4836, 10
+
+\bibitem[\protect\citeauthoryear{Valvano, Winter, Sfair, Machado~Oliveira,
+  Borderes-Motta  \& Moura}{Valvano et~al.}{2022}]{valvano2022apophis}
+Valvano G.,  Winter O.~C.,  Sfair R.,  Machado~Oliveira R.,  Borderes-Motta G.,
+    Moura T.,  2022, Monthly Notices of the Royal Astronomical Society, 510, 95
+
+\bibitem[\protect\citeauthoryear{Van~Gelderen}{Van~Gelderen}{1998}]{Gelderen1998TheSO}
+Van~Gelderen M.,  1998, DEOS Progress Letter, 98, 57
+
+\bibitem[\protect\citeauthoryear{Wright et~al.,}{Wright
+  et~al.}{2010}]{wright2010wide}
+Wright E.~L.,  et~al., 2010, The Astronomical Journal, 140, 1868
+
+\bibitem[\protect\citeauthoryear{Yu, Richardson, Michel, Schwartz  \&
+  Ballouz}{Yu et~al.}{2014}]{yu2014numerical}
+Yu Y.,  Richardson D.~C.,  Michel P.,  Schwartz S.~R.,   Ballouz R.-L.,  2014,
+  Icarus, 242, 82
+
+\bibitem[\protect\citeauthoryear{{de Wit, J.}, {Gillon, M.}, {Demory, B.-O.}
+  \& {Seager, S.}}{{de Wit, J.} et~al.}{2012}]{dewit2012}
+{de Wit, J.} {Gillon, M.} {Demory, B.-O.}  {Seager, S.} 2012, \mn@doi [A\&A]
+  {10.1051/0004-6361/201219060}, 548, A128
+
+\makeatother
+\end{thebibliography}
