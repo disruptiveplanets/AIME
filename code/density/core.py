@@ -280,3 +280,19 @@ class UncertaintyTracker:
         unc_tracker.density_map_square_sum = square_sum
         unc_tracker.num_maps = nums[0, 0, 0]
         return unc_tracker
+
+if __name__ == "__main__":
+    ELLIPSOID_AM = 1000
+    DIVISION = 19
+    k22a, k20a = -0.05200629, -0.2021978
+    blob_rad = 300
+    # ("two-lump", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.two_core(3, blob_rad, [0, 500, 0], 3, blob_rad, [0, -500, 0]), False),
+    asteroid = Asteroid("double-test", None, DIVISION, 2000,
+        Indicator.ell(ELLIPSOID_AM, k22a, k20a),
+        TrueShape.two_core(3, blob_rad, [0, 500, 0], 3, blob_rad, [0, -500, 0]),
+        None)
+    densities = asteroid.get_true_densities().astype(float)
+    densities[densities < 0.1] = np.nan
+    densities /= np.nanmean(densities)
+    make_slices(densities, asteroid.grid_line,
+        "$\\rho_\mathrm{true}$", 'plasma', f"test", None)

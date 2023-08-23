@@ -7,7 +7,7 @@
 #include "../sim/backend.hpp"
 #include "../sim/algebra.hpp"
 
-#define CADENCE 1200.0 // Seconds between record
+#define CADENCE 120.0 // Seconds between record
 
 int main(int argc, char* argv[]) {
     // Open files

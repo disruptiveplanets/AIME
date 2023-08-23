@@ -1,1 +1,1 @@
-g++ -DASTEROIDS_MAX_J=0 -DASTEROIDS_MAX_K=3 -Wall -std=c++17 ../sim/*.cpp main.cpp -o "bin/generate" -O3
+g++ -DASTEROIDS_MAX_J=0 -DASTEROIDS_MAX_K=2 -Wall -std=c++17 ../sim/*.cpp main.cpp -o "bin/generate" -O3

@@ -33,7 +33,7 @@ asteroids = [
     #("sph", Indicator.sph(ELLIPSOID_AM), lambda x,y,z: 1),
     #("ells", Indicator.ell(ELLIPSOID_AM, k22s, k20s), lambda x,y,z: 1),
     #("ella", Indicator.ell(ELLIPSOID_AM, k22a, k20a), lambda x,y,z: 1, False),
-    #("tet", Indicator.tet(ELLIPSOID_AM), lambda x,y,z: 1),
+    # ("tet", Indicator.tet(ELLIPSOID_AM), lambda x,y,z: 1),
     #("db", Indicator.dumbbell(ELLIPSOID_AM), lambda x,y,z: 1),
     #("in", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.in_(ELLIPSOID_AM)),
     #("out", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.out(ELLIPSOID_AM)),
@@ -49,9 +49,9 @@ asteroids = [
     #("moved-high", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_high), TrueShape.uniform(), True),
     # ("two-lump", Indicator.ell(ELLIPSOID_AM, k22a, k20a), TrueShape.two_core(3, blob_rad, [0, 500, 0], 3, blob_rad, [0, -500, 0]), False),
 
-    ("core-move-1.5", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.core_shift(1.5, core_rad, core_displacement), True),
+    # ("core-move-1.5", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.core_shift(1.5, core_rad, core_displacement), True),
 
-    ("smooth", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.smooth_y(ELLIPSOID_AM, k22a, k20a, core_shift_low), True),
+    # ("smooth", Indicator.ell_y_shift(ELLIPSOID_AM, k22a, k20a, -core_shift_low), TrueShape.smooth_y(ELLIPSOID_AM, k22a, k20a, core_shift_low), True),
 ]
 
 def get_klms(index):

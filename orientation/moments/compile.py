@@ -110,6 +110,44 @@ def make_unc():
     fig.savefig("unc-compare.png", bbox_inches="tight")
     fig.savefig("unc-compare.pdf", bbox_inches="tight")
 
+def make_unc_ang_vel():
+    OFFSET = 0
+    WIDTH = 0.7
+    fig = plt.figure(figsize=(5, 8.5))
+    ax_2 = plt.subplot2grid((10+OFFSET, 1), (0, 0), rowspan=3)
+    ax_3 = plt.subplot2grid((10+OFFSET, 1), (3+OFFSET, 0), rowspan=7)
+    
+    vel_means = np.mean(vel_moments, axis=0)
+
+    mask_2 = [2, 1, 0]
+    mask_3 = [9, 8, 7, 6, 5, 4, 3]
+    handles = {}
+    for (mask, ax) in zip([mask_2, mask_3], [ax_2, ax_3]):
+        xs = np.arange(1, len(mask) + 1)
+        parts1 = ax.violinplot(np.flip(vel_moments[:,mask] - TRUES[mask], axis=0), showextrema=False, widths=WIDTH, vert=False)
+        parts2 = ax.violinplot(np.flip(vel_moments[:,mask] - TRUES[mask], axis=0), showextrema=False, widths=WIDTH, vert=False)
+        handles['vel'] = ax.scatter(vel_means[mask] - TRUES[mask], xs, marker='|', c="C0", s=48)
+        for pc in parts1['bodies']:
+            pc.set_facecolor('C0')
+        for pc in parts2['bodies']:
+            pc.set_facecolor('none')
+            pc.set_edgecolor('C0')
+            pc.set_alpha(1.0)
+
+        ax.set_yticks(xs)
+        ax.set_yticklabels([f"${f}$" for f in param_names[mask]])
+
+    ax_2.set_xlim(-2.5e-5, 2.5e-5)
+    ax_3.set_xlim(-0.3, 0.3)
+    ax_2.set_ylim(0.5, 3.5)
+    ax_3.set_ylim(0.5, 7.5)
+    ax_3.set_xlabel("PPDs (centred on true values)")
+
+    fig.tight_layout()
+    fig.savefig("unc-compare-ang-vel.png", bbox_inches="tight")
+    fig.savefig("unc-compare-ang-vel.pdf", bbox_inches="tight")
+
 if __name__ == "__main__":
-    make_unc()
+    # make_unc()
+    make_unc_ang_vel()
     # plt.show()
